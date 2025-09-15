@@ -1,4 +1,3 @@
-
 /* ==== Base Styles ==== */
 
 body {
@@ -39,13 +38,21 @@ body {
 
 }
 
+
+
 .nav-container {
 
   display: flex;
 
-  justify-content: space-between;
+  justify-content: space-between; /* توزيع العناصر يمين ويسار */
 
   align-items: center;
+
+  max-width: 1200px;
+
+  margin: auto;
+
+  padding: 0 20px;
 
 }
 
@@ -55,21 +62,35 @@ body {
 
 .logo img {
 
-  height: 150px;
+  height: 140px; /* تكبير الشعار */
+
+  max-height: 140px;
 
   width: auto;
 
   object-fit: contain;
 
+  display: block;
+
+  margin: 0;
+
+  padding: 0;
+
   transition: height 0.3s ease;
 
 }
+
+
+
+/* موبايل */
 
 @media (max-width: 768px) {
 
   .logo img {
 
-    height: 88px;
+    height: 90px;
+
+    max-height: 90px;
 
   }
 
@@ -313,7 +334,7 @@ body {
 
 
 
-/* Mobile Responsive Adjustments */
+/* ==== Mobile Adjustments ==== */
 
 @media (max-width: 768px) {
 
