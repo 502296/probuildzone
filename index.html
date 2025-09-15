@@ -11,25 +11,27 @@
 
   <title>ProBuildZone</title>
 
-  <link rel="stylesheet" href="style.css"/>
+  <!-- v=3 لكسر الكاش على الجوال بدون تغيير تصميم الديسكتوب -->
+
+  <link rel="stylesheet" href="style.css?v=3">
 
 </head>
 
 <body>
 
-  <!-- Navigation -->
+  <!-- Navbar (يبقى كما في الديسكتوب) -->
 
   <header class="navbar">
 
-    <img src="images/logo.png" alt="ProBuildZone Logo" class="logo">
+    <img src="images/logo.png" alt="ProBuildZone Logo" class="logo" />
 
     <nav>
 
-      <a href="#">How it works</a>
+      <a href="#how">How it works</a>
 
-      <a href="#">Services</a>
+      <a href="#services">Services</a>
 
-      <a href="#" class="for-pros">For Pros</a>
+      <a href="#post" class="for-pros">For Pros</a>
 
     </nav>
 
@@ -47,19 +49,23 @@
 
       <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
+
+
       <div class="buttons">
 
-        <a href="#" class="btn primary">Post a Job (Free)</a>
+        <a href="#post" class="btn primary">Post a Job (Free)</a>
 
-        <a href="#" class="btn secondary">View Services</a>
+        <a href="#services" class="btn secondary">View Services</a>
 
       </div>
 
+
+
       <div class="job-id">
 
-        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
+        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)" aria-label="Enter Job ID">
 
-        <button class="go-btn">Go</button>
+        <button class="go-btn" aria-label="Go">Go</button>
 
       </div>
 
