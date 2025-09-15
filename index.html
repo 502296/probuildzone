@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -11,27 +10,31 @@
 
   <title>ProBuildZone</title>
 
-  <!-- v=3 لكسر الكاش على الجوال بدون تغيير تصميم الديسكتوب -->
-
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css"/>
 
 </head>
 
 <body>
 
-  <!-- Navbar (يبقى كما في الديسكتوب) -->
-
-  <header class="navbar">
-
-    <img src="images/logo.png" alt="ProBuildZone Logo" class="logo" />
+  <header>
 
     <nav>
 
-      <a href="#how">How it works</a>
+      <div class="logo">
 
-      <a href="#services">Services</a>
+        <img src="images/logo.png" alt="ProBuildZone Logo">
 
-      <a href="#post" class="for-pros">For Pros</a>
+      </div>
+
+      <ul>
+
+        <li><a href="#">How it works</a></li>
+
+        <li><a href="#">Services</a></li>
+
+        <li><a href="#" class="pro-btn">For Pros</a></li>
+
+      </ul>
 
     </nav>
 
@@ -39,33 +42,27 @@
 
 
 
-  <!-- Hero Section -->
+  <section class="hero">
 
-  <section class="hero-section">
-
-    <div class="hero-content">
+    <div class="overlay">
 
       <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
       <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-
-
       <div class="buttons">
 
-        <a href="#post" class="btn primary">Post a Job (Free)</a>
+        <a href="#" class="btn primary">Post a Job (Free)</a>
 
-        <a href="#services" class="btn secondary">View Services</a>
+        <a href="#" class="btn secondary">View Services</a>
 
       </div>
 
-
-
       <div class="job-id">
 
-        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)" aria-label="Enter Job ID">
+        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
 
-        <button class="go-btn" aria-label="Go">Go</button>
+        <button>Go</button>
 
       </div>
 
