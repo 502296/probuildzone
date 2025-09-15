@@ -1,4 +1,3 @@
-
 /* Base Styles */
 
 body {
@@ -51,11 +50,33 @@ body {
 
 }
 
+
+
+/* Logo */
+
 .logo img {
 
-  height: 50px;
+  height: 150px; /* حجم كبير للكمبيوتر */
+
+  transition: height 0.3s ease;
 
 }
+
+
+
+/* للشاشات الصغيرة (موبايل) */
+
+@media (max-width: 768px) {
+
+  .logo img {
+
+    height: 80px; /* حجم أصغر للموبايل */
+
+  }
+
+}
+
+
 
 .nav a {
 
