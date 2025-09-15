@@ -1,44 +1,41 @@
+
 <!DOCTYPE html>
 
 <html lang="en">
 
 <head>
 
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>Home Service Platform</title>
+  <title>ProBuildZone</title>
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-  <!-- ===== Header / Navbar ===== -->
+  <!-- Navbar -->
 
-  <header class="site-header">
+  <header class="navbar">
 
-    <div class="container header-row">
+    <div class="container nav-container">
 
-      <a class="brand" href="/">
+      <a href="/" class="logo">
 
-        <span class="brand__mark" aria-hidden="true">●</span>
-
-        <span class="brand__name">YourPlatform</span>
+        <img src="images/logo.png" alt="ProBuildZone Logo">
 
       </a>
 
+      <nav class="nav">
 
+        <a href="#how">How it works</a>
 
-      <nav class="nav" aria-label="Primary">
+        <a href="#services">Services</a>
 
-        <a class="nav__link" href="#how">How it works</a>
-
-        <a class="nav__link" href="#services">Services</a>
-
-        <a class="nav__cta btn btn--primary" href="#book">Book now</a>
+        <a href="#post" class="btn btn--pro">For Pros</a>
 
       </nav>
 
@@ -48,223 +45,43 @@
 
 
 
-  <!-- ===== Hero ===== -->
+  <!-- Hero Section -->
 
-  <main>
+  <section class="hero">
 
-    <section class="hero">
+    <div class="container">
 
-      <div class="container hero__grid">
+      <h1 class="hero__title">Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
-        <div class="hero__text">
+      <p class="hero__subtitle">Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-          <h1 class="hero__title">Get home projects done — calmly.</h1>
+      <div class="hero__buttons">
 
-          <p class="hero__subtitle">
+        <a class="btn btn--primary" href="#post">Post a Job (Free)</a>
 
-            Simple, trusted, and fast. Pick a service, choose a time, and we’ll handle the rest.
-
-          </p>
-
-          <div class="hero__actions">
-
-            <a class="btn btn--primary" href="#book">Book an appointment</a>
-
-            <a class="btn btn--ghost" href="#services">View services</a>
-
-          </div>
-
-        </div>
-
-        <div class="hero__media" aria-hidden="true"></div>
+        <a class="btn btn--ghost" href="#services">View Services</a>
 
       </div>
 
-    </section>
+      <!-- Job ID Feature -->
 
+      <div class="track-job">
 
+        <form class="track-job__form" onsubmit="return false">
 
-    <!-- ===== Trust Bar (minimal) ===== -->
+          <input type="text" class="track-job__input" placeholder="Enter Job ID (e.g., FH-99999)">
 
-    <section class="trust">
-
-      <div class="container trust__row">
-
-        <div class="trust__item">✔ Vetted Pros</div>
-
-        <div class="trust__item">✔ Upfront Pricing</div>
-
-        <div class="trust__item">✔ Free Rescheduling</div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===== Services (3 minimal cards) ===== -->
-
-    <section id="services" class="section">
-
-      <div class="container">
-
-        <h2 class="section__title">Popular services</h2>
-
-        <div class="cards">
-
-          <article class="card">
-
-            <h3 class="card__title">Repairs</h3>
-
-            <p class="card__text">Quick fixes for home essentials.</p>
-
-            <a class="card__link" href="#book">Choose</a>
-
-          </article>
-
-          <article class="card">
-
-            <h3 class="card__title">Installations</h3>
-
-            <p class="card__text">From fixtures to appliances.</p>
-
-            <a class="card__link" href="#book">Choose</a>
-
-          </article>
-
-          <article class="card">
-
-            <h3 class="card__title">Upgrades</h3>
-
-            <p class="card__text">Refresh spaces with ease.</p>
-
-            <a class="card__link" href="#book">Choose</a>
-
-          </article>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===== How it works (3 steps) ===== -->
-
-    <section id="how" class="section section--soft">
-
-      <div class="container">
-
-        <h2 class="section__title">How it works</h2>
-
-        <ol class="steps">
-
-          <li class="steps__item"><strong>Book</strong> your service & time.</li>
-
-          <li class="steps__item"><strong>Confirm</strong> details in one message.</li>
-
-          <li class="steps__item"><strong>Relax</strong> while a vetted pro gets it done.</li>
-
-        </ol>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===== Minimal booking anchor (placeholder) ===== -->
-
-    <section id="book" class="section">
-
-      <div class="container book">
-
-        <h2 class="section__title">Book now</h2>
-
-        <form class="book__form" action="#" method="post" onsubmit="return false">
-
-          <label class="field">
-
-            <span class="field__label">Service</span>
-
-            <select class="field__control">
-
-              <option>Repairs</option>
-
-              <option>Installations</option>
-
-              <option>Upgrades</option>
-
-            </select>
-
-          </label>
-
-
-
-          <label class="field">
-
-            <span class="field__label">ZIP code</span>
-
-            <input class="field__control" type="text" inputmode="numeric" placeholder="e.g., 40202" />
-
-          </label>
-
-
-
-          <label class="field">
-
-            <span class="field__label">Preferred time</span>
-
-            <input class="field__control" type="datetime-local" />
-
-          </label>
-
-
-
-          <button class="btn btn--primary" type="submit">Request appointment</button>
+          <button type="submit" class="btn btn--primary">Go</button>
 
         </form>
 
+        <p class="track-job__note">Enter your project ID to view offers securely.</p>
+
       </div>
-
-    </section>
-
-  </main>
-
-
-
-  <!-- ===== Footer ===== -->
-
-  <footer class="site-footer">
-
-    <div class="container footer__row">
-
-      <small>© <span id="y"></span> YourPlatform</small>
-
-      <nav class="footer__nav" aria-label="Footer">
-
-        <a href="#">Terms</a>
-
-        <a href="#">Privacy</a>
-
-        <a href="#contact">Contact</a>
-
-      </nav>
 
     </div>
 
-  </footer>
-
-
-
-  <script>
-
-    // small enhancement: current year, no framework
-
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-  </script>
+  </section>
 
 </body>
 
