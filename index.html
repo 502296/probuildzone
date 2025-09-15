@@ -11,35 +11,27 @@
 
   <title>ProBuildZone</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 
 </head>
 
 <body>
 
-  <!-- Navbar -->
+  <!-- Navigation -->
 
   <header class="navbar">
 
-    <div class="container nav-container">
+    <img src="images/logo.png" alt="ProBuildZone Logo" class="logo">
 
-      <a href="/" class="logo">
+    <nav>
 
-        <img src="images/logo.png" alt="ProBuildZone Logo">
+      <a href="#">How it works</a>
 
-      </a>
+      <a href="#">Services</a>
 
-      <nav class="nav">
+      <a href="#" class="for-pros">For Pros</a>
 
-        <a href="#how">How it works</a>
-
-        <a href="#services">Services</a>
-
-        <a href="#post" class="btn btn--pro">For Pros</a>
-
-      </nav>
-
-    </div>
+    </nav>
 
   </header>
 
@@ -47,41 +39,27 @@
 
   <!-- Hero Section -->
 
-  <section class="hero">
+  <section class="hero-section">
 
-    <div class="container">
+    <div class="hero-content">
 
-      <h1 class="hero__title">Get Home Projects Done — Fair Prices, Local Pros.</h1>
+      <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
-      <p class="hero__subtitle">Post your project with photos. Local contractors send offers. You choose the best match.</p>
+      <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-      
+      <div class="buttons">
 
-      <!-- Buttons -->
+        <a href="#" class="btn primary">Post a Job (Free)</a>
 
-      <div class="hero__buttons">
-
-        <a class="btn btn--primary" href="#post">Post a Job (Free)</a>
-
-        <a class="btn btn--ghost" href="#services">View Services</a>
+        <a href="#" class="btn secondary">View Services</a>
 
       </div>
 
+      <div class="job-id">
 
+        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
 
-      <!-- Job ID Feature -->
-
-      <div class="track-job">
-
-        <form class="track-job__form" onsubmit="return false">
-
-          <input type="text" class="track-job__input" placeholder="Enter Job ID (e.g., FH-99999)">
-
-          <button type="submit" class="btn btn--primary">Go</button>
-
-        </form>
-
-        <p class="track-job__note">Enter your project ID to view offers securely.</p>
+        <button class="go-btn">Go</button>
 
       </div>
 
