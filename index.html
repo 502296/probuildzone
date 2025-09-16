@@ -20,6 +20,54 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+
+
+  <!-- Extra styles for legal cards + stronger logo colors -->
+
+  <style>
+
+    /* Stronger logo colors */
+
+    :root{
+
+      --logo-base:#0F2A43;    /* dark blue */
+
+      --logo-accent:#F28C1B;  /* strong orange */
+
+      --logo-em:#E63946;      /* warm red */
+
+    }
+
+    .brand-logo{font-weight:800;font-size:24px;color:var(--logo-base);letter-spacing:.2px;text-shadow:0 1px 0 rgba(0,0,0,.05)}
+
+    .brand-logo span{color:var(--logo-accent)}
+
+    .brand-logo em{color:var(--logo-em);font-style:normal}
+
+
+
+    /* Legal links section */
+
+    .legal-links{padding:40px 16px;background:#f7f9fc;border-top:1px solid rgba(0,0,0,.06)}
+
+    .legal-links h2{margin:0 0 6px;text-align:center}
+
+    .legal-links .mega-sub{margin:0 0 22px;text-align:center;color:#5b6b7f}
+
+    .legal-wrap{max-width:1100px;margin:0 auto;display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
+
+    @media (max-width:800px){.legal-wrap{grid-template-columns:1fr}}
+
+    .legal-card{display:flex;align-items:center;gap:12px;padding:18px 20px;border-radius:14px;text-decoration:none;color:#132033;background:#fff;border:1px solid rgba(0,0,0,.07);transition:transform .15s, box-shadow .15s, border-color .15s}
+
+    .legal-card i{font-size:22px;opacity:.9}
+
+    .legal-card span{font-weight:600;letter-spacing:.2px}
+
+    .legal-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.08);border-color:rgba(0,0,0,.12)}
+
+  </style>
+
 </head>
 
 
@@ -68,7 +116,7 @@
 
         <a href="#services" class="btn secondary">View Services</a>
 
-        <!-- زر الباب الواحد -->
+        <!-- Single “Upload Door” button -->
 
         <button class="btn" id="openDoor" style="margin-left:8px">Open Upload Door</button>
 
@@ -90,345 +138,53 @@
 
 
 
-  <!-- Mega Categories (القسم القديم) -->
+  <!-- ===== Replaced old 12-cards section with legal/info cards ===== -->
 
-  <section id="services" class="mega-categories">
+  <section class="legal-links" id="services">
 
-    <h2>Home Project Categories</h2>
+    <h2>Explore More</h2>
 
-    <p class="mega-sub">Pick a category — upload photos and local pros will send offers.</p>
+    <p class="mega-sub">Learn about our services, privacy practices, and terms.</p>
 
 
 
-    <!-- أعطيناه id حتى نخفيه بالـCSS -->
+    <div class="legal-wrap">
 
-    <div class="mega-grid" id="old-services">
+      <a class="legal-card" href="services.html">
 
-      <!-- نفس بطاقاتك 1..12 كما هي (أبقيتها) -->
+        <i class="fa-solid fa-list-check"></i>
 
-      <!-- 1 -->
+        <span>Services</span>
 
-      <div class="cat">
+      </a>
 
-        <i class="fas fa-screwdriver-wrench"></i>
 
-        <h3>General Home Repairs</h3>
 
-        <p>Small fixes, handyman tasks, doors & windows.</p>
+      <a class="legal-card" href="privacy.html">
 
-        <div class="actions">
+        <i class="fa-solid fa-shield-halved"></i>
 
-          <label class="upload-btn">
+        <span>Privacy Policy</span>
 
-            <input type="file" accept="image/*" multiple>
+      </a>
 
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
-          </label>
 
-          <a href="#" class="cta">Post a Job</a>
+      <a class="legal-card" href="terms.html">
 
-        </div>
+        <i class="fa-solid fa-scale-balanced"></i>
 
-      </div>
+        <span>Terms of Service</span>
 
-      <!-- ... بقية البطاقات 2..12 بدون تغيير ... -->
-
-      <div class="cat">
-
-        <i class="fas fa-bolt"></i>
-
-        <h3>Electrical</h3>
-
-        <p>Outlets, lighting, panel work, troubleshooting.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-faucet"></i>
-
-        <h3>Plumbing</h3>
-
-        <p>Leaks, faucets, drains, water heaters.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-house-chimney"></i>
-
-        <h3>Roofing & Gutters</h3>
-
-        <p>Patch leaks, shingles, gutter install & clean.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-paint-roller"></i>
-
-        <h3>Painting</h3>
-
-        <p>Interior & exterior, prep and clean finishes.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-border-all"></i>
-
-        <h3>Flooring</h3>
-
-        <p>Hardwood, laminate, tile, repairs & install.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-seedling"></i>
-
-        <h3>Landscaping</h3>
-
-        <p>Yard cleanup, sod, mulch, seasonal care.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-fan"></i>
-
-        <h3>HVAC</h3>
-
-        <p>Heating & cooling tune-ups, repairs, installs.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-warehouse"></i>
-
-        <h3>Basement</h3>
-
-        <p>Waterproofing, repairs, finishing & remodeling.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-hammer"></i>
-
-        <h3>Carpentry</h3>
-
-        <p>Custom woodwork, framing, and repairs.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-door-open"></i>
-
-        <h3>Windows & Doors</h3>
-
-        <p>Install, replace, adjust & weatherproof.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="cat">
-
-        <i class="fas fa-plug"></i>
-
-        <h3>Appliances</h3>
-
-        <p>Installations & repairs for home appliances.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
+      </a>
 
     </div>
-
-
-
-    <a href="#" class="browse-all">Browse All Categories →</a>
 
   </section>
 
 
 
-  <!-- ===== Upload Door Modal (زر واحد) ===== -->
+  <!-- ===== Upload Door Modal (one button → 12 icons) ===== -->
 
   <div class="modal" id="modal" style="display:none">
 
@@ -478,7 +234,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
-  <script src="./app.umd.js?v=1"></script>
+  <script src="./app.umd.js?v=2"></script>
 
 </body>
 
