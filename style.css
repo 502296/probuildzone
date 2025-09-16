@@ -1,347 +1,241 @@
-/* Reset */
+<!DOCTYPE html>
 
-* {
+<html lang="en">
 
-  margin: 0;
+<head>
 
-  padding: 0;
+  <meta charset="UTF-8" />
 
-  box-sizing: border-box;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-}
+  <title>ProBuildZone — Fair Prices, Local Pros</title>
 
+  <meta name="description" content="Post your home project with photos. Local pros send offers. You choose the best match — fair prices, local professionals." />
 
+  <link rel="stylesheet" href="style.css?v=3"/>
 
-body {
+</head>
 
-  font-family: Arial, sans-serif;
+<body>
 
-  background: #fff;
+  <header>
 
-  color: #333;
+    <nav>
 
-}
+      <div class="logo">
 
+        <img src="images/logo.png" alt="ProBuildZone Logo">
 
+      </div>
 
-/* Navbar */
+      <ul>
 
-header {
+        <li><a href="#">How it works</a></li>
 
-  width: 100%;
+        <li><a href="#">Services</a></li>
 
-  position: absolute;
+        <li><a href="#" class="pro-btn">For Pros</a></li>
 
-  top: 0;
+      </ul>
 
-  left: 0;
+    </nav>
 
-  z-index: 10;
+  </header>
 
-  padding: 20px 40px;
 
-  transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
 
-}
+  <!-- ===== Hero ===== -->
 
-header.scrolled{
+  <section class="hero">
 
-  background: rgba(0,0,0,.35);
+    <div class="overlay">
 
-  backdrop-filter: blur(6px);
+      <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
-  -webkit-backdrop-filter: blur(6px);
+      <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-  box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      <div class="buttons">
 
-}
+        <a href="#" class="btn primary">Post a Job (Free)</a>
 
+        <a href="#" class="btn secondary">View Services</a>
 
+      </div>
 
-nav {
+      <div class="job-id">
 
-  display: flex;
+        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
 
-  justify-content: space-between;
+        <button>Go</button>
 
-  align-items: center;
+      </div>
 
-}
+    </div>
 
+  </section>
 
 
-.logo img {
 
-  height: 50px;
+  <!-- ===== Services ===== -->
 
-}
+  <section class="section services">
 
+    <div class="container">
 
+      <h2>Home Project Categories</h2>
 
-nav ul {
+      <p class="sub">Pick a category — local pros will send offers.</p>
 
-  display: flex;
 
-  list-style: none;
 
-  gap: 20px;
+      <div class="s-grid">
 
-}
+        <article class="s-card">
 
+          <div class="s-ico">🛠️</div>
 
+          <h3>General Home Repairs</h3>
 
-nav a {
+          <p>Small fixes, handyman tasks, doors & windows.</p>
 
-  text-decoration: none;
+          <a href="#" class="s-cta">Post a Job</a>
 
-  color: #fff;
+        </article>
 
-  font-weight: 600;
 
-}
 
+        <article class="s-card">
 
+          <div class="s-ico">💡</div>
 
-.pro-btn {
+          <h3>Electrical</h3>
 
-  background: #f6a623;
+          <p>Outlets, lighting, panel work, troubleshooting.</p>
 
-  padding: 8px 16px;
+          <a href="#" class="s-cta">Post a Job</a>
 
-  border-radius: 5px;
+        </article>
 
-  color: #000 !important;
 
-}
 
+        <article class="s-card">
 
+          <div class="s-ico">🚿</div>
 
-/* Hero Section */
+          <h3>Plumbing</h3>
 
-.hero {
+          <p>Leaks, faucets, drains, water heaters.</p>
 
-  height: 100vh;
+          <a href="#" class="s-cta">Post a Job</a>
 
-  background: url('./images/hero-bg.jpg') no-repeat center center/cover;
+        </article>
 
-  display: flex;
 
-  align-items: center;
 
-  justify-content: center;
+        <article class="s-card">
 
-  position: relative;
+          <div class="s-ico">🧱</div>
 
-  text-align: center;
+          <h3>Roofing & Gutters</h3>
 
-  overflow: hidden;
+          <p>Patch leaks, shingles, gutter install & clean.</p>
 
-}
+          <a href="#" class="s-cta">Post a Job</a>
 
-.overlay {
+        </article>
 
-  background: rgba(0, 0, 0, 0.45);
 
-  backdrop-filter: blur(4px);
 
-  -webkit-backdrop-filter: blur(4px);
+        <article class="s-card">
 
-  box-shadow: 0 16px 48px rgba(0,0,0,.35);
+          <div class="s-ico">🎨</div>
 
-  padding: 40px;
+          <h3>Painting</h3>
 
-  border-radius: 16px;
+          <p>Interior & exterior, prep and clean finishes.</p>
 
-  color: #fff;
+          <a href="#" class="s-cta">Post a Job</a>
 
-  max-width: 700px;
+        </article>
 
-}
 
 
+        <article class="s-card">
 
-/* Typography */
+          <div class="s-ico">🪵</div>
 
-.hero h1 {
+          <h3>Flooring</h3>
 
-  font-size: 2.5rem;
+          <p>Hardwood, laminate, tile, repairs & install.</p>
 
-  margin-bottom: 20px;
+          <a href="#" class="s-cta">Post a Job</a>
 
-}
+        </article>
 
-.hero p {
 
-  font-size: 1.2rem;
 
-  margin-bottom: 30px;
+        <article class="s-card">
 
-}
+          <div class="s-ico">🌿</div>
 
+          <h3>Landscaping</h3>
 
+          <p>Yard cleanup, sod, mulch, seasonal care.</p>
 
-/* Buttons */
+          <a href="#" class="s-cta">Post a Job</a>
 
-.buttons {
+        </article>
 
-  display: flex;
 
-  justify-content: center;
 
-  gap: 20px;
+        <article class="s-card">
 
-  margin-bottom: 20px;
+          <div class="s-ico">❄️</div>
 
-}
+          <h3>HVAC</h3>
 
-.btn {
+          <p>Heating & cooling tune-ups, repairs, installs.</p>
 
-  padding: 12px 20px;
+          <a href="#" class="s-cta">Post a Job</a>
 
-  border-radius: 5px;
+        </article>
 
-  text-decoration: none;
+      </div>
 
-  font-weight: bold;
 
-  font-size: 1rem;
 
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+      <div class="browse-all">
 
-  box-shadow: 0 6px 14px rgba(0,0,0,.18);
+        <a href="#" class="browse-btn">Browse All Categories →</a>
 
-}
+      </div>
 
-.btn:focus{ outline: 3px solid rgba(255,255,255,.65); outline-offset: 2px; }
+    </div>
 
-.primary { background: #007bff; color: #fff; }
+  </section>
 
-.secondary { background: transparent; color: #fff; border: 2px solid #fff; }
 
-.primary:hover{ transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,123,255,.35); }
 
-.primary:active{ transform: translateY(0); box-shadow: 0 6px 14px rgba(0,123,255,.25); }
+  <script>
 
-.secondary:hover{ transform: translateY(-2px); box-shadow: 0 12px 24px rgba(255,255,255,.25); background: rgba(255,255,255,.08); }
+    // Navbar on scroll
 
-.secondary:active{ transform: translateY(0); }
+    const header = document.querySelector('header');
 
+    const onScroll = () => {
 
+      if (window.scrollY > 8) header.classList.add('scrolled');
 
-/* Job ID form */
+      else header.classList.remove('scrolled');
 
-.job-id {
+    };
 
-  display: flex;
+    window.addEventListener('scroll', onScroll);
 
-  justify-content: center;
+    onScroll();
 
-  gap: 10px;
+  </script>
 
-}
+</body>
 
-.job-id input {
-
-  padding: 10px;
-
-  border-radius: 5px;
-
-  border: none;
-
-  width: 220px;
-
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.25);
-
-}
-
-.job-id button {
-
-  padding: 10px 15px;
-
-  border: none;
-
-  background: #007bff;
-
-  color: white;
-
-  border-radius: 5px;
-
-  font-weight: bold;
-
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
-
-}
-
-.job-id button:hover{ transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,123,255,.32); }
-
-
-
-/* Animations */
-
-@keyframes fadeUp {
-
-  from { opacity: 0; transform: translateY(14px); }
-
-  to   { opacity: 1; transform: translateY(0); }
-
-}
-
-.overlay > * { 
-
-  opacity: 0; 
-
-  animation: fadeUp .7s ease-out forwards;
-
-}
-
-.overlay h1 { animation-delay: .05s; }
-
-.overlay p  { animation-delay: .18s; }
-
-.overlay .buttons { animation-delay: .30s; }
-
-.overlay .job-id { animation-delay: .42s; }
-
-
-
-/* Reduce motion */
-
-@media (prefers-reduced-motion: reduce) {
-
-  * { animation: none !important; transition: none !important; }
-
-}
-
-
-
-/* Mobile Responsive */
-
-@media (max-width: 768px) {
-
-  .overlay{
-
-    background: rgba(0, 0, 0, 0.6);
-
-    padding: 22px;
-
-    width: 90%;
-
-    border-radius: 14px;
-
-  }
-
-  .hero h1 { font-size: 1.8rem; }
-
-  .hero p { font-size: 1rem; }
-
-  .buttons { flex-direction: column; gap: 10px; }
-
-  .buttons .btn{ width: 100%; }
-
-  .job-id{ flex-direction: row; gap: 8px; }
-
-  .job-id input{ width: 100%; }
-
-  nav a { color: #fff; }
-
-}
+</html>
