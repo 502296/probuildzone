@@ -40,6 +40,20 @@ header {
 
   padding: 20px 40px;
 
+  transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+
+}
+
+header.scrolled{
+
+  background: rgba(0,0,0,.35);
+
+  backdrop-filter: blur(6px);
+
+  -webkit-backdrop-filter: blur(6px);
+
+  box-shadow: 0 6px 20px rgba(0,0,0,.35);
+
 }
 
 
@@ -120,17 +134,23 @@ nav a {
 
   text-align: center;
 
+  overflow: hidden;
+
 }
-
-
 
 .overlay {
 
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.45);
+
+  backdrop-filter: blur(4px);
+
+  -webkit-backdrop-filter: blur(4px);
+
+  box-shadow: 0 16px 48px rgba(0,0,0,.35);
 
   padding: 40px;
 
-  border-radius: 10px;
+  border-radius: 16px;
 
   color: #fff;
 
@@ -140,6 +160,8 @@ nav a {
 
 
 
+/* Typography */
+
 .hero h1 {
 
   font-size: 2.5rem;
@@ -147,8 +169,6 @@ nav a {
   margin-bottom: 20px;
 
 }
-
-
 
 .hero p {
 
@@ -159,6 +179,8 @@ nav a {
 }
 
 
+
+/* Buttons */
 
 .buttons {
 
@@ -172,8 +194,6 @@ nav a {
 
 }
 
-
-
 .btn {
 
   padding: 12px 20px;
@@ -186,31 +206,29 @@ nav a {
 
   font-size: 1rem;
 
-}
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
 
-
-
-.primary {
-
-  background: #007bff;
-
-  color: #fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,.18);
 
 }
 
+.btn:focus{ outline: 3px solid rgba(255,255,255,.65); outline-offset: 2px; }
+
+.primary { background: #007bff; color: #fff; }
+
+.secondary { background: transparent; color: #fff; border: 2px solid #fff; }
+
+.primary:hover{ transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,123,255,.35); }
+
+.primary:active{ transform: translateY(0); box-shadow: 0 6px 14px rgba(0,123,255,.25); }
+
+.secondary:hover{ transform: translateY(-2px); box-shadow: 0 12px 24px rgba(255,255,255,.25); background: rgba(255,255,255,.08); }
+
+.secondary:active{ transform: translateY(0); }
 
 
-.secondary {
 
-  background: transparent;
-
-  color: #fff;
-
-  border: 2px solid #fff;
-
-}
-
-
+/* Job ID form */
 
 .job-id {
 
@@ -222,8 +240,6 @@ nav a {
 
 }
 
-
-
 .job-id input {
 
   padding: 10px;
@@ -234,9 +250,9 @@ nav a {
 
   width: 220px;
 
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.25);
+
 }
-
-
 
 .job-id button {
 
@@ -252,56 +268,80 @@ nav a {
 
   font-weight: bold;
 
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+
+}
+
+.job-id button:hover{ transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,123,255,.32); }
+
+
+
+/* Animations */
+
+@keyframes fadeUp {
+
+  from { opacity: 0; transform: translateY(14px); }
+
+  to   { opacity: 1; transform: translateY(0); }
+
+}
+
+.overlay > * { 
+
+  opacity: 0; 
+
+  animation: fadeUp .7s ease-out forwards;
+
+}
+
+.overlay h1 { animation-delay: .05s; }
+
+.overlay p  { animation-delay: .18s; }
+
+.overlay .buttons { animation-delay: .30s; }
+
+.overlay .job-id { animation-delay: .42s; }
+
+
+
+/* Reduce motion */
+
+@media (prefers-reduced-motion: reduce) {
+
+  * { animation: none !important; transition: none !important; }
+
 }
 
 
 
-/* Responsive Mobile */
+/* Mobile Responsive */
 
 @media (max-width: 768px) {
 
-  .overlay {
+  .overlay{
 
     background: rgba(0, 0, 0, 0.6);
 
-    padding: 20px;
+    padding: 22px;
 
     width: 90%;
 
-  }
-
-
-
-  .hero h1 {
-
-    font-size: 1.8rem;
+    border-radius: 14px;
 
   }
 
+  .hero h1 { font-size: 1.8rem; }
 
+  .hero p { font-size: 1rem; }
 
-  .hero p {
+  .buttons { flex-direction: column; gap: 10px; }
 
-    font-size: 1rem;
+  .buttons .btn{ width: 100%; }
 
-  }
+  .job-id{ flex-direction: row; gap: 8px; }
 
+  .job-id input{ width: 100%; }
 
-
-  .buttons {
-
-    flex-direction: column;
-
-    gap: 10px;
-
-  }
-
-
-
-  nav a {
-
-    color: #fff;
-
-  }
+  nav a { color: #fff; }
 
 }
