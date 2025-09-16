@@ -12,8 +12,6 @@
 
   <meta name="description" content="Post your project with photos. Local contractors send offers. You choose the best match — fair prices, local pros.">
 
-  <link rel="stylesheet" href="style.css"/>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -21,6 +19,10 @@
   <style>
 
     :root{ --logo-base:#0F2A43; --logo-accent:#F28C1B; --logo-em:#E63946; }
+
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+    a{color:inherit}
 
     .brand-logo{font-weight:800;font-size:24px;color:var(--logo-base)}
 
@@ -30,7 +32,55 @@
 
 
 
-    /* modal + layout */
+    header nav{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
+
+    header nav ul{display:flex;gap:14px;list-style:none;margin:0;padding:0}
+
+
+
+    .hero{padding:28px 16px;text-align:center;background:#eef3f9;min-height:38vh;display:flex;flex-direction:column;justify-content:center}
+
+    .hero h1{margin:0 0 8px}
+
+    .hero p{margin:0 0 8px;color:#374151}
+
+
+
+    /* buttons layout */
+
+    .btn-group{
+
+      display:flex;
+
+      flex-wrap:wrap;
+
+      gap:10px;
+
+      justify-content:center;
+
+      margin-top:14px
+
+    }
+
+    .btn{
+
+      padding:10px 14px;border-radius:10px;font-weight:600;border:none;
+
+      cursor:pointer;text-decoration:none;text-align:center;display:inline-block
+
+    }
+
+    .btn.blue{ background:#2563eb;color:#fff }
+
+    .btn.gray{ background:#374151;color:#fff }
+
+    .btn.dark{ background:#111827;color:#fff }
+
+    @media(max-width:600px){ .btn{ flex:1 1 100% } }
+
+
+
+    /* modal + form */
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
 
@@ -52,15 +102,19 @@
 
     input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:#e5e7eb}
 
-    button.btn{padding:10px 14px;border-radius:10px;border:0;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
-
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
     .hint{opacity:.8;font-size:.9rem}
 
     .ok{color:#10b981}.err{color:#ef4444}
 
-    .hero{padding:28px 16px;text-align:center;background:#eef3f9}
+
+
+    /* links section (اختياري) */
+
+    #services{padding:24px 16px;text-align:center}
+
+    #services a{margin:0 6px;color:#0b3c7d}
 
   </style>
 
@@ -74,11 +128,11 @@
 
   <header>
 
-    <nav style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
+    <nav>
 
       <div class="brand-logo">Pro<span>Build</span><em>Zone</em></div>
 
-      <ul style="display:flex;gap:14px;list-style:none;margin:0;padding:0">
+      <ul>
 
         <li><a href="#how">How it works</a></li>
 
@@ -102,13 +156,15 @@
 
     <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-    <div style="margin:12px 0">
 
-      <a href="#services" class="btn" style="background:#2563eb;color:#fff;padding:10px 14px;border-radius:10px">Post a Job (Free)</a>
 
-      <a href="#services" class="btn" style="background:#374151;color:#fff;padding:10px 14px;border-radius:10px">View Services</a>
+    <div class="btn-group">
 
-      <button class="btn" id="openDoor" style="margin-left:8px;background:#111827;color:#fff">Open Upload Door</button>
+      <a href="#services" class="btn blue">Post a Job (Free)</a>
+
+      <a href="#services" class="btn gray">View Services</a>
+
+      <button class="btn dark" id="openDoor">Open Upload Door</button>
 
     </div>
 
@@ -116,9 +172,9 @@
 
 
 
-  <!-- Some links/cards (اختياري) -->
+  <!-- links -->
 
-  <section id="services" style="padding:24px 16px;text-align:center">
+  <section id="services">
 
     <a href="services.html">Services</a> •
 
@@ -140,7 +196,7 @@
 
         <h3 style="margin:6px 0 8px">Choose a category (12)</h3>
 
-        <button class="btn" id="closeDoor" style="padding:8px 12px">Close</button>
+        <button class="btn blue" id="closeDoor" style="padding:8px 12px">Close</button>
 
       </div>
 
@@ -240,7 +296,7 @@
 
           <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
 
-            <button id="sendBtn" class="btn">🚀 Post Job</button>
+            <button id="sendBtn" class="btn blue">🚀 Post Job</button>
 
             <span id="sendMsg" class="hint"></span>
 
@@ -256,7 +312,7 @@
 
 
 
-  <!-- ===== Main Script (no app.umd.js) ===== -->
+  <!-- ===== Main Script ===== -->
 
   <script>
 
@@ -330,25 +386,15 @@
 
 
 
-    // send
+    // helpers
 
-    function bufToBase64(buf){
+    function bufToBase64(buf){ let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); }
 
-      let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b));
-
-      return btoa(bin);
-
-    }
-
-    async function filesToBase64(list){
-
-      const arr=[]; for (const f of [...list||[]]) { const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); }
-
-      return arr;
-
-    }
+    async function filesToBase64(list){ const arr=[]; for (const f of [...list||[]]) { const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); } return arr; }
 
 
+
+    // submit
 
     document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
@@ -393,8 +439,6 @@
         const photosBase64 = await filesToBase64(fileInput.files);
 
 
-
-        // send to API
 
         const res = await fetch('/api/jobs/create', {
 
