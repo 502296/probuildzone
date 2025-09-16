@@ -62,7 +62,7 @@
 
       content:"";position:absolute;inset:0;
 
-      background:url('./hero-bg.jpg') center/cover no-repeat; /* ضع الصورة بجانب index.html */
+      background:url('images/hero-bg.jpg') center/cover no-repeat; /* ✅ المسار الصحيح */
 
       opacity:.22;filter:saturate(.9);
 
@@ -158,9 +158,9 @@
 
 </head>
 
+
+
 <body>
-
-
 
   <!-- Navbar -->
 
@@ -472,13 +472,13 @@
 
         if(!selectedCategory){ m.textContent='Choose a category first.'; return; }
 
-        const title  = document.getElementById('title').value.trim();
+        const title   = document.getElementById('title').value.trim();
 
         const summary= document.getElementById('summary').value.trim();
 
-        const city   = document.getElementById('city').value.trim();
+        const city    = document.getElementById('city').value.trim();
 
-        const state  = document.getElementById('state').value.trim();
+        const state   = document.getElementById('state').value.trim();
 
         const budget_min = document.getElementById('budgetMin').value || null;
 
@@ -486,11 +486,11 @@
 
         const contact_name = document.getElementById('contactName').value.trim();
 
-        const phone  = document.getElementById('phone').value.trim();
+        const phone   = document.getElementById('phone').value.trim();
 
-        const email  = document.getElementById('email').value.trim();
+        const email   = document.getElementById('email').value.trim();
 
-        const address= document.getElementById('address').value.trim();
+        const address = document.getElementById('address').value.trim();
 
         const description_long = document.getElementById('longDesc').value.trim();
 
