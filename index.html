@@ -8,15 +8,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>ProBuildZone</title>
+  <title>ProBuildZone — Fair Prices, Local Pros</title>
 
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="description" content="Post your home project with photos. Local contractors send offers. You choose the best match — fair prices, local pros." />
+
+  <link rel="stylesheet" href="style.css?v=4"/>
 
 
 
-  <!-- Font Awesome -->
+  <!-- Font Awesome for icons -->
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 
@@ -24,25 +26,27 @@
 
 <body>
 
-
-
   <!-- Header / Navbar -->
 
   <header>
 
-    <nav>
+    <nav class="nav">
 
-      <div class="logo">
+      <!-- LOGO (text-based, no image) -->
 
-        <img src="images/logo.png" alt="ProBuildZone Logo">
+      <a href="#" class="brand" aria-label="ProBuildZone Home">
 
-      </div>
+        Pro<span>Build</span><em>Zone</em>
 
-      <ul>
+      </a>
 
-        <li><a href="#">How it works</a></li>
 
-        <li><a href="#">Services</a></li>
+
+      <ul class="nav-links">
+
+        <li><a href="#how">How it works</a></li>
+
+        <li><a href="#services">Services</a></li>
 
         <li><a href="#" class="pro-btn">For Pros</a></li>
 
@@ -58,23 +62,31 @@
 
   <section class="hero">
 
-    <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
+    <div class="overlay">
 
-    <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
+      <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
-    <div class="buttons">
+      <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-      <a href="#" class="btn primary">Post a Job (Free)</a>
 
-      <a href="#" class="btn secondary">View Services</a>
 
-    </div>
+      <div class="buttons">
 
-    <div class="job-id">
+        <a href="#" class="btn primary">Post a Job (Free)</a>
 
-      <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
+        <a href="#services" class="btn secondary">View Services</a>
 
-      <button>Go</button>
+      </div>
+
+
+
+      <div class="job-id">
+
+        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)" aria-label="Enter Job ID">
+
+        <button>Go</button>
+
+      </div>
 
     </div>
 
@@ -84,7 +96,7 @@
 
   <!-- Categories Section -->
 
-  <section class="categories">
+  <section id="services" class="categories">
 
     <h2>Home Project Categories</h2>
 
@@ -92,113 +104,131 @@
 
 
 
-    <div class="category">
+    <div class="categories-grid">
 
-      <i class="fas fa-tools"></i>
+      <div class="category">
 
-      <h3>General Home Repairs</h3>
+        <i class="fas fa-screwdriver-wrench"></i>
 
-      <p>Small fixes, handyman tasks, doors & windows.</p>
+        <h3>General Home Repairs</h3>
 
-      <a href="#">Post a Job</a>
+        <p>Small fixes, handyman tasks, doors & windows.</p>
 
-    </div>
+        <a href="#">Post a Job</a>
 
-
-
-    <div class="category">
-
-      <i class="fas fa-bolt"></i>
-
-      <h3>Electrical</h3>
-
-      <p>Outlets, lighting, panel work, troubleshooting.</p>
-
-      <a href="#">Post a Job</a>
-
-    </div>
+      </div>
 
 
 
-    <div class="category">
+      <div class="category">
 
-      <i class="fas fa-faucet"></i>
+        <i class="fas fa-bolt"></i>
 
-      <h3>Plumbing</h3>
+        <h3>Electrical</h3>
 
-      <p>Leaks, faucets, drains, water heaters.</p>
+        <p>Outlets, lighting, panel work, troubleshooting.</p>
 
-      <a href="#">Post a Job</a>
+        <a href="#">Post a Job</a>
 
-    </div>
-
-
-
-    <div class="category">
-
-      <i class="fas fa-home"></i>
-
-      <h3>Roofing & Gutters</h3>
-
-      <p>Patch leaks, shingles, gutter install & clean.</p>
-
-      <a href="#">Post a Job</a>
-
-    </div>
+      </div>
 
 
 
-    <div class="category">
+      <div class="category">
 
-      <i class="fas fa-paint-roller"></i>
+        <i class="fas fa-faucet"></i>
 
-      <h3>Painting</h3>
+        <h3>Plumbing</h3>
 
-      <p>Interior & exterior, prep and clean finishes.</p>
+        <p>Leaks, faucets, drains, water heaters.</p>
 
-      <a href="#">Post a Job</a>
+        <a href="#">Post a Job</a>
 
-    </div>
-
-
-
-    <div class="category">
-
-      <i class="fas fa-border-all"></i>
-
-      <h3>Flooring</h3>
-
-      <p>Hardwood, laminate, tile, repairs & install.</p>
-
-      <a href="#">Post a Job</a>
-
-    </div>
+      </div>
 
 
 
-    <div class="category">
+      <div class="category">
 
-      <i class="fas fa-seedling"></i>
+        <i class="fas fa-house-chimney"></i>
 
-      <h3>Landscaping</h3>
+        <h3>Roofing & Gutters</h3>
 
-      <p>Yard cleanup, sod, mulch, seasonal care.</p>
+        <p>Patch leaks, shingles, gutter install & clean.</p>
 
-      <a href="#">Post a Job</a>
+        <a href="#">Post a Job</a>
 
-    </div>
+      </div>
 
 
 
-    <div class="category">
+      <div class="category">
 
-      <i class="fas fa-fan"></i>
+        <i class="fas fa-paint-roller"></i>
 
-      <h3>HVAC</h3>
+        <h3>Painting</h3>
 
-      <p>Heating & cooling tune-ups, repairs, installs.</p>
+        <p>Interior & exterior, prep and clean finishes.</p>
 
-      <a href="#">Post a Job</a>
+        <a href="#">Post a Job</a>
+
+      </div>
+
+
+
+      <div class="category">
+
+        <i class="fas fa-border-all"></i>
+
+        <h3>Flooring</h3>
+
+        <p>Hardwood, laminate, tile, repairs & install.</p>
+
+        <a href="#">Post a Job</a>
+
+      </div>
+
+
+
+      <div class="category">
+
+        <i class="fas fa-seedling"></i>
+
+        <h3>Landscaping</h3>
+
+        <p>Yard cleanup, sod, mulch, seasonal care.</p>
+
+        <a href="#">Post a Job</a>
+
+      </div>
+
+
+
+      <div class="category">
+
+        <i class="fas fa-fan"></i>
+
+        <h3>HVAC</h3>
+
+        <p>Heating & cooling tune-ups, repairs, installs.</p>
+
+        <a href="#">Post a Job</a>
+
+      </div>
+
+
+
+      <div class="category">
+
+        <i class="fas fa-warehouse"></i>
+
+        <h3>Basement</h3>
+
+        <p>Waterproofing, repairs, finishing & remodeling.</p>
+
+        <a href="#">Post a Job</a>
+
+      </div>
 
     </div>
 
@@ -207,8 +237,6 @@
     <a href="#" class="browse-all">Browse All Categories →</a>
 
   </section>
-
-
 
 </body>
 
