@@ -14,10 +14,6 @@
 
   <link rel="stylesheet" href="style.css"/>
 
-
-
-  <!-- Font Awesome (icons) -->
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -26,25 +22,15 @@
 
     :root{ --logo-base:#0F2A43; --logo-accent:#F28C1B; --logo-em:#E63946; }
 
-    .brand-logo{font-weight:800;font-size:24px;color:var(--logo-base);letter-spacing:.2px;text-shadow:0 1px 0 rgba(0,0,0,.05)}
+    .brand-logo{font-weight:800;font-size:24px;color:var(--logo-base)}
 
-    .brand-logo span{color:var(--logo-accent)} .brand-logo em{color:var(--logo-em);font-style:normal}
+    .brand-logo span{color:var(--logo-accent)}
 
-    .legal-links{padding:40px 16px;background:#f7f9fc;border-top:1px solid rgba(0,0,0,.06)}
+    .brand-logo em{color:var(--logo-em);font-style:normal}
 
-    .legal-links h2{margin:0 0 6px;text-align:center}
 
-    .legal-links .mega-sub{margin:0 0 22px;text-align:center;color:#5b6b7f}
 
-    .legal-wrap{max-width:1100px;margin:0 auto;display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
-
-    @media (max-width:800px){.legal-wrap{grid-template-columns:1fr}}
-
-    .legal-card{display:flex;align-items:center;gap:12px;padding:18px 20px;border-radius:14px;text-decoration:none;color:#132033;background:#fff;border:1px solid rgba(0,0,0,.07);transition:.15s}
-
-    .legal-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.08);border-color:rgba(0,0,0,.12)}
-
-    /* modal & grid */
+    /* modal + layout */
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
 
@@ -55,6 +41,8 @@
     @media(max-width:780px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
     .icon{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#111827,#0b1220);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;cursor:pointer}
+
+    .icon:hover{transform:translateY(-2px)}
 
     .emoji{font-size:22px}
 
@@ -68,9 +56,11 @@
 
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-    .hint{opacity:.75;font-size:.9rem}
+    .hint{opacity:.8;font-size:.9rem}
 
     .ok{color:#10b981}.err{color:#ef4444}
+
+    .hero{padding:28px 16px;text-align:center;background:#eef3f9}
 
   </style>
 
@@ -80,7 +70,7 @@
 
 <body>
 
-  <!-- Header / Navbar -->
+  <!-- Header -->
 
   <header>
 
@@ -106,13 +96,13 @@
 
   <!-- Hero -->
 
-  <section class="hero" style="padding:28px 16px;text-align:center;background:#eef3f9">
+  <section class="hero">
 
     <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
     <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-    <div class="buttons" style="margin:12px 0">
+    <div style="margin:12px 0">
 
       <a href="#services" class="btn" style="background:#2563eb;color:#fff;padding:10px 14px;border-radius:10px">Post a Job (Free)</a>
 
@@ -126,23 +116,15 @@
 
 
 
-  <!-- Legal/Info cards -->
+  <!-- Some links/cards (اختياري) -->
 
-  <section class="legal-links" id="services">
+  <section id="services" style="padding:24px 16px;text-align:center">
 
-    <h2>Explore More</h2>
+    <a href="services.html">Services</a> •
 
-    <p class="mega-sub">Learn about our services, privacy practices, and terms.</p>
+    <a href="privacy.html">Privacy</a> •
 
-    <div class="legal-wrap">
-
-      <a class="legal-card" href="services.html"><i class="fa-solid fa-list-check"></i><span>Services</span></a>
-
-      <a class="legal-card" href="privacy.html"><i class="fa-solid fa-shield-halved"></i><span>Privacy Policy</span></a>
-
-      <a class="legal-card" href="terms.html"><i class="fa-solid fa-scale-balanced"></i><span>Terms of Service</span></a>
-
-    </div>
+    <a href="terms.html">Terms</a>
 
   </section>
 
@@ -274,19 +256,23 @@
 
 
 
-  <!-- Supabase UMD -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
-
-
-  <!-- Main script -->
+  <!-- ===== Main Script (no app.umd.js) ===== -->
 
   <script>
 
-    // ===== Config: اجعلها فارغة هنا (نستعمل مفاتيح Vercel في الـ API) =====
+    // open/close modal
 
-    const categories = [
+    const modal = document.getElementById('modal');
+
+    document.getElementById('openDoor').onclick  = () => { modal.style.display = 'flex'; };
+
+    document.getElementById('closeDoor').onclick = () => { modal.style.display = 'none'; };
+
+
+
+    // categories
+
+    const CATS = [
 
       ['General Home Repairs','🛠'],['Electrical','⚡'],['Plumbing','🚰'],['Roofing & Gutters','🏠'],
 
@@ -296,16 +282,6 @@
 
     ];
 
-    const modal = document.getElementById('modal');
-
-    document.getElementById('openDoor').onclick = ()=>{ modal.style.display='flex'; };
-
-    document.getElementById('closeDoor').onclick = ()=>{ modal.style.display='none'; };
-
-
-
-    // Build grid
-
     const grid = document.getElementById('iconGrid');
 
     const uploader = document.getElementById('uploaderArea');
@@ -314,35 +290,31 @@
 
     let selectedCategory = null;
 
-    categories.forEach(([name, emoji])=>{
 
-      const div = document.createElement('div');
 
-      div.className = 'icon';
+    CATS.forEach(([name, emoji])=>{
 
-      div.innerHTML = '<div class="emoji">'+emoji+'</div><div>'+name+'</div>';
+      const el = document.createElement('div');
 
-      div.onclick = ()=>{
+      el.className = 'icon';
 
-        selectedCategory = name;
+      el.innerHTML = `<div class="emoji">${emoji}</div><div>${name}</div>`;
 
-        catTitle.textContent = 'Selected: '+name;
+      el.onclick = () => { selectedCategory = name; catTitle.textContent = 'Selected: '+name; uploader.style.display='block'; };
 
-        uploader.style.display = 'block';
-
-      };
-
-      grid.appendChild(div);
+      grid.appendChild(el);
 
     });
 
 
 
-    // File list preview
+    // files preview
 
     const fileInput = document.getElementById('fileInput');
 
-    const fileList = document.getElementById('fileList');
+    const fileList  = document.getElementById('fileList');
+
+    document.querySelector('label.icon').onclick = () => fileInput.click();
 
     fileInput.addEventListener('change', ()=>{
 
@@ -350,43 +322,33 @@
 
       [...fileInput.files].forEach(f=>{
 
-        const p = document.createElement('p'); p.textContent = f.name+' ('+Math.round(f.size/1024)+' KB)';
-
-        fileList.appendChild(p);
+        const p=document.createElement('p'); p.textContent = `${f.name} (${Math.round(f.size/1024)} KB)`; fileList.appendChild(p);
 
       });
 
     });
 
-    // Click area triggers input
-
-    document.querySelector('label.icon').onclick = ()=>fileInput.click();
 
 
+    // send
 
-    // Helpers
+    function bufToBase64(buf){
 
-    async function filesToBase64(fileList){
+      let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b));
 
-      const files = [...fileList||[]]; const arr=[];
+      return btoa(bin);
 
-      for (const f of files){
+    }
 
-        const buf = await f.arrayBuffer();
+    async function filesToBase64(list){
 
-        let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b));
-
-        arr.push(btoa(bin));
-
-      }
+      const arr=[]; for (const f of [...list||[]]) { const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); }
 
       return arr;
 
     }
 
 
-
-    // Submit
 
     document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
@@ -396,13 +358,13 @@
 
         if(!selectedCategory){ m.textContent='Choose a category first.'; return; }
 
-        const title = document.getElementById('title').value.trim();
+        const title  = document.getElementById('title').value.trim();
 
-        const summary = document.getElementById('summary').value.trim();
+        const summary= document.getElementById('summary').value.trim();
 
-        const city = document.getElementById('city').value.trim();
+        const city   = document.getElementById('city').value.trim();
 
-        const state = document.getElementById('state').value.trim();
+        const state  = document.getElementById('state').value.trim();
 
         const budget_min = document.getElementById('budgetMin').value || null;
 
@@ -410,45 +372,39 @@
 
         const contact_name = document.getElementById('contactName').value.trim();
 
-        const phone = document.getElementById('phone').value.trim();
+        const phone  = document.getElementById('phone').value.trim();
 
-        const email = document.getElementById('email').value.trim();
+        const email  = document.getElementById('email').value.trim();
 
-        const address = document.getElementById('address').value.trim();
+        const address= document.getElementById('address').value.trim();
 
         const description_long = document.getElementById('longDesc').value.trim();
 
         if(!title||!contact_name||!phone||!email||!address||!description_long){
 
-          m.textContent='Please fill all required fields.'; return;
+          m.textContent = 'Please fill all required fields.'; return;
 
         }
 
-        m.textContent='Uploading…';
+
+
+        m.textContent = 'Uploading…';
 
         const photosBase64 = await filesToBase64(fileInput.files);
 
 
 
-        // إذا لديك تسجيل دخول Supabase، مرر التوكن حتى تُطبق RLS للمالك:
-
-        const supa = window.supabase.createClient('%SUPABASE_URL%', '%SUPABASE_ANON%'); // تُترك افتراضية
-
-        const { data: { session } } = await supa.auth.getSession();
-
-        const token = session?.access_token;
-
-
+        // send to API
 
         const res = await fetch('/api/jobs/create', {
 
           method:'POST',
 
-          headers: { 'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}) },
+          headers:{'Content-Type':'application/json'},
 
           body: JSON.stringify({
 
-            category: selectedCategory, title, summary, city, state, budget_min, budget_max,
+            category:selectedCategory, title, summary, city, state, budget_min, budget_max,
 
             address, contact_name, phone, email, description_long, photosBase64
 
@@ -460,9 +416,13 @@
 
         if(!res.ok || !j.ok) throw new Error(j.error||'Failed');
 
-        m.textContent='Posted ✔ Job ID: '+j.job_id; m.className='hint ok';
+        m.textContent = 'Posted ✔ Job ID: '+j.job_id; m.className = 'hint ok';
 
-      }catch(e){ m.textContent='Error: '+(e.message||'failed'); m.className='hint err'; }
+      }catch(e){
+
+        m.textContent = 'Error: '+(e.message||'failed'); m.className = 'hint err';
+
+      }
 
     });
 
