@@ -12,10 +12,6 @@
 
   <meta name="description" content="Post your project with photos. Local contractors send offers. You choose the best match — fair prices, local pros.">
 
-
-
-  <!-- Font Awesome -->
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -24,7 +20,11 @@
 
     /* ===== Base ===== */
 
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111;line-height:1.5}
+    :root{ --logo-base:#0F2A43; --logo-accent:#F28C1B; --logo-em:#E63946; }
+
+    *{box-sizing:border-box}
+
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
 
     a{text-decoration:none;color:inherit}
 
@@ -32,23 +32,19 @@
 
     /* ===== Navbar ===== */
 
-    header{background:#fff;border-bottom:1px solid #eee;padding:10px 20px}
+    header{background:#fff;border-bottom:1px solid #eee}
 
-    nav{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto}
+    nav{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
 
-    .brand-logo{font-weight:800;font-size:22px;color:#0F2A43}
+    .brand-logo{font-weight:800;font-size:22px;color:var(--logo-base)}
 
-    .brand-logo span{color:#F28C1B}
+    .brand-logo span{color:var(--logo-accent)}
 
-    .brand-logo em{color:#E63946;font-style:normal}
+    .brand-logo em{color:var(--logo-em);font-style:normal}
 
-    nav ul{list-style:none;display:flex;gap:20px;margin:0;padding:0}
+    nav ul{list-style:none;display:flex;gap:18px;margin:0;padding:0}
 
-    nav li{display:inline}
-
-    nav a{font-weight:600;color:#111}
-
-    nav .pro-btn{background:#f59e0b;color:#fff;padding:6px 12px;border-radius:6px}
+    nav a{font-weight:600}
 
 
 
@@ -56,7 +52,7 @@
 
     .hero{
 
-      position:relative;min-height:55vh;padding:28px 16px;text-align:center;
+      position:relative;min-height:52vh;padding:28px 16px;text-align:center;
 
       display:flex;flex-direction:column;justify-content:center;background:#eef3f9;
 
@@ -66,7 +62,7 @@
 
       content:"";position:absolute;inset:0;
 
-      background:url('./hero-bg.jpg') center/cover no-repeat;
+      background:url('./hero-bg.jpg') center/cover no-repeat; /* ضع الصورة بجانب index.html */
 
       opacity:.22;filter:saturate(.9);
 
@@ -74,49 +70,43 @@
 
     .hero > *{position:relative}
 
-    .hero h1{font-size:1.9rem;font-weight:700;margin-bottom:10px}
+    .hero h1{margin:0 0 10px;font-size:2rem}
 
-    .hero p{max-width:520px;margin:0 auto 20px;color:#333}
-
-    .buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-
-    .btn{padding:12px 20px;border:0;border-radius:8px;font-weight:600;cursor:pointer}
-
-    .btn.primary{background:#2563eb;color:#fff}
-
-    .btn.secondary{background:#374151;color:#fff}
-
-    .btn.dark{background:#111;color:#fff}
+    .hero p{margin:0 auto 14px;max-width:640px;color:#374151}
 
 
 
-    /* ===== Legal Links ===== */
+    .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
-    .legal-links{padding:40px 16px;background:#f7f9fc;border-top:1px solid rgba(0,0,0,.06)}
+    .btn{padding:12px 16px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
 
-    .legal-links h2{text-align:center;margin:0 0 6px}
+    .blue{background:#2563eb;color:#fff}
 
-    .legal-links .mega-sub{text-align:center;color:#5b6b7f;margin:0 0 22px}
+    .gray{background:#374151;color:#fff}
 
-    .legal-wrap{max-width:1100px;margin:0 auto;display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+    .dark{background:#111827;color:#fff}
 
-    .legal-wrap a{font-weight:600;color:#2563eb}
+    @media(max-width:600px){ .btn{flex:1 1 100%} }
 
 
 
-    /* ===== Modal ===== */
+    /* ===== Links section ===== */
 
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;
+    #services{padding:26px 16px;text-align:center}
 
-           align-items:center;justify-content:center;padding:12px;z-index:50}
+    #services a{margin:0 8px;color:#0b3c7d;font-weight:600}
+
+
+
+    /* ===== Modal & form ===== */
+
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
 
     .sheet{
 
-      width:100%;max-width:900px;border-radius:16px;background:#0b1220;color:#e5e7eb;
+      width:100%;max-width:940px;border-radius:16px;background:#0b1220;color:#e5e7eb;
 
-      border:1px solid rgba(255,255,255,.08);max-height:90dvh;overflow:auto;
-
-      display:flex;flex-direction:column;
+      border:1px solid rgba(255,255,255,.08);max-height:90dvh;overflow:auto;display:flex;flex-direction:column;
 
     }
 
@@ -128,21 +118,39 @@
 
       background:linear-gradient(180deg,rgba(11,18,32,0),rgba(11,18,32,.85) 30%,#0b1220 60%);
 
-      display:flex;gap:10px;align-items:center;border-top:1px solid rgba(255,255,255,.08);
+      border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center
 
     }
 
-    .btn.blue{background:#2563eb;color:#fff}
-
     .hint{opacity:.85;font-size:.9rem}
 
+    .ok{color:#10b981}.err{color:#ef4444}
 
 
-    /* ===== Form ===== */
 
-    input,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;margin-bottom:10px}
+    /* Grid (12 categories) */
 
-    label{font-weight:600;font-size:.9rem;display:block;margin-bottom:4px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+
+    @media(max-width:780px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+    .icon{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#111827,#0b1220);
+
+      border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;cursor:pointer}
+
+    .icon:hover{transform:translateY(-2px)}
+
+    .emoji{font-size:22px}
+
+    .card{background:linear-gradient(180deg,#111827,#0b1220);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}
+
+
+
+    /* Inputs */
+
+    label{display:block;margin:.6rem 0 .25rem;font-weight:600}
+
+    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:#e5e7eb}
 
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
@@ -168,7 +176,7 @@
 
         <li><a href="#services">Services</a></li>
 
-        <li><a href="#pros" class="pro-btn">For Pros</a></li>
+        <li><a href="#pros">For Pros</a></li>
 
       </ul>
 
@@ -186,11 +194,15 @@
 
     <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-    <div class="buttons">
 
-      <button class="btn primary">Post a Job (Free)</button>
 
-      <a href="#services" class="btn secondary">View Services</a>
+    <div class="btns">
+
+      <button class="btn blue" id="postJobTop">Post a Job (Free)</button>
+
+      <a href="#services" class="btn gray">View Services</a>
+
+      <button class="btn dark" id="checkOffers">Check Offer Prices</button>
 
       <button class="btn dark" id="openDoor">Open Upload Door</button>
 
@@ -200,29 +212,21 @@
 
 
 
-  <!-- Legal Links -->
+  <!-- Links -->
 
-  <section class="legal-links" id="services">
+  <section id="services">
 
-    <h2>Explore More</h2>
+    <a href="services.html">Services</a> •
 
-    <p class="mega-sub">Learn about our services, privacy practices, and terms.</p>
+    <a href="privacy.html">Privacy</a> •
 
-    <div class="legal-wrap">
-
-      <a href="services.html">Services</a>
-
-      <a href="privacy.html">Privacy</a>
-
-      <a href="terms.html">Terms</a>
-
-    </div>
+    <a href="terms.html">Terms</a>
 
   </section>
 
 
 
-  <!-- Modal -->
+  <!-- ===== Upload Door Modal ===== -->
 
   <div class="modal" id="modal">
 
@@ -232,71 +236,113 @@
 
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
 
-          <h3>Post Your Project</h3>
+          <h3 style="margin:6px 0 8px">Choose a category (12)</h3>
 
-          <button class="btn blue" id="closeDoor">Close</button>
-
-        </div>
-
-
-
-        <label>Project title *</label>
-
-        <input id="title" required placeholder="e.g., Replace leaking roof">
-
-
-
-        <label>Short summary</label>
-
-        <textarea id="summary" placeholder="One or two lines…"></textarea>
-
-
-
-        <div class="row2">
-
-          <div><label>City</label><input id="city"></div>
-
-          <div><label>State</label><input id="state"></div>
+          <button class="btn blue" id="closeDoor" style="padding:8px 12px">Close</button>
 
         </div>
 
 
 
-        <div class="row2">
+        <!-- شبكة 12 أيقونة -->
 
-          <div><label>Budget min</label><input id="budgetMin" type="number"></div>
+        <div class="grid" id="iconGrid"></div>
 
-          <div><label>Budget max</label><input id="budgetMax" type="number"></div>
+
+
+        <!-- منطقة الرفع + النموذج (تظهر بعد اختيار فئة) -->
+
+        <div id="uploaderArea" style="display:none">
+
+          <h3 id="catTitle" style="margin-top:16px"></h3>
+
+
+
+          <!-- رفع الصور -->
+
+          <label class="icon" style="display:block;cursor:pointer">
+
+            <input type="file" id="fileInput" multiple accept="image/*" style="display:none" />
+
+            <div class="emoji">⬆️</div>
+
+            <span>Drop files here or click to choose</span>
+
+          </label>
+
+          <div class="card" id="fileList" style="margin-top:12px"></div>
+
+
+
+          <!-- نموذج صاحب المنزل -->
+
+          <div class="card" style="margin-top:12px">
+
+            <h4>Owner details & project info</h4>
+
+            <p class="hint">Private fields are hidden from pros until you approve them.</p>
+
+
+
+            <label>Project title *</label>
+
+            <input id="title" required placeholder="e.g., Replace leaking roof"/>
+
+
+
+            <label>Short summary</label>
+
+            <textarea id="summary" placeholder="One or two lines…"></textarea>
+
+
+
+            <div class="row2">
+
+              <div><label>City</label><input id="city"/></div>
+
+              <div><label>State</label><input id="state"/></div>
+
+            </div>
+
+
+
+            <div class="row2">
+
+              <div><label>Budget min</label><input id="budgetMin" type="number"/></div>
+
+              <div><label>Budget max</label><input id="budgetMax" type="number"/></div>
+
+            </div>
+
+
+
+            <hr style="opacity:.2;margin:12px 0">
+
+
+
+            <div class="row2">
+
+              <div><label>Contact name *</label><input id="contactName" required/></div>
+
+              <div><label>Phone *</label><input id="phone" required/></div>
+
+            </div>
+
+            <label>Email *</label><input id="email" type="email" required/>
+
+            <label>Full address *</label><input id="address" required/>
+
+            <label>Full description *</label><textarea id="longDesc" required placeholder="Describe the job in detail…"></textarea>
+
+          </div>
 
         </div>
-
-
-
-        <label>Contact name *</label>
-
-        <input id="contactName" required>
-
-        <label>Phone *</label>
-
-        <input id="phone" required>
-
-        <label>Email *</label>
-
-        <input id="email" type="email" required>
-
-        <label>Full address *</label>
-
-        <input id="address" required>
-
-        <label>Full description *</label>
-
-        <textarea id="longDesc" required></textarea>
 
       </div>
 
 
 
-      <!-- زر ثابت -->
+      <!-- زر إرسال ثابت أسفل المودال -->
 
       <div class="sticky-footer">
 
@@ -312,53 +358,189 @@
 
 
 
-  <!-- Scripts -->
+  <!-- ===== JS ===== -->
 
   <script>
+
+    // فتح/إغلاق المودال + منع تمرير الخلفية
 
     const modal = document.getElementById('modal');
 
     const htmlEl = document.documentElement;
 
+    const openDoor = () => { modal.style.display='flex'; htmlEl.style.overflow='hidden'; };
 
-
-    document.getElementById('openDoor').onclick = () => {
-
-      modal.style.display = 'flex';
-
-      htmlEl.style.overflow = 'hidden';
-
-    };
-
-    document.getElementById('closeDoor').onclick = () => {
-
-      modal.style.display = 'none';
-
-      htmlEl.style.overflow = '';
-
-    };
+    const closeDoor = () => { modal.style.display='none'; htmlEl.style.overflow=''; };
 
 
 
-    document.getElementById('sendBtn').onclick = () => {
+    document.getElementById('openDoor').onclick = openDoor;
 
-      document.getElementById('sendMsg').innerText = "✅ Job submitted!";
+    document.getElementById('postJobTop').onclick = openDoor;
 
-      setTimeout(() => {
+    document.getElementById('closeDoor').onclick = closeDoor;
 
-        modal.style.display = 'none';
 
-        htmlEl.style.overflow = '';
 
-        document.getElementById('sendMsg').innerText = "";
+    // زر فحص الأسعار — يطلب Job ID وينتقل لصفحة (عدّل المسار لاحقاً)
 
-      }, 2000);
+    document.getElementById('checkOffers').onclick = () => {
+
+      const id = prompt('Enter your Job ID to check offer prices:');
+
+      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
 
     };
+
+
+
+    // شبكة 12 أيقونة
+
+    const CATS = [
+
+      ['General Home Repairs','🛠'],['Electrical','⚡'],['Plumbing','🚰'],['Roofing & Gutters','🏠'],
+
+      ['Painting','🎨'],['Flooring','🧱'],['Landscaping','🌿'],['HVAC','❄'],['Basement','🏚'],
+
+      ['Carpentry','🔨'],['Windows & Doors','🚪'],['Appliances','🔌']
+
+    ];
+
+    const grid = document.getElementById('iconGrid');
+
+    const uploader = document.getElementById('uploaderArea');
+
+    const catTitle = document.getElementById('catTitle');
+
+    let selectedCategory = null;
+
+
+
+    CATS.forEach(([name, emoji])=>{
+
+      const el = document.createElement('div');
+
+      el.className = 'icon';
+
+      el.innerHTML = `<div class="emoji">${emoji}</div><div>${name}</div>`;
+
+      el.onclick = () => { selectedCategory = name; catTitle.textContent = 'Selected: '+name; uploader.style.display='block'; };
+
+      grid.appendChild(el);
+
+    });
+
+
+
+    // رفع الصور (مع معاينة)
+
+    const fileInput = document.getElementById('fileInput');
+
+    const fileList  = document.getElementById('fileList');
+
+    document.querySelector('label.icon').onclick = () => fileInput.click();
+
+    fileInput.addEventListener('change', ()=>{
+
+      fileList.innerHTML = '';
+
+      [...fileInput.files].forEach(f=>{
+
+        const p=document.createElement('p'); p.textContent=`${f.name} (${Math.round(f.size/1024)} KB)`; fileList.appendChild(p);
+
+      });
+
+    });
+
+
+
+    // Helpers Base64
+
+    const bufToBase64 = (buf)=>{ let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); };
+
+    const filesToBase64 = async (list)=>{ const arr=[]; for(const f of [...list||[]]){ const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); } return arr; };
+
+
+
+    // الإرسال
+
+    document.getElementById('sendBtn').addEventListener('click', async ()=>{
+
+      const m = document.getElementById('sendMsg');
+
+      try{
+
+        if(!selectedCategory){ m.textContent='Choose a category first.'; return; }
+
+        const title  = document.getElementById('title').value.trim();
+
+        const summary= document.getElementById('summary').value.trim();
+
+        const city   = document.getElementById('city').value.trim();
+
+        const state  = document.getElementById('state').value.trim();
+
+        const budget_min = document.getElementById('budgetMin').value || null;
+
+        const budget_max = document.getElementById('budgetMax').value || null;
+
+        const contact_name = document.getElementById('contactName').value.trim();
+
+        const phone  = document.getElementById('phone').value.trim();
+
+        const email  = document.getElementById('email').value.trim();
+
+        const address= document.getElementById('address').value.trim();
+
+        const description_long = document.getElementById('longDesc').value.trim();
+
+        if(!title||!contact_name||!phone||!email||!address||!description_long){
+
+          m.textContent='Please fill all required fields.'; return;
+
+        }
+
+
+
+        m.textContent='Uploading…';
+
+        const photosBase64 = await filesToBase64(fileInput.files);
+
+
+
+        const res = await fetch('/api/jobs/create', {
+
+          method:'POST',
+
+          headers:{'Content-Type':'application/json'},
+
+          body:JSON.stringify({
+
+            category:selectedCategory, title, summary, city, state, budget_min, budget_max,
+
+            address, contact_name, phone, email, description_long, photosBase64
+
+          })
+
+        });
+
+        const j = await res.json();
+
+        if(!res.ok || !j.ok) throw new Error(j.error||'Failed');
+
+        m.textContent='Posted ✔ Job ID: '+j.job_id; m.className='hint ok';
+
+        setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1200);
+
+      }catch(e){
+
+        m.textContent='Error: '+(e.message||'failed'); m.className='hint err';
+
+      }
+
+    });
 
   </script>
-
-
 
 </body>
 
