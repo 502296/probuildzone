@@ -8,9 +8,11 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>ProBuildZone</title>
+  <title>ProBuildZone — Fair Prices, Local Pros</title>
 
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="description" content="Post your home project with photos. Local pros send offers. You choose the best match — fair prices, local professionals." />
+
+  <link rel="stylesheet" href="style.css?v=2"/>
 
 </head>
 
@@ -69,6 +71,28 @@
     </div>
 
   </section>
+
+
+
+  <script>
+
+    // Navbar on scroll
+
+    const header = document.querySelector('header');
+
+    const onScroll = () => {
+
+      if (window.scrollY > 8) header.classList.add('scrolled');
+
+      else header.classList.remove('scrolled');
+
+    };
+
+    window.addEventListener('scroll', onScroll);
+
+    onScroll();
+
+  </script>
 
 </body>
 
