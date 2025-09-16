@@ -1,30 +1,3 @@
-
-/* Reset */
-
-* {
-
-  margin: 0;
-
-  padding: 0;
-
-  box-sizing: border-box;
-
-}
-
-
-
-body {
-
-  font-family: Arial, sans-serif;
-
-  background: #fff;
-
-  color: #333;
-
-}
-
-
-
 /* Navbar */
 
 header {
@@ -45,215 +18,97 @@ header {
 
 
 
-nav {
+nav { display: flex; justify-content: space-between; align-items: center; }
 
-  display: flex;
+.logo img { height: 50px; }
 
-  justify-content: space-between;
+nav ul { display: flex; list-style: none; gap: 20px; }
 
-  align-items: center;
+nav a { text-decoration: none; color: #fff; font-weight: 600; }
 
-}
-
-
-
-.logo img {
-
-  height: 50px;
-
-}
+.pro-btn { background: #f6a623; padding: 8px 16px; border-radius: 5px; color: #000 !important; }
 
 
 
-nav ul {
-
-  display: flex;
-
-  list-style: none;
-
-  gap: 20px;
-
-}
-
-
-
-nav a {
-
-  text-decoration: none;
-
-  color: #fff;
-
-  font-weight: 600;
-
-}
-
-
-
-.pro-btn {
-
-  background: #f6a623;
-
-  padding: 8px 16px;
-
-  border-radius: 5px;
-
-  color: #000 !important;
-
-}
-
-
-
-/* Hero Section */
+/* ===== Hero بدون صورة خلفية ===== */
 
 .hero {
 
   height: 100vh;
 
-  background: url('images/hero-bg.jpg') no-repeat center center/cover;
+  /* خلفية متدرجة بسيطة بدل الصورة */
 
-  display: flex;
+  background: linear-gradient(180deg, #0f2233 0%, #1b2f45 50%, #102334 100%);
 
-  align-items: center;
+  display: flex; align-items: center; justify-content: center;
 
-  justify-content: center;
-
-  position: relative;
-
-  text-align: center;
+  position: relative; text-align: center;
 
 }
 
 
+
+/* صندوق المحتوى شفاف أكثر لأن ما عدنا صورة */
 
 .overlay {
 
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.35);
 
   padding: 40px;
 
-  border-radius: 10px;
+  border-radius: 16px;
 
   color: #fff;
 
-  max-width: 700px;
+  max-width: 900px;
+
+  width: min(92vw, 900px);
+
+  backdrop-filter: blur(2px);
 
 }
 
 
 
-.hero h1 {
+/* اللوجو الكبير */
 
-  font-size: 2.5rem;
+.brand-logo{
 
-  margin-bottom: 20px;
+  width: min(90vw, 520px);   /* حجم كبير ومتجاوب */
 
-}
+  height: auto;
 
+  display: block;
 
+  margin: 0 auto 24px;
 
-.hero p {
-
-  font-size: 1.2rem;
-
-  margin-bottom: 30px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
 
 }
 
 
 
-.buttons {
+.hero h1 { font-size: 2.6rem; margin-bottom: 16px; }
 
-  display: flex;
-
-  justify-content: center;
-
-  gap: 20px;
-
-  margin-bottom: 20px;
-
-}
+.hero p  { font-size: 1.15rem; margin-bottom: 24px; opacity: .95; }
 
 
 
-.btn {
+.buttons { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; }
 
-  padding: 12px 20px;
+.btn { padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 1rem; }
 
-  border-radius: 5px;
+.primary { background: #007bff; color: #fff; }
 
-  text-decoration: none;
-
-  font-weight: bold;
-
-  font-size: 1rem;
-
-}
+.secondary { background: transparent; color: #fff; border: 2px solid #fff; }
 
 
 
-.primary {
+.job-id { display: flex; justify-content: center; gap: 10px; }
 
-  background: #007bff;
+.job-id input { padding: 10px; border-radius: 6px; border: none; width: 240px; }
 
-  color: #fff;
-
-}
-
-
-
-.secondary {
-
-  background: transparent;
-
-  color: #fff;
-
-  border: 2px solid #fff;
-
-}
-
-
-
-.job-id {
-
-  display: flex;
-
-  justify-content: center;
-
-  gap: 10px;
-
-}
-
-
-
-.job-id input {
-
-  padding: 10px;
-
-  border-radius: 5px;
-
-  border: none;
-
-  width: 220px;
-
-}
-
-
-
-.job-id button {
-
-  padding: 10px 15px;
-
-  border: none;
-
-  background: #007bff;
-
-  color: white;
-
-  border-radius: 5px;
-
-  font-weight: bold;
-
-}
+.job-id button { padding: 10px 15px; border: none; background: #007bff; color: #fff; border-radius: 6px; font-weight: 700; }
 
 
 
@@ -261,58 +116,14 @@ nav a {
 
 @media (max-width: 768px) {
 
-  .hero {
+  .overlay { background: rgba(0, 0, 0, 0.45); padding: 20px; width: 92vw; }
 
-    background: url('images/hero-bg.jpg') no-repeat center center/cover;
+  .brand-logo{ width: min(92vw, 380px); margin-bottom: 18px; }
 
-    height: 100vh;
+  .hero h1 { font-size: 1.9rem; }
 
-  }
+  .hero p  { font-size: 1rem; }
 
-
-
-  .overlay {
-
-    background: rgba(0, 0, 0, 0.6);
-
-    padding: 20px;
-
-    width: 90%;
-
-  }
-
-
-
-  .hero h1 {
-
-    font-size: 1.8rem;
-
-  }
-
-
-
-  .hero p {
-
-    font-size: 1rem;
-
-  }
-
-
-
-  .buttons {
-
-    flex-direction: column;
-
-    gap: 10px;
-
-  }
-
-
-
-  nav a {
-
-    color: #fff;
-
-  }
+  .buttons { flex-direction: column; gap: 10px; }
 
 }
