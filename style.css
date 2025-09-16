@@ -429,3 +429,35 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
   .mega-grid{ grid-template-columns: 1fr; }
 
 }
+
+/* اخفاء الشبكة القديمة (لأننا سنستخدم زر + مودال) */
+
+#old-services { display: none !important; }
+
+
+
+/* تنسيقات المودال والـ12 أيقونة */
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:9999}
+
+.sheet{background:#0e132b;border:1px solid rgba(255,255,255,.1);border-radius:18px;width:min(880px,100%);padding:18px;color:#E9ECF5}
+
+.card{background:#121735;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px}
+
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+@media (max-width:820px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}}
+
+.icon{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.15));border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:.2s}
+
+.icon:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.25)}
+
+.icon .emoji{font-size:30px}
+
+.icon span{display:block;margin-top:8px;color:#A7B0C4;font-size:12px}
+
+.row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.15)}
+
+progress{width:180px;height:10px}
