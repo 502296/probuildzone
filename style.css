@@ -1,241 +1,183 @@
-<!DOCTYPE html>
+/* Reset */
 
-<html lang="en">
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-<head>
+body{ font-family: Arial, sans-serif; background:#fff; color:#333; }
 
-  <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>ProBuildZone — Fair Prices, Local Pros</title>
+/* Navbar */
 
-  <meta name="description" content="Post your home project with photos. Local pros send offers. You choose the best match — fair prices, local professionals." />
+header{
 
-  <link rel="stylesheet" href="style.css?v=3"/>
+  width:100%; position:absolute; top:0; left:0; z-index:10; padding:20px 40px;
 
-</head>
+  transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
 
-<body>
+}
 
-  <header>
+header.scrolled{ background:rgba(0,0,0,.35); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); box-shadow:0 6px 20px rgba(0,0,0,.35); }
 
-    <nav>
+nav{ display:flex; justify-content:space-between; align-items:center; }
 
-      <div class="logo">
+.logo img{ height:50px; }
 
-        <img src="images/logo.png" alt="ProBuildZone Logo">
+nav ul{ display:flex; list-style:none; gap:20px; }
 
-      </div>
+nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
-      <ul>
+.pro-btn{ background:#f6a623; padding:8px 16px; border-radius:5px; color:#000 !important; }
 
-        <li><a href="#">How it works</a></li>
 
-        <li><a href="#">Services</a></li>
 
-        <li><a href="#" class="pro-btn">For Pros</a></li>
+/* Hero */
 
-      </ul>
+.hero{
 
-    </nav>
+  height:100vh;
 
-  </header>
+  background: url('./images/hero-bg.jpg') no-repeat center center/cover;
 
+  display:flex; align-items:center; justify-content:center; position:relative; text-align:center; overflow:hidden;
 
+}
 
-  <!-- ===== Hero ===== -->
+.overlay{
 
-  <section class="hero">
+  background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
 
-    <div class="overlay">
+  box-shadow:0 16px 48px rgba(0,0,0,.35);
 
-      <h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
+  padding:40px; border-radius:16px; color:#fff; max-width:700px;
 
-      <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
+}
 
-      <div class="buttons">
+.hero h1{ font-size:2.5rem; margin-bottom:20px; }
 
-        <a href="#" class="btn primary">Post a Job (Free)</a>
+.hero p{ font-size:1.2rem; margin-bottom:30px; }
 
-        <a href="#" class="btn secondary">View Services</a>
 
-      </div>
 
-      <div class="job-id">
+/* Buttons */
 
-        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
+.buttons{ display:flex; justify-content:center; gap:20px; margin-bottom:20px; }
 
-        <button>Go</button>
+.btn{
 
-      </div>
+  padding:12px 20px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1rem;
 
-    </div>
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
 
-  </section>
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
 
+}
 
+.primary{ background:#007bff; color:#fff; }
 
-  <!-- ===== Services ===== -->
+.secondary{ background:transparent; color:#fff; border:2px solid #fff; }
 
-  <section class="section services">
+.primary:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(0,123,255,.35); }
 
-    <div class="container">
+.secondary:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(255,255,255,.25); background:rgba(255,255,255,.08); }
 
-      <h2>Home Project Categories</h2>
 
-      <p class="sub">Pick a category — local pros will send offers.</p>
 
+/* Job ID */
 
+.job-id{ display:flex; justify-content:center; gap:10px; }
 
-      <div class="s-grid">
+.job-id input{ padding:10px; border-radius:5px; border:none; width:220px; box-shadow:inset 0 1px 2px rgba(0,0,0,.25); }
 
-        <article class="s-card">
+.job-id button{ padding:10px 15px; border:none; background:#007bff; color:white; border-radius:5px; font-weight:bold; }
 
-          <div class="s-ico">🛠️</div>
 
-          <h3>General Home Repairs</h3>
 
-          <p>Small fixes, handyman tasks, doors & windows.</p>
+/* Animations */
 
-          <a href="#" class="s-cta">Post a Job</a>
+@keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
 
-        </article>
+.overlay>*{ opacity:0; animation:fadeUp .7s ease-out forwards; }
 
+.overlay h1{ animation-delay:.05s; }
 
+.overlay p{ animation-delay:.18s; }
 
-        <article class="s-card">
+.overlay .buttons{ animation-delay:.30s; }
 
-          <div class="s-ico">💡</div>
+.overlay .job-id{ animation-delay:.42s; }
 
-          <h3>Electrical</h3>
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 
-          <p>Outlets, lighting, panel work, troubleshooting.</p>
 
-          <a href="#" class="s-cta">Post a Job</a>
 
-        </article>
+/* ===== Services ===== */
 
+.section.services{ padding:72px 0; background:#11293d; color:#fff; }
 
+.section.services .container{ width:min(1100px,92vw); margin:0 auto; }
 
-        <article class="s-card">
+.section.services h2{ font-size:clamp(26px,3.4vw,36px); text-align:center; margin-bottom:8px; }
 
-          <div class="s-ico">🚿</div>
+.section.services .sub{ text-align:center; opacity:.9; margin-bottom:28px; }
 
-          <h3>Plumbing</h3>
 
-          <p>Leaks, faucets, drains, water heaters.</p>
 
-          <a href="#" class="s-cta">Post a Job</a>
+.s-grid{ display:grid; grid-template-columns: repeat(4,1fr); gap:18px; }
 
-        </article>
+.s-card{
 
+  background:#ffffff; color:#0f2233; border-radius:12px; padding:18px;
 
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
 
-        <article class="s-card">
+  display:flex; flex-direction:column; justify-content:space-between;
 
-          <div class="s-ico">🧱</div>
+}
 
-          <h3>Roofing & Gutters</h3>
+.s-ico{ font-size:28px; }
 
-          <p>Patch leaks, shingles, gutter install & clean.</p>
+.s-card h3{ margin:10px 0 6px; font-size:18px; }
 
-          <a href="#" class="s-cta">Post a Job</a>
+.s-card p{ color:#3b4a5a; margin-bottom:14px; }
 
-        </article>
+.s-cta{
 
+  align-self:flex-start; padding:10px 14px;
 
+  background:#007bff; color:#fff; text-decoration:none;
 
-        <article class="s-card">
+  border-radius:8px; font-weight:700;
 
-          <div class="s-ico">🎨</div>
+  transition: transform .15s ease, box-shadow .15s ease;
 
-          <h3>Painting</h3>
+  box-shadow:0 6px 16px rgba(0,123,255,.28);
 
-          <p>Interior & exterior, prep and clean finishes.</p>
+}
 
-          <a href="#" class="s-cta">Post a Job</a>
+.s-cta:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,123,255,.35); }
 
-        </article>
 
 
+/* Browse All */
 
-        <article class="s-card">
+.browse-all{ text-align:center; margin-top:28px; }
 
-          <div class="s-ico">🪵</div>
+.browse-btn{
 
-          <h3>Flooring</h3>
+  display:inline-block; padding:12px 20px; background:transparent; border:2px solid #fff; color:#fff;
 
-          <p>Hardwood, laminate, tile, repairs & install.</p>
+  border-radius:8px; font-weight:700; text-decoration:none;
 
-          <a href="#" class="s-cta">Post a Job</a>
+  transition:background .2s ease, color .2s ease;
 
-        </article>
+}
 
+.browse-btn:hover{ background:#fff; color:#0f2233; }
 
 
-        <article class="s-card">
 
-          <div class="s-ico">🌿</div>
+/* Responsive */
 
-          <h3>Landscaping</h3>
+@media (max-width:992px){ .s-grid{ grid-template-columns:1fr 1fr; } }
 
-          <p>Yard cleanup, sod, mulch, seasonal care.</p>
-
-          <a href="#" class="s-cta">Post a Job</a>
-
-        </article>
-
-
-
-        <article class="s-card">
-
-          <div class="s-ico">❄️</div>
-
-          <h3>HVAC</h3>
-
-          <p>Heating & cooling tune-ups, repairs, installs.</p>
-
-          <a href="#" class="s-cta">Post a Job</a>
-
-        </article>
-
-      </div>
-
-
-
-      <div class="browse-all">
-
-        <a href="#" class="browse-btn">Browse All Categories →</a>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <script>
-
-    // Navbar on scroll
-
-    const header = document.querySelector('header');
-
-    const onScroll = () => {
-
-      if (window.scrollY > 8) header.classList.add('scrolled');
-
-      else header.classList.remove('scrolled');
-
-    };
-
-    window.addEventListener('scroll', onScroll);
-
-    onScroll();
-
-  </script>
-
-</body>
-
-</html>
+@media (max-width:600px){ .s-grid{ grid-template-columns:1fr; } }
