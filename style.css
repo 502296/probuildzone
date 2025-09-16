@@ -1,10 +1,12 @@
 /* =========================
 
-   Brand settings
+   Brand settings (easy edit)
 
    ========================= */
 
 :root{
+
+  /* US-flag logo colors */
 
   --brand-pro:   #D32F2F; /* Red */
 
@@ -12,7 +14,11 @@
 
   --brand-zone:  #FFFFFF; /* White */
 
-  --logo-size: 30px;      /* Logo size */
+
+
+  /* Logo size */
+
+  --logo-size: 30px;
 
 }
 
@@ -38,27 +44,39 @@ nav{ display:flex; justify-content:space-between; align-items:center; }
 
 
 
+/* Logo: text */
+
 .brand-logo{
 
-  font-weight:900;
+  font-weight: 900;
 
   font-size: var(--logo-size);
 
-  letter-spacing:.4px;
+  letter-spacing: .4px;
 
   user-select:none;
 
-  line-height:1;
+  line-height: 1;
+
+  color: var(--brand-pro);     /* Pro (Red) */
 
 }
 
-.brand-logo{ color: var(--brand-pro); }
+.brand-logo span{ color: var(--brand-build); } /* Build (Blue) */
 
-.brand-logo span{ color: var(--brand-build); }
+.brand-logo em{
 
-.brand-logo em{ font-style:normal; color: var(--brand-zone); text-shadow:0 1px 3px rgba(0,0,0,.4); }
+  font-style:normal;
+
+  color: var(--brand-zone);    /* Zone (White) */
+
+  text-shadow: 0 1px 3px rgba(0,0,0,.4); /* حتى يبان فوق الخلفية */
+
+}
 
 
+
+/* Nav links */
 
 nav ul{ display:flex; list-style:none; gap:22px; }
 
@@ -83,6 +101,8 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
   overflow:hidden;
 
 }
+
+/* overlay desktop */
 
 .hero::before{
 
@@ -138,71 +158,231 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
 
 
-/* Categories */
+/* ============ Mega Categories (12) ============ */
 
-.categories{ padding:64px 24px; background:#f7f8fa; text-align:center; }
+.mega-categories{
 
-.categories h2{ font-size:2rem; margin-bottom:8px; color:#222; }
+  padding: 64px 24px;
 
-.cats-sub{ color:#555; margin-bottom:36px; }
+  background: #f7f8fa;
 
-
-
-.categories-grid{
-
-  display:grid; grid-template-columns: repeat(3,1fr);
-
-  gap:25px; max-width:1200px; margin:0 auto;
+  text-align: center;
 
 }
 
-.category{
+.mega-categories h2{
 
-  background:#fff; border-radius:12px; padding:22px;
+  font-size: 2rem;
 
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  margin-bottom: 8px;
+
+  color: #222;
+
+}
+
+.mega-categories .mega-sub{
+
+  color: #555;
+
+  margin-bottom: 36px;
+
+}
+
+
+
+.mega-grid{
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr); /* desktop: 4 columns */
+
+  gap: 24px;
+
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+}
+
+
+
+.cat{
+
+  background: #fff;
+
+  border-radius: 14px;
+
+  padding: 22px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
 
   transition: transform .2s ease, box-shadow .2s ease;
 
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
 }
 
-.category:hover{ transform: translateY(-5px); box-shadow:0 8px 22px rgba(0,0,0,.18); }
+.cat:hover{
 
-.category i{ font-size:28px; color:#007bff; margin-bottom:12px; }
+  transform: translateY(-5px);
 
-.category h3{ font-size:18px; margin-bottom:8px; color:#333; }
+  box-shadow: 0 10px 24px rgba(0,0,0,.16);
 
-.category p{ color:#555; margin-bottom:14px; }
+}
 
-.category a{
 
-  display:inline-block; padding:8px 14px; border-radius:8px;
 
-  background:#007bff; color:#fff; text-decoration:none; font-weight:700;
+.cat i{
+
+  font-size: 28px;
+
+  color: #007bff;
+
+  margin-bottom: 12px;
+
+}
+
+.cat h3{
+
+  font-size: 18px;
+
+  color: #333;
+
+  margin-bottom: 8px;
+
+}
+
+.cat p{
+
+  color: #555;
+
+  margin-bottom: 16px;
+
+  min-height: 44px;
+
+}
+
+
+
+/* Actions inside card */
+
+.actions{
+
+  display: flex;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+}
+
+
+
+.upload-btn{
+
+  position: relative;
+
+  overflow: hidden;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 9px 14px;
+
+  border-radius: 8px;
+
+  border: 2px dashed #007bff;
+
+  color: #007bff;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: all .15s ease;
+
+}
+
+.upload-btn:hover{ background: rgba(0,123,255,.06); }
+
+.upload-btn input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+.upload-btn span{ display:inline-flex; align-items:center; gap:8px; }
+
+
+
+.cta{
+
+  display:inline-block;
+
+  padding: 10px 14px;
+
+  border-radius: 8px;
+
+  background:#007bff;
+
+  color:#fff;
+
+  text-decoration:none;
+
+  font-weight:800;
 
   box-shadow:0 6px 16px rgba(0,123,255,.28);
 
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
 
 }
 
-.category a:hover{ transform: translateY(-2px); box-shadow:0 10px 22px rgba(0,123,255,.35); }
+.cta:hover{
+
+  transform: translateY(-2px);
+
+  box-shadow:0 10px 22px rgba(0,123,255,.35);
+
+  background:#0066d6;
+
+}
 
 
 
-.browse-all{ display:inline-block; margin-top:28px; font-weight:700; color:#007bff; text-decoration:none; }
+.browse-all{
+
+  display:inline-block;
+
+  margin-top:28px;
+
+  font-weight:700;
+
+  color:#007bff;
+
+  text-decoration:none;
+
+}
 
 
 
-/* Responsive */
+/* ========= Responsive ========= */
 
-@media (max-width: 992px){
+@media (max-width: 1200px){
 
-  .categories-grid{ grid-template-columns: repeat(2,1fr); }
+  .mega-grid{ grid-template-columns: repeat(3, 1fr); }
 
 }
 
 @media (max-width: 768px){
+
+  /* أخف على الموبايل */
 
   header{ padding:14px 16px; }
 
@@ -212,7 +392,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
   :root{ --logo-size: 24px; }
 
-  
+
 
   .hero::before{
 
@@ -220,11 +400,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
   }
 
-  
 
-  .hero h1{ font-size:2rem; }
-
-  .hero p{ font-size:1rem; }
 
   .buttons{ flex-direction:column; gap:12px; }
 
@@ -232,9 +408,13 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
   .job-id input{ width:100%; }
 
+
+
+  .mega-grid{ grid-template-columns: repeat(2, 1fr); }
+
 }
 
-@media (max-width: 420px){
+@media (max-width: 520px){
 
   :root{ --logo-size: 20px; }
 
@@ -244,6 +424,8 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
   .pro-btn{ font-size:13px; padding:6px 10px; }
 
-  .hero h1{ font-size:1.9rem; }
+  .hero h1{ font-size: 1.9rem; }
+
+  .mega-grid{ grid-template-columns: 1fr; }
 
 }
