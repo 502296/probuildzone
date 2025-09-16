@@ -6,19 +6,19 @@
 
 :root{
 
-  /* Logo colors */
+  /* Logo colors - US flag */
 
-  --brand-pro:   #E0592A;  /* Pro  */
+  --brand-pro:   #B22234; /* Pro: Red   */
 
-  --brand-build: #0B3A67;  /* Build */
+  --brand-build: #FFFFFF; /* Build: White */
 
-  --brand-zone:  #1B7A4A;  /* Zone  */
+  --brand-zone:  #0A3161; /* Zone: Blue  */
 
 
 
   /* Logo size */
 
-  --logo-size: 28px;       /* كبّر/صغّر اللوجو من هنا */
+  --logo-size: 28px;      /* كبّر/صغّر اللوجو من هنا */
 
 }
 
@@ -58,13 +58,27 @@ nav{ display:flex; justify-content:space-between; align-items:center; }
 
   line-height: 1;
 
+  color: var(--brand-pro);            /* Pro (Red) */
+
+  text-shadow: 0 1px 3px rgba(0,0,0,.25);
+
 }
 
-.brand-logo{ color: var(--brand-pro); }     /* Pro */
+.brand-logo span{                      /* Build (White) */
 
-.brand-logo span{ color: var(--brand-build);}/* Build */
+  color: var(--brand-build);
 
-.brand-logo em{ font-style:normal; color: var(--brand-zone);} /* Zone */
+  text-shadow: 0 1px 3px rgba(0,0,0,.45); /* حتى يبان فوق الصورة */
+
+}
+
+.brand-logo em{                        /* Zone (Blue) */
+
+  font-style:normal;
+
+  color: var(--brand-zone);
+
+}
 
 
 
@@ -94,13 +108,13 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
 }
 
-/* تدرّج خفيف لتحسين قراءة النص */
+/* تدرّج خفيف لتحسين قراءة النص (ديسكتوب) */
 
 .hero::before{
 
   content:""; position:absolute; inset:0;
 
-  background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,.15) 45%, rgba(0,0,0,0) 70%);
+  background: linear-gradient(180deg, rgba(0,0,0,.40) 0%, rgba(0,0,0,.14) 45%, rgba(0,0,0,0) 70%);
 
   pointer-events:none;
 
@@ -224,26 +238,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
 }
 
-@media (max-width: 768px){
 
-  nav a{ color:#fff; }
-
-  /* صغّر اللوجو قليلًا على الموبايل */
-
-  :root{ --logo-size: 22px; }
-
-  .hero h1{ font-size: 2.2rem; }
-
-  .hero p{ font-size: 1rem; }
-
-}
-
-@media (max-width: 600px){
-
-  .categories-grid{ grid-template-columns: 1fr; }
-
-}
-/* ===== Mobile polish (lighter overlay) ===== */
 
 @media (max-width: 768px){
 
@@ -255,9 +250,9 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
       180deg,
 
-      rgba(0,0,0,.20) 0%,   /* كان .28 */
+      rgba(0,0,0,.18) 0%,
 
-      rgba(0,0,0,.06) 45%,  /* كان .10 */
+      rgba(0,0,0,.05) 45%,
 
       rgba(0,0,0,0) 70%
 
@@ -267,15 +262,9 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
 
 
-  /* صغّر اللوجو قليلاً وحافظ على الألوان */
+  /* اللوجو والمسافات في الهيدر */
 
   :root{ --logo-size: 22px; }
-
-  .brand-logo{ letter-spacing: .2px; }
-
-
-
-  /* النافبار: تقليل المسافات حتى لا ينكسر السطر */
 
   header{ padding: 14px 16px; }
 
@@ -286,8 +275,6 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
   nav a{ font-weight: 600; font-size: 15px; white-space: nowrap; }
 
 
-
-  /* زر For Pros أصغر قليلاً */
 
   .pro-btn{
 
@@ -301,7 +288,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
 
 
-  /* نصوص الهيرو أكثر وضوحاً فوق الصورة */
+  /* نصوص الهيرو */
 
   .hero h1{
 
@@ -309,7 +296,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
     line-height: 1.18;
 
-    text-shadow: 0 3px 14px rgba(0,0,0,.3);
+    text-shadow: 0 3px 14px rgba(0,0,0,.30);
 
     margin-bottom: 14px;
 
@@ -327,19 +314,23 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
 
 
 
-  /* أزرار الهيرو متراصّة أفضل */
-
   .buttons{ gap: 12px; margin-bottom: 14px; }
 
   .btn{ padding: 11px 16px; font-size: .95rem; border-radius: 6px; }
 
 
 
-  /* حقل Job ID يأخذ العرض كاملاً */
-
   .job-id{ gap: 8px; }
 
   .job-id input{ width: 100%; max-width: 520px; }
+
+}
+
+
+
+@media (max-width: 600px){
+
+  .categories-grid{ grid-template-columns: 1fr; }
 
 }
 
