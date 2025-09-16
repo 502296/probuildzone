@@ -10,9 +10,9 @@ export default async function handler(req, res) {
 
   try {
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const url     = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const anon    = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     const service = process.env.SUPABASE_SERVICE_ROLE;
 
@@ -20,11 +20,11 @@ export default async function handler(req, res) {
 
 
 
-    // DB client (RLS يطبق لو يوجد Authorization)
+    // DB client (RLS يُطبق إن وُجد توكن)
 
-    const db = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+    const db    = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
 
-    const admin = createClient(url, service); // للصور فقط
+    const admin = createClient(url, service); // لرفع الصور (صلاحية مرتفعة)
 
 
 
@@ -40,31 +40,31 @@ export default async function handler(req, res) {
 
 
 
-    // المستخدم (إن كان مسجل)
+    // 1) إنشاء job (ولو فيه مستخدم مسجل سيتم ربطه)
 
-    const { data: userSession } = await db.auth.getUser();
+    const { data: sessionInfo } = await db.auth.getUser();
 
-    const user_id = userSession?.user?.id || null; // قد يكون null إذا بدون تسجيل
+    const user_id = sessionInfo?.user?.id || null;
 
 
 
-    // 1) إنشاء job
+    const baseJob = { category, title, summary, city, state, budget_min, budget_max };
 
-    const insertObj = { category, title, summary, city, state, budget_min, budget_max };
+    if (user_id) baseJob.user_id = user_id;
 
-    if (user_id) insertObj.user_id = user_id; // يثبت الملكية إن توفرت
 
-    const { data: job, error: e1 } = await db.from('jobs').insert(insertObj).select().single();
+
+    const { data: job, error: e1 } = await db.from('jobs').insert(baseJob).select().single();
 
     if (e1) return res.status(400).json({ error: e1.message });
 
 
 
-    // 2) رفع الصور (خاص)
+    // 2) رفع الصور (خاصة)
 
     const paths = [];
 
-    for (let i=0;i<(photosBase64||[]).length;i++){
+    for (let i = 0; i < (photosBase64 || []).length; i++) {
 
       const bin = Buffer.from(photosBase64[i], 'base64');
 
