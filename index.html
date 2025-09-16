@@ -18,9 +18,7 @@
 
   <!-- Font Awesome (icons) -->
 
-  <link rel="stylesheet"
-
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 </head>
 
@@ -34,11 +32,7 @@
 
     <nav>
 
-      <!-- Logo: Text (US flag colors) -->
-
       <div class="brand-logo">Pro<span>Build</span><em>Zone</em></div>
-
-
 
       <ul>
 
@@ -74,6 +68,10 @@
 
         <a href="#services" class="btn secondary">View Services</a>
 
+        <!-- زر الباب الواحد -->
+
+        <button class="btn" id="openDoor" style="margin-left:8px">Open Upload Door</button>
+
       </div>
 
 
@@ -92,7 +90,7 @@
 
 
 
-  <!-- Mega Categories (12) -->
+  <!-- Mega Categories (القسم القديم) -->
 
   <section id="services" class="mega-categories">
 
@@ -102,7 +100,11 @@
 
 
 
-    <div class="mega-grid">
+    <!-- أعطيناه id حتى نخفيه بالـCSS -->
+
+    <div class="mega-grid" id="old-services">
+
+      <!-- نفس بطاقاتك 1..12 كما هي (أبقيتها) -->
 
       <!-- 1 -->
 
@@ -130,9 +132,7 @@
 
       </div>
 
-
-
-      <!-- 2 -->
+      <!-- ... بقية البطاقات 2..12 بدون تغيير ... -->
 
       <div class="cat">
 
@@ -160,8 +160,6 @@
 
 
 
-      <!-- 3 -->
-
       <div class="cat">
 
         <i class="fas fa-faucet"></i>
@@ -187,8 +185,6 @@
       </div>
 
 
-
-      <!-- 4 -->
 
       <div class="cat">
 
@@ -216,8 +212,6 @@
 
 
 
-      <!-- 5 -->
-
       <div class="cat">
 
         <i class="fas fa-paint-roller"></i>
@@ -243,8 +237,6 @@
       </div>
 
 
-
-      <!-- 6 -->
 
       <div class="cat">
 
@@ -272,8 +264,6 @@
 
 
 
-      <!-- 7 -->
-
       <div class="cat">
 
         <i class="fas fa-seedling"></i>
@@ -299,8 +289,6 @@
       </div>
 
 
-
-      <!-- 8 -->
 
       <div class="cat">
 
@@ -328,8 +316,6 @@
 
 
 
-      <!-- 9 -->
-
       <div class="cat">
 
         <i class="fas fa-warehouse"></i>
@@ -355,8 +341,6 @@
       </div>
 
 
-
-      <!-- 10 -->
 
       <div class="cat">
 
@@ -384,8 +368,6 @@
 
 
 
-      <!-- 11 -->
-
       <div class="cat">
 
         <i class="fas fa-door-open"></i>
@@ -411,8 +393,6 @@
       </div>
 
 
-
-      <!-- 12 -->
 
       <div class="cat">
 
@@ -445,6 +425,60 @@
     <a href="#" class="browse-all">Browse All Categories →</a>
 
   </section>
+
+
+
+  <!-- ===== Upload Door Modal (زر واحد) ===== -->
+
+  <div class="modal" id="modal" style="display:none">
+
+    <div class="sheet">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+
+        <h3 style="margin:6px 0 8px">Choose a category (12)</h3>
+
+        <button class="btn" id="closeDoor" style="padding:8px 12px">Close</button>
+
+      </div>
+
+
+
+      <div class="grid" id="iconGrid"></div>
+
+
+
+      <div id="uploaderArea" style="display:none">
+
+        <h3 id="catTitle" style="margin-top:16px"></h3>
+
+        <label class="icon" style="display:block;cursor:pointer">
+
+          <input type="file" id="fileInput" multiple style="display:none" />
+
+          <div class="emoji">⬆️</div>
+
+          <span>Drop files here or click to choose</span>
+
+        </label>
+
+        <div class="card" id="fileList" style="margin-top:12px"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ======================================= -->
+
+
+
+  <!-- Scripts -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <script src="./app.umd.js?v=1"></script>
 
 </body>
 
