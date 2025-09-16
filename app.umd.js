@@ -1,10 +1,12 @@
-/* app.umd.js */
+/* app.umd.js — One Door + 12 Icons (UMD) */
 
 
 
-const SUPABASE_URL  = "https://YOUR-PROJECT.supabase.co";   // عدّل لاحقًا
+/* ضع مفاتيح Supabase الحقيقية لاحقًا */
 
-const SUPABASE_ANON = "YOUR-ANON-KEY";                      // عدّل لاحقًا
+const SUPABASE_URL  = "https://YOUR-PROJECT.supabase.co";
+
+const SUPABASE_ANON = "YOUR-ANON-KEY";
 
 const BUCKET = "projects";
 
@@ -20,7 +22,7 @@ let currentUserId = null;
 
   try {
 
-    const { data: { user } } = await supa.auth.getUser();
+    const { data: { user} } = await supa.auth.getUser();
 
     if (user) currentUserId = user.id;
 
@@ -34,29 +36,29 @@ let currentUserId = null;
 
 const categories = [
 
-  {key:"blueprints",     label:"المخططات",     emoji:"📐"},
+  {key:"blueprints",     label:"Blueprints",   emoji:"📐"},
 
-  {key:"photos_before",  label:"صور قبل",      emoji:"📷"},
+  {key:"photos_before",  label:"Before",       emoji:"📷"},
 
-  {key:"photos_after",   label:"صور بعد",      emoji:"✨"},
+  {key:"photos_after",   label:"After",        emoji:"✨"},
 
-  {key:"permits",        label:"تصاريح",       emoji:"📄"},
+  {key:"permits",        label:"Permits",      emoji:"📄"},
 
-  {key:"invoices",       label:"فواتير",       emoji:"🧾"},
+  {key:"invoices",       label:"Invoices",     emoji:"🧾"},
 
-  {key:"contracts",      label:"عقود",         emoji:"✍️"},
+  {key:"contracts",      label:"Contracts",    emoji:"✍️"},
 
-  {key:"materials",      label:"مواد",         emoji:"🏗️"},
+  {key:"materials",      label:"Materials",    emoji:"🏗️"},
 
-  {key:"designs",        label:"تصاميم",       emoji:"🎨"},
+  {key:"designs",        label:"Designs",      emoji:"🎨"},
 
-  {key:"measurements",   label:"قياسات",       emoji:"📏"},
+  {key:"measurements",   label:"Measurements", emoji:"📏"},
 
-  {key:"videos",         label:"فيديوهات",     emoji:"🎬"},
+  {key:"videos",         label:"Videos",       emoji:"🎬"},
 
-  {key:"voice_notes",    label:"ملاحظات صوت",  emoji:"🎙️"},
+  {key:"voice_notes",    label:"Voice Notes",  emoji:"🎙️"},
 
-  {key:"other",          label:"أخرى",         emoji:"🗂️"},
+  {key:"other",          label:"Other",        emoji:"🗂️"},
 
 ];
 
@@ -98,7 +100,7 @@ categories.forEach(c => {
 
   div.innerHTML = `<div class="emoji">${c.emoji}</div><span>${c.label}</span>`;
 
-  div.onclick = () => { activeCategory = c; uploaderArea.style.display = "block"; catTitle.textContent = `الفئة المختارة: ${c.label}`; };
+  div.onclick = () => { activeCategory = c; uploaderArea.style.display = "block"; catTitle.textContent = `Selected: ${c.label}`; };
 
   grid.appendChild(div);
 
@@ -108,7 +110,7 @@ categories.forEach(c => {
 
 fileInput && fileInput.addEventListener("change", async (e) => {
 
-  if (!activeCategory) return alert("اختر فئة أولًا");
+  if (!activeCategory) return alert("Choose a category first");
 
   const files = Array.from(e.target.files);
 
@@ -155,6 +157,8 @@ async function uploadOne(file){
   });
 
   if (error) { prog.value = 0; row.style.color = "#ff7b7b"; row.title = error.message; return; }
+
+
 
   prog.value = 100;
 
