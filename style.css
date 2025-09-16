@@ -18,7 +18,7 @@
 
   /* Logo size */
 
-  --logo-size: 33px;
+  --logo-size: 30px;
 
 }
 
@@ -382,7 +382,7 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; white-space:nowrap; }
 
 @media (max-width: 768px){
 
-  /* أخف على الموبايل */
+  /* موبايل */
 
   header{ padding:14px 16px; }
 
