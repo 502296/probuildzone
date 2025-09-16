@@ -1,104 +1,106 @@
-import { createClient } from '@supabase/supabase-js'
-
-
-
-const supabase = createClient(
-
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-
-  process.env.SUPABASE_SERVICE_ROLE
-
-)
+import { createClient } from '@supabase/supabase-js';
 
 
 
 export default async function handler(req, res) {
 
-  if (req.method !== "POST") {
-
-    return res.status(405).json({ error: "Method not allowed" })
-
-  }
-
-
-
-  const { category, name, phone, address, details, photos } = req.body
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
 
 
   try {
 
-    // 1) حفظ job الأساسي
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const { data: job, error: jobError } = await supabase
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      .from("jobs")
+    const service = process.env.SUPABASE_SERVICE_ROLE;
 
-      .insert([{ category, status: "pending" }])
-
-      .select()
-
-      .single()
+    const authHeader = req.headers.authorization || '';
 
 
 
-    if (jobError) throw jobError
+    // DB client (RLS يطبق لو يوجد Authorization)
+
+    const db = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+
+    const admin = createClient(url, service); // للصور فقط
 
 
 
-    // 2) حفظ تفاصيل صاحب المنزل (private)
+    const body = req.body || {};
 
-    const { error: privError } = await supabase
+    const {
 
-      .from("jobs_private")
+      category, title, summary, city, state, budget_min, budget_max,
 
-      .insert([{
+      address, contact_name, phone, email, description_long, photosBase64
 
-        job_id: job.id,
-
-        homeowner_name: name,
-
-        phone,
-
-        address,
-
-        details
-
-      }])
-
-    if (privError) throw privError
+    } = body;
 
 
 
-    // 3) رفع الصور للبَكِت job-photos
+    // المستخدم (إن كان مسجل)
 
-    for (let photo of photos) {
+    const { data: userSession } = await db.auth.getUser();
 
-      const base64Data = photo.data.split(',')[1] // remove "data:image/...;base64,"
+    const user_id = userSession?.user?.id || null; // قد يكون null إذا بدون تسجيل
 
-      const buffer = Buffer.from(base64Data, "base64")
 
-      await supabase.storage.from("job-photos").upload(
 
-        `${job.id}/${photo.name}`,
+    // 1) إنشاء job
 
-        buffer,
+    const insertObj = { category, title, summary, city, state, budget_min, budget_max };
 
-        { contentType: "image/jpeg", upsert: true }
+    if (user_id) insertObj.user_id = user_id; // يثبت الملكية إن توفرت
 
-      )
+    const { data: job, error: e1 } = await db.from('jobs').insert(insertObj).select().single();
+
+    if (e1) return res.status(400).json({ error: e1.message });
+
+
+
+    // 2) رفع الصور (خاص)
+
+    const paths = [];
+
+    for (let i=0;i<(photosBase64||[]).length;i++){
+
+      const bin = Buffer.from(photosBase64[i], 'base64');
+
+      const filePath = `${job.id}/${Date.now()}_${i}.jpg`;
+
+      const { error: upErr } = await admin.storage.from('job-photos')
+
+        .upload(filePath, bin, { contentType: 'image/jpeg', upsert: true });
+
+      if (upErr) return res.status(400).json({ error: upErr.message });
+
+      paths.push(filePath);
 
     }
 
 
 
-    return res.status(200).json({ jobId: job.id })
+    // 3) التفاصيل الخاصة
+
+    const { error: e2 } = await db.from('jobs_private').insert({
+
+      job_id: job.id, address, contact_name, phone, email, description_long, photos: paths
+
+    });
+
+    if (e2) return res.status(400).json({ error: e2.message });
+
+
+
+    return res.json({ ok: true, job_id: job.id });
 
   } catch (err) {
 
-    console.error(err)
+    console.error(err);
 
-    return res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: 'Server error' });
 
   }
 
