@@ -243,3 +243,120 @@ nav a{ text-decoration:none; color:#fff; font-weight:600; }
   .categories-grid{ grid-template-columns: 1fr; }
 
 }
+/* ===== Mobile polish (lighter overlay) ===== */
+
+@media (max-width: 768px){
+
+  /* خلفية أخف بكثير على الهاتف */
+
+  .hero::before{
+
+    background: linear-gradient(
+
+      180deg,
+
+      rgba(0,0,0,.20) 0%,   /* كان .28 */
+
+      rgba(0,0,0,.06) 45%,  /* كان .10 */
+
+      rgba(0,0,0,0) 70%
+
+    );
+
+  }
+
+
+
+  /* صغّر اللوجو قليلاً وحافظ على الألوان */
+
+  :root{ --logo-size: 22px; }
+
+  .brand-logo{ letter-spacing: .2px; }
+
+
+
+  /* النافبار: تقليل المسافات حتى لا ينكسر السطر */
+
+  header{ padding: 14px 16px; }
+
+  nav{ gap: 10px; }
+
+  nav ul{ gap: 12px; }
+
+  nav a{ font-weight: 600; font-size: 15px; white-space: nowrap; }
+
+
+
+  /* زر For Pros أصغر قليلاً */
+
+  .pro-btn{
+
+    padding: 6px 12px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+  }
+
+
+
+  /* نصوص الهيرو أكثر وضوحاً فوق الصورة */
+
+  .hero h1{
+
+    font-size: 2.1rem;
+
+    line-height: 1.18;
+
+    text-shadow: 0 3px 14px rgba(0,0,0,.3);
+
+    margin-bottom: 14px;
+
+  }
+
+  .hero p{
+
+    font-size: 1.02rem;
+
+    text-shadow: 0 2px 10px rgba(0,0,0,.25);
+
+    margin-bottom: 18px;
+
+  }
+
+
+
+  /* أزرار الهيرو متراصّة أفضل */
+
+  .buttons{ gap: 12px; margin-bottom: 14px; }
+
+  .btn{ padding: 11px 16px; font-size: .95rem; border-radius: 6px; }
+
+
+
+  /* حقل Job ID يأخذ العرض كاملاً */
+
+  .job-id{ gap: 8px; }
+
+  .job-id input{ width: 100%; max-width: 520px; }
+
+}
+
+
+
+/* شاشات أصغر جداً */
+
+@media (max-width: 420px){
+
+  :root{ --logo-size: 20px; }
+
+  nav ul{ gap: 10px; }
+
+  nav a{ font-size: 14px; }
+
+  .pro-btn{ font-size: 13px; padding: 6px 10px; }
+
+  .hero h1{ font-size: 1.9rem; }
+
+}
