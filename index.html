@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -12,6 +11,10 @@
   <title>ProBuildZone — Get Home Projects Done</title>
 
   <meta name="description" content="Post your project with photos. Local contractors send offers. You choose the best match — fair prices, local pros.">
+
+
+
+  <!-- CSS الرئيسي -->
 
   <link rel="stylesheet" href="style.css"/>
 
@@ -33,11 +36,13 @@
 
     <nav>
 
+      <!-- ألوان الشعار ستُطبّق من CSS -->
+
       <div class="brand-logo">Pro<span>Build</span><em>Zone</em></div>
 
       <ul>
 
-        <li><a href="#how">How it works</a></li>
+        <!-- تم حذف How it works حسب المطلوب -->
 
         <li><a href="#services">Services</a></li>
 
@@ -65,11 +70,11 @@
 
       <div class="buttons">
 
-        <a href="#services" class="btn primary">Post a Job (Free)</a>
+        <a href="#services" class="btn primary" id="postJobTop">Post a Job (Free)</a>
 
         <a href="#services" class="btn secondary">View Services</a>
 
-        <!-- زر الباب الواحد -->
+        <!-- زر الباب الواحد (ابقيناه كما هو) -->
 
         <button class="btn" id="openDoor" style="margin-left:8px">Open Upload Door</button>
 
@@ -91,6 +96,24 @@
 
 
 
+  <!-- روابط أسفل الهيرو: Services · Privacy · Terms -->
+
+  <section id="legal-links" class="legal-links">
+
+    <a href="services.html">Services</a>
+
+    <span>•</span>
+
+    <a href="privacy.html">Privacy</a>
+
+    <span>•</span>
+
+    <a href="terms.html">Terms</a>
+
+  </section>
+
+
+
   <!-- Mega Categories (القسم القديم) -->
 
   <section id="services" class="mega-categories">
@@ -101,11 +124,7 @@
 
 
 
-    <!-- أعطيناه id حتى نخفيه بالـCSS -->
-
     <div class="mega-grid" id="old-services">
-
-      <!-- نفس بطاقاتك 1..12 كما هي (أبقيتها) -->
 
       <!-- 1 -->
 
@@ -121,7 +140,9 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <!-- تحسين iOS: قبول صور + فتح الكاميرا -->
+
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -133,7 +154,9 @@
 
       </div>
 
-      <!-- ... بقية البطاقات 2..12 بدون تغيير ... -->
+
+
+      <!-- 2 -->
 
       <div class="cat">
 
@@ -147,7 +170,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -160,6 +183,8 @@
       </div>
 
 
+
+      <!-- 3 -->
 
       <div class="cat">
 
@@ -173,7 +198,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -186,6 +211,8 @@
       </div>
 
 
+
+      <!-- 4 -->
 
       <div class="cat">
 
@@ -199,7 +226,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -212,6 +239,8 @@
       </div>
 
 
+
+      <!-- 5 -->
 
       <div class="cat">
 
@@ -225,7 +254,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -238,6 +267,8 @@
       </div>
 
 
+
+      <!-- 6 -->
 
       <div class="cat">
 
@@ -251,7 +282,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -264,6 +295,8 @@
       </div>
 
 
+
+      <!-- 7 -->
 
       <div class="cat">
 
@@ -277,7 +310,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -290,6 +323,8 @@
       </div>
 
 
+
+      <!-- 8 -->
 
       <div class="cat">
 
@@ -303,7 +338,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -316,6 +351,8 @@
       </div>
 
 
+
+      <!-- 9 -->
 
       <div class="cat">
 
@@ -329,7 +366,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -342,6 +379,8 @@
       </div>
 
 
+
+      <!-- 10 -->
 
       <div class="cat">
 
@@ -355,7 +394,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -368,6 +407,8 @@
       </div>
 
 
+
+      <!-- 11 -->
 
       <div class="cat">
 
@@ -381,7 +422,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -395,6 +436,8 @@
 
 
 
+      <!-- 12 -->
+
       <div class="cat">
 
         <i class="fas fa-plug"></i>
@@ -407,7 +450,7 @@
 
           <label class="upload-btn">
 
-            <input type="file" accept="image/*" multiple>
+            <input type="file" accept="image/*" capture="environment" multiple>
 
             <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
 
@@ -455,7 +498,9 @@
 
         <label class="icon" style="display:block;cursor:pointer">
 
-          <input type="file" id="fileInput" multiple style="display:none" />
+          <!-- تحسين iOS هنا أيضاً -->
+
+          <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none" />
 
           <div class="emoji">⬆️</div>
 
