@@ -14,13 +14,17 @@
 
   <link rel="stylesheet" href="style.css"/>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+  <!-- Font Awesome (icons) -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 
-
-
 <body>
+
+
 
   <!-- Header / Navbar -->
 
@@ -28,13 +32,17 @@
 
     <nav>
 
-      <div class="brand-logo">Pro<span>Build</span><em>Zone</em></div>
+      <div class="brand-logo">
+
+        <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
+
+      </div>
 
       <ul>
 
-        <!-- تم حذف How it works -->
+        <!-- حذفت How it works حسب طلبك -->
 
-        <li><a href="#services">Services</a></li>
+        <li><a href="#links">Services</a></li>
 
         <li><a href="#pros" class="pro-btn">For Pros</a></li>
 
@@ -60,13 +68,11 @@
 
       <div class="buttons">
 
-        <a href="#services" class="btn primary" id="postJobTop">Post a Job (Free)</a>
+        <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
 
-        <a href="#services" class="btn secondary">View Services</a>
+        <a href="#links" class="btn secondary">View Services</a>
 
-        <!-- نترك زر الباب الواحد كما هو -->
-
-        <button class="btn" id="openDoor" style="margin-left:8px">Open Upload Door</button>
+        <button class="btn dark" id="checkOffers">Check Offer Prices</button>
 
       </div>
 
@@ -74,9 +80,9 @@
 
       <div class="job-id">
 
-        <input type="text" placeholder="Enter Job ID (e.g., FH-99999)">
+        <input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., FH-99999)">
 
-        <button>Go</button>
+        <button id="goQuick">Go</button>
 
       </div>
 
@@ -86,9 +92,9 @@
 
 
 
-  <!-- روابط أسفل الهيرو -->
+  <!-- Footer links under hero -->
 
-  <section id="legal-links" class="legal-links">
+  <section id="links" class="links-row">
 
     <a href="services.html">Services</a>
 
@@ -104,401 +110,129 @@
 
 
 
-  <!-- Mega Categories (القسم القديم) -->
-
-  <section id="services" class="mega-categories">
-
-    <h2>Home Project Categories</h2>
-
-    <p class="mega-sub">Pick a category — upload photos and local pros will send offers.</p>
-
-
-
-    <!-- نخفيه بالـCSS لأن الرفع صار عبر زر واحد + مودال -->
-
-    <div class="mega-grid" id="old-services">
-
-      <!-- 1 -->
-
-      <div class="cat">
-
-        <i class="fas fa-screwdriver-wrench"></i>
-
-        <h3>General Home Repairs</h3>
-
-        <p>Small fixes, handyman tasks, doors & windows.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 2 -->
-
-      <div class="cat">
-
-        <i class="fas fa-bolt"></i>
-
-        <h3>Electrical</h3>
-
-        <p>Outlets, lighting, panel work, troubleshooting.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 3 -->
-
-      <div class="cat">
-
-        <i class="fas fa-faucet"></i>
-
-        <h3>Plumbing</h3>
-
-        <p>Leaks, faucets, drains, water heaters.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 4 -->
-
-      <div class="cat">
-
-        <i class="fas fa-house-chimney"></i>
-
-        <h3>Roofing & Gutters</h3>
-
-        <p>Patch leaks, shingles, gutter install & clean.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 5 -->
-
-      <div class="cat">
-
-        <i class="fas fa-paint-roller"></i>
-
-        <h3>Painting</h3>
-
-        <p>Interior & exterior, prep and clean finishes.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 6 -->
-
-      <div class="cat">
-
-        <i class="fas fa-border-all"></i>
-
-        <h3>Flooring</h3>
-
-        <p>Hardwood, laminate, tile, repairs & install.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 7 -->
-
-      <div class="cat">
-
-        <i class="fas fa-seedling"></i>
-
-        <h3>Landscaping</h3>
-
-        <p>Yard cleanup, sod, mulch, seasonal care.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 8 -->
-
-      <div class="cat">
-
-        <i class="fas fa-fan"></i>
-
-        <h3>HVAC</h3>
-
-        <p>Heating & cooling tune-ups, repairs, installs.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 9 -->
-
-      <div class="cat">
-
-        <i class="fas fa-warehouse"></i>
-
-        <h3>Basement</h3>
-
-        <p>Waterproofing, repairs, finishing & remodeling.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 10 -->
-
-      <div class="cat">
-
-        <i class="fas fa-hammer"></i>
-
-        <h3>Carpentry</h3>
-
-        <p>Custom woodwork, framing, and repairs.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 11 -->
-
-      <div class="cat">
-
-        <i class="fas fa-door-open"></i>
-
-        <h3>Windows & Doors</h3>
-
-        <p>Install, replace, adjust & weatherproof.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- 12 -->
-
-      <div class="cat">
-
-        <i class="fas fa-plug"></i>
-
-        <h3>Appliances</h3>
-
-        <p>Installations & repairs for home appliances.</p>
-
-        <div class="actions">
-
-          <label class="upload-btn">
-
-            <input type="file" accept="image/*" capture="environment" multiple>
-
-            <span><i class="fas fa-cloud-upload-alt"></i> Upload Photos</span>
-
-          </label>
-
-          <a href="#" class="cta">Post a Job</a>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <a href="#" class="browse-all">Browse All Categories →</a>
-
-  </section>
-
-
-
-  <!-- ===== Upload Door Modal (زر واحد) ===== -->
+  <!-- ===== Upload Modal (12 icons + form) ===== -->
 
   <div class="modal" id="modal" style="display:none">
 
     <div class="sheet">
 
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="sheet-head">
 
-        <h3 style="margin:6px 0 8px">Choose a category (12)</h3>
+        <h3>Choose a category (12)</h3>
 
-        <button class="btn" id="closeDoor" style="padding:8px 12px">Close</button>
+        <button class="btn xsm ghost" id="closeDoor">Close</button>
 
       </div>
 
 
 
+      <!-- شبكة 12 أيقونة -->
+
       <div class="grid" id="iconGrid"></div>
 
 
 
-      <div id="uploaderArea" style="display:none">
+      <!-- منطقة الرفع + النموذج (تظهر بعد اختيار فئة) -->
 
-        <h3 id="catTitle" style="margin-top:16px"></h3>
+      <div id="uploaderArea" class="hidden">
 
-        <label class="icon" style="display:block;cursor:pointer">
+        <h3 id="catTitle" class="cat-title"></h3>
 
-          <!-- تحسين iOS -->
 
-          <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none" />
 
-          <div class="emoji">⬆️</div>
+        <!-- رفع الصور (يدعم iPhone) -->
 
-          <span>Drop files here or click to choose</span>
+        <div class="upload-wrap">
 
-        </label>
+          <input type="file" id="fileInput" multiple accept="image/*" />
 
-        <div class="card" id="fileList" style="margin-top:12px"></div>
+          <button type="button" class="btn outline" id="pickBtn">
+
+            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos
+
+          </button>
+
+          <span class="hint">You can select multiple photos.</span>
+
+        </div>
+
+        <div class="card" id="fileList"></div>
+
+
+
+        <!-- نموذج صاحب المنزل -->
+
+        <div class="card form-wrap">
+
+          <h4>Owner details & project info</h4>
+
+          <p class="hint">Private fields are hidden from pros until you approve them.</p>
+
+
+
+          <label>Project title *</label>
+
+          <input id="title" required placeholder="e.g., Replace leaking roof"/>
+
+
+
+          <label>Short summary</label>
+
+          <textarea id="summary" placeholder="One or two lines…"></textarea>
+
+
+
+          <div class="row2">
+
+            <div><label>City</label><input id="city"/></div>
+
+            <div><label>State</label><input id="state"/></div>
+
+          </div>
+
+
+
+          <div class="row2">
+
+            <div><label>Budget min</label><input id="budgetMin" type="number"/></div>
+
+            <div><label>Budget max</label><input id="budgetMax" type="number"/></div>
+
+          </div>
+
+
+
+          <hr class="sep">
+
+
+
+          <div class="row2">
+
+            <div><label>Contact name *</label><input id="contactName" required/></div>
+
+            <div><label>Phone *</label><input id="phone" required inputmode="tel"/></div>
+
+          </div>
+
+          <label>Email *</label><input id="email" type="email" required inputmode="email"/>
+
+          <label>Full address *</label><input id="address" required/>
+
+          <label>Full description *</label><textarea id="longDesc" required placeholder="Describe the job in detail…"></textarea>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- زر إرسال ثابت أسفل المودال -->
+
+      <div class="sticky-footer">
+
+        <button id="sendBtn" class="btn primary">🚀 Post Job</button>
+
+        <span id="sendMsg" class="hint"></span>
 
       </div>
 
@@ -506,13 +240,249 @@
 
   </div>
 
+  <!-- ======================================= -->
+
 
 
   <!-- Scripts -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
 
-  <script src="./app.umd.js?v=1"></script>
+    // فتح/إغلاق المودال + منع تمرير الخلفية
+
+    const modal = document.getElementById('modal');
+
+    const htmlEl = document.documentElement;
+
+    const openDoor = () => { modal.style.display = 'flex'; htmlEl.style.overflow = 'hidden'; };
+
+    const closeDoor = () => { modal.style.display = 'none'; htmlEl.style.overflow = ''; };
+
+
+
+    document.getElementById('postJobTop').onclick = openDoor;
+
+    document.getElementById('closeDoor').onclick = closeDoor;
+
+
+
+    // Check offer prices (بسيطة الآن)
+
+    document.getElementById('checkOffers').onclick = () => {
+
+      const id = prompt('Enter your Job ID to check offer prices:');
+
+      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
+
+    };
+
+    document.getElementById('goQuick').onclick = () => {
+
+      const id = document.getElementById('jobIdQuick').value.trim();
+
+      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
+
+    };
+
+
+
+    // شبكة 12 أيقونة
+
+    const CATS = [
+
+      ['General Home Repairs','🛠'],['Electrical','⚡'],['Plumbing','🚰'],['Roofing & Gutters','🏠'],
+
+      ['Painting','🎨'],['Flooring','🧱'],['Landscaping','🌿'],['HVAC','❄️'],['Basement','🏚️'],
+
+      ['Carpentry','🔨'],['Windows & Doors','🚪'],['Appliances','🔌']
+
+    ];
+
+    const grid = document.getElementById('iconGrid');
+
+    const uploader = document.getElementById('uploaderArea');
+
+    const catTitle = document.getElementById('catTitle');
+
+    let selectedCategory = null;
+
+
+
+    CATS.forEach(([name, emoji])=>{
+
+      const el = document.createElement('button');
+
+      el.type = 'button';
+
+      el.className = 'icon';
+
+      el.innerHTML = `<div class="emoji">${emoji}</div><span>${name}</span>`;
+
+      el.onclick = () => {
+
+        selectedCategory = name;
+
+        catTitle.textContent = 'Selected: ' + name;
+
+        uploader.classList.remove('hidden');
+
+        uploader.scrollIntoView({behavior:'smooth', block:'start'});
+
+      };
+
+      grid.appendChild(el);
+
+    });
+
+
+
+    // رفع الصور (يدعم iPhone)
+
+    const fileInput = document.getElementById('fileInput');
+
+    const pickBtn = document.getElementById('pickBtn');
+
+    const fileList = document.getElementById('fileList');
+
+    pickBtn.onclick = () => fileInput.click();
+
+    fileInput.addEventListener('change', ()=>{
+
+      fileList.innerHTML = '';
+
+      [...fileInput.files].forEach(f=>{
+
+        const p = document.createElement('p');
+
+        p.textContent = `${f.name} (${Math.round(f.size/1024)} KB)`;
+
+        fileList.appendChild(p);
+
+      });
+
+    });
+
+
+
+    // Helpers Base64
+
+    const bufToBase64 = (buf)=>{
+
+      let bin = '';
+
+      new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
+
+      return btoa(bin);
+
+    };
+
+    const filesToBase64 = async (list)=>{
+
+      const arr = [];
+
+      for (const f of [...list||[]]) {
+
+        const buf = await f.arrayBuffer();
+
+        arr.push(bufToBase64(buf));
+
+      }
+
+      return arr;
+
+    };
+
+
+
+    // إرسال
+
+    document.getElementById('sendBtn').addEventListener('click', async ()=>{
+
+      const m = document.getElementById('sendMsg');
+
+      try{
+
+        if(!selectedCategory){ m.textContent='Choose a category first.'; return; }
+
+
+
+        const title = document.getElementById('title').value.trim();
+
+        const summary = document.getElementById('summary').value.trim();
+
+        const city = document.getElementById('city').value.trim();
+
+        const state = document.getElementById('state').value.trim();
+
+        const budget_min = document.getElementById('budgetMin').value || null;
+
+        const budget_max = document.getElementById('budgetMax').value || null;
+
+        const contact_name = document.getElementById('contactName').value.trim();
+
+        const phone = document.getElementById('phone').value.trim();
+
+        const email = document.getElementById('email').value.trim();
+
+        const address = document.getElementById('address').value.trim();
+
+        const description_long = document.getElementById('longDesc').value.trim();
+
+
+
+        if(!title||!contact_name||!phone||!email||!address||!description_long){
+
+          m.textContent='Please fill all required fields.'; return;
+
+        }
+
+
+
+        m.textContent='Uploading…';
+
+        const photosBase64 = await filesToBase64(fileInput.files);
+
+
+
+        const res = await fetch('/api/jobs/create', {
+
+          method:'POST',
+
+          headers:{'Content-Type':'application/json'},
+
+          body:JSON.stringify({
+
+            category:selectedCategory, title, summary, city, state, budget_min, budget_max,
+
+            address, contact_name, phone, email, description_long, photosBase64
+
+          })
+
+        });
+
+        const j = await res.json();
+
+        if(!res.ok || !j.ok) throw new Error(j.error||'Failed');
+
+
+
+        m.textContent='Posted ✔ Job ID: '+j.job_id;
+
+        m.className='hint ok';
+
+        setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1300);
+
+      }catch(e){
+
+        m.textContent='Error: '+(e.message||'failed');
+
+        m.className='hint err';
+
+      }
+
+    });
+
+  </script>
 
 </body>
 
