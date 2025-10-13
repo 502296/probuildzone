@@ -144,6 +144,18 @@
 
         </div>
 
+
+
+        <!-- 👇 Hint الرمادي الناعم المطلوب -->
+
+        <div class="file-hint">
+
+          💡 Adding photos helps pros understand your project better (optional)
+
+        </div>
+
+
+
         <div class="card" id="fileList"></div>
 
 
@@ -412,8 +424,6 @@
 
       for (const f of [...list||[]]) {
 
-        // 10MB limit per file (optional guard)
-
         if (f.size > 10*1024*1024) throw new Error(`File too large: ${f.name}`);
 
         const buf = await f.arrayBuffer();
@@ -482,7 +492,7 @@
 
           body: JSON.stringify({
 
-            category: 'General', // إذا عندك فئة مختارة ديناميكياً استبدلها
+            category: 'General',
 
             title, summary, city, state, budget_min, budget_max,
 
