@@ -4,7 +4,7 @@
 
 <head>
 
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -18,11 +18,11 @@
 
 </head>
 
+
+
 <body>
 
-
-
-  <!-- Header / Navbar -->
+  <!-- ===== Header / Navbar ===== -->
 
   <header>
 
@@ -48,7 +48,7 @@
 
 
 
-  <!-- Hero -->
+  <!-- ===== Hero Section ===== -->
 
   <section class="hero">
 
@@ -86,7 +86,7 @@
 
 
 
-  <!-- Footer links -->
+  <!-- ===== Footer Links ===== -->
 
   <section id="links" class="links-row">
 
@@ -100,7 +100,7 @@
 
 
 
-  <!-- Modal -->
+  <!-- ===== Modal (Form) ===== -->
 
   <div class="modal" id="modal" style="display:none">
 
@@ -110,7 +110,7 @@
 
         <button class="btn xsm ghost back" id="backBtn">← Back</button>
 
-        <h3 id="sheetTitle">Choose a category (12)</h3>
+        <h3 id="sheetTitle">Post a Job</h3>
 
         <button class="btn xsm ghost" id="closeDoor">Close</button>
 
@@ -118,103 +118,85 @@
 
 
 
-      <div class="grid" id="iconGrid"></div>
+      <!-- ===== Job Form ===== -->
+
+      <section class="job-form">
+
+        <h2>Owner details & project info</h2>
+
+        <p class="note">Private fields are hidden from pros until you approve them.</p>
 
 
 
-      <div id="uploaderArea" class="hidden">
+        <label>Project title *</label>
 
-        <h3 id="catTitle" class="cat-title"></h3>
+        <input type="text" placeholder="e.g., Replace leaking roof" required>
 
 
 
-        <div class="upload-wrap">
+        <label>Short summary</label>
 
-          <input type="file" id="fileInput" multiple accept="image/*"/>
+        <input type="text" placeholder="One or two lines...">
 
-          <button type="button" class="btn outline" id="pickBtn">
 
-            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos
 
-          </button>
+        <div class="row2">
 
-          <span class="hint">You can select multiple photos.</span>
+          <div><label>City</label><input type="text" placeholder="Enter your city"></div>
+
+          <div><label>State</label><input type="text" placeholder="Enter your state"></div>
+
+        </div>
+
+
+
+        <label>Estimated budget range</label>
+
+        <div class="row2">
+
+          <div><input type="number" placeholder="From ($)" id="budgetMin"></div>
+
+          <div><input type="number" placeholder="To ($)" id="budgetMax"></div>
+
+        </div>
+
+        <span class="hint">💡 Just an estimate — pros will confirm after seeing your project.</span>
+
+
+
+        <div class="row2">
+
+          <div><label>Contact name *</label><input type="text" placeholder="Your name" required></div>
+
+          <div><label>Phone *</label><input type="tel" placeholder="Your phone number" required></div>
 
         </div>
 
 
 
-        <div class="card" id="fileList"></div>
+        <label>Email *</label>
+
+        <input type="email" placeholder="Your email address" required>
 
 
 
-        <div class="card form-wrap">
+        <label>Full address *</label>
 
-          <h4>Owner details & project info</h4>
-
-          <p class="hint">Private fields are hidden from pros until you approve them.</p>
+        <input type="text" placeholder="Street, City, State" required>
 
 
 
-          <label>Project title *</label>
+        <label>Full description *</label>
 
-          <input id="title" required placeholder="e.g., Replace leaking roof"/>
+        <textarea placeholder="Describe the job in detail..." rows="4" required></textarea>
 
-
-
-          <label>Short summary</label>
-
-          <textarea id="summary" placeholder="One or two lines…"></textarea>
-
-
-
-          <div class="row2">
-
-            <div><label>City</label><input id="city"/></div>
-
-            <div><label>State</label><input id="state"/></div>
-
-          </div>
-
-
-
-          <div class="row2">
-
-            <div><label>Budget min</label><input id="budgetMin" type="number"/></div>
-
-            <div><label>Budget max</label><input id="budgetMax" type="number"/></div>
-
-          </div>
-
-
-
-          <hr class="sep">
-
-
-
-          <div class="row2">
-
-            <div><label>Contact name *</label><input id="contactName" required/></div>
-
-            <div><label>Phone *</label><input id="phone" required inputmode="tel"/></div>
-
-          </div>
-
-          <label>Email *</label><input id="email" type="email" required inputmode="email"/>
-
-          <label>Full address *</label><input id="address" required/>
-
-          <label>Full description *</label><textarea id="longDesc" required placeholder="Describe the job in detail…"></textarea>
-
-        </div>
-
-      </div>
+      </section>
 
     </div>
 
 
 
-    <!-- ✅ Fixed Action Bar -->
+    <!-- ===== Fixed Action Bar ===== -->
 
     <div class="action-bar" id="actionBar">
 
@@ -232,171 +214,39 @@
 
 
 
-  <!-- Scripts -->
+  <!-- ===== JavaScript ===== -->
 
   <script>
 
     const modal = document.getElementById('modal');
 
-    const htmlEl = document.documentElement;
+    const openDoor = () => modal.style.display = 'flex';
 
-    const openDoor = () => { modal.style.display = 'flex'; htmlEl.style.overflow = 'hidden'; };
+    const closeDoor = () => modal.style.display = 'none';
 
-    const closeDoor = () => { modal.style.display = 'none'; htmlEl.style.overflow = ''; };
 
 
+    document.getElementById('postJobTop').onclick = openDoor;
 
-    document.getElementById('postJobTop').onclick = () => {
+    document.getElementById('closeDoor').onclick = closeDoor;
 
-      openDoor();
+    document.getElementById('backBtn').onclick = closeDoor;
 
-      document.querySelector('.sheet').scrollTop = 0;
 
-    };
 
+    document.getElementById('sendBtn').onclick = () => {
 
+      const msg = document.getElementById('sendMsg');
 
-    // Reset state
+      msg.textContent = '✅ Job Posted Successfully!';
 
-    const uploader = document.getElementById('uploaderArea');
+      setTimeout(() => {
 
-    const grid = document.getElementById('iconGrid');
+        msg.textContent = '';
 
-    const sheetTitle = document.getElementById('sheetTitle');
+        closeDoor();
 
-    const catTitle = document.getElementById('catTitle');
-
-    const resetSheet = () => {
-
-      uploader.classList.add('hidden');
-
-      sheetTitle.textContent = 'Choose a category (12)';
-
-      catTitle.textContent = '';
-
-      selectedCategory = null;
-
-    };
-
-
-
-    document.getElementById('closeDoor').onclick = () => { resetSheet(); closeDoor(); };
-
-
-
-    // Categories
-
-    const CATS = [
-
-      ['General Home Repairs','🛠'],['Electrical','⚡'],['Plumbing','🚰'],['Roofing & Gutters','🏠'],
-
-      ['Painting','🎨'],['Flooring','🧱'],['Landscaping','🌿'],['HVAC','❄️'],['Basement','🏚️'],
-
-      ['Carpentry','🔨'],['Windows & Doors','🚪'],['Appliances','🔌']
-
-    ];
-
-    let selectedCategory = null;
-
-    CATS.forEach(([name, emoji])=>{
-
-      const el = document.createElement('button');
-
-      el.className = 'icon';
-
-      el.innerHTML = `<div class="emoji">${emoji}</div><span>${name}</span>`;
-
-      el.onclick = ()=>{
-
-        selectedCategory = name;
-
-        uploader.classList.remove('hidden');
-
-        sheetTitle.textContent = 'Post a Job';
-
-        catTitle.textContent = 'Selected: ' + name;
-
-      };
-
-      grid.appendChild(el);
-
-    });
-
-
-
-    // Back button
-
-    document.getElementById('backBtn').onclick = ()=>{
-
-      if(!uploader.classList.contains('hidden')){
-
-        resetSheet();
-
-      } else closeDoor();
-
-    };
-
-
-
-    // Upload preview
-
-    const fileInput = document.getElementById('fileInput');
-
-    const fileList = document.getElementById('fileList');
-
-    document.getElementById('pickBtn').onclick = ()=>fileInput.click();
-
-    fileInput.onchange = ()=>{
-
-      fileList.innerHTML='';
-
-      [...fileInput.files].forEach(f=>{
-
-        const p=document.createElement('p');
-
-        p.textContent=`${f.name} (${Math.round(f.size/1024)} KB)`;
-
-        fileList.appendChild(p);
-
-      });
-
-    };
-
-
-
-    // Send job
-
-    document.getElementById('sendBtn').onclick = async ()=>{
-
-      const m=document.getElementById('sendMsg');
-
-      try{
-
-        if(!selectedCategory) return m.textContent='Choose a category first.';
-
-        const title=document.getElementById('title').value.trim();
-
-        const contact=document.getElementById('contactName').value.trim();
-
-        const phone=document.getElementById('phone').value.trim();
-
-        const email=document.getElementById('email').value.trim();
-
-        const addr=document.getElementById('address').value.trim();
-
-        const desc=document.getElementById('longDesc').value.trim();
-
-        if(!title||!contact||!phone||!email||!addr||!desc) return m.textContent='Fill all required fields.';
-
-        m.textContent='Uploading...';
-
-        await new Promise(r=>setTimeout(r,1200)); // Demo wait
-
-        m.textContent='✅ Job Posted!';
-
-        setTimeout(()=>{m.textContent=''; closeDoor();},1200);
-
-      }catch(e){m.textContent='Error';}
+      }, 1500);
 
     };
 
