@@ -4,7 +4,7 @@
 
 <head>
 
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
@@ -13,10 +13,6 @@
   <meta name="description" content="Post your project with photos. Local contractors send offers. You choose the best match — fair prices, local pros.">
 
   <link rel="stylesheet" href="style.css"/>
-
-
-
-  <!-- Font Awesome (icons) -->
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -32,15 +28,13 @@
 
     <nav>
 
-      <div class="brand-logo">
+      <div class="brand-logo" aria-label="ProBuildZone">
 
         <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
 
       </div>
 
       <ul>
-
-        <!-- حذفت How it works حسب طلبك -->
 
         <li><a href="#links">Services</a></li>
 
@@ -96,13 +90,9 @@
 
   <section id="links" class="links-row">
 
-    <a href="services.html">Services</a>
+    <a href="services.html">Services</a><span>•</span>
 
-    <span>•</span>
-
-    <a href="privacy.html">Privacy</a>
-
-    <span>•</span>
+    <a href="privacy.html">Privacy</a><span>•</span>
 
     <a href="terms.html">Terms</a>
 
@@ -110,7 +100,7 @@
 
 
 
-  <!-- ===== Upload Modal (12 icons + form) ===== -->
+  <!-- ===== Upload Modal ===== -->
 
   <div class="modal" id="modal" style="display:none">
 
@@ -118,7 +108,9 @@
 
       <div class="sheet-head">
 
-        <h3>Choose a category (12)</h3>
+        <button class="btn xsm ghost back" id="backBtn">← Back</button>
+
+        <h3 id="sheetTitle">Choose a category (12)</h3>
 
         <button class="btn xsm ghost" id="closeDoor">Close</button>
 
@@ -140,11 +132,11 @@
 
 
 
-        <!-- رفع الصور (يدعم iPhone) -->
+        <!-- رفع الصور -->
 
         <div class="upload-wrap">
 
-          <input type="file" id="fileInput" multiple accept="image/*" />
+          <input type="file" id="fileInput" multiple accept="image/*"/>
 
           <button type="button" class="btn outline" id="pickBtn">
 
@@ -226,7 +218,7 @@
 
 
 
-      <!-- زر إرسال ثابت أسفل المودال -->
+      <!-- زر إرسال ثابت -->
 
       <div class="sticky-footer">
 
@@ -239,8 +231,6 @@
     </div>
 
   </div>
-
-  <!-- ======================================= -->
 
 
 
@@ -260,13 +250,19 @@
 
 
 
-    document.getElementById('postJobTop').onclick = openDoor;
+    document.getElementById('postJobTop').onclick = () => {
 
-    document.getElementById('closeDoor').onclick = closeDoor;
+      openDoor();
+
+      document.querySelector('.sheet').scrollTop = 0;
+
+    };
+
+    document.getElementById('closeDoor').onclick = () => { resetSheet(); closeDoor(); };
 
 
 
-    // Check offer prices (بسيطة الآن)
+    // Check offer prices
 
     document.getElementById('checkOffers').onclick = () => {
 
@@ -286,7 +282,7 @@
 
 
 
-    // شبكة 12 أيقونة
+    // شبكة الفئات
 
     const CATS = [
 
@@ -303,6 +299,10 @@
     const uploader = document.getElementById('uploaderArea');
 
     const catTitle = document.getElementById('catTitle');
+
+    const sheetTitle = document.getElementById('sheetTitle');
+
+    const backBtn = document.getElementById('backBtn');
 
     let selectedCategory = null;
 
@@ -324,6 +324,8 @@
 
         catTitle.textContent = 'Selected: ' + name;
 
+        sheetTitle.textContent = 'Post a Job';
+
         uploader.classList.remove('hidden');
 
         uploader.scrollIntoView({behavior:'smooth', block:'start'});
@@ -336,7 +338,33 @@
 
 
 
-    // رفع الصور (يدعم iPhone)
+    // زر رجوع ذكي
+
+    backBtn.onclick = () => {
+
+      if (!uploader.classList.contains('hidden')) {
+
+        uploader.classList.add('hidden');
+
+        selectedCategory = null;
+
+        catTitle.textContent = '';
+
+        sheetTitle.textContent = 'Choose a category (12)';
+
+        grid.scrollIntoView({behavior:'smooth', block:'start'});
+
+      } else {
+
+        closeDoor();
+
+      }
+
+    };
+
+
+
+    // رفع الصور
 
     const fileInput = document.getElementById('fileInput');
 
@@ -368,9 +396,7 @@
 
     const bufToBase64 = (buf)=>{
 
-      let bin = '';
-
-      new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
+      let bin = ''; new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
 
       return btoa(bin);
 
@@ -389,6 +415,26 @@
       }
 
       return arr;
+
+    };
+
+
+
+    // Reset sheet state
+
+    const resetSheet = () => {
+
+      uploader.classList.add('hidden');
+
+      selectedCategory = null;
+
+      catTitle.textContent = '';
+
+      sheetTitle.textContent = 'Choose a category (12)';
+
+      fileInput.value = '';
+
+      fileList.innerHTML = '';
 
     };
 
@@ -470,7 +516,7 @@
 
         m.className='hint ok';
 
-        setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1300);
+        setTimeout(()=>{ m.textContent=''; resetSheet(); closeDoor(); }, 1300);
 
       }catch(e){
 
