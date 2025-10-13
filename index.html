@@ -128,23 +128,55 @@
 
 
 
-        <label>Project title *</label>
+        <!-- Upload: Button + Drag&Drop + Preview -->
 
-        <input type="text" placeholder="e.g., Replace leaking roof" required>
+        <div class="upload-wrap" id="dropZone">
+
+          <input type="file" id="fileInput" multiple accept="image/*,application/pdf"/>
+
+          <button type="button" class="btn outline" id="pickBtn">
+
+            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos/Files
+
+          </button>
+
+          <span class="hint">You can select multiple photos or a PDF plan. Drag & drop is supported.</span>
+
+        </div>
+
+        <div class="card" id="fileList"></div>
 
 
 
-        <label>Short summary</label>
+        <label for="title">Project title *</label>
 
-        <input type="text" placeholder="One or two lines...">
+        <input id="title" type="text" placeholder="e.g., Replace leaking roof" required>
+
+
+
+        <label for="summary">Short summary</label>
+
+        <input id="summary" type="text" placeholder="One or two lines...">
 
 
 
         <div class="row2">
 
-          <div><label>City</label><input type="text" placeholder="Enter your city"></div>
+          <div>
 
-          <div><label>State</label><input type="text" placeholder="Enter your state"></div>
+            <label for="city">City</label>
+
+            <input id="city" type="text" placeholder="Enter your city">
+
+          </div>
+
+          <div>
+
+            <label for="state">State</label>
+
+            <input id="state" type="text" placeholder="Enter your state">
+
+          </div>
 
         </div>
 
@@ -154,9 +186,9 @@
 
         <div class="row2">
 
-          <div><input type="number" placeholder="From ($)" id="budgetMin"></div>
+          <div><input id="budgetMin" type="number" placeholder="From ($)"></div>
 
-          <div><input type="number" placeholder="To ($)" id="budgetMax"></div>
+          <div><input id="budgetMax" type="number" placeholder="To ($)"></div>
 
         </div>
 
@@ -166,29 +198,41 @@
 
         <div class="row2">
 
-          <div><label>Contact name *</label><input type="text" placeholder="Your name" required></div>
+          <div>
 
-          <div><label>Phone *</label><input type="tel" placeholder="Your phone number" required></div>
+            <label for="contactName">Contact name *</label>
+
+            <input id="contactName" type="text" placeholder="Your name" required>
+
+          </div>
+
+          <div>
+
+            <label for="phone">Phone *</label>
+
+            <input id="phone" type="tel" placeholder="Your phone number" required>
+
+          </div>
 
         </div>
 
 
 
-        <label>Email *</label>
+        <label for="email">Email *</label>
 
-        <input type="email" placeholder="Your email address" required>
-
-
-
-        <label>Full address *</label>
-
-        <input type="text" placeholder="Street, City, State" required>
+        <input id="email" type="email" placeholder="Your email address" required>
 
 
 
-        <label>Full description *</label>
+        <label for="address">Full address *</label>
 
-        <textarea placeholder="Describe the job in detail..." rows="4" required></textarea>
+        <input id="address" type="text" placeholder="Street, City, State" required>
+
+
+
+        <label for="longDesc">Full description *</label>
+
+        <textarea id="longDesc" placeholder="Describe the job in detail..." rows="4" required></textarea>
 
       </section>
 
@@ -218,15 +262,17 @@
 
   <script>
 
+    // Open/Close modal
+
     const modal = document.getElementById('modal');
 
-    const openDoor = () => modal.style.display = 'flex';
+    const openDoor = () => { modal.style.display = 'flex'; document.documentElement.style.overflow = 'hidden'; };
 
-    const closeDoor = () => modal.style.display = 'none';
+    const closeDoor = () => { modal.style.display = 'none'; document.documentElement.style.overflow = ''; };
 
 
 
-    document.getElementById('postJobTop').onclick = openDoor;
+    document.getElementById('postJobTop').onclick = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
 
     document.getElementById('closeDoor').onclick = closeDoor;
 
@@ -234,19 +280,239 @@
 
 
 
-    document.getElementById('sendBtn').onclick = () => {
+    // Quick offers
 
-      const msg = document.getElementById('sendMsg');
+    document.getElementById('checkOffers').onclick = () => {
 
-      msg.textContent = '✅ Job Posted Successfully!';
+      const id = prompt('Enter your Job ID to check offer prices:');
 
-      setTimeout(() => {
+      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
 
-        msg.textContent = '';
+    };
 
-        closeDoor();
+    document.getElementById('goQuick').onclick = () => {
 
-      }, 1500);
+      const id = document.getElementById('jobIdQuick').value.trim();
+
+      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
+
+    };
+
+
+
+    // ===== Upload (pick & drag-drop & preview) =====
+
+    const fileInput = document.getElementById('fileInput');
+
+    const pickBtn = document.getElementById('pickBtn');
+
+    const fileList = document.getElementById('fileList');
+
+    const dropZone = document.getElementById('dropZone');
+
+
+
+    pickBtn.onclick = () => fileInput.click();
+
+
+
+    const humanSize = (b)=> {
+
+      if (b < 1024) return b + ' B';
+
+      if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+
+      return (b/1024/1024).toFixed(1) + ' MB';
+
+    };
+
+
+
+    const renderList = (files) => {
+
+      fileList.innerHTML = '';
+
+      if (!files.length) { fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
+
+      [...files].forEach(f=>{
+
+        const item = document.createElement('div');
+
+        item.className = 'file-item';
+
+        const isImg = /^image\//.test(f.type);
+
+        item.innerHTML = `
+
+          <div class="thumb">${isImg ? `<img src="${URL.createObjectURL(f)}" alt="">` : `<i class="fa-regular fa-file-lines"></i>`}</div>
+
+          <div class="meta"><b>${f.name}</b><span>${f.type || 'file'} • ${humanSize(f.size)}</span></div>
+
+        `;
+
+        fileList.appendChild(item);
+
+      });
+
+    };
+
+
+
+    fileInput.addEventListener('change', () => renderList(fileInput.files));
+
+
+
+    // Drag & Drop
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+
+      dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
+
+    });
+
+    ['dragenter','dragover'].forEach(e => {
+
+      dropZone.addEventListener(e, () => dropZone.classList.add('hover'), false);
+
+    });
+
+    ['dragleave','drop'].forEach(e => {
+
+      dropZone.addEventListener(e, () => dropZone.classList.remove('hover'), false);
+
+    });
+
+    dropZone.addEventListener('drop', (ev)=>{
+
+      const dt = ev.dataTransfer;
+
+      if (!dt || !dt.files) return;
+
+      fileInput.files = dt.files; // assign to input
+
+      renderList(fileInput.files);
+
+    });
+
+
+
+    // Helpers Base64
+
+    const bufToBase64 = (buf)=>{
+
+      let bin = ''; new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
+
+      return btoa(bin);
+
+    };
+
+    const filesToBase64 = async (list)=>{
+
+      const arr = [];
+
+      for (const f of [...list||[]]) {
+
+        // 10MB limit per file (optional guard)
+
+        if (f.size > 10*1024*1024) throw new Error(`File too large: ${f.name}`);
+
+        const buf = await f.arrayBuffer();
+
+        arr.push(bufToBase64(buf));
+
+      }
+
+      return arr;
+
+    };
+
+
+
+    // ===== Submit =====
+
+    document.getElementById('sendBtn').onclick = async ()=>{
+
+      const m = document.getElementById('sendMsg');
+
+      try{
+
+        const title = document.getElementById('title').value.trim();
+
+        const summary = document.getElementById('summary').value.trim();
+
+        const city = document.getElementById('city').value.trim();
+
+        const state = document.getElementById('state').value.trim();
+
+        const budget_min = document.getElementById('budgetMin').value || null;
+
+        const budget_max = document.getElementById('budgetMax').value || null;
+
+        const contact_name = document.getElementById('contactName').value.trim();
+
+        const phone = document.getElementById('phone').value.trim();
+
+        const email = document.getElementById('email').value.trim();
+
+        const address = document.getElementById('address').value.trim();
+
+        const description_long = document.getElementById('longDesc').value.trim();
+
+
+
+        if(!title||!contact_name||!phone||!email||!address||!description_long){
+
+          m.textContent = 'Please fill all required fields.'; return;
+
+        }
+
+
+
+        m.textContent = 'Uploading…';
+
+        const photosBase64 = await filesToBase64(fileInput.files);
+
+
+
+        const res = await fetch('/api/jobs/create', {
+
+          method: 'POST',
+
+          headers: {'Content-Type':'application/json'},
+
+          body: JSON.stringify({
+
+            category: 'General', // إذا عندك فئة مختارة ديناميكياً استبدلها
+
+            title, summary, city, state, budget_min, budget_max,
+
+            address, contact_name, phone, email, description_long,
+
+            photosBase64
+
+          })
+
+        });
+
+        const j = await res.json();
+
+        if(!res.ok || !j.ok) throw new Error(j.error || 'Failed');
+
+
+
+        m.textContent = 'Posted ✔ Job ID: ' + j.job_id;
+
+        m.className = 'hint ok';
+
+        setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1200);
+
+      }catch(e){
+
+        m.textContent = 'Error: ' + (e.message || 'failed');
+
+        m.className = 'hint err';
+
+      }
 
     };
 
