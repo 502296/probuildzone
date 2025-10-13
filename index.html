@@ -28,7 +28,7 @@
 
     <nav>
 
-      <div class="brand-logo" aria-label="ProBuildZone">
+      <div class="brand-logo">
 
         <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
 
@@ -86,7 +86,7 @@
 
 
 
-  <!-- Footer links under hero -->
+  <!-- Footer links -->
 
   <section id="links" class="links-row">
 
@@ -100,7 +100,7 @@
 
 
 
-  <!-- ===== Upload Modal ===== -->
+  <!-- Modal -->
 
   <div class="modal" id="modal" style="display:none">
 
@@ -118,21 +118,15 @@
 
 
 
-      <!-- شبكة 12 أيقونة -->
-
       <div class="grid" id="iconGrid"></div>
 
 
-
-      <!-- منطقة الرفع + النموذج (تظهر بعد اختيار فئة) -->
 
       <div id="uploaderArea" class="hidden">
 
         <h3 id="catTitle" class="cat-title"></h3>
 
 
-
-        <!-- رفع الصور -->
 
         <div class="upload-wrap">
 
@@ -148,11 +142,11 @@
 
         </div>
 
+
+
         <div class="card" id="fileList"></div>
 
 
-
-        <!-- نموذج صاحب المنزل -->
 
         <div class="card form-wrap">
 
@@ -216,11 +210,15 @@
 
       </div>
 
+    </div>
 
 
-      <!-- زر إرسال ثابت -->
 
-      <div class="sticky-footer">
+    <!-- ✅ Fixed Action Bar -->
+
+    <div class="action-bar" id="actionBar">
+
+      <div class="bar-inner">
 
         <button id="sendBtn" class="btn primary">🚀 Post Job</button>
 
@@ -237,8 +235,6 @@
   <!-- Scripts -->
 
   <script>
-
-    // فتح/إغلاق المودال + منع تمرير الخلفية
 
     const modal = document.getElementById('modal');
 
@@ -258,31 +254,37 @@
 
     };
 
+
+
+    // Reset state
+
+    const uploader = document.getElementById('uploaderArea');
+
+    const grid = document.getElementById('iconGrid');
+
+    const sheetTitle = document.getElementById('sheetTitle');
+
+    const catTitle = document.getElementById('catTitle');
+
+    const resetSheet = () => {
+
+      uploader.classList.add('hidden');
+
+      sheetTitle.textContent = 'Choose a category (12)';
+
+      catTitle.textContent = '';
+
+      selectedCategory = null;
+
+    };
+
+
+
     document.getElementById('closeDoor').onclick = () => { resetSheet(); closeDoor(); };
 
 
 
-    // Check offer prices
-
-    document.getElementById('checkOffers').onclick = () => {
-
-      const id = prompt('Enter your Job ID to check offer prices:');
-
-      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
-
-    };
-
-    document.getElementById('goQuick').onclick = () => {
-
-      const id = document.getElementById('jobIdQuick').value.trim();
-
-      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
-
-    };
-
-
-
-    // شبكة الفئات
+    // Categories
 
     const CATS = [
 
@@ -294,41 +296,25 @@
 
     ];
 
-    const grid = document.getElementById('iconGrid');
-
-    const uploader = document.getElementById('uploaderArea');
-
-    const catTitle = document.getElementById('catTitle');
-
-    const sheetTitle = document.getElementById('sheetTitle');
-
-    const backBtn = document.getElementById('backBtn');
-
     let selectedCategory = null;
-
-
 
     CATS.forEach(([name, emoji])=>{
 
       const el = document.createElement('button');
 
-      el.type = 'button';
-
       el.className = 'icon';
 
       el.innerHTML = `<div class="emoji">${emoji}</div><span>${name}</span>`;
 
-      el.onclick = () => {
+      el.onclick = ()=>{
 
         selectedCategory = name;
 
-        catTitle.textContent = 'Selected: ' + name;
+        uploader.classList.remove('hidden');
 
         sheetTitle.textContent = 'Post a Job';
 
-        uploader.classList.remove('hidden');
-
-        uploader.scrollIntoView({behavior:'smooth', block:'start'});
+        catTitle.textContent = 'Selected: ' + name;
 
       };
 
@@ -338,195 +324,81 @@
 
 
 
-    // زر رجوع ذكي
+    // Back button
 
-    backBtn.onclick = () => {
+    document.getElementById('backBtn').onclick = ()=>{
 
-      if (!uploader.classList.contains('hidden')) {
+      if(!uploader.classList.contains('hidden')){
 
-        uploader.classList.add('hidden');
+        resetSheet();
 
-        selectedCategory = null;
-
-        catTitle.textContent = '';
-
-        sheetTitle.textContent = 'Choose a category (12)';
-
-        grid.scrollIntoView({behavior:'smooth', block:'start'});
-
-      } else {
-
-        closeDoor();
-
-      }
+      } else closeDoor();
 
     };
 
 
 
-    // رفع الصور
+    // Upload preview
 
     const fileInput = document.getElementById('fileInput');
 
-    const pickBtn = document.getElementById('pickBtn');
-
     const fileList = document.getElementById('fileList');
 
-    pickBtn.onclick = () => fileInput.click();
+    document.getElementById('pickBtn').onclick = ()=>fileInput.click();
 
-    fileInput.addEventListener('change', ()=>{
+    fileInput.onchange = ()=>{
 
-      fileList.innerHTML = '';
+      fileList.innerHTML='';
 
       [...fileInput.files].forEach(f=>{
 
-        const p = document.createElement('p');
+        const p=document.createElement('p');
 
-        p.textContent = `${f.name} (${Math.round(f.size/1024)} KB)`;
+        p.textContent=`${f.name} (${Math.round(f.size/1024)} KB)`;
 
         fileList.appendChild(p);
 
       });
 
-    });
-
-
-
-    // Helpers Base64
-
-    const bufToBase64 = (buf)=>{
-
-      let bin = ''; new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
-
-      return btoa(bin);
-
-    };
-
-    const filesToBase64 = async (list)=>{
-
-      const arr = [];
-
-      for (const f of [...list||[]]) {
-
-        const buf = await f.arrayBuffer();
-
-        arr.push(bufToBase64(buf));
-
-      }
-
-      return arr;
-
     };
 
 
 
-    // Reset sheet state
+    // Send job
 
-    const resetSheet = () => {
+    document.getElementById('sendBtn').onclick = async ()=>{
 
-      uploader.classList.add('hidden');
-
-      selectedCategory = null;
-
-      catTitle.textContent = '';
-
-      sheetTitle.textContent = 'Choose a category (12)';
-
-      fileInput.value = '';
-
-      fileList.innerHTML = '';
-
-    };
-
-
-
-    // إرسال
-
-    document.getElementById('sendBtn').addEventListener('click', async ()=>{
-
-      const m = document.getElementById('sendMsg');
+      const m=document.getElementById('sendMsg');
 
       try{
 
-        if(!selectedCategory){ m.textContent='Choose a category first.'; return; }
+        if(!selectedCategory) return m.textContent='Choose a category first.';
 
+        const title=document.getElementById('title').value.trim();
 
+        const contact=document.getElementById('contactName').value.trim();
 
-        const title = document.getElementById('title').value.trim();
+        const phone=document.getElementById('phone').value.trim();
 
-        const summary = document.getElementById('summary').value.trim();
+        const email=document.getElementById('email').value.trim();
 
-        const city = document.getElementById('city').value.trim();
+        const addr=document.getElementById('address').value.trim();
 
-        const state = document.getElementById('state').value.trim();
+        const desc=document.getElementById('longDesc').value.trim();
 
-        const budget_min = document.getElementById('budgetMin').value || null;
+        if(!title||!contact||!phone||!email||!addr||!desc) return m.textContent='Fill all required fields.';
 
-        const budget_max = document.getElementById('budgetMax').value || null;
+        m.textContent='Uploading...';
 
-        const contact_name = document.getElementById('contactName').value.trim();
+        await new Promise(r=>setTimeout(r,1200)); // Demo wait
 
-        const phone = document.getElementById('phone').value.trim();
+        m.textContent='✅ Job Posted!';
 
-        const email = document.getElementById('email').value.trim();
+        setTimeout(()=>{m.textContent=''; closeDoor();},1200);
 
-        const address = document.getElementById('address').value.trim();
+      }catch(e){m.textContent='Error';}
 
-        const description_long = document.getElementById('longDesc').value.trim();
-
-
-
-        if(!title||!contact_name||!phone||!email||!address||!description_long){
-
-          m.textContent='Please fill all required fields.'; return;
-
-        }
-
-
-
-        m.textContent='Uploading…';
-
-        const photosBase64 = await filesToBase64(fileInput.files);
-
-
-
-        const res = await fetch('/api/jobs/create', {
-
-          method:'POST',
-
-          headers:{'Content-Type':'application/json'},
-
-          body:JSON.stringify({
-
-            category:selectedCategory, title, summary, city, state, budget_min, budget_max,
-
-            address, contact_name, phone, email, description_long, photosBase64
-
-          })
-
-        });
-
-        const j = await res.json();
-
-        if(!res.ok || !j.ok) throw new Error(j.error||'Failed');
-
-
-
-        m.textContent='Posted ✔ Job ID: '+j.job_id;
-
-        m.className='hint ok';
-
-        setTimeout(()=>{ m.textContent=''; resetSheet(); closeDoor(); }, 1300);
-
-      }catch(e){
-
-        m.textContent='Error: '+(e.message||'failed');
-
-        m.className='hint err';
-
-      }
-
-    });
+    };
 
   </script>
 
