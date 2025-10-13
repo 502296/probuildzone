@@ -168,7 +168,7 @@ nav a{color:#fff;text-decoration:none;font-weight:700}
 
   background:#10182a; border:1px dashed #7aa2ff; border-radius:12px;
 
-  padding:12px 14px; margin:8px 0 10px;
+  padding:12px 14px; margin:8px 0 6px;
 
   transition: .2s ease;
 
@@ -179,6 +179,28 @@ nav a{color:#fff;text-decoration:none;font-weight:700}
 .upload-wrap input[type=file]{ display:none; }
 
 .btn.outline{ background:transparent; border:1px dashed #7aa2ff; color:#dbe7ff; }
+
+
+
+/* 👇 hint الرمادي الناعم تحت زر الرفع */
+
+.file-hint{
+
+  font-size:0.85rem;
+
+  color:#9ca3af;
+
+  margin-top:6px;
+
+  margin-bottom:12px;
+
+  text-align:left;
+
+  line-height:1.4;
+
+}
+
+
 
 .card{ background:#121735; border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px; margin:10px 0; }
 
