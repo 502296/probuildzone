@@ -247,3 +247,107 @@ nav a{color:#fff;text-decoration:none;font-weight:700}
 @media(max-width:780px){ header{padding:14px 16px} :root{--logo-size:26px} }
 
 @media(max-width:520px){ :root{--logo-size:22px} .pro-btn{font-size:13px;padding:6px 10px} }
+
+/* ===== Legal pages (Privacy / Terms / Services) ===== */
+
+.legal{
+
+  max-width: 920px;
+
+  margin: 80px auto 120px;
+
+  padding: 24px;
+
+  background: rgba(12,18,24,0.92);
+
+  color: #E9ECF5;
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+}
+
+.legal h1{
+
+  color:#fff;
+
+  font-size: 28px;
+
+  margin-bottom: 4px;
+
+}
+
+.legal .updated{
+
+  color:#aab3c9;
+
+  margin-bottom: 16px;
+
+}
+
+.legal h2{
+
+  margin-top: 24px;
+
+  margin-bottom: 8px;
+
+  color:#eaf2ff;
+
+  font-size: 18px;
+
+}
+
+.legal p{ line-height: 1.7; }
+
+.legal ul{ margin-left: 18px; line-height: 1.8; }
+
+.legal a{ color:#9ccaff; text-decoration: none; }
+
+.legal a:hover{ text-decoration: underline; }
+
+
+
+/* Sticky back bar */
+
+.backbar{
+
+  position: fixed;
+
+  left: 0; right: 0; bottom: 0;
+
+  z-index: 9999;
+
+  display: flex; justify-content: center;
+
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+
+  background: linear-gradient(180deg, rgba(12,18,24,0), rgba(12,18,24,.98) 45%);
+
+  border-top: 1px solid rgba(255,255,255,.12);
+
+}
+
+.backbar .back-btn{
+
+  background: transparent;
+
+  color: #E9ECF5;
+
+  border: 1px solid rgba(255,255,255,.25);
+
+  border-radius: 10px;
+
+  padding: 10px 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+.backbar .back-btn:hover{
+
+  background: rgba(255,255,255,.12);
+
+}
