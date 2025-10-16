@@ -2,8 +2,6 @@
 
 import Stripe from "stripe";
 
-
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -16,13 +14,9 @@ export default async function handler(req, res) {
 
   const { plan } = req.body;
 
+  const PRICE_YEARLY = process.env.STRIPE_PRICE_YEARLY;
 
-
-  // Define your price IDs (from Stripe Dashboard)
-
-  const PRICE_YEARLY = "price_xxxxxxx";
-
-  const PRICE_TRIAL = "price_xxxxxxx"; // optional
+  const PRICE_TRIAL = process.env.STRIPE_PRICE_TRIAL;
 
 
 
@@ -56,13 +50,13 @@ export default async function handler(req, res) {
 
 
 
-    return res.status(200).json({ url: session.url });
+    res.status(200).json({ url: session.url });
 
-  } catch (err) {
+  } catch (error) {
 
-    console.error("Stripe error:", err);
+    console.error("Stripe Error:", error);
 
-    return res.status(500).json({ error: err.message });
+    res.status(500).json({ error: error.message });
 
   }
 
