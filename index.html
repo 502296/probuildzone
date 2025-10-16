@@ -36,9 +36,11 @@
 
       <ul>
 
-        <li><a href="#links">Services</a></li>
+        <!-- صاروا روابط داخلية -->
 
-        <li><a href="#pros" class="pro-btn">For Pros</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+
+        <li><a href="#pros" class="pro-btn nav-link">For Pros</a></li>
 
       </ul>
 
@@ -50,7 +52,7 @@
 
   <!-- ===== Hero Section ===== -->
 
-  <section class="hero">
+  <section class="hero" id="home">
 
     <div class="overlay">
 
@@ -64,17 +66,19 @@
 
         <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
 
-        <a href="#links" class="btn secondary">View Services</a>
+        <a href="#services" class="btn secondary nav-link">View Services</a>
 
-        <button class="btn dark" id="checkOffers">Check Offer Prices</button>
+        <!-- تم حذف زر Check Offer Prices حسب طلبك -->
 
       </div>
 
 
 
+      <!-- نُبقي مربع البحث عن العروض -->
+
       <div class="job-id">
 
-        <input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., FH-99999)">
+        <input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., PBZ-99999)">
 
         <button id="goQuick">Go</button>
 
@@ -86,11 +90,63 @@
 
 
 
-  <!-- ===== Footer Links ===== -->
+  <!-- ===== Services (شبكة فئات للعرض العام) ===== -->
+
+  <section id="services" class="services-block">
+
+    <div class="services-head">
+
+      <h2>Popular Services</h2>
+
+      <p>Select a category below — it will be prefilled in the form.</p>
+
+    </div>
+
+    <div class="category-grid">
+
+      <!-- عند الضغط نفتح الفورم ونضبط الفئة المختارة -->
+
+      <button class="cat" data-cat="Roofing">🏠 Roofing</button>
+
+      <button class="cat" data-cat="Decks & Porches">🪚 Decks & Porches</button>
+
+      <button class="cat" data-cat="Kitchens">🍳 Kitchens</button>
+
+      <button class="cat" data-cat="Bathrooms">🛁 Bathrooms</button>
+
+      <button class="cat" data-cat="Flooring">🪵 Flooring</button>
+
+      <button class="cat" data-cat="Painting">🎨 Painting</button>
+
+      <button class="cat" data-cat="Masonry">🧱 Masonry</button>
+
+      <button class="cat" data-cat="Electrical">⚡ Electrical</button>
+
+      <button class="cat" data-cat="Plumbing">🚰 Plumbing</button>
+
+      <button class="cat" data-cat="Windows & Doors">🪟 Windows & Doors</button>
+
+      <button class="cat" data-cat="Landscaping">🌿 Landscaping</button>
+
+      <button class="cat" data-cat="Handyman">🧰 Handyman</button>
+
+    </div>
+
+    <div class="center">
+
+      <button class="btn primary" id="postJobMid">Post a Job</button>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ===== Footer Links (نبقيها كما هي) ===== -->
 
   <section id="links" class="links-row">
 
-    <a href="services.html">Services</a><span>•</span>
+    <a href="#services" class="nav-link">Services</a><span>•</span>
 
     <a href="privacy.html">Privacy</a><span>•</span>
 
@@ -128,7 +184,7 @@
 
 
 
-        <!-- Upload: Button + Drag&Drop + Preview -->
+        <!-- Upload -->
 
         <div class="upload-wrap" id="dropZone">
 
@@ -144,19 +200,43 @@
 
         </div>
 
-
-
-        <!-- 👇 Hint الرمادي الناعم المطلوب -->
-
-        <div class="file-hint">
-
-          💡 Adding photos helps pros understand your project better (optional)
-
-        </div>
-
-
+        <div class="file-hint">💡 Adding photos helps pros understand your project better (optional)</div>
 
         <div class="card" id="fileList"></div>
+
+
+
+        <!-- NEW: Category (12 أيقونة داخل الفورم) -->
+
+        <label>Category *</label>
+
+        <div class="form-categories">
+
+          <label><input type="radio" name="category" value="Roofing" required> 🏠 Roofing</label>
+
+          <label><input type="radio" name="category" value="Decks & Porches"> 🪚 Decks & Porches</label>
+
+          <label><input type="radio" name="category" value="Kitchens"> 🍳 Kitchens</label>
+
+          <label><input type="radio" name="category" value="Bathrooms"> 🛁 Bathrooms</label>
+
+          <label><input type="radio" name="category" value="Flooring"> 🪵 Flooring</label>
+
+          <label><input type="radio" name="category" value="Painting"> 🎨 Painting</label>
+
+          <label><input type="radio" name="category" value="Masonry"> 🧱 Masonry</label>
+
+          <label><input type="radio" name="category" value="Electrical"> ⚡ Electrical</label>
+
+          <label><input type="radio" name="category" value="Plumbing"> 🚰 Plumbing</label>
+
+          <label><input type="radio" name="category" value="Windows & Doors"> 🪟 Windows & Doors</label>
+
+          <label><input type="radio" name="category" value="Landscaping"> 🌿 Landscaping</label>
+
+          <label><input type="radio" name="category" value="Handyman"> 🧰 Handyman</label>
+
+        </div>
 
 
 
@@ -270,9 +350,113 @@
 
 
 
+  <!-- ===== For Pros (داخل نفس الصفحة) ===== -->
+
+  <section id="pros" class="pros-section">
+
+    <div class="pros-inner">
+
+      <div class="pros-copy">
+
+        <h2>Pros: Get more of the right jobs</h2>
+
+        <ul>
+
+          <li>✅ <b>3 months free</b> — unlimited leads.</li>
+
+          <li>💳 ثم <b>$300/year</b> — مشاريع غير محدودة، بدون رسوم لكل عرض.</li>
+
+          <li>🔒 تفاصيل العميل تبقى مخفية حتى يتم shortlist.</li>
+
+        </ul>
+
+      </div>
+
+      <form class="pros-form" id="proForm">
+
+        <h3>Claim your free trial</h3>
+
+        <label>Business name* <input type="text" name="biz" required></label>
+
+        <label>Owner/Contact name* <input type="text" name="name" required></label>
+
+        <div class="row2">
+
+          <label>Email* <input type="email" name="email" required></label>
+
+          <label>Phone* <input type="tel" name="phone" required></label>
+
+        </div>
+
+        <label>Primary service*
+
+          <select name="primary" required>
+
+            <option value="" disabled selected>Select a service</option>
+
+            <option>Roofing</option><option>Decks & Porches</option><option>Bathrooms</option>
+
+            <option>Kitchens</option><option>Flooring</option><option>Masonry</option>
+
+            <option>Handyman</option><option>Electrical</option><option>Plumbing</option>
+
+            <option>Windows & Doors</option><option>Landscaping</option><option>Painting</option>
+
+          </select>
+
+        </label>
+
+        <label>Service areas (ZIPs) <input type="text" name="zips" placeholder="e.g., 40220, 40299"></label>
+
+        <label>Website/Instagram (optional) <input type="text" name="site" placeholder="https://"></label>
+
+
+
+        <button class="btn primary" type="submit">Start Free Trial</button>
+
+        <button class="btn dark" id="payYearly">Pay $300/year</button>
+
+        <p class="hint" id="proMsg"></p>
+
+
+
+        <!-- ضع ايميل الاستقبال هنا لاحقاً -->
+
+        <!-- TODO: EMAIL_FOR_NOTIFICATIONS = contact@probuildzone.com -->
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+
   <!-- ===== JavaScript ===== -->
 
   <script>
+
+    // Smooth scroll للروابط الداخلية
+
+    document.querySelectorAll('.nav-link').forEach(a=>{
+
+      a.addEventListener('click', (e)=>{
+
+        const href = a.getAttribute('href');
+
+        if(href && href.startsWith('#')){
+
+          e.preventDefault();
+
+          document.querySelector(href)?.scrollIntoView({behavior:'smooth'});
+
+        }
+
+      });
+
+    });
+
+
 
     // Open/Close modal
 
@@ -284,23 +468,17 @@
 
 
 
-    document.getElementById('postJobTop').onclick = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
+    document.getElementById('postJobTop').onclick  = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
 
-    document.getElementById('closeDoor').onclick = closeDoor;
+    document.getElementById('postJobMid').onclick  = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
 
-    document.getElementById('backBtn').onclick = closeDoor;
+    document.getElementById('closeDoor').onclick   = closeDoor;
+
+    document.getElementById('backBtn').onclick     = closeDoor;
 
 
 
-    // Quick offers
-
-    document.getElementById('checkOffers').onclick = () => {
-
-      const id = prompt('Enter your Job ID to check offer prices:');
-
-      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
-
-    };
+    // Quick offers (نُبقي حقل البحث فقط)
 
     document.getElementById('goQuick').onclick = () => {
 
@@ -312,15 +490,37 @@
 
 
 
+    // اختيار فئة من شبكة الخدمات يملأ راديو الفورم
+
+    document.querySelectorAll('.category-grid .cat').forEach(btn=>{
+
+      btn.addEventListener('click', ()=>{
+
+        openDoor();
+
+        const val = btn.dataset.cat;
+
+        const input = [...document.querySelectorAll('input[name="category"]')].find(i=>i.value===val);
+
+        if(input){ input.checked = true; }
+
+        document.querySelector('.sheet').scrollTop = 0;
+
+      });
+
+    });
+
+
+
     // ===== Upload (pick & drag-drop & preview) =====
 
     const fileInput = document.getElementById('fileInput');
 
-    const pickBtn = document.getElementById('pickBtn');
+    const pickBtn   = document.getElementById('pickBtn');
 
-    const fileList = document.getElementById('fileList');
+    const fileList  = document.getElementById('fileList');
 
-    const dropZone = document.getElementById('dropZone');
+    const dropZone  = document.getElementById('dropZone');
 
 
 
@@ -352,7 +552,7 @@
 
         item.className = 'file-item';
 
-        const isImg = /^image\//.test(f.type);
+        const isImg = /^image\\//.test(f.type);
 
         item.innerHTML = `
 
@@ -367,8 +567,6 @@
       });
 
     };
-
-
 
     fileInput.addEventListener('change', () => renderList(fileInput.files));
 
@@ -400,7 +598,7 @@
 
       if (!dt || !dt.files) return;
 
-      fileInput.files = dt.files; // assign to input
+      fileInput.files = dt.files;
 
       renderList(fileInput.files);
 
@@ -438,13 +636,21 @@
 
 
 
-    // ===== Submit =====
+    // ===== Submit Job =====
 
     document.getElementById('sendBtn').onclick = async ()=>{
 
       const m = document.getElementById('sendMsg');
 
       try{
+
+        // اجلب الفئة المختارة
+
+        const catEl = document.querySelector('input[name="category"]:checked');
+
+        const category = catEl ? catEl.value : null;
+
+
 
         const title = document.getElementById('title').value.trim();
 
@@ -470,7 +676,7 @@
 
 
 
-        if(!title||!contact_name||!phone||!email||!address||!description_long){
+        if(!category||!title||!contact_name||!phone||!email||!address||!description_long){
 
           m.textContent = 'Please fill all required fields.'; return;
 
@@ -492,9 +698,11 @@
 
           body: JSON.stringify({
 
-            category: 'General',
+            // 🔽 ضع ايميل الإشعارات الافتراضي هنا لاحقاً إن أردت
 
-            title, summary, city, state, budget_min, budget_max,
+            // NOTE: default_notify_email = "contact@probuildzone.com"
+
+            category, title, summary, city, state, budget_min, budget_max,
 
             address, contact_name, phone, email, description_long,
 
@@ -525,6 +733,82 @@
       }
 
     };
+
+
+
+    // ===== Pros form =====
+
+    document.getElementById('proForm').addEventListener('submit', async (e)=>{
+
+      e.preventDefault();
+
+      const msg = document.getElementById('proMsg');
+
+      msg.textContent = 'Submitting…';
+
+
+
+      const formData = new FormData(e.currentTarget);
+
+      const data = Object.fromEntries(formData.entries());
+
+
+
+      try{
+
+        const res = await fetch('/api/pros/create', {
+
+          method:'POST',
+
+          headers:{'Content-Type':'application/json'},
+
+          body: JSON.stringify({
+
+            ...data,
+
+            // 🔑 Stripe لاحقاً:
+
+            // publishable_key: "pk_live_xxx",  // ضع المفتاح العلني هنا
+
+          })
+
+        });
+
+        const j = await res.json();
+
+        if(!res.ok || !j.ok) throw new Error(j.error || 'Failed');
+
+        msg.textContent = 'Profile received ✔ We will email you next steps.';
+
+        msg.className = 'hint ok';
+
+      }catch(err){
+
+        msg.textContent = 'Error: ' + (err.message || 'failed');
+
+        msg.className = 'hint err';
+
+      }
+
+    });
+
+
+
+    // زر دفع سنوي Placeholder (Stripe لاحقاً)
+
+    document.getElementById('payYearly').addEventListener('click', (e)=>{
+
+      e.preventDefault();
+
+      alert('Stripe Checkout: $300/year — placeholder.\\n\\n// لاحقاً سنستخدم price_id من Stripe هنا.');
+
+      // مثال لاحقاً:
+
+      // const stripe = Stripe('pk_live_xxx'); // ضع مفتاح Stripe العلني هنا
+
+      // stripe.redirectToCheckout({ lineItems:[{price:'price_300_yearly', quantity:1}], mode:'subscription', successUrl:location.origin+'/success', cancelUrl:location.href });
+
+    });
 
   </script>
 
