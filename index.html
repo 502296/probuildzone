@@ -36,11 +36,13 @@
 
       <ul>
 
-        <!-- صاروا روابط داخلية -->
+        <!-- Services now explains the platform -->
 
-        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#about" class="nav-link">Services</a></li>
 
-        <li><a href="#pros" class="pro-btn nav-link">For Pros</a></li>
+        <!-- For Pros goes to its own page -->
+
+        <li><a href="pros.html" class="pro-btn">For Pros</a></li>
 
       </ul>
 
@@ -50,7 +52,7 @@
 
 
 
-  <!-- ===== Hero Section ===== -->
+  <!-- ===== Hero ===== -->
 
   <section class="hero" id="home">
 
@@ -64,17 +66,15 @@
 
       <div class="buttons">
 
-        <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
+        <!-- Ensure this always opens the modal -->
 
-        <a href="#services" class="btn secondary nav-link">View Services</a>
+        <button class="btn primary" id="postJobTop" onclick="openDoor()">Post a Job (Free)</button>
 
-        <!-- تم حذف زر Check Offer Prices حسب طلبك -->
+        <!-- keep only Job ID controls (no extra hero buttons) -->
 
       </div>
 
 
-
-      <!-- نُبقي مربع البحث عن العروض -->
 
       <div class="job-id">
 
@@ -90,51 +90,27 @@
 
 
 
-  <!-- ===== Services (شبكة فئات للعرض العام) ===== -->
+  <!-- ===== About the Platform (Services explanation) ===== -->
 
-  <section id="services" class="services-block">
+  <section id="about" class="about">
 
-    <div class="services-head">
+    <div class="box">
 
-      <h2>Popular Services</h2>
+      <h2>About our platform</h2>
 
-      <p>Select a category below — it will be prefilled in the form.</p>
+      <p><strong>ProBuildZone</strong> is a matching platform that connects homeowners with local, vetted pros. We are <em>not</em> a contractor, and we don’t perform any manual work or handle payments between parties.</p>
 
-    </div>
+      <ul>
 
-    <div class="category-grid">
+        <li>🔗 We introduce homeowners to qualified builders/pros.</li>
 
-      <!-- عند الضغط نفتح الفورم ونضبط الفئة المختارة -->
+        <li>🔒 Privacy-first — project photos, address, and contact info stay private until the owner approves sharing.</li>
 
-      <button class="cat" data-cat="Roofing">🏠 Roofing</button>
+        <li>🤝 You negotiate scope, timing, and price directly with the pro.</li>
 
-      <button class="cat" data-cat="Decks & Porches">🪚 Decks & Porches</button>
+        <li>💳 No platform fees; we never interfere with any offer or payment.</li>
 
-      <button class="cat" data-cat="Kitchens">🍳 Kitchens</button>
-
-      <button class="cat" data-cat="Bathrooms">🛁 Bathrooms</button>
-
-      <button class="cat" data-cat="Flooring">🪵 Flooring</button>
-
-      <button class="cat" data-cat="Painting">🎨 Painting</button>
-
-      <button class="cat" data-cat="Masonry">🧱 Masonry</button>
-
-      <button class="cat" data-cat="Electrical">⚡ Electrical</button>
-
-      <button class="cat" data-cat="Plumbing">🚰 Plumbing</button>
-
-      <button class="cat" data-cat="Windows & Doors">🪟 Windows & Doors</button>
-
-      <button class="cat" data-cat="Landscaping">🌿 Landscaping</button>
-
-      <button class="cat" data-cat="Handyman">🧰 Handyman</button>
-
-    </div>
-
-    <div class="center">
-
-      <button class="btn primary" id="postJobMid">Post a Job</button>
+      </ul>
 
     </div>
 
@@ -142,11 +118,11 @@
 
 
 
-  <!-- ===== Footer Links (نبقيها كما هي) ===== -->
+  <!-- ===== Footer Links (unchanged) ===== -->
 
   <section id="links" class="links-row">
 
-    <a href="#services" class="nav-link">Services</a><span>•</span>
+    <a href="#about" class="nav-link">Services</a><span>•</span>
 
     <a href="privacy.html">Privacy</a><span>•</span>
 
@@ -173,8 +149,6 @@
       </div>
 
 
-
-      <!-- ===== Job Form ===== -->
 
       <section class="job-form">
 
@@ -206,7 +180,7 @@
 
 
 
-        <!-- NEW: Category (12 أيقونة داخل الفورم) -->
+        <!-- Category (12 icons) -->
 
         <label>Category *</label>
 
@@ -284,7 +258,7 @@
 
         </div>
 
-        <span class="hint">💡 Just an estimate — pros will confirm after seeing your project.</span>
+        <span class="hint">Just an estimate — pros will confirm after seeing your project.</span>
 
 
 
@@ -332,7 +306,7 @@
 
 
 
-    <!-- ===== Fixed Action Bar ===== -->
+    <!-- Fixed Action -->
 
     <div class="action-bar" id="actionBar">
 
@@ -350,93 +324,11 @@
 
 
 
-  <!-- ===== For Pros (داخل نفس الصفحة) ===== -->
-
-  <section id="pros" class="pros-section">
-
-    <div class="pros-inner">
-
-      <div class="pros-copy">
-
-        <h2>Pros: Get more of the right jobs</h2>
-
-        <ul>
-
-          <li>✅ <b>3 months free</b> — unlimited leads.</li>
-
-          <li>💳 ثم <b>$300/year</b> — مشاريع غير محدودة، بدون رسوم لكل عرض.</li>
-
-          <li>🔒 تفاصيل العميل تبقى مخفية حتى يتم shortlist.</li>
-
-        </ul>
-
-      </div>
-
-      <form class="pros-form" id="proForm">
-
-        <h3>Claim your free trial</h3>
-
-        <label>Business name* <input type="text" name="biz" required></label>
-
-        <label>Owner/Contact name* <input type="text" name="name" required></label>
-
-        <div class="row2">
-
-          <label>Email* <input type="email" name="email" required></label>
-
-          <label>Phone* <input type="tel" name="phone" required></label>
-
-        </div>
-
-        <label>Primary service*
-
-          <select name="primary" required>
-
-            <option value="" disabled selected>Select a service</option>
-
-            <option>Roofing</option><option>Decks & Porches</option><option>Bathrooms</option>
-
-            <option>Kitchens</option><option>Flooring</option><option>Masonry</option>
-
-            <option>Handyman</option><option>Electrical</option><option>Plumbing</option>
-
-            <option>Windows & Doors</option><option>Landscaping</option><option>Painting</option>
-
-          </select>
-
-        </label>
-
-        <label>Service areas (ZIPs) <input type="text" name="zips" placeholder="e.g., 40220, 40299"></label>
-
-        <label>Website/Instagram (optional) <input type="text" name="site" placeholder="https://"></label>
-
-
-
-        <button class="btn primary" type="submit">Start Free Trial</button>
-
-        <button class="btn dark" id="payYearly">Pay $300/year</button>
-
-        <p class="hint" id="proMsg"></p>
-
-
-
-        <!-- ضع ايميل الاستقبال هنا لاحقاً -->
-
-        <!-- TODO: EMAIL_FOR_NOTIFICATIONS = contact@probuildzone.com -->
-
-      </form>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- ===== JavaScript ===== -->
+  <!-- ===== JS ===== -->
 
   <script>
 
-    // Smooth scroll للروابط الداخلية
+    // Smooth scroll for internal links
 
     document.querySelectorAll('.nav-link').forEach(a=>{
 
@@ -458,101 +350,67 @@
 
 
 
-    // Open/Close modal
+    // Modal controls (robust)
 
     const modal = document.getElementById('modal');
 
-    const openDoor = () => { modal.style.display = 'flex'; document.documentElement.style.overflow = 'hidden'; };
+    function openDoor(){ modal.style.display='flex'; document.documentElement.style.overflow='hidden'; }
 
-    const closeDoor = () => { modal.style.display = 'none'; document.documentElement.style.overflow = ''; };
-
-
-
-    document.getElementById('postJobTop').onclick  = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
-
-    document.getElementById('postJobMid').onclick  = () => { openDoor(); document.querySelector('.sheet').scrollTop = 0; };
-
-    document.getElementById('closeDoor').onclick   = closeDoor;
-
-    document.getElementById('backBtn').onclick     = closeDoor;
+    function closeDoor(){ modal.style.display='none'; document.documentElement.style.overflow=''; }
 
 
 
-    // Quick offers (نُبقي حقل البحث فقط)
+    const sheet = document.querySelector('.sheet');
 
-    document.getElementById('goQuick').onclick = () => {
+    document.getElementById('postJobTop').addEventListener('click', ()=>{ openDoor(); sheet.scrollTop=0; });
+
+    document.getElementById('closeDoor').addEventListener('click', closeDoor);
+
+    document.getElementById('backBtn').addEventListener('click', closeDoor);
+
+
+
+    // Job ID lookup
+
+    document.getElementById('goQuick').addEventListener('click', ()=>{
 
       const id = document.getElementById('jobIdQuick').value.trim();
 
-      if (id) location.href = `/offers.html?id=${encodeURIComponent(id)}`;
-
-    };
-
-
-
-    // اختيار فئة من شبكة الخدمات يملأ راديو الفورم
-
-    document.querySelectorAll('.category-grid .cat').forEach(btn=>{
-
-      btn.addEventListener('click', ()=>{
-
-        openDoor();
-
-        const val = btn.dataset.cat;
-
-        const input = [...document.querySelectorAll('input[name="category"]')].find(i=>i.value===val);
-
-        if(input){ input.checked = true; }
-
-        document.querySelector('.sheet').scrollTop = 0;
-
-      });
+      if(id){ location.href = `/offers.html?id=${encodeURIComponent(id)}`; }
 
     });
 
 
 
-    // ===== Upload (pick & drag-drop & preview) =====
+    // Upload preview
 
     const fileInput = document.getElementById('fileInput');
 
-    const pickBtn   = document.getElementById('pickBtn');
+    const pickBtn = document.getElementById('pickBtn');
 
-    const fileList  = document.getElementById('fileList');
+    const fileList = document.getElementById('fileList');
 
-    const dropZone  = document.getElementById('dropZone');
+    const dropZone = document.getElementById('dropZone');
 
-
-
-    pickBtn.onclick = () => fileInput.click();
+    pickBtn.onclick = ()=> fileInput.click();
 
 
 
-    const humanSize = (b)=> {
+    const humanSize = (b)=> b<1024? (b+' B') : b<1048576? ((b/1024).toFixed(1)+' KB') : ((b/1048576).toFixed(1)+' MB');
 
-      if (b < 1024) return b + ' B';
+    const renderList = (files)=>{
 
-      if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+      fileList.innerHTML='';
 
-      return (b/1024/1024).toFixed(1) + ' MB';
-
-    };
-
-
-
-    const renderList = (files) => {
-
-      fileList.innerHTML = '';
-
-      if (!files.length) { fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
+      if(!files.length){ fileList.innerHTML='<span class="hint">No files selected yet.</span>'; return; }
 
       [...files].forEach(f=>{
 
+        const isImg = /^image\//.test(f.type);
+
         const item = document.createElement('div');
 
-        item.className = 'file-item';
-
-        const isImg = /^image\\//.test(f.type);
+        item.className='file-item';
 
         item.innerHTML = `
 
@@ -568,83 +426,33 @@
 
     };
 
-    fileInput.addEventListener('change', () => renderList(fileInput.files));
+    fileInput.addEventListener('change', ()=>renderList(fileInput.files));
+
+    ['dragenter','dragover','dragleave','drop'].forEach(e=>dropZone.addEventListener(e,ev=>{ev.preventDefault();ev.stopPropagation();},false));
+
+    ['dragenter','dragover'].forEach(e=>dropZone.addEventListener(e,()=>dropZone.classList.add('hover'),false));
+
+    ['dragleave','drop'].forEach(e=>dropZone.addEventListener(e,()=>dropZone.classList.remove('hover'),false));
+
+    dropZone.addEventListener('drop', ev=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files=dt.files; renderList(fileInput.files); }});
 
 
 
-    // Drag & Drop
+    // Convert files to base64
 
-    ['dragenter','dragover','dragleave','drop'].forEach(e => {
+    const bufToBase64 = (buf)=>{ let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); };
 
-      dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }, false);
-
-    });
-
-    ['dragenter','dragover'].forEach(e => {
-
-      dropZone.addEventListener(e, () => dropZone.classList.add('hover'), false);
-
-    });
-
-    ['dragleave','drop'].forEach(e => {
-
-      dropZone.addEventListener(e, () => dropZone.classList.remove('hover'), false);
-
-    });
-
-    dropZone.addEventListener('drop', (ev)=>{
-
-      const dt = ev.dataTransfer;
-
-      if (!dt || !dt.files) return;
-
-      fileInput.files = dt.files;
-
-      renderList(fileInput.files);
-
-    });
+    const filesToBase64 = async(list)=>{ const arr=[]; for(const f of [...list||[]]){ if(f.size>10*1024*1024) throw new Error(`File too large: ${f.name}`); const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); } return arr; };
 
 
 
-    // Helpers Base64
+    // Submit Job  (API endpoint placeholder)
 
-    const bufToBase64 = (buf)=>{
-
-      let bin = ''; new Uint8Array(buf).forEach(b=>bin += String.fromCharCode(b));
-
-      return btoa(bin);
-
-    };
-
-    const filesToBase64 = async (list)=>{
-
-      const arr = [];
-
-      for (const f of [...list||[]]) {
-
-        if (f.size > 10*1024*1024) throw new Error(`File too large: ${f.name}`);
-
-        const buf = await f.arrayBuffer();
-
-        arr.push(bufToBase64(buf));
-
-      }
-
-      return arr;
-
-    };
-
-
-
-    // ===== Submit Job =====
-
-    document.getElementById('sendBtn').onclick = async ()=>{
+    document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
       const m = document.getElementById('sendMsg');
 
       try{
-
-        // اجلب الفئة المختارة
 
         const catEl = document.querySelector('input[name="category"]:checked');
 
@@ -652,63 +460,57 @@
 
 
 
-        const title = document.getElementById('title').value.trim();
+        const payload = {
 
-        const summary = document.getElementById('summary').value.trim();
+          category,
 
-        const city = document.getElementById('city').value.trim();
+          title: document.getElementById('title').value.trim(),
 
-        const state = document.getElementById('state').value.trim();
+          summary: document.getElementById('summary').value.trim(),
 
-        const budget_min = document.getElementById('budgetMin').value || null;
+          city: document.getElementById('city').value.trim(),
 
-        const budget_max = document.getElementById('budgetMax').value || null;
+          state: document.getElementById('state').value.trim(),
 
-        const contact_name = document.getElementById('contactName').value.trim();
+          budget_min: document.getElementById('budgetMin').value || null,
 
-        const phone = document.getElementById('phone').value.trim();
+          budget_max: document.getElementById('budgetMax').value || null,
 
-        const email = document.getElementById('email').value.trim();
+          contact_name: document.getElementById('contactName').value.trim(),
 
-        const address = document.getElementById('address').value.trim();
+          phone: document.getElementById('phone').value.trim(),
 
-        const description_long = document.getElementById('longDesc').value.trim();
+          email: document.getElementById('email').value.trim(),
+
+          address: document.getElementById('address').value.trim(),
+
+          description_long: document.getElementById('longDesc').value.trim(),
+
+          photosBase64: await filesToBase64(fileInput.files),
+
+          // TODO: default_notify_email = "contact@probuildzone.com"  (ضع بريد الإشعارات هنا لو رغبت)
+
+        };
 
 
 
-        if(!category||!title||!contact_name||!phone||!email||!address||!description_long){
+        if(!payload.category||!payload.title||!payload.contact_name||!payload.phone||!payload.email||!payload.address||!payload.description_long){
 
-          m.textContent = 'Please fill all required fields.'; return;
+          m.textContent='Please fill all required fields.'; return;
 
         }
 
 
 
-        m.textContent = 'Uploading…';
-
-        const photosBase64 = await filesToBase64(fileInput.files);
-
-
+        m.textContent='Uploading…';
 
         const res = await fetch('/api/jobs/create', {
 
-          method: 'POST',
+          method:'POST',
 
-          headers: {'Content-Type':'application/json'},
+          headers:{'Content-Type':'application/json'},
 
-          body: JSON.stringify({
-
-            // 🔽 ضع ايميل الإشعارات الافتراضي هنا لاحقاً إن أردت
-
-            // NOTE: default_notify_email = "contact@probuildzone.com"
-
-            category, title, summary, city, state, budget_min, budget_max,
-
-            address, contact_name, phone, email, description_long,
-
-            photosBase64
-
-          })
+          body: JSON.stringify(payload)
 
         });
 
@@ -731,82 +533,6 @@
         m.className = 'hint err';
 
       }
-
-    };
-
-
-
-    // ===== Pros form =====
-
-    document.getElementById('proForm').addEventListener('submit', async (e)=>{
-
-      e.preventDefault();
-
-      const msg = document.getElementById('proMsg');
-
-      msg.textContent = 'Submitting…';
-
-
-
-      const formData = new FormData(e.currentTarget);
-
-      const data = Object.fromEntries(formData.entries());
-
-
-
-      try{
-
-        const res = await fetch('/api/pros/create', {
-
-          method:'POST',
-
-          headers:{'Content-Type':'application/json'},
-
-          body: JSON.stringify({
-
-            ...data,
-
-            // 🔑 Stripe لاحقاً:
-
-            // publishable_key: "pk_live_xxx",  // ضع المفتاح العلني هنا
-
-          })
-
-        });
-
-        const j = await res.json();
-
-        if(!res.ok || !j.ok) throw new Error(j.error || 'Failed');
-
-        msg.textContent = 'Profile received ✔ We will email you next steps.';
-
-        msg.className = 'hint ok';
-
-      }catch(err){
-
-        msg.textContent = 'Error: ' + (err.message || 'failed');
-
-        msg.className = 'hint err';
-
-      }
-
-    });
-
-
-
-    // زر دفع سنوي Placeholder (Stripe لاحقاً)
-
-    document.getElementById('payYearly').addEventListener('click', (e)=>{
-
-      e.preventDefault();
-
-      alert('Stripe Checkout: $300/year — placeholder.\\n\\n// لاحقاً سنستخدم price_id من Stripe هنا.');
-
-      // مثال لاحقاً:
-
-      // const stripe = Stripe('pk_live_xxx'); // ضع مفتاح Stripe العلني هنا
-
-      // stripe.redirectToCheckout({ lineItems:[{price:'price_300_yearly', quantity:1}], mode:'subscription', successUrl:location.origin+'/success', cancelUrl:location.href });
 
     });
 
