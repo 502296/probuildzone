@@ -1,28 +1,34 @@
-// server.js  (Node 18+)
+// server.js  — Node 18+
+
+// تثبيت الحزم المطلوبة:
 
 // npm i express stripe cors body-parser dotenv
 
-import express from 'express';
 
-import cors from 'cors';
 
-import bodyParser from 'body-parser';
+import express from "express";
 
-import dotenv from 'dotenv';
+import cors from "cors";
 
-import Stripe from 'stripe';
+import bodyParser from "body-parser";
+
+import dotenv from "dotenv";
+
+import Stripe from "stripe";
 
 
 
 dotenv.config();
 
+
+
 const app = express();
 
 app.use(cors());
 
-app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.json({ limit: "10mb" }));
 
-app.use(bodyParser.raw({ type: 'application/json', limit: '1mb' })); // للويبهوك
+app.use(bodyParser.raw({ type: "application/json" }));
 
 
 
@@ -30,7 +36,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
-// ذاكرة مؤقتة للتجارب (بدل DB حقيقية)
+// ذاكرة مؤقتة للتجارب (بدل قاعدة بيانات)
 
 const DB = {
 
@@ -38,31 +44,55 @@ const DB = {
 
   leads: [
 
-    { job_id:'PBZ-90123', title:'Replace leaking roof', category:'Roofing', city:'Louisville', state:'KY', budget_min:2000, budget_max:4500 },
+    { job_id: "PBZ-90123", title: "Replace leaking faucet" },
 
-    { job_id:'PBZ-90124', title:'Install kitchen backsplash', category:'Kitchens', city:'Louisville', state:'KY', budget_min:800,  budget_max:1500 }
+    { job_id: "PBZ-90124", title: "Install kitchen lighting" },
 
   ],
 
-  sessions: {}
+  sessions: {},
 
 };
 
 
 
-// ===== Stripe: إنشاء Checkout Session (اشتراك) =====
+// ✅ صفحة رئيسية بسيطة لتأكيد عمل السيرفر
 
-app.post('/api/stripe/create-checkout-session', async (req, res) => {
+app.get("/", (req, res) => {
+
+  res.send(
+
+    "✅ ProBuildZone API is running! Use /api/stripe/create-checkout-session to test Stripe integration."
+
+  );
+
+});
+
+
+
+// ✅ اختبار الحالة الصحية للسيرفر
+
+app.get("/api/health", (req, res) => {
+
+  res.json({ ok: true, uptime: process.uptime(), env: process.env.NODE_ENV || "dev" });
+
+});
+
+
+
+// ✅ إنشاء جلسة Checkout على Stripe (مع تجربة مجانية 30 يوم إن وجدت)
+
+app.post("/api/stripe/create-checkout-session", async (req, res) => {
 
   try {
 
-    const { price_id, metadata, customer_email, trial_days } = req.body || {};
+    const { price_id, metadata, customer_email, trial_days } = req.body;
 
 
 
     const params = {
 
-      mode: 'subscription',
+      mode: "subscription",
 
       line_items: [{ price: price_id || process.env.STRIPE_PRICE_ID_YEARLY, quantity: 1 }],
 
@@ -70,19 +100,25 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
       cancel_url: process.env.DASHBOARD_CANCEL_URL,
 
-      metadata: metadata || {},
+      payment_method_collection: "always",
 
-      payment_method_collection: 'always', // نجمع وسيلة الدفع الآن حتى مع التجربة
+      metadata: metadata || {},
 
     };
 
 
 
+    // ربط البريد لو أُرسل من الواجهة
+
     if (customer_email) params.customer_email = customer_email;
+
+
+
+    // تجربة مجانية 30 يوم
 
     if (Number(trial_days) > 0) {
 
-      params.subscription_data = { trial_period_days: Number(trial_days) }; // ← 30 يوم
+      params.subscription_data = { trial_period_days: Number(trial_days) };
 
     }
 
@@ -90,7 +126,9 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
     const session = await stripe.checkout.sessions.create(params);
 
-    DB.sessions[session.id] = { status: 'created' };
+    DB.sessions[session.id] = { status: "created" };
+
+
 
     res.json({ id: session.id });
 
@@ -104,41 +142,21 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
 
 
-// ===== Stripe: بوابة إدارة الفوترة (Placeholder) =====
+// ✅ Stripe Webhook (يمكن تفعيله لاحقاً)
 
-app.post('/api/stripe/customer-portal', async (req, res) => {
-
-  return res.json({ url: 'https://billing.stripe.com/p/login/test_xxx' });
-
-});
-
-
-
-// ===== Stripe: حالة الاشتراك (Placeholder) =====
-
-app.get('/api/stripe/subscription-status', async (req, res) => {
-
-  res.json({ ok: true, status: 'active' });
-
-});
-
-
-
-// ===== Stripe Webhook (للإنتاج يُفضَّل تفعيله مع توقيع) =====
-
-app.post('/api/stripe/webhook', (req, res) => {
+app.post("/api/stripe/webhook", (req, res) => {
 
   try {
 
     const event = JSON.parse(req.body.toString());
 
-    if (event.type === 'checkout.session.completed') {
+    if (event.type === "checkout.session.completed") {
 
       const session = event.data.object;
 
-      DB.sessions[session.id] = { status: 'completed' };
+      DB.sessions[session.id] = { status: "completed" };
 
-      // TODO: اربط session.customer بملف الـpro وحدّث حالته trialing/active
+      console.log("✅ Session completed:", session.id);
 
     }
 
@@ -154,53 +172,57 @@ app.post('/api/stripe/webhook', (req, res) => {
 
 
 
-// ===== Pros API (بسيطة للتجربة) =====
+// ✅ API بسيط للتجار (pros)
 
-app.post('/api/pros/create', (req, res) => {
+app.post("/api/pros/create", (req, res) => {
 
-  const { biz, name, email, phone, license, insurance, primary, zips, site } = req.body || {};
+  const { biz, name, email, phone, license, insurance } = req.body;
 
-  if (!biz || !name || !email || !phone || !license || !primary) {
+  if (!biz || !name || !email || !phone)
 
-    return res.status(400).json({ ok: false, error: 'Missing fields' });
+    return res.status(400).json({ ok: false, error: "Missing fields" });
 
-  }
 
-  const pro_id = 'pr_' + Math.random().toString(36).slice(2, 9);
 
-  DB.pros[pro_id] = { pro_id, biz, name, email, phone, license, insurance, primary, zips, site, status: 'trialing' };
+  const pro_id = "pr_" + Math.random().toString(36).substring(2, 9);
 
-  return res.json({ ok: true, pro_id });
+  DB.pros[pro_id] = { pro_id, biz, name, email, phone, license, insurance };
+
+
+
+  res.json({ ok: true, pro_id });
 
 });
 
 
 
-app.get('/api/pros/me', (req, res) => {
+app.get("/api/pros/me", (req, res) => {
 
   const any = Object.values(DB.pros)[0];
 
-  return res.json({ ok: true, profile: any || {} });
+  res.json({ ok: true, profile: any || {} });
 
 });
 
 
 
-app.post('/api/pros/update', (req, res) => {
+app.post("/api/pros/update", (req, res) => {
 
   const anyId = Object.keys(DB.pros)[0];
 
-  if (!anyId) return res.json({ ok: false, error: 'No pro yet' });
+  if (!anyId) return res.json({ ok: false, error: "No pros found" });
+
+
 
   DB.pros[anyId] = { ...DB.pros[anyId], ...req.body };
 
-  return res.json({ ok: true });
+  res.json({ ok: true });
 
 });
 
 
 
-app.get('/api/pros/leads', (req, res) => {
+app.get("/api/pros/leads", (req, res) => {
 
   res.json({ ok: true, items: DB.leads });
 
@@ -208,18 +230,16 @@ app.get('/api/pros/leads', (req, res) => {
 
 
 
-app.post('/api/pros/lead-action', (req, res) => {
+app.post("/api/pros/lead-action", (req, res) => {
 
-  // accept/dismiss — احفظ الإجراء لو رغبت
-
-  return res.json({ ok: true });
+  res.json({ ok: true });
 
 });
 
 
 
-// ===== Start server =====
+// ✅ تشغيل السيرفر
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, () => console.log(`PBZ API listening on http://localhost:${port}`));
+app.listen(port, () => console.log(`PBZ API running on port ${port}`));
