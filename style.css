@@ -381,3 +381,57 @@ nav a{color:#fff;text-decoration:none;font-weight:700}
 }
 
 .about ul{margin-left:18px;line-height:1.8}
+
+/* Step 1: Categories grid (cards without radio dots) */
+
+.cat-grid{
+
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px
+
+}
+
+@media(max-width:820px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
+
+.cat-card{
+
+  display:flex;align-items:center;gap:10px;justify-content:flex-start;
+
+  background:#10182a;border:1px solid rgba(255,255,255,.12);
+
+  color:#E9ECF5;border-radius:12px;padding:14px;cursor:pointer;
+
+  font-weight:800;
+
+}
+
+.cat-card:hover{border-color:#7aa2ff;box-shadow:0 0 0 3px rgba(122,162,255,.15)}
+
+.cat-card span{font-weight:800}
+
+
+
+/* Step 2: selected category badge */
+
+.selected-cat{
+
+  display:inline-flex;gap:8px;align-items:center;margin-bottom:10px;
+
+  background:#121735;border:1px solid rgba(255,255,255,.15);
+
+  color:#cfe0ff;border-radius:999px;padding:6px 12px;font-size:.9rem
+
+}
+
+
+
+/* About / Services modal (if not already added) */
+
+.about-modal{position:fixed; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.55); z-index:9999}
+
+.about-dialog{width:min(820px,94%); background:#fff; border:1px solid #e5e9f2; border-radius:14px; overflow:hidden}
+
+.about-head{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0b1220; color:#E9ECF5; border-bottom:1px solid rgba(255,255,255,.12)}
+
+.about-body{ padding:18px }
+
+.about-body ul{ margin-left:18px; line-height:1.8 }
