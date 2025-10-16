@@ -1,0 +1,371 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8"/>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Pro Dashboard — ProBuildZone</title>
+
+  <link rel="stylesheet" href="style.css"/>
+
+  <style>
+
+    body{background:#0b1220;color:#E9ECF5}
+
+    header{position:sticky;top:0;z-index:6;background:#0b1220}
+
+    nav{max-width:1080px;margin:0 auto;padding:16px}
+
+
+
+    .shell{max-width:1080px;margin:0 auto;padding:18px}
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+
+    .tab{padding:10px 14px;border-radius:10px;border:1px solid #1f2937;background:#111827;color:#fff;font-weight:800;cursor:pointer}
+
+    .tab.active{background:#0EA5E9;border-color:#0EA5E9}
+
+    .panel{display:none}
+
+    .panel.active{display:block}
+
+
+
+    .card{background:#0e132b;border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;margin-bottom:14px}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+
+
+    table{width:100%;border-collapse:collapse}
+
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+
+    th{color:#cfe0ff}
+
+    .btn{padding:8px 12px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+
+    .btn.primary{background:#0EA5E9;color:#fff}
+
+    .btn.dark{background:#111827;color:#fff;border:1px solid #1f2937}
+
+    .tiny{color:#9aa6bf}
+
+    .ok{color:#7cf3b2}.err{color:#ff9b9b}
+
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    @media(max-width:620px){.row2{grid-template-columns:1fr}}
+
+    .input,.select{width:100%;background:#0d1824;border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:10px 12px}
+
+  </style>
+
+</head>
+
+<body>
+
+<header>
+
+  <nav>
+
+    <div class="brand-logo">
+
+      <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
+
+    </div>
+
+    <ul>
+
+      <li><a href="index.html#about">Services</a></li>
+
+      <li><a href="pros.html" class="pro-btn">For Pros</a></li>
+
+    </ul>
+
+  </nav>
+
+</header>
+
+
+
+<main class="shell">
+
+  <h1>Pro Dashboard</h1>
+
+  <div class="tabs">
+
+    <button class="tab active" data-tab="leads">Leads</button>
+
+    <button class="tab" data-tab="profile">Profile</button>
+
+    <button class="tab" data-tab="billing">Billing</button>
+
+  </div>
+
+
+
+  <!-- Leads -->
+
+  <section id="panel-leads" class="panel active">
+
+    <div class="card">
+
+      <h3>Open leads</h3>
+
+      <table id="leadsTable">
+
+        <thead>
+
+          <tr><th>Job</th><th>City</th><th>Budget</th><th>Actions</th></tr>
+
+        </thead>
+
+        <tbody><tr><td colspan="4" class="tiny">Loading…</td></tr></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- Profile -->
+
+  <section id="panel-profile" class="panel">
+
+    <div class="grid">
+
+      <div class="card">
+
+        <h3>Business info</h3>
+
+        <div class="row2">
+
+          <div><label>Business name<input id="p_biz" class="input" type="text"></label></div>
+
+          <div><label>Owner / Contact<input id="p_name" class="input" type="text"></label></div>
+
+        </div>
+
+        <div class="row2">
+
+          <div><label>Email<input id="p_email" class="input" type="email"></label></div>
+
+          <div><label>Phone<input id="p_phone" class="input" type="tel"></label></div>
+
+        </div>
+
+        <div class="row2">
+
+          <div><label>License #<input id="p_license" class="input" type="text"></label></div>
+
+          <div><label>Insurance<input id="p_ins" class="input" type="text" placeholder="Carrier / Policy #"></label></div>
+
+        </div>
+
+        <div><label>Website/Instagram<input id="p_site" class="input" type="text" placeholder="https://"></label></div>
+
+        <div style="margin-top:10px"><button id="saveProfile" class="btn primary">Save changes</button> <span id="saveMsg" class="tiny"></span></div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <h3>Service areas & categories</h3>
+
+        <label>ZIP codes (comma-separated)<input id="p_zips" class="input" type="text" placeholder="40220, 40299"></label>
+
+        <label style="margin-top:10px">Primary service
+
+          <select id="p_primary" class="select">
+
+            <option>Roofing</option><option>Decks & Porches</option><option>Bathrooms</option>
+
+            <option>Kitchens</option><option>Flooring</option><option>Masonry</option>
+
+            <option>Handyman</option><option>Electrical</option><option>Plumbing</option>
+
+            <option>Windows & Doors</option><option>Landscaping</option><option>Painting</option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- Billing -->
+
+  <section id="panel-billing" class="panel">
+
+    <div class="card">
+
+      <h3>Subscription</h3>
+
+      <p class="tiny" id="subStatus">Loading subscription…</p>
+
+      <button id="manageBilling" class="btn dark">Manage billing</button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+
+<script>
+
+// Tabs
+
+document.querySelectorAll('.tab').forEach(t=>{
+
+  t.addEventListener('click', ()=>{
+
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+
+    t.classList.add('active');
+
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+
+  });
+
+});
+
+
+
+// Load profile + leads
+
+async function loadMe(){
+
+  const me = await fetch('/api/pros/me').then(r=>r.json()).catch(()=>null);
+
+  if(me && me.ok){
+
+    const p = me.profile || {};
+
+    p_biz.value=p.biz||''; p_name.value=p.name||''; p_email.value=p.email||''; p_phone.value=p.phone||'';
+
+    p_license.value=p.license||''; p_ins.value=p.insurance||''; p_site.value=p.site||'';
+
+    p_zips.value=p.zips||''; p_primary.value=p.primary||'Roofing';
+
+  }
+
+}
+
+async function loadLeads(){
+
+  const tb = document.querySelector('#leadsTable tbody');
+
+  const res = await fetch('/api/pros/leads?status=open').then(r=>r.json()).catch(()=>null);
+
+  if(!res || !res.ok || !res.items?.length){ tb.innerHTML='<tr><td colspan="4" class="tiny">No open leads yet.</td></tr>'; return; }
+
+  tb.innerHTML = res.items.map(x=>`
+
+    <tr>
+
+      <td>${x.title || '(untitled)'}<div class="tiny">${x.category||''} • #${x.job_id||''}</div></td>
+
+      <td>${x.city||''}${x.state? ', '+x.state:''}</td>
+
+      <td>${x.budget_min? '$'+x.budget_min : ''}${x.budget_max? '–$'+x.budget_max:''}</td>
+
+      <td>
+
+        <button class="btn primary" onclick="actLead('${x.job_id}','accept')">Send offer</button>
+
+        <button class="btn dark" onclick="actLead('${x.job_id}','dismiss')">Dismiss</button>
+
+      </td>
+
+    </tr>`).join('');
+
+}
+
+async function actLead(jobId, action){
+
+  await fetch('/api/pros/lead-action', {
+
+    method:'POST',
+
+    headers:{'Content-Type':'application/json'},
+
+    body: JSON.stringify({ job_id: jobId, action })
+
+  });
+
+  loadLeads();
+
+}
+
+saveProfile.onclick = async ()=>{
+
+  saveMsg.textContent = 'Saving…';
+
+  const payload = {
+
+    biz:p_biz.value, name:p_name.value, email:p_email.value, phone:p_phone.value,
+
+    license:p_license.value, insurance:p_ins.value, site:p_site.value,
+
+    zips:p_zips.value, primary:p_primary.value
+
+  };
+
+  const res = await fetch('/api/pros/update', {
+
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+
+  }).then(r=>r.json()).catch(()=>null);
+
+  saveMsg.textContent = res?.ok ? 'Saved ✔' : 'Failed';
+
+  saveMsg.className = 'tiny ' + (res?.ok ? 'ok' : 'err');
+
+}
+
+manageBilling.onclick = async ()=>{
+
+  const j = await fetch('/api/stripe/customer-portal', { method:'POST' }).then(r=>r.json()).catch(()=>null);
+
+  if(j?.url) location.href = j.url;
+
+};
+
+
+
+// Subscription status
+
+(async ()=>{
+
+  const j = await fetch('/api/stripe/subscription-status').then(r=>r.json()).catch(()=>null);
+
+  subStatus.textContent = j?.ok ? `Status: ${j.status || 'active'}` : 'Not active';
+
+})();
+
+loadMe(); loadLeads();
+
+</script>
+
+</body></html>
