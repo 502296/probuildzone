@@ -1,22 +1,10 @@
 // pros-stripe.js
 
-// Handles Stripe checkout for ProBuildZone
-
-// Connects buttons (#trialBtn & #payBtn) with your backend API endpoint
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
 
   const trialBtn = document.getElementById("trialBtn");
 
   const payBtn = document.getElementById("payBtn");
-
-
-
-  // Stripe public key (replace with your actual publishable key)
-
-  const stripe = Stripe("pk_live_your_public_key_here");
 
 
 
@@ -30,37 +18,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
         headers: { "Content-Type": "application/json" },
 
-        body: JSON.stringify({
-
-          plan: planType, // "trial" or "yearly"
-
-        }),
+        body: JSON.stringify({ plan: planType }),
 
       });
 
 
 
-      const session = await response.json();
+      const data = await response.json();
 
 
 
-      if (session.url) {
+      if (data.url) {
 
-        window.location.href = session.url; // Redirect to Stripe Checkout
+        window.location.href = data.url;
 
       } else {
 
-        alert("Unable to start checkout. Please try again later.");
-
-        console.error(session);
+        alert("Unable to start checkout session");
 
       }
 
     } catch (err) {
 
-      console.error("Error creating checkout session:", err);
+      console.error(err);
 
-      alert("An error occurred. Please try again later.");
+      alert("Something went wrong while connecting to Stripe.");
 
     }
 
@@ -68,18 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  // Handle clicks
+  if (trialBtn) trialBtn.addEventListener("click", () => createCheckout("trial"));
 
-  if (trialBtn) {
-
-    trialBtn.addEventListener("click", () => createCheckout("trial"));
-
-  }
-
-  if (payBtn) {
-
-    payBtn.addEventListener("click", () => createCheckout("yearly"));
-
-  }
+  if (payBtn) payBtn.addEventListener("click", () => createCheckout("yearly"));
 
 });
