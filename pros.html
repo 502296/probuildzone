@@ -16,29 +16,101 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+
+
+  <!-- Page-specific polish (kept scoped here so it doesn’t affect other pages) -->
+
   <style>
+
+    :root { --card:#0e132b; --line:rgba(255,255,255,.14); --muted:#9aa6bf; --text:#eef3ff; }
 
     .pros-hero{padding:72px 16px;background:#0b1220;color:#E9ECF5;text-align:center}
 
-    .pros-hero h1{margin:0 0 8px}
+    .pros-hero h1{margin:0 0 8px; font-size:clamp(26px,3.5vw,34px)}
 
-    .pros-wrap{max-width:980px;margin:0 auto;padding:28px 16px;display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+    .pros-hero p{margin:0 auto;max-width:820px;color:#c9d3ea}
 
-    @media(max-width:920px){.pros-wrap{grid-template-columns:1fr}}
 
-    .pros-card{background:#0e132b;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:18px}
 
-    .pros-card h3{margin-top:0}
+    .pros-shell{max-width:1080px;margin:0 auto;padding:28px 16px}
 
-    .pros-card label{display:block;font-weight:600;margin-top:12px;margin-bottom:6px}
+    .pros-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 
-    .pros-card input,.pros-card select{width:100%;background:#0d1824;border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:10px 14px}
+    @media (max-width: 980px){ .pros-grid{grid-template-columns:1fr} }
 
-    .pros-card .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-    @media(max-width:620px){.pros-card .row2{grid-template-columns:1fr}}
 
-    .note{color:#a0aec0;font-size:.9rem}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+
+    .benefits{list-style:none;padding:0;margin:0}
+
+    .benefits li{display:flex;gap:10px;align-items:flex-start;margin:12px 0;color:#d7def1;line-height:1.7}
+
+    .benefits .ic{width:20px;display:inline-block;text-align:center;opacity:.95}
+
+
+
+    .form h3{margin:0 0 10px;color:var(--text)}
+
+    .field{margin-top:12px}
+
+    .label{display:block;font-weight:700;color:#eaf2ff;margin-bottom:6px}
+
+    .help{display:block;color:var(--muted);font-size:.9rem;margin-top:6px}
+
+
+
+    .input, .select{
+
+      width:100%;background:#0d1824;border:1px solid var(--line);
+
+      color:#fff;border-radius:10px;padding:12px 14px;font-size:16px;outline:none
+
+    }
+
+    .input:focus, .select:focus{border-color:#7aa2ff; box-shadow:0 0 0 3px rgba(122,162,255,.18)}
+
+
+
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    @media (max-width: 620px){ .row2{grid-template-columns:1fr} }
+
+
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    .btn{padding:12px 18px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+
+    .btn.primary{background:#0EA5E9;color:#fff}
+
+    .btn.dark{background:#111827;color:#fff;border:1px solid #1f2937}
+
+    .btn:hover{filter:brightness(1.06)}
+
+    .msg{margin-top:8px;color:#c9d3ea;font-size:.95rem}
+
+
+
+    /* tiny success & error states */
+
+    .ok{color:#7cf3b2}
+
+    .err{color:#ff9b9b}
+
+
+
+    /* header nav alignment reuse from your site */
+
+    header{position:sticky;top:0;z-index:6;background:#0b1220}
+
+    nav{max-width:1080px;margin:0 auto;padding:16px}
+
+
+
+    /* make labels always readable on iOS */
+
+    ::placeholder{color:#97a5c0}
 
   </style>
 
@@ -74,117 +146,223 @@
 
     <h1>Pros: Win more of the right jobs</h1>
 
-    <p class="note">Create a profile, set your service areas, and get matched with real projects near you.</p>
+    <p>Create a profile, set your service areas, and get matched with real projects near you.</p>
 
   </section>
 
 
 
-  <section class="pros-wrap">
+  <main class="pros-shell">
 
-    <div>
+    <div class="pros-grid">
 
-      <ul style="line-height:1.9">
+      <!-- Benefits / Sales copy -->
 
-        <li>✅ <b>3 months free</b> — unlimited leads in your city.</li>
+      <aside class="card">
 
-        <li>💳 Then <b>$300/year</b> — no per-lead fees, unlimited projects.</li>
+        <ul class="benefits">
 
-        <li>🔒 Homeowner details stay private until shortlisted.</li>
+          <li><span class="ic">✅</span><div><b>3 months free</b> — unlimited leads in your city.</div></li>
 
-        <li>📍 Control your service ZIPs and categories.</li>
+          <li><span class="ic">💳</span><div>Then <b>$300/year</b> — no per-lead fees, unlimited projects.</div></li>
 
-      </ul>
+          <li><span class="ic">🔒</span><div>Homeowner details stay private until shortlisted.</div></li>
+
+          <li><span class="ic">📍</span><div>Control your service ZIPs and categories.</div></li>
+
+        </ul>
+
+      </aside>
+
+
+
+      <!-- Form -->
+
+      <section class="card form" aria-labelledby="formTitle">
+
+        <h3 id="formTitle">Claim your free trial</h3>
+
+        <form id="proForm" novalidate>
+
+          <div class="field">
+
+            <label class="label" for="biz">Business name*</label>
+
+            <input class="input" id="biz" name="biz" type="text" placeholder="Your company LLC" required>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label class="label" for="name">Owner / Contact name*</label>
+
+            <input class="input" id="name" name="name" type="text" placeholder="Full name" required>
+
+          </div>
+
+
+
+          <div class="row2">
+
+            <div class="field">
+
+              <label class="label" for="email">Email*</label>
+
+              <input class="input" id="email" name="email" type="email" placeholder="you@example.com" required>
+
+            </div>
+
+            <div class="field">
+
+              <label class="label" for="phone">Phone*</label>
+
+              <input class="input" id="phone" name="phone" type="tel" placeholder="(555) 555-5555" required>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="row2">
+
+            <div class="field">
+
+              <label class="label" for="license">License number*</label>
+
+              <input class="input" id="license" name="license" type="text" placeholder="State license #" required>
+
+            </div>
+
+            <div class="field">
+
+              <label class="label" for="insurance">Insurance (optional)</label>
+
+              <input class="input" id="insurance" name="insurance" type="text" placeholder="Carrier / Policy # (optional)">
+
+            </div>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label class="label" for="primary">Primary service*</label>
+
+            <select class="select" id="primary" name="primary" required>
+
+              <option value="" disabled selected>Select a service</option>
+
+              <option>Roofing</option><option>Decks & Porches</option><option>Bathrooms</option>
+
+              <option>Kitchens</option><option>Flooring</option><option>Masonry</option>
+
+              <option>Handyman</option><option>Electrical</option><option>Plumbing</option>
+
+              <option>Windows & Doors</option><option>Landscaping</option><option>Painting</option>
+
+            </select>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label class="label" for="zips">Service areas (ZIPs)</label>
+
+            <input class="input" id="zips" name="zips" type="text" placeholder="e.g., 40220, 40299">
+
+            <span class="help">Add comma-separated ZIP codes you actively serve.</span>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label class="label" for="site">Website / Instagram (optional)</label>
+
+            <input class="input" id="site" name="site" type="text" placeholder="https://">
+
+          </div>
+
+
+
+          <div class="actions">
+
+            <button class="btn primary" type="submit" id="startTrial">Start Free Trial</button>
+
+            <button class="btn dark" id="payYearly">Pay $300/year</button>
+
+          </div>
+
+          <p class="msg" id="proMsg"></p>
+
+
+
+          <!-- TODO (set later): -->
+
+          <!-- EMAIL_FOR_NOTIFICATIONS = "contact@probuildzone.com" -->
+
+          <!-- STRIPE_PUBLISHABLE_KEY  = "pk_live_xxx" -->
+
+          <!-- STRIPE_PRICE_ID_YEARLY  = "price_300_yearly" -->
+
+        </form>
+
+      </section>
 
     </div>
 
-
-
-    <form class="pros-card" id="proForm">
-
-      <h3>Claim your free trial</h3>
-
-      <label>Business name* <input type="text" name="biz" required></label>
-
-      <label>Owner/Contact name* <input type="text" name="name" required></label>
-
-      <div class="row2">
-
-        <label>Email* <input type="email" name="email" required></label>
-
-        <label>Phone* <input type="tel" name="phone" required></label>
-
-      </div>
-
-      <div class="row2">
-
-        <label>License number* <input type="text" name="license" required></label>
-
-        <label>Insurance (optional) <input type="text" name="insurance" placeholder="Carrier / Policy # (optional)"></label>
-
-      </div>
-
-      <label>Primary service*
-
-        <select name="primary" required>
-
-          <option value="" disabled selected>Select a service</option>
-
-          <option>Roofing</option><option>Decks & Porches</option><option>Bathrooms</option>
-
-          <option>Kitchens</option><option>Flooring</option><option>Masonry</option>
-
-          <option>Handyman</option><option>Electrical</option><option>Plumbing</option>
-
-          <option>Windows & Doors</option><option>Landscaping</option><option>Painting</option>
-
-        </select>
-
-      </label>
-
-      <label>Service areas (ZIPs) <input type="text" name="zips" placeholder="e.g., 40220, 40299"></label>
-
-      <label>Website / Instagram (optional) <input type="text" name="site" placeholder="https://"></label>
-
-
-
-      <button class="btn primary" type="submit">Start Free Trial</button>
-
-      <button class="btn dark" id="payYearly">Pay $300/year</button>
-
-      <p class="note" id="proMsg"></p>
-
-
-
-      <!-- TODO: EMAIL_FOR_NOTIFICATIONS = "contact@probuildzone.com" -->
-
-      <!-- TODO: STRIPE_PUBLISHABLE_KEY = "pk_live_xxx" -->
-
-      <!-- TODO: STRIPE_PRICE_ID_YEARLY = "price_300_yearly" -->
-
-    </form>
-
-  </section>
+  </main>
 
 
 
   <script>
 
-    // Submit pro signup (placeholder API)
+    // Basic client-side validation and submit
 
-    document.getElementById('proForm').addEventListener('submit', async (e)=>{
+    const form = document.getElementById('proForm');
+
+    const msg  = document.getElementById('proMsg');
+
+
+
+    form.addEventListener('submit', async (e)=>{
 
       e.preventDefault();
 
-      const msg = document.getElementById('proMsg');
+      msg.textContent = '';
+
+      const requiredIds = ['biz','name','email','phone','license','primary'];
+
+      for(const id of requiredIds){
+
+        const el = document.getElementById(id);
+
+        if(!el.value.trim()){
+
+          msg.textContent = 'Please complete the required fields.';
+
+          msg.className = 'msg err';
+
+          el.focus();
+
+          return;
+
+        }
+
+      }
+
+
 
       msg.textContent = 'Submitting…';
 
-
-
-      const formData = new FormData(e.currentTarget);
-
-      const data = Object.fromEntries(formData.entries());
+      const data = Object.fromEntries(new FormData(form).entries());
 
 
 
@@ -206,13 +384,13 @@
 
         msg.textContent = 'Profile received ✔ We will email you next steps.';
 
-        msg.className = 'hint ok';
+        msg.className = 'msg ok';
 
       }catch(err){
 
         msg.textContent = 'Error: ' + (err.message || 'failed');
 
-        msg.className = 'hint err';
+        msg.className = 'msg err';
 
       }
 
@@ -226,13 +404,23 @@
 
       e.preventDefault();
 
-      alert('Stripe Checkout $300/year — placeholder.\\n\\n// Later: use STRIPE_PUBLISHABLE_KEY + STRIPE_PRICE_ID_YEARLY here.');
+      alert('Stripe Checkout $300/year — placeholder.\n\n// Later: use STRIPE_PUBLISHABLE_KEY + STRIPE_PRICE_ID_YEARLY here.');
 
       // Example later:
 
-      // const stripe = Stripe('pk_live_xxx'); // TODO
+      // const stripe = Stripe('pk_live_xxx');
 
-      // stripe.redirectToCheckout({ lineItems:[{price:'price_300_yearly',quantity:1}], mode:'subscription', successUrl:location.origin+'/success', cancelUrl:location.href });
+      // stripe.redirectToCheckout({
+
+      //   lineItems:[{price:'price_300_yearly', quantity:1}],
+
+      //   mode:'subscription',
+
+      //   successUrl: location.origin+'/success',
+
+      //   cancelUrl: location.href
+
+      // });
 
     });
 
