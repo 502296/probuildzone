@@ -1,4 +1,4 @@
-// server.js
+// server.js  (Node 18+)
 
 // npm i express stripe cors body-parser dotenv
 
@@ -20,47 +20,47 @@ const app = express();
 
 app.use(cors());
 
-app.use(bodyParser.json({ limit: '10mb' })); // JSON
+app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use(bodyParser.raw({ type: 'application/json', limit: '1mb' })); // للويبهوك
 
 
 
-// Stripe
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
-// ذاكرة مؤقتة للتجربة (بدل قاعدة بيانات)
+// ذاكرة مؤقتة للتجارب (بدل DB حقيقية)
 
 const DB = {
 
-  pros: {},     // pro_id -> profile
+  pros: {},
 
   leads: [
 
     { job_id:'PBZ-90123', title:'Replace leaking roof', category:'Roofing', city:'Louisville', state:'KY', budget_min:2000, budget_max:4500 },
 
-    { job_id:'PBZ-90124', title:'Install kitchen backsplash', category:'Kitchens', city:'Louisville', state:'KY', budget_min:800, budget_max:1500 }
+    { job_id:'PBZ-90124', title:'Install kitchen backsplash', category:'Kitchens', city:'Louisville', state:'KY', budget_min:800,  budget_max:1500 }
 
   ],
 
-  sessions: {}   // اختياري: لحفظ جلسات Stripe
+  sessions: {}
 
 };
 
 
 
-// ============ Stripe: إنشاء Checkout Session ============
+// ===== Stripe: إنشاء Checkout Session (اشتراك) =====
 
 app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
   try {
 
-    const { price_id, metadata } = req.body || {};
+    const { price_id, metadata, customer_email, trial_days } = req.body || {};
 
-    const session = await stripe.checkout.sessions.create({
+
+
+    const params = {
 
       mode: 'subscription',
 
@@ -72,11 +72,23 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
       metadata: metadata || {},
 
-      allow_promotion_codes: true
+      payment_method_collection: 'always', // نجمع وسيلة الدفع الآن حتى مع التجربة
 
-    });
+    };
 
-    // احفظ لو حبيت
+
+
+    if (customer_email) params.customer_email = customer_email;
+
+    if (Number(trial_days) > 0) {
+
+      params.subscription_data = { trial_period_days: Number(trial_days) }; // ← 30 يوم
+
+    }
+
+
+
+    const session = await stripe.checkout.sessions.create(params);
 
     DB.sessions[session.id] = { status: 'created' };
 
@@ -92,33 +104,19 @@ app.post('/api/stripe/create-checkout-session', async (req, res) => {
 
 
 
-// ============ Stripe: بوابة إدارة الفوترة (Customer Portal) ============
+// ===== Stripe: بوابة إدارة الفوترة (Placeholder) =====
 
 app.post('/api/stripe/customer-portal', async (req, res) => {
 
-  try {
-
-    // عادةً تحتاج customer_id من قاعدة بياناتك. هنا مجرد مثال.
-
-    // لو عندك customer_id: const portal = await stripe.billingPortal.sessions.create({ customer, return_url: 'https://probuildzone.com/pros-dashboard.html' });
-
-    return res.json({ url: 'https://billing.stripe.com/p/login/test_xxx' });
-
-  } catch (e) {
-
-    res.status(400).json({ error: e.message });
-
-  }
+  return res.json({ url: 'https://billing.stripe.com/p/login/test_xxx' });
 
 });
 
 
 
-// ============ Stripe: حالة الاشتراك ============
+// ===== Stripe: حالة الاشتراك (Placeholder) =====
 
 app.get('/api/stripe/subscription-status', async (req, res) => {
-
-  // في الحقيقة: رجّع الحالة من قاعدة بياناتك بناءً على المستخدم الحالي
 
   res.json({ ok: true, status: 'active' });
 
@@ -126,21 +124,13 @@ app.get('/api/stripe/subscription-status', async (req, res) => {
 
 
 
-// ============ Stripe Webhook (اختياري لكن مهم للإنتاج) ============
+// ===== Stripe Webhook (للإنتاج يُفضَّل تفعيله مع توقيع) =====
 
-app.post('/api/stripe/webhook', bodyParser.raw({ type: 'application/json' }), (req, res) => {
+app.post('/api/stripe/webhook', (req, res) => {
 
   try {
 
-    // ملاحظة: في الإنتاج تحقّق من التوقيع:
-
-    // const sig = req.headers['stripe-signature'];
-
-    // const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-
     const event = JSON.parse(req.body.toString());
-
-
 
     if (event.type === 'checkout.session.completed') {
 
@@ -148,13 +138,7 @@ app.post('/api/stripe/webhook', bodyParser.raw({ type: 'application/json' }), (r
 
       DB.sessions[session.id] = { status: 'completed' };
 
-      // TODO: حدّث pro.status='active' في DB حسب customer/reference
-
-    }
-
-    if (event.type === 'customer.subscription.updated' || event.type === 'invoice.paid') {
-
-      // TODO: مزامنة حالة الاشتراك
+      // TODO: اربط session.customer بملف الـpro وحدّث حالته trialing/active
 
     }
 
@@ -170,7 +154,7 @@ app.post('/api/stripe/webhook', bodyParser.raw({ type: 'application/json' }), (r
 
 
 
-// ============ Pros: إنشاء ملف منشئ ============
+// ===== Pros API (بسيطة للتجربة) =====
 
 app.post('/api/pros/create', (req, res) => {
 
@@ -186,33 +170,21 @@ app.post('/api/pros/create', (req, res) => {
 
   DB.pros[pro_id] = { pro_id, biz, name, email, phone, license, insurance, primary, zips, site, status: 'trialing' };
 
-
-
-  // TODO: أرسل بريد ترحيب هنا (استخدم مزوّد بريدك)
-
   return res.json({ ok: true, pro_id });
 
 });
 
 
 
-// ============ Pros: جلب الملف الشخصي ============
-
 app.get('/api/pros/me', (req, res) => {
-
-  // في الإنتاج: تعرّف المستخدم من الجلسة أو الـJWT
 
   const any = Object.values(DB.pros)[0];
 
-  if (!any) return res.json({ ok: true, profile: {} });
-
-  return res.json({ ok: true, profile: any });
+  return res.json({ ok: true, profile: any || {} });
 
 });
 
 
-
-// ============ Pros: تحديث الملف ============
 
 app.post('/api/pros/update', (req, res) => {
 
@@ -228,13 +200,7 @@ app.post('/api/pros/update', (req, res) => {
 
 
 
-// ============ Pros: قائمة العروض (Leads) ============
-
 app.get('/api/pros/leads', (req, res) => {
-
-  const { status } = req.query;
-
-  // status غير مُستخدم هنا – فقط عينة
 
   res.json({ ok: true, items: DB.leads });
 
@@ -242,13 +208,9 @@ app.get('/api/pros/leads', (req, res) => {
 
 
 
-// ============ Pros: إجراء على عرض ============
-
 app.post('/api/pros/lead-action', (req, res) => {
 
-  const { job_id, action } = req.body || {};
-
-  // TODO: سجّل الإجراء (accept/dismiss) للـpro الحالي
+  // accept/dismiss — احفظ الإجراء لو رغبت
 
   return res.json({ ok: true });
 
@@ -256,7 +218,7 @@ app.post('/api/pros/lead-action', (req, res) => {
 
 
 
-// ===== تشغيل السيرفر =====
+// ===== Start server =====
 
 const port = process.env.PORT || 8080;
 
