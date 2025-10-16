@@ -2,6 +2,12 @@
 
 :root {
 
+  /* Global font upgrade for the whole site */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+body{ font-family: Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+
   --build-sky:#0EA5E9;
 
   --zone-gold:#F9A825;
