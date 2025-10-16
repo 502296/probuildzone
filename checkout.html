@@ -1,0 +1,323 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>ProBuildZone — Pro Checkout</title>
+
+  <link rel="stylesheet" href="style.css"/>
+
+  <style>
+
+    body{background:#0b1220;color:#E9ECF5;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+
+    .wrap{max-width:820px;margin:60px auto;padding:24px;background:#0e132b;border:1px solid rgba(255,255,255,.12);border-radius:14px}
+
+    h1{margin:0 0 6px}
+
+    p{color:#aab3c9;margin:0 0 16px}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    .row > div{display:flex;flex-direction:column}
+
+    label{font-weight:600;margin:8px 0 6px}
+
+    input,select{background:#0d1824;border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:12px 14px;outline:none}
+
+    input:focus,select:focus{border-color:#0EA5E9;box-shadow:0 0 8px rgba(14,165,233,.35)}
+
+    .actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+
+    .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer}
+
+    .primary{background:#0EA5E9;color:#fff}
+
+    .dark{background:#141a2d;color:#fff}
+
+    .ok{color:#88fca3}
+
+    .err{color:#ff7a7a}
+
+    .note{font-size:.9rem;color:#9aa6bf}
+
+  </style>
+
+  <script src="https://js.stripe.com/v3"></script>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <h1>ProBuildZone Pro — Checkout</h1>
+
+    <p class="note">اختبر الاشتراك السنوي ($300) أو ابدأ تجربة مجانية 30 يومًا. هذا يعمل على مفاتيح Stripe <b>Sandbox</b>.</p>
+
+
+
+    <div class="row">
+
+      <div>
+
+        <label>Business name*</label>
+
+        <input id="biz" placeholder="Acme LLC" required />
+
+      </div>
+
+      <div>
+
+        <label>Owner / Contact name*</label>
+
+        <input id="name" placeholder="John Smith" required />
+
+      </div>
+
+      <div>
+
+        <label>Email*</label>
+
+        <input id="email" type="email" placeholder="john@acme.com" required />
+
+      </div>
+
+      <div>
+
+        <label>Phone*</label>
+
+        <input id="phone" placeholder="(555) 555-5555" required />
+
+      </div>
+
+      <div>
+
+        <label>License number*</label>
+
+        <input id="license" placeholder="KY-12345" required />
+
+      </div>
+
+      <div>
+
+        <label>Insurance (optional)</label>
+
+        <input id="ins" placeholder="Carrier / Policy #" />
+
+      </div>
+
+      <div>
+
+        <label>Primary service</label>
+
+        <select id="primary">
+
+          <option>Roofing</option><option>Decks & Porches</option><option>Kitchens</option>
+
+          <option>Bathrooms</option><option>Flooring</option><option>Painting</option>
+
+          <option>Masonry</option><option>Electrical</option><option>Plumbing</option>
+
+          <option>Windows & Doors</option><option>Landscaping</option><option>Handyman</option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <label>Service ZIPs</label>
+
+        <input id="zips" placeholder="e.g., 40220, 40299" />
+
+      </div>
+
+      <div class="full" style="grid-column:1 / -1">
+
+        <label>Website / Instagram (optional)</label>
+
+        <input id="site" placeholder="https://…" />
+
+      </div>
+
+    </div>
+
+
+
+    <div class="actions">
+
+      <button id="trialBtn" class="btn primary">Start Free Trial (30 days)</button>
+
+      <button id="payBtn" class="btn dark">Pay $300/year</button>
+
+    </div>
+
+
+
+    <p id="msg" class="note" style="margin-top:10px"></p>
+
+  </div>
+
+
+
+  <script>
+
+    // ===== إعداد نقطة اتصال السيرفر =====
+
+    // إن كنت تفتح checkout.html من جهازك والباكند في Codespaces على 8082،
+
+    // ضع هنا رابط الباكند (استبدل الرابط حسب نافذة "Open in Browser").
+
+    // مثال Codespaces:
+
+    // const API_BASE = "https://<your-codespace>-8082.app.github.dev";
+
+    // إن كنت ترفعه خلف نفس الدومين (nginx proxy) خلّه نسبي:
+
+    const API_BASE = ""; // فارغ = نفس الأصل (origin)
+
+
+
+    const $ = (id)=>document.getElementById(id);
+
+    const msg = $('msg');
+
+
+
+    // نجيب Stripe Publishable Key من السيرفر (أفضل من حرقه هنا)
+
+    let stripe;
+
+    async function loadStripe() {
+
+      try {
+
+        const res = await fetch(`${API_BASE}/api/stripe/pk`);
+
+        const data = await res.json();
+
+        if (!data.key) throw new Error("Missing PK");
+
+        stripe = Stripe(data.key);
+
+      } catch (e) {
+
+        msg.className = 'err';
+
+        msg.textContent = 'Stripe init failed: ' + e.message;
+
+      }
+
+    }
+
+    loadStripe();
+
+
+
+    async function createSession(trialDays) {
+
+      msg.className = 'note';
+
+      msg.textContent = 'Creating checkout session…';
+
+
+
+      const payload = {
+
+        price_id: undefined, // لو تركته undefined، السيرفر سيستخدم قيمة .env
+
+        trial_days: trialDays || 0,
+
+        customer_email: $('email').value.trim(),
+
+        metadata: {
+
+          biz: $('biz').value.trim(),
+
+          name: $('name').value.trim(),
+
+          email: $('email').value.trim(),
+
+          phone: $('phone').value.trim(),
+
+          license: $('license').value.trim(),
+
+          insurance: $('ins').value.trim(),
+
+          primary: $('primary').value,
+
+          zips: $('zips').value.trim(),
+
+          site: $('site').value.trim()
+
+        }
+
+      };
+
+
+
+      // تحقق بسيط
+
+      if (!payload.metadata.biz || !payload.metadata.name || !payload.metadata.email || !payload.metadata.phone || !payload.metadata.license) {
+
+        msg.className = 'err';
+
+        msg.textContent = 'Please fill the required fields (biz, name, email, phone, license).';
+
+        return;
+
+      }
+
+
+
+      try {
+
+        const res = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+
+          method: 'POST',
+
+          headers: {'Content-Type':'application/json'},
+
+          body: JSON.stringify(payload)
+
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.id) throw new Error(data.error || 'Failed to create session');
+
+
+
+        // تحويل إلى Stripe Checkout
+
+        const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
+
+        if (error) throw error;
+
+      } catch (e) {
+
+        msg.className = 'err';
+
+        msg.textContent = 'Checkout error: ' + e.message;
+
+      }
+
+    }
+
+
+
+    $('trialBtn').addEventListener('click', ()=> createSession(30)); // تجربة 30 يوم
+
+    $('payBtn').addEventListener('click', ()=> createSession(0));   // دفع مباشر
+
+  </script>
+
+</body>
+
+</html>
