@@ -426,6 +426,30 @@
 
   </script>
 
+  const STRIPE_PUBLISHABLE_KEY = "pk_live_xxx";       // ضع المفتاح العلني
+
+const STRIPE_PRICE_ID_YEARLY = "price_300_yearly";  // ضع Price ID
+
+
+
+// يطلب من سيرفرك إنشاء Checkout Session
+
+const res = await fetch('/api/stripe/create-checkout-session', {
+
+  method:'POST',
+
+  headers:{'Content-Type':'application/json'},
+
+  body: JSON.stringify({
+
+    price_id: STRIPE_PRICE_ID_YEARLY,
+
+    metadata: { biz: data.biz || '', email: data.email || '', phone: data.phone || '' }
+
+  })
+
+});
+
 </body>
 
 </html>
