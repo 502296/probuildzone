@@ -1,450 +1,100 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
 
 <head>
 
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>For Pros — ProBuildZone</title>
+  <title>For Pros | ProBuildZone</title>
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="pros.css" />
 
-  <style>
+  <script src="https://js.stripe.com/v3"></script>
 
-    /* ====== Local premium tweaks for this page only ====== */
-
-    :root{
-
-      --bg:#0b1220;
-
-      --panel:#10162a;
-
-      --panel-2:#0f172a;
-
-      --text:#e9ecf6;
-
-      --muted:#a7b2cc;
-
-      --line:rgba(255,255,255,.10);
-
-      --brand:#00b4ff;
-
-      --brand-2:#0078ff;
-
-      --ink:#1a1f37;
-
-      --success:#19c37d;
-
-      --radius:14px;
-
-    }
-
-    html,body{background:var(--bg);color:var(--text);font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-
-    a{color:#9ccaff;text-decoration:none}
-
-    a:hover{text-decoration:underline}
-
-
-
-    /* Header */
-
-    header{
-
-      position:sticky;top:0;z-index:100;
-
-      backdrop-filter: blur(10px) saturate(180%);
-
-      background:rgba(11,18,32,.85);
-
-      border-bottom:1px solid rgba(255,255,255,.07);
-
-    }
-
-    .nav{
-
-      max-width:1100px;margin:0 auto;padding:14px 18px;
-
-      display:flex;align-items:center;justify-content:space-between;
-
-    }
-
-    .logo{display:flex;gap:8px;align-items:center;font-weight:800;font-size:20px}
-
-    .logo .b{color:#4fc3ff}
-
-    .logo .z{color:#f7b251}
-
-    .nav-right{display:flex;gap:10px;align-items:center}
-
-    .chip{padding:9px 14px;border-radius:999px;background:#1e243b;border:1px solid var(--line);color:#d7def0}
-
-    .chip.gold{background:#f3a93a;color:#0b1220;border:none;font-weight:700}
-
-
-
-    /* Layout */
-
-    .wrap{max-width:1100px;margin:40px auto;padding:0 18px}
-
-    .hero{margin:6px 0 18px 0}
-
-    .pros-title{font-size:clamp(26px,3.5vw,38px);font-weight:800;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.4)}
-
-    .pros-sub{font-size:17px;color:var(--muted);line-height:1.6;margin-top:6px}
-
-
-
-    .grid{display:grid;grid-template-columns: 1.1fr 1fr;gap:22px;margin-top:26px}
-
-    @media (max-width: 900px){
-
-      .grid{grid-template-columns:1fr}
-
-    }
-
-
-
-    /* Cards */
-
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);
-
-      box-shadow:0 12px 28px rgba(0,0,0,.3)}
-
-    .card .pad{padding:20px}
-
-
-
-    /* Benefit list */
-
-    .benefit{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-
-    .benefit:last-child{border-bottom:none}
-
-    .ic{font-size:22px;line-height:1.1;min-width:22px}
-
-    .benefit b{font-size:18px}
-
-    .benefit .muted{color:var(--muted)}
-
-
-
-    /* Form */
-
-    form.pro{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-    @media (max-width: 700px){ form.pro{grid-template-columns:1fr} }
-
-    .pro label{font-size:12px;color:#9fb0cf;margin:2px 2px 6px 2px;display:block}
-
-    .pro-field{display:flex;flex-direction:column}
-
-    .pro-field input,.pro-field select{
-
-      background:var(--panel-2);color:var(--text);
-
-      border-radius:12px;border:1px solid rgba(255,255,255,.12);
-
-      padding:14px;outline:none;transition:.25s;
-
-    }
-
-    .pro-field input::placeholder{color:#7783a3}
-
-    .pro-field input:focus,.pro-field select:focus{
-
-      border-color:var(--brand);
-
-      box-shadow:0 0 0 3px rgba(0,180,255,.25)
-
-    }
-
-
-
-    .actions{display:flex;gap:10px;grid-column:1 / -1;margin-top:6px}
-
-    .btn{
-
-      border-radius:12px;padding:13px 16px;border:none;cursor:pointer;
-
-      font-weight:700;letter-spacing:.3px;transition:.25s;
-
-    }
-
-    .btn.primary{
-
-      background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:#fff;
-
-      box-shadow:0 4px 12px rgba(0,153,255,.35);
-
-    }
-
-    .btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,153,255,.45)}
-
-    .btn.dark{background:var(--ink);color:#e9ecf6;border:1px solid var(--line)}
-
-    .btn.dark:hover{transform:translateY(-2px);background:#212744}
-
-
-
-    .note{font-size:12px;color:#8fa3c7;margin-top:6px}
-
-  </style>
+  <script src="pros-stripe.js" defer></script>
 
 </head>
 
-<body>
 
-  <!-- Header -->
+
+<body>
 
   <header>
 
-    <div class="nav">
+    <nav>
 
-      <div class="logo">
+      <div class="logo">Pro<span>Build</span>Zone</div>
 
-        <span>Pro</span><span class="b">Build</span><span class="z">Zone</span>
-
-      </div>
-
-      <div class="nav-right">
-
-        <a class="chip" href="services.html">Services</a>
-
-        <a class="chip gold" href="pros.html">For Pros</a>
-
-      </div>
-
-    </div>
+    </nav>
 
   </header>
 
 
 
-  <!-- Content -->
+  <section class="hero">
 
-  <div class="wrap">
+    <div class="container">
 
-    <div class="hero">
+      <h1>Join ProBuildZone Professionals</h1>
 
-      <h1 class="pros-title">Pros: Win more of the right jobs</h1>
-
-      <p class="pros-sub">Create a profile, set your service areas, and get matched with real projects near you.</p>
-
-    </div>
+      <p>Get unlimited project opportunities in your city. First 30 days free, then $300/year only.</p>
 
 
 
-    <div class="grid">
+      <div class="buttons">
 
-      <!-- Left: Benefits -->
+        <button id="trialBtn" class="btn primary">Start 30-Day Free Trial</button>
 
-      <div class="card">
-
-        <div class="pad">
-
-          <div class="benefit">
-
-            <div class="ic">✅</div>
-
-            <div>
-
-              <b>30 days free</b>
-
-              <div class="muted">Unlimited leads in your city.</div>
-
-            </div>
-
-          </div>
-
-          <div class="benefit">
-
-            <div class="ic">💳</div>
-
-            <div>
-
-              <b>$300/year</b>
-
-              <div class="muted">No per-lead fees, unlimited projects.</div>
-
-            </div>
-
-          </div>
-
-          <div class="benefit">
-
-            <div class="ic">🔒</div>
-
-            <div>
-
-              <b>Privacy-first</b>
-
-              <div class="muted">Homeowner details stay private until shortlisted.</div>
-
-            </div>
-
-          </div>
-
-          <div class="benefit">
-
-            <div class="ic">📍</div>
-
-            <div>
-
-              <b>Control coverage</b>
-
-              <div class="muted">Choose your service ZIPs and categories.</div>
-
-            </div>
-
-          </div>
-
-        </div>
+        <button id="payBtn" class="btn dark">Subscribe $300 / Year</button>
 
       </div>
 
 
 
-      <!-- Right: Form -->
+      <form class="pro-form">
 
-      <div class="card">
+        <h2>Business Registration</h2>
 
-        <div class="pad">
+        <label>Business Name</label>
 
-          <form class="pro" id="proForm" onsubmit="return false;">
+        <input type="text" placeholder="Your company name" required />
 
-            <div class="pro-field">
+        <label>Contact Email</label>
 
-              <label>Business name*</label>
+        <input type="email" placeholder="you@email.com" required />
 
-              <input type="text" id="biz" placeholder="Acme LLC" required>
+        <label>Phone Number</label>
 
-            </div>
+        <input type="tel" placeholder="(555) 123-4567" required />
 
-            <div class="pro-field">
+        <label>License Number</label>
 
-              <label>Email*</label>
+        <input type="text" placeholder="State License #" />
 
-              <input type="email" id="email" placeholder="you@company.com" required>
+        <label>Insurance (optional)</label>
 
-            </div>
+        <input type="text" placeholder="Insurance provider" />
 
+        <label>Service Area</label>
 
+        <input type="text" placeholder="City or ZIP code" required />
 
-            <div class="pro-field">
+        <label>Business Website (optional)</label>
 
-              <label>Owner / Contact name*</label>
+        <input type="url" placeholder="https://yourbusiness.com" />
 
-              <input type="text" id="name" placeholder="John Doe" required>
 
-            </div>
 
-            <div class="pro-field">
+        <div class="note">After completing registration, you’ll receive a verification email and access to ProBuildZone dashboard.</div>
 
-              <label>Phone*</label>
-
-              <input type="tel" id="phone" placeholder="(555) 555-5555" required>
-
-            </div>
-
-
-
-            <div class="pro-field">
-
-              <label>License number*</label>
-
-              <input type="text" id="license" placeholder="KY-12345" required>
-
-            </div>
-
-            <div class="pro-field">
-
-              <label>Insurance (optional)</label>
-
-              <input type="text" id="insurance" placeholder="Carrier / Policy # (optional)">
-
-            </div>
-
-
-
-            <div class="pro-field">
-
-              <label>Primary service*</label>
-
-              <select id="primary" required>
-
-                <option value="" selected disabled>Select a service</option>
-
-                <option>Roofing</option><option>Decks & Porches</option>
-
-                <option>Kitchens</option><option>Bathrooms</option>
-
-                <option>Flooring</option><option>Painting</option>
-
-                <option>Masonry</option><option>Electrical</option>
-
-                <option>Plumbing</option><option>Windows & Doors</option>
-
-                <option>Landscaping</option><option>Handyman</option>
-
-              </select>
-
-            </div>
-
-            <div class="pro-field">
-
-              <label>Service areas (ZIPs)*</label>
-
-              <input type="text" id="zips" placeholder="e.g., 40220, 40299" required>
-
-            </div>
-
-
-
-            <div class="pro-field" style="grid-column:1 / -1">
-
-              <label>Website / Instagram (optional)</label>
-
-              <input type="url" id="site" placeholder="https://">
-
-            </div>
-
-
-
-            <div class="actions">
-
-              <button class="btn primary" id="trialBtn" type="button">Start Free Trial</button>
-
-              <button class="btn dark" id="payBtn" type="button">Pay $300/year</button>
-
-            </div>
-
-            <div class="note">No per-lead fees. You can cancel anytime.</div>
-
-          </form>
-
-        </div>
-
-      </div>
+      </form>
 
     </div>
 
-  </div>
-
-
-
-  <!-- Optional: keep your existing Stripe wiring script here -->
-
-  <!--
-
-  <script src="https://js.stripe.com/v3"></script>
-
-  <script src="pros-stripe.js"></script>
-
-  -->
+  </section>
 
 </body>
 
