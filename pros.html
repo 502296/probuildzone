@@ -12,23 +12,13 @@
 
 
 
-  <!-- الأسلوب العام للموقع -->
-
   <link rel="stylesheet" href="style.css" />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
-
-  <!-- Stripe.js — ضروري للدفع -->
 
   <script src="https://js.stripe.com/v3"></script>
 
 
-
-  <!-- تنسيقات هذه الصفحة فقط (محصورة هنا) -->
 
   <style>
 
@@ -39,8 +29,6 @@
     header{position:sticky;top:0;z-index:6;background:#0b1220}
 
     nav{max-width:1080px;margin:0 auto;padding:16px}
-
-
 
     .pros-hero{padding:72px 16px;background:#0b1220;color:#E9ECF5;text-align:center}
 
@@ -154,13 +142,11 @@
 
     <div class="pros-grid">
 
-      <!-- Benefits -->
-
       <aside class="card" aria-label="Benefits">
 
         <ul class="benefits">
 
-          <li><span class="ic">✅</span><div><b>3 months free</b> — unlimited leads in your city.</div></li>
+          <li><span class="ic">✅</span><div><b>30 days free</b> — unlimited leads in your city.</div></li>
 
           <li><span class="ic">💳</span><div>Then <b>$300/year</b> — no per-lead fees, unlimited projects.</div></li>
 
@@ -173,8 +159,6 @@
       </aside>
 
 
-
-      <!-- Sign-up form -->
 
       <section class="card form" aria-labelledby="formTitle">
 
@@ -302,18 +286,6 @@
 
           <p class="msg" id="proMsg"></p>
 
-
-
-          <!-- ملاحظات إعداد لاحقًا:
-
-               EMAIL_FOR_NOTIFICATIONS = "contact@probuildzone.com"
-
-               STRIPE_PUBLISHABLE_KEY  = "pk_live_xxx"
-
-               STRIPE_PRICE_ID_YEARLY  = "price_300_yearly"
-
-          -->
-
         </form>
 
       </section>
@@ -324,15 +296,9 @@
 
 
 
-  <!-- سكربتات الصفحة -->
-
   <script>
 
-    // =========================
-
-    // إرسال نموذج الـ Pros (إنشاء بروفايل)
-
-    // =========================
+    // ====== إرسال نموذج إنشاء بروفايل (اختياري لكنه مفيد قبل الدفع) ======
 
     const form = document.getElementById('proForm');
 
@@ -346,10 +312,6 @@
 
       msg.textContent = '';
 
-
-
-      // تحقق بسيط من الحقول المطلوبة
-
       const requiredIds = ['biz','name','email','phone','license','primary'];
 
       for(const id of requiredIds){
@@ -362,31 +324,21 @@
 
           msg.className = 'msg err';
 
-          el.focus();
-
-          return;
+          el.focus(); return;
 
         }
 
       }
 
-
-
       msg.textContent = 'Submitting…';
 
       const data = Object.fromEntries(new FormData(form).entries());
 
-
-
       try{
-
-        // ملاحظة: غيّر المسار لو كان الـAPI على دومين مختلف
 
         const res = await fetch('/api/pros/create', {
 
-          method:'POST',
-
-          headers:{'Content-Type':'application/json'},
+          method:'POST', headers:{'Content-Type':'application/json'},
 
           body: JSON.stringify(data)
 
@@ -412,77 +364,47 @@
 
 
 
-    // =========================
+    // ====== Stripe: مفاتيح + أزرار ======
 
-    // Stripe Checkout — زر الدفع السنوي
+    // ضع المفتاح العلني والـPrice ID الفعليين قبل النشر:
 
-    // =========================
+    const STRIPE_PUBLISHABLE_KEY = "pk_live_xxx";
 
-
-
-    // ⚠️ غيّر القيمتين تحت قبل النشر:
-
-    const STRIPE_PUBLISHABLE_KEY = "pk_live_xxx";       // <- ضع المفتاح العلني من Stripe
-
-    const STRIPE_PRICE_ID_YEARLY = "price_300_yearly";  // <- ضع Price ID لخطة $300/سنة
+    const STRIPE_PRICE_ID_YEARLY = "price_300_yearly";
 
 
 
-    const payBtn = document.getElementById('payYearly');
+    // زر التجربة المجانية 30 يوم
 
-    payBtn.addEventListener('click', async (e)=>{
+    document.getElementById('startTrial').addEventListener('click', async (e)=>{
 
       e.preventDefault();
 
-
-
-      // (اختياري) إرسال جزء من بيانات النموذج كـ metadata
-
       const data = Object.fromEntries(new FormData(document.getElementById('proForm')).entries());
-
-
 
       try{
 
-        // ملاحظة: غيّر المسار لو كان الـAPI على دومين مختلف (مثل https://api.probuildzone.com/...)
-
         const res = await fetch('/api/stripe/create-checkout-session', {
 
-          method:'POST',
-
-          headers:{'Content-Type':'application/json'},
+          method:'POST', headers:{'Content-Type':'application/json'},
 
           body: JSON.stringify({
 
             price_id: STRIPE_PRICE_ID_YEARLY,
 
-            metadata: {
+            trial_days: 30, // ← 30 يوم تجربة
 
-              biz:   data.biz   || '',
+            customer_email: data.email || '',
 
-              email: data.email || '',
-
-              phone: data.phone || ''
-
-            }
+            metadata: { biz:data.biz||'', email:data.email||'', phone:data.phone||'' }
 
           })
 
         });
 
-
-
         const j = await res.json();
 
-        if(!res.ok || !j.id){
-
-          alert(j.error || 'Stripe error');
-
-          return;
-
-        }
-
-
+        if(!res.ok || !j.id){ alert(j.error || 'Stripe error'); return; }
 
         const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
 
@@ -490,11 +412,49 @@
 
         if(error) alert(error.message);
 
-      }catch(err){
+      }catch(err){ alert('Network error: ' + (err.message || 'failed')); }
 
-        alert('Network error: ' + (err.message || 'failed'));
+    });
 
-      }
+
+
+    // زر الدفع السنوي مباشرة
+
+    document.getElementById('payYearly').addEventListener('click', async (e)=>{
+
+      e.preventDefault();
+
+      const data = Object.fromEntries(new FormData(document.getElementById('proForm')).entries());
+
+      try{
+
+        const res = await fetch('/api/stripe/create-checkout-session', {
+
+          method:'POST', headers:{'Content-Type':'application/json'},
+
+          body: JSON.stringify({
+
+            price_id: STRIPE_PRICE_ID_YEARLY,
+
+            customer_email: data.email || '',
+
+            metadata: { biz:data.biz||'', email:data.email||'', phone:data.phone||'' }
+
+          })
+
+        });
+
+        const j = await res.json();
+
+        if(!res.ok || !j.id){ alert(j.error || 'Stripe error'); return; }
+
+        const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+        const { error } = await stripe.redirectToCheckout({ sessionId: j.id });
+
+        if(error) alert(error.message);
+
+      }catch(err){ alert('Network error: ' + (err.message || 'failed')); }
 
     });
 
