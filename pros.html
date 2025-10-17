@@ -10,127 +10,61 @@
 
   <title>For Pros | ProBuildZone</title>
 
-
-
   <style>
 
-    :root {
+    :root { --nav-h:72px; --dark:#0b1020; --card:#11172b; --text:#eaf1ff; --muted:#b8c6e8; --accent:#1992ff; --accent2:#33aaff; --r:14px; }
 
-      --nav-h: 72px;
+    *{box-sizing:border-box}
 
-      --dark-bg: #0b1020;
+    body{margin:0;background:var(--dark);color:var(--text);font-family:system-ui,Arial,sans-serif}
 
-      --card-bg: #11172b;
+    header{position:fixed;inset:0 0 auto 0;height:var(--nav-h);display:flex;align-items:center;justify-content:center;background:rgba(11,16,32,.9);backdrop-filter:blur(8px);z-index:10;font-weight:700}
 
-      --text: #eaf1ff;
+    header a{color:var(--accent2);text-decoration:none}
 
-      --muted: #b8c6e8;
+    main{padding-top:calc(var(--nav-h) + 40px)}
 
-      --accent: #1992ff;
+    .container{max-width:900px;margin:0 auto;padding:0 20px}
 
-      --accent-light: #33aaff;
+    .forpros-hero h1{margin:0 0 10px;text-align:center;font-size:2rem}
 
-      --radius: 14px;
+    .forpros-hero p{margin:0 0 26px;text-align:center;color:var(--muted)}
 
-    }
+    .card{background:var(--card);border-radius:var(--r);box-shadow:0 0 20px rgba(0,0,0,.3)}
 
-    * { box-sizing: border-box; }
+    .benefits{padding:24px;margin-bottom:34px}
 
-    body { margin:0; background:var(--dark-bg); color:var(--text); font-family:system-ui, Arial, sans-serif; }
+    .benefits ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 
-    header {
+    .benefits li{display:flex;gap:12px;align-items:flex-start}
 
-      position: fixed; inset: 0 0 auto 0; height: var(--nav-h);
+    .benefits strong{color:var(--accent2)}
 
-      display:flex; align-items:center; justify-content:center;
+    .form{padding:26px}
 
-      background: rgba(11,16,32,.9); backdrop-filter: blur(8px); z-index: 10; font-weight:700;
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 
-    }
+    label{display:block;margin-bottom:6px;font-size:.9rem;color:var(--muted)}
 
-    header a { color: var(--accent-light); text-decoration:none; font-size:1.1rem; }
+    input,select,textarea{width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--text);padding:10px 12px;font-size:.95rem;outline:none}
 
-    main { padding-top: calc(var(--nav-h) + 40px); }
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(25,146,255,.25)}
 
-    .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+    textarea{height:100px;resize:vertical}
 
+    .price{text-align:center;color:var(--accent2);font-weight:700;margin-top:18px}
 
+    .cta{display:flex;justify-content:center;margin-top:16px}
 
-    /* Hero */
+    .btn{background:var(--accent);color:#fff;border:none;height:48px;padding:0 42px;border-radius:10px;font-weight:700;cursor:pointer;transition:.25s}
 
-    .forpros-hero h1 { margin:0 0 10px; text-align:center; font-size:2rem; }
+    .btn:hover{background:var(--accent2);box-shadow:0 0 12px rgba(51,170,255,.4)}
 
-    .forpros-hero p { margin:0 0 26px; text-align:center; color:var(--muted); }
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
 
+    footer{text-align:center;padding:40px 0;opacity:.6}
 
-
-    /* Benefits */
-
-    .pros-benefits { background:var(--card-bg); border-radius:var(--radius); padding:24px; margin-bottom:34px; box-shadow:0 0 20px rgba(0,0,0,.3); }
-
-    .pros-benefits ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:18px; }
-
-    .pros-benefits li { display:flex; gap:12px; align-items:flex-start; }
-
-    .pros-benefits .icon { font-size:1.2rem; }
-
-    .pros-benefits strong { color:var(--accent-light); }
-
-
-
-    /* Form */
-
-    .pros-form { background:var(--card-bg); border-radius:var(--radius); padding:26px; box-shadow:0 0 20px rgba(0,0,0,.3); }
-
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-
-    label { display:block; margin-bottom:6px; font-size:.9rem; color:var(--muted); }
-
-    input, select, textarea {
-
-      width:100%; border-radius:10px; border:1px solid rgba(255,255,255,.1);
-
-      background:rgba(255,255,255,.05); color:var(--text); padding:10px 12px; font-size:.95rem; outline:none;
-
-    }
-
-    textarea { height:100px; resize:vertical; }
-
-    input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(25,146,255,.25); }
-
-
-
-    /* Price + button */
-
-    .price-badge { text-align:center; color:var(--accent-light); font-weight:700; margin-top:20px; font-size:1.1rem; }
-
-    .cta-row { display:flex; justify-content:center; margin-top:18px; }
-
-    .btn-primary {
-
-      background:var(--accent); color:#fff; border:none; height:48px; padding:0 42px; border-radius:10px;
-
-      font-weight:700; cursor:pointer; transition:.25s;
-
-    }
-
-    .btn-primary:hover { background:var(--accent-light); box-shadow:0 0 12px rgba(51,170,255,.4); }
-
-    .btn-primary[disabled] { opacity:.6; cursor:not-allowed; }
-
-
-
-    footer { text-align:center; padding:40px 0; opacity:.6; }
-
-
-
-    @media (max-width: 768px) {
-
-      .forpros-hero h1{font-size:1.6rem}
-
-      .form-grid{ grid-template-columns:1fr; }
-
-    }
+    @media(max-width:768px){.grid{grid-template-columns:1fr}.forpros-hero h1{font-size:1.6rem}}
 
   </style>
 
@@ -156,17 +90,17 @@
 
 
 
-      <div class="pros-benefits">
+      <div class="card benefits">
 
         <ul>
 
-          <li><span class="icon">✅</span><div><strong>30 days free</strong><br>Unlimited leads in your city.</div></li>
+          <li><span>✅</span><div><strong>30 days free</strong><br>Unlimited leads in your city.</div></li>
 
-          <li><span class="icon">💳</span><div><strong>$300 / year</strong><br>No per-lead fees, unlimited projects.</div></li>
+          <li><span>💳</span><div><strong>$300 / year</strong><br>No per-lead fees, unlimited projects.</div></li>
 
-          <li><span class="icon">🔒</span><div><strong>Privacy-first</strong><br>Homeowner details stay private until shortlisted.</div></li>
+          <li><span>🔒</span><div><strong>Privacy-first</strong><br>Homeowner details stay private until shortlisted.</div></li>
 
-          <li><span class="icon">📍</span><div><strong>Control coverage</strong><br>Choose your service ZIPs and categories.</div></li>
+          <li><span>📍</span><div><strong>Control coverage</strong><br>Choose your service ZIPs and categories.</div></li>
 
         </ul>
 
@@ -174,29 +108,21 @@
 
 
 
-      <!-- Form -->
+      <form id="prosForm" class="card form">
 
-      <form class="pros-form" id="prosForm">
+        <div class="grid">
 
-        <div class="form-grid">
+          <div><label>Business name*</label><input id="business" required placeholder="Acme LLC"></div>
 
-          <div><label>Business name*</label><input id="business" type="text" placeholder="Acme LLC" required></div>
+          <div><label>Owner / Contact name*</label><input id="name" required placeholder="John Doe"></div>
 
-          <div><label>Owner / Contact name*</label><input id="name" type="text" placeholder="John Doe" required></div>
+          <div><label>Email*</label><input id="email" type="email" required placeholder="you@company.com"></div>
 
+          <div><label>Phone*</label><input id="phone" required placeholder="(555) 555-5555"></div>
 
+          <div><label>License number*</label><input id="license" required placeholder="KY-12345"></div>
 
-          <div><label>Email*</label><input id="email" type="email" placeholder="you@company.com" required></div>
-
-          <div><label>Phone*</label><input id="phone" type="tel" placeholder="(555) 555-5555" required></div>
-
-
-
-          <div><label>License number*</label><input id="license" type="text" placeholder="KY-12345" required></div>
-
-          <div><label>Insurance (optional)</label><input id="insurance" type="text" placeholder="Carrier / Policy #"></div>
-
-
+          <div><label>Insurance (optional)</label><input id="insurance" placeholder="Carrier / Policy #"></div>
 
           <div>
 
@@ -206,23 +132,13 @@
 
               <option value="">Select a service</option>
 
-              <option>General Contractor</option>
-
-              <option>Electrician</option>
-
-              <option>Plumber</option>
-
-              <option>Roofing</option>
-
-              <option>Landscaping</option>
+              <option>General Contractor</option><option>Electrician</option><option>Plumber</option><option>Roofing</option><option>Landscaping</option>
 
             </select>
 
           </div>
 
-          <div><label>Service areas (ZIPs)</label><input id="zips" type="text" placeholder="e.g., 40220, 40299"></div>
-
-
+          <div><label>Service areas (ZIPs)</label><input id="zips" placeholder="e.g., 40220, 40299"></div>
 
           <div><label>Website / Instagram (optional)</label><input id="website" type="url" placeholder="https://"></div>
 
@@ -232,13 +148,9 @@
 
 
 
-        <div class="price-badge">$300 / year</div>
+        <div class="price">$300 / year • 30-day free trial</div>
 
-        <div class="cta-row">
-
-          <button type="button" id="subscribeBtn" class="btn-primary">$300 / year</button>
-
-        </div>
+        <div class="cta"><button type="button" id="trialBtn" class="btn">Start Free Trial</button></div>
 
       </form>
 
@@ -252,71 +164,41 @@
 
 
 
-  <!-- JS: تحقق + إنشاء جلسة Stripe -->
-
   <script>
 
-    const btn = document.getElementById('subscribeBtn');
+    const btn = document.getElementById('trialBtn');
 
-
-
-    function getValue(id){ return document.getElementById(id).value.trim(); }
+    const $ = id => document.getElementById(id).value.trim();
 
 
 
     btn.addEventListener('click', async () => {
 
-      // تحقق أساسي من الحقول
-
       const payload = {
 
-        business: getValue('business'),
+        business: $('business'), name: $('name'), email: $('email'),
 
-        name: getValue('name'),
+        phone: $('phone'), license: $('license'), insurance: $('insurance'),
 
-        email: getValue('email'),
+        service: $('service'), zips: $('zips'), website: $('website'),
 
-        phone: getValue('phone'),
-
-        license: getValue('license'),
-
-        insurance: getValue('insurance'),
-
-        service: getValue('service'),
-
-        zips: getValue('zips'),
-
-        website: getValue('website'),
-
-        notes: getValue('notes'),
-
-        plan: 'yearly'
+        notes: $('notes'), plan: 'yearly_trial'
 
       };
 
-
-
       if (!payload.business || !payload.name || !payload.email || !payload.phone || !payload.license || !payload.service) {
 
-        alert('Please fill out all required fields.');
-
-        return;
+        alert('Please fill out all required fields.'); return;
 
       }
 
-
-
       btn.disabled = true; btn.textContent = 'Loading…';
-
-
 
       try {
 
         const res = await fetch('/api/stripe/create-checkout-session', {
 
-          method: 'POST',
-
-          headers: {'Content-Type':'application/json'},
+          method: 'POST', headers: {'Content-Type': 'application/json'},
 
           body: JSON.stringify(payload)
 
@@ -324,23 +206,13 @@
 
         const data = await res.json();
 
-        if (data.url) {
+        if (data.url) window.location.href = data.url;
 
-          window.location.href = data.url; // افتح Stripe Checkout
-
-        } else {
-
-          alert('Error creating checkout session.');
-
-          btn.disabled = false; btn.textContent = '$300 / year';
-
-        }
+        else { alert('Error creating checkout session.'); btn.disabled=false; btn.textContent='Start Free Trial'; }
 
       } catch (e) {
 
-        alert('Network error. Please try again.');
-
-        btn.disabled = false; btn.textContent = '$300 / year';
+        alert('Network error. Please try again.'); btn.disabled=false; btn.textContent='Start Free Trial';
 
       }
 
