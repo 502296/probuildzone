@@ -1,259 +1,263 @@
-body {
+/* ===== For Pros – Mobile polish (drop-in) ===== */
 
-  background: #0b1220;
+:root{
 
-  color: #fff;
+  --nav-h: 64px;            /* غيّرها إذا ارتفاع الـNavbar عندك مختلف */
 
-  font-family: "Poppins", sans-serif;
+  --section-pad: 28px;
+
+  --card-radius: 14px;
+
+}
+
+
+
+/* جذر الصفحة */
+
+#for-pros{
+
+  position: relative;
+
+  padding-top: calc(var(--nav-h) + 24px); /* يمنع تداخل العنوان مع الـNavbar */
+
+}
+
+
+
+/* مراعاة حافة الآيفون العلوية (notch) */
+
+@supports(padding:max(0px)){
+
+  #for-pros{
+
+    padding-top: calc(var(--nav-h) + max(24px, env(safe-area-inset-top)));
+
+  }
+
+}
+
+
+
+/* البانر/الهيرو */
+
+#for-pros .forpros-hero{
+
+  padding: var(--section-pad) 0;
+
+}
+
+#for-pros .forpros-hero h1{
+
+  margin: 0 0 10px;
+
+  line-height: 1.25;
+
+}
+
+#for-pros .forpros-hero p{
 
   margin: 0;
 
-  padding: 0;
+  opacity: .85;
 
 }
 
 
 
-header {
+/* بطاقة المزايا */
 
-  padding: 20px 40px;
+#for-pros .pros-benefits{
 
-  position: sticky;
+  margin-top: 18px;
 
-  top: 0;
+  margin-bottom: 28px;
 
-  z-index: 100;
+  border-radius: var(--card-radius);
 
-  background: rgba(11, 18, 32, 0.85);
+  padding: 18px 16px;
 
-  backdrop-filter: blur(8px);
+}
 
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+#for-pros .pros-benefits ul{
+
+  list-style: none;
+
+  margin: 0; padding: 0;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px 18px;
+
+}
+
+#for-pros .pros-benefits li{
+
+  display: flex; align-items: flex-start; gap: 10px;
+
+}
+
+#for-pros .pros-benefits .icon{
+
+  flex: 0 0 22px; height: 22px; display: inline-grid; place-items: center;
 
 }
 
 
 
-.logo {
+/* الفورم */
 
-  font-size: 28px;
+#for-pros .pros-form{
 
-  font-weight: 800;
+  border-radius: var(--card-radius);
 
-  color: #fff;
-
-}
-
-.logo span {
-
-  color: #00b4ff;
+  padding: 16px;
 
 }
 
+#for-pros .pros-form .form-grid{
 
+  display: grid;
 
-.hero {
-
-  text-align: center;
-
-  padding: 100px 20px 60px;
-
-}
-
-
-
-.hero h1 {
-
-  font-size: clamp(28px, 4vw, 42px);
-
-  font-weight: 800;
-
-  margin-bottom: 10px;
-
-  text-shadow: 0 3px 10px rgba(0,0,0,0.4);
-
-}
-
-
-
-.hero p {
-
-  font-size: 18px;
-
-  color: #a7b2cc;
-
-  max-width: 700px;
-
-  margin: 0 auto 30px;
-
-}
-
-
-
-.buttons {
-
-  display: flex;
-
-  justify-content: center;
+  grid-template-columns: 1fr 1fr;
 
   gap: 14px;
 
-  flex-wrap: wrap;
+}
 
-  margin-bottom: 40px;
+#for-pros .pros-form label{
+
+  font-size: .92rem; opacity: .9; display:block; margin-bottom: 6px;
 
 }
 
+#for-pros .pros-form input,
 
+#for-pros .pros-form select,
 
-.btn {
-
-  padding: 14px 24px;
-
-  border-radius: 10px;
-
-  border: none;
-
-  cursor: pointer;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
-  transition: all 0.25s ease;
-
-}
-
-
-
-.primary {
-
-  background: linear-gradient(135deg, #00b4ff, #0078ff);
-
-  color: #fff;
-
-}
-
-.primary:hover {
-
-  background: linear-gradient(135deg, #02c8ff, #0099ff);
-
-  transform: translateY(-2px);
-
-  box-shadow: 0 4px 14px rgba(0,153,255,0.4);
-
-}
-
-
-
-.dark {
-
-  background: #1a1f37;
-
-  color: #fff;
-
-  border: 1px solid rgba(255,255,255,0.1);
-
-}
-
-.dark:hover {
-
-  background: #212744;
-
-  transform: translateY(-2px);
-
-}
-
-
-
-.pro-form {
-
-  background: rgba(15, 23, 42, 0.9);
-
-  border-radius: 16px;
-
-  border: 1px solid rgba(255,255,255,0.1);
-
-  max-width: 600px;
-
-  margin: 0 auto;
-
-  padding: 40px 30px;
-
-  text-align: left;
-
-}
-
-
-
-.pro-form h2 {
-
-  margin-bottom: 20px;
-
-  font-size: 24px;
-
-  text-align: center;
-
-}
-
-
-
-.pro-form label {
-
-  display: block;
-
-  font-weight: 600;
-
-  margin-top: 12px;
-
-  margin-bottom: 6px;
-
-}
-
-
-
-.pro-form input {
+#for-pros .pros-form textarea{
 
   width: 100%;
 
-  padding: 12px;
+  height: 46px;
 
   border-radius: 10px;
 
-  background: #0f172a;
+  padding: 10px 12px;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,.08);
 
-  color: #fff;
-
-  font-size: 15px;
-
-  transition: all 0.25s ease;
-
-}
-
-
-
-.pro-form input:focus {
-
-  border-color: #00b4ff;
-
-  box-shadow: 0 0 0 3px rgba(0,180,255,0.25);
+  background: rgba(255,255,255,.04);
 
   outline: none;
 
 }
 
+#for-pros .pros-form textarea{ height: 110px; resize: vertical; }
 
 
-.note {
 
-  font-size: 14px;
+/* شارة السعر */
 
-  color: #9ca3af;
+#for-pros .price-badge{
 
-  margin-top: 20px;
+  display: inline-flex;
 
-  text-align: center;
+  align-items: center;
+
+  justify-content: center;
+
+  height: 40px; padding: 0 14px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  margin-top: 6px;
+
+}
+
+
+
+/* الأزرار */
+
+#for-pros .cta-row{
+
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+
+  margin-top: 8px;
+
+}
+
+#for-pros .cta-row .btn{
+
+  display: inline-flex; align-items: center; justify-content: center;
+
+  height: 48px; border-radius: 12px; font-weight: 600; text-decoration: none;
+
+}
+
+
+
+/* تباعد أسفل الصفحة */
+
+#for-pros .page-end-space{ height: 28px; }
+
+
+
+/* ======= موبايل أولاً ======= */
+
+@media (max-width: 768px){
+
+  #for-pros .forpros-hero h1{
+
+    font-size: 1.6rem; text-align: center;
+
+  }
+
+  #for-pros .forpros-hero p{
+
+    text-align: center; font-size: .98rem;
+
+  }
+
+  #for-pros .pros-benefits ul{
+
+    grid-template-columns: 1fr;     /* عمودي على الموبايل */
+
+  }
+
+  #for-pros .pros-form .form-grid{
+
+    grid-template-columns: 1fr;     /* الحقول صف واحد */
+
+  }
+
+  #for-pros .cta-row{
+
+    grid-template-columns: 1fr;     /* الأزرار تحت بعض */
+
+  }
+
+  #for-pros .price-badge{
+
+    width: 100%; justify-content: center;
+
+  }
+
+}
+
+
+
+/* ======= دِسك توب تحسينات خفيفة ======= */
+
+@media (min-width: 769px){
+
+  #for-pros{ padding-top: calc(var(--nav-h) + 12px); }
+
+  #for-pros .forpros-hero{ padding: 36px 0 20px; }
+
+  #for-pros .pros-benefits{ padding: 22px 20px; margin-bottom: 34px; }
 
 }
