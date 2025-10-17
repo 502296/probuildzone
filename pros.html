@@ -6,67 +6,215 @@
 
   <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>For Pros | ProBuildZone</title>
 
 
 
-  <!-- ملف التنسيق العام -->
+  <!-- ستايل عام (لو عندك) -->
 
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- ملف التنسيق الخاص بالصفحة -->
+
+
+  <!-- ستايل صفحة For Pros -->
 
   <link rel="stylesheet" href="css/pros.css" />
 
+
+
+  <!-- fallback بسيط حتى لو pros.css ما اشتغل تبقى الصفحة واضحة -->
+
+  <style>
+
+    body{background:#0b1020;color:#e9eefc;font-family:system-ui, Arial, sans-serif;margin:0}
+
+    .container{max-width:1000px;margin:0 auto;padding:0 16px}
+
+    header, footer{padding:14px 0}
+
+    a{color:#7ecbff}
+
+  </style>
+
 </head>
-
-
 
 <body>
 
-  <!-- ✅ هنا الـ Navbar الثابت الخاص بالموقع -->
+  <!-- مثال Navbar بسيط (اختياري) -->
 
-  <header>
+  <header class="container">
 
-    <!-- محتوى الـNavbar -->
+    <a href="/" style="text-decoration:none;font-weight:700;">ProBuildZone</a>
 
   </header>
 
 
 
-  <!-- ✅ ضع الكود الذي أرسلته (المقطع الكبير) هنا بالضبط -->
-
   <main>
 
-    <!-- بداية مقطع For Pros -->
+    <!-- 👇 هنا المحتوى الحقيقي للصفحة — لا تغيّر الـid -->
 
     <section id="for-pros">
 
-      ... (الكود الكامل الذي أرسلته لي) ...
+      <div class="forpros-hero container">
+
+        <h1>Pros: Win more of the right jobs</h1>
+
+        <p>Create a profile, set your service areas, and get matched with real projects near you.</p>
+
+      </div>
+
+
+
+      <div class="pros-benefits container card">
+
+        <ul>
+
+          <li><span class="icon">✅</span><div><strong>30 days free</strong><br>Unlimited leads in your city.</div></li>
+
+          <li><span class="icon">💳</span><div><strong>$300/year</strong><br>No per-lead fees, unlimited projects.</div></li>
+
+          <li><span class="icon">🔒</span><div><strong>Privacy-first</strong><br>Homeowner details stay private until shortlisted.</div></li>
+
+          <li><span class="icon">📍</span><div><strong>Control coverage</strong><br>Choose your service ZIPs and categories.</div></li>
+
+        </ul>
+
+      </div>
+
+
+
+      <form class="pros-form container card" id="pros-signup">
+
+        <div class="form-grid">
+
+          <div class="field">
+
+            <label>Business name*</label>
+
+            <input type="text" name="business_name" placeholder="Acme LLC" required>
+
+          </div>
+
+          <div class="field">
+
+            <label>Owner / Contact name*</label>
+
+            <input type="text" name="owner_name" placeholder="John Doe" required>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label>Email*</label>
+
+            <input type="email" name="email" placeholder="you@company.com" required>
+
+          </div>
+
+          <div class="field">
+
+            <label>Phone*</label>
+
+            <input type="tel" name="phone" placeholder="(555) 555-5555" required>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label>License number*</label>
+
+            <input type="text" name="license" placeholder="KY-12345" required>
+
+          </div>
+
+          <div class="field">
+
+            <label>Insurance (optional)</label>
+
+            <input type="text" name="insurance" placeholder="Carrier / Policy #">
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label>Primary service*</label>
+
+            <select name="primary_service" required>
+
+              <option value="">Select a service</option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>Service areas (ZIPs)</label>
+
+            <input type="text" name="zips" placeholder="e.g., 40220, 40299">
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label>Website / Instagram (optional)</label>
+
+            <input type="url" name="website" placeholder="https://">
+
+          </div>
+
+          <div class="field">
+
+            <label>Notes (optional)</label>
+
+            <textarea name="notes" placeholder="Anything we should know?"></textarea>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="cta-row">
+
+          <a href="#" class="btn btn-secondary" id="registerBtn">Register &amp; Continue</a>
+
+          <a href="#" class="btn btn-primary" id="trialBtn">Start Free Trial</a>
+
+        </div>
+
+
+
+        <div class="price-badge">$300 / year</div>
+
+      </form>
+
+
+
+      <div class="page-end-space"></div>
 
     </section>
-
-    <!-- نهاية المقطع -->
 
   </main>
 
 
 
-  <!-- ✅ الفوتر العام للموقع -->
+  <footer class="container">
 
-  <footer>
-
-    <!-- محتوى الفوتر -->
+    © ProBuildZone
 
   </footer>
-
-
-
-  <!-- سكريبتات الموقع -->
-
-  <script src="js/main.js"></script>
 
 </body>
 
