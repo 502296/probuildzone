@@ -1,6 +1,8 @@
-// /api/create-checkout-session.js
+// /api/stripe/create-checkout-session.js
 
-import Stripe from "stripe";
+import Stripe from 'stripe';
+
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -8,31 +10,39 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
 
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).json({error: 'Method not allowed'});
 
 
 
-  const { plan } = req.body;
+  const {
 
-  const PRICE_YEARLY = process.env.STRIPE_PRICE_YEARLY;
+    business, name, email, phone, license,
 
-  const PRICE_TRIAL = process.env.STRIPE_PRICE_TRIAL;
+    insurance, service, zips, website, notes, plan
+
+  } = req.body || {};
 
 
 
   try {
 
+    // بإمكانك هنا حفظ بيانات البروفيشنال في قاعدة أو Airtable قبل الدفع
+
+
+
     const session = await stripe.checkout.sessions.create({
 
-      mode: "subscription",
+      mode: 'subscription',
 
-      payment_method_types: ["card"],
+      payment_method_types: ['card'],
+
+      customer_email: email,
 
       line_items: [
 
         {
 
-          price: plan === "trial" ? PRICE_TRIAL : PRICE_YEARLY,
+          price: process.env.STRIPE_PRICE_YEARLY, // ← Price ID من Stripe
 
           quantity: 1,
 
@@ -40,23 +50,27 @@ export default async function handler(req, res) {
 
       ],
 
-      allow_promotion_codes: true,
+      metadata: {
+
+        business, name, phone, license, insurance, service, zips, website, notes, plan
+
+      },
 
       success_url: `${req.headers.origin}/success.html`,
 
-      cancel_url: `${req.headers.origin}/pros.html`,
+      cancel_url: `${req.headers.origin}/cancel.html`,
 
     });
 
 
 
-    res.status(200).json({ url: session.url });
+    return res.status(200).json({ url: session.url });
 
-  } catch (error) {
+  } catch (err) {
 
-    console.error("Stripe Error:", error);
+    console.error('Stripe error:', err);
 
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Failed to create checkout session' });
 
   }
 
