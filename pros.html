@@ -12,14 +12,6 @@
 
 
 
-  <!-- ✨ ستايل رئيسي -->
-
-  <link rel="stylesheet" href="style.css" />
-
-
-
-  <!-- ✨ ستايل خاص بـ For Pros -->
-
   <style>
 
     :root {
@@ -214,29 +206,29 @@
 
 
 
-    /* BUTTONS */
+    /* PRICE + BUTTON */
 
-    .cta-row {
+    .price-badge {
 
-      display: grid;
+      font-size: 1.1rem;
 
-      grid-template-columns: 1fr 1fr;
+      color: var(--accent-light);
 
-      gap: 14px;
+      text-align: center;
 
       margin-top: 20px;
 
+      font-weight: 600;
+
     }
 
-    .btn {
+    .cta-row.single {
 
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
 
-      height: 48px; border-radius: 12px;
+      justify-content: center;
 
-      text-decoration: none; font-weight: 600;
-
-      transition: .25s;
+      margin-top: 20px;
 
     }
 
@@ -246,39 +238,29 @@
 
       color: #fff;
 
-    }
+      border: none;
 
-    .btn-primary:hover {background: var(--accent-light);}
+      padding: 0 40px;
 
-    .btn-secondary {
-
-      background: transparent;
-
-      color: var(--accent-light);
-
-      border: 1px solid var(--accent-light);
-
-    }
-
-    .btn-secondary:hover {
-
-      background: var(--accent-light);
-
-      color: #fff;
-
-    }
-
-
-
-    .price-badge {
-
-      margin-top: 16px;
-
-      text-align: center;
+      font-size: 1rem;
 
       font-weight: 600;
 
-      color: var(--accent-light);
+      border-radius: 10px;
+
+      height: 48px;
+
+      cursor: pointer;
+
+      transition: 0.25s;
+
+    }
+
+    .btn-primary:hover {
+
+      background: var(--accent-light);
+
+      box-shadow: 0 0 10px rgba(51,170,255,.4);
 
     }
 
@@ -303,8 +285,6 @@
       .forpros-hero h1{font-size:1.6rem;}
 
       .pros-form .form-grid{grid-template-columns:1fr;}
-
-      .cta-row{grid-template-columns:1fr;}
 
     }
 
@@ -352,7 +332,7 @@
 
 
 
-      <form class="pros-form" id="pros-signup">
+      <form class="pros-form" id="pros-signup" action="thankyou.html">
 
         <div class="form-grid">
 
@@ -406,17 +386,15 @@
 
 
 
-        <div class="cta-row">
+        <div class="price-badge">$300 / year</div>
 
-          <a href="#" class="btn btn-secondary">Register &amp; Continue</a>
 
-          <a href="#" class="btn btn-primary">Start Free Trial</a>
+
+        <div class="cta-row single">
+
+          <button type="submit" class="btn-primary">Submit</button>
 
         </div>
-
-
-
-        <div class="price-badge">$300 / year</div>
 
       </form>
 
