@@ -1,464 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
 
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>ProBuildZone — For Pros</title>
-
-  <link rel="preconnect" href="https://js.stripe.com" />
-
-  <link rel="stylesheet" href="style.css" />
+  <title>For Pros | ProBuildZone</title>
 
 
 
-  <style>
+  <!-- ملف التنسيق العام -->
 
-    /* لمسة سريعة لو ما حبيت تعدّل style.css الآن */
+  <link rel="stylesheet" href="css/style.css" />
 
-    :root{
+  <!-- ملف التنسيق الخاص بالصفحة -->
 
-      --bg:#0b1220;--card:#0e132b;--ink:#e9ecf5;--muted:#9aa6bf;
-
-      --brand:#0EA5E9;--brand-2:#2563EB;--ok:#22c55e;--ring:rgba(255,255,255,.06)
-
-    }
-
-    *{box-sizing:border-box}
-
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-
-    a{color:#9ccaff;text-decoration:none}
-
-    header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px}
-
-    .logo{font-weight:800;letter-spacing:.2px}
-
-    .logo b{color:#48b0ff}
-
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-
-    h1{font-size:34px;margin:8px 0 4px}
-
-    .lead{color:var(--muted);margin:0 0 28px}
-
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:18px 18px}
-
-    .benefit{display:flex;gap:12px;margin:12px 0}
-
-    .benefit .ic{font-size:22px}
-
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-    .row > *{min-width:0}
-
-    label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
-
-    input,select{width:100%;background:#0c1226;border:1px solid var(--ring);color:var(--ink);
-
-      border-radius:10px;padding:14px 12px;outline:none}
-
-    input:focus,select:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
-
-    .btns{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-
-    .btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-
-    .btn.primary{background:var(--brand);color:#fff}
-
-    .btn.dark{background:#0f172a;color:#fff;border:1px solid var(--ring)}
-
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-
-    .note{font-size:13px;color:var(--muted);margin-top:8px}
-
-    .msg{margin-top:12px;font-size:14px}
-
-    .msg.err{color:#f87171}
-
-    .msg.ok{color:#22c55e}
-
-    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
-
-  </style>
+  <link rel="stylesheet" href="css/pros.css" />
 
 </head>
 
+
+
 <body>
 
-  <header class="wrap">
+  <!-- ✅ هنا الـ Navbar الثابت الخاص بالموقع -->
 
-    <div class="logo">Pro<b>Build</b>Zone</div>
+  <header>
 
-    <nav><a href="services.html">Services</a> &nbsp; <a class="btn dark" href="pros.html">For Pros</a></nav>
+    <!-- محتوى الـNavbar -->
 
   </header>
 
 
 
-  <main class="wrap">
+  <!-- ✅ ضع الكود الذي أرسلته (المقطع الكبير) هنا بالضبط -->
 
-    <h1>Pros: Win more of the right jobs</h1>
+  <main>
 
-    <p class="lead">Create a profile, set your service areas, and get matched with real projects near you.</p>
+    <!-- بداية مقطع For Pros -->
 
+    <section id="for-pros">
 
+      ... (الكود الكامل الذي أرسلته لي) ...
 
-    <div class="grid">
+    </section>
 
-      <!-- Benefits -->
-
-      <section class="card">
-
-        <div class="benefit"><div class="ic">✅</div><div><b>30 days free</b><br/>Unlimited leads in your city.</div></div>
-
-        <div class="benefit"><div class="ic">💳</div><div><b>$300/year</b><br/>No per-lead fees, unlimited projects.</div></div>
-
-        <div class="benefit"><div class="ic">🔒</div><div><b>Privacy-first</b><br/>Homeowner details stay private until shortlisted.</div></div>
-
-        <div class="benefit"><div class="ic">📍</div><div><b>Control coverage</b><br/>Choose your service ZIPs and categories.</div></div>
-
-      </section>
-
-
-
-      <!-- Form -->
-
-      <section class="card">
-
-        <form id="proForm" novalidate>
-
-          <div class="row">
-
-            <div>
-
-              <label>Business name*</label>
-
-              <input id="biz" placeholder="Acme LLC" required />
-
-            </div>
-
-            <div>
-
-              <label>Owner / Contact name*</label>
-
-              <input id="name" placeholder="John Doe" required />
-
-            </div>
-
-          </div>
-
-
-
-          <div class="row">
-
-            <div>
-
-              <label>Email*</label>
-
-              <input id="email" type="email" placeholder="you@company.com" required />
-
-            </div>
-
-            <div>
-
-              <label>Phone*</label>
-
-              <input id="phone" placeholder="(555) 555-5555" required />
-
-            </div>
-
-          </div>
-
-
-
-          <div class="row">
-
-            <div>
-
-              <label>License number*</label>
-
-              <input id="license" placeholder="KY-12345" required />
-
-            </div>
-
-            <div>
-
-              <label>Insurance (optional)</label>
-
-              <input id="insurance" placeholder="Carrier / Policy #" />
-
-            </div>
-
-          </div>
-
-
-
-          <div class="row">
-
-            <div>
-
-              <label>Primary service*</label>
-
-              <select id="primary" required>
-
-                <option value="" selected disabled>Select a service</option>
-
-                <option>Roofing</option><option>Decks & Porches</option><option>Kitchens</option>
-
-                <option>Bathrooms</option><option>Flooring</option><option>Painting</option>
-
-                <option>Masonry</option><option>Electrical</option><option>Plumbing</option>
-
-                <option>Windows & Doors</option><option>Landscaping</option><option>Handyman</option>
-
-              </select>
-
-            </div>
-
-            <div>
-
-              <label>Service areas (ZIPs)</label>
-
-              <input id="zips" placeholder="e.g., 40220, 40299" />
-
-            </div>
-
-          </div>
-
-
-
-          <div>
-
-            <label>Website / Instagram (optional)</label>
-
-            <input id="site" placeholder="https://" />
-
-          </div>
-
-
-
-          <div class="btns">
-
-            <button type="button" id="registerBtn" class="btn dark">Register & Continue</button>
-
-            <button type="button" id="trialBtn" class="btn primary">Start Free Trial</button>
-
-            <button type="button" id="payBtn" class="btn dark">$300 / year</button>
-
-          </div>
-
-
-
-          <div id="msg" class="msg"></div>
-
-          <p class="note">No charge today on the free trial. You can cancel anytime from your dashboard.</p>
-
-        </form>
-
-      </section>
-
-    </div>
+    <!-- نهاية المقطع -->
 
   </main>
 
 
 
-  <!-- Stripe.js -->
+  <!-- ✅ الفوتر العام للموقع -->
 
-  <script src="https://js.stripe.com/v3"></script>
+  <footer>
 
-  <script>
+    <!-- محتوى الفوتر -->
 
-    // ========= مفاتيح الربط =========
+  </footer>
 
-    // مفتاح النشر (Publishable) — آمن على الواجهة.
 
-    const STRIPE_PUBLISHABLE_KEY = "pk_test_51S1vzLBYTD0cnM24khknev00GhYZ4Vd1X0WNF7qvfYqvRLhvcA4HkV8XVFZZI284cuyr0E0TDuFcfqSNcaRGlR00E9ed0SJZ";
 
-    // سنعتمد على الـ server لتحديد الـ price من خلال .env، لذا لا نحتاج Price ID هنا.
+  <!-- سكريبتات الموقع -->
 
-
-
-    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-
-    const $ = (s) => document.querySelector(s);
-
-    const msg = $('#msg');
-
-
-
-    function setMsg(text, type=''){ msg.textContent = text; msg.className = 'msg ' + (type||''); }
-
-    function getFormData(){
-
-      return {
-
-        biz: $('#biz').value.trim(),
-
-        name: $('#name').value.trim(),
-
-        email: $('#email').value.trim(),
-
-        phone: $('#phone').value.trim(),
-
-        license: $('#license').value.trim(),
-
-        insurance: $('#insurance').value.trim(),
-
-        primary: $('#primary').value,
-
-        zips: $('#zips').value.trim(),
-
-        site: $('#site').value.trim()
-
-      };
-
-    }
-
-    function valid(d){
-
-      if(!d.biz || !d.name || !d.email || !d.phone || !d.license || !d.primary){ return false; }
-
-      return true;
-
-    }
-
-
-
-    async function saveProfile(){
-
-      const data = getFormData();
-
-      if(!valid(data)){ setMsg('Please complete all required fields (*)', 'err'); throw new Error('invalid'); }
-
-      setMsg('Saving profile…');
-
-
-
-      // استدعاء API لحفظ ملف البزنس
-
-      const r = await fetch('/api/pros/create', {
-
-        method:'POST',
-
-        headers:{ 'Content-Type':'application/json' },
-
-        body: JSON.stringify(data)
-
-      });
-
-      const j = await r.json().catch(()=> ({}));
-
-      if(!r.ok || !j.ok){ setMsg('Could not save profile. Please try again.', 'err'); throw new Error('save_failed'); }
-
-      setMsg('Profile saved ✓', 'ok');
-
-      return j;
-
-    }
-
-
-
-    async function createSession(trialDays = 0){
-
-      const data = getFormData();
-
-      // نرسل بيانات خفيفة كـ metadata أيضًا
-
-      const res = await fetch('/api/stripe/create-checkout-session',{
-
-        method:'POST',
-
-        headers:{'Content-Type':'application/json'},
-
-        body: JSON.stringify({
-
-          price_id: undefined, // السيرفر يستخدم STRIPE_PRICE_YEARLY من .env
-
-          trial_days: trialDays,
-
-          customer_email: data.email,
-
-          metadata: { biz: data.biz, phone: data.phone }
-
-        })
-
-      });
-
-      const j = await res.json();
-
-      if(!res.ok || !j.id){ setMsg('Checkout error: ' + (j.error || 'unknown'), 'err'); throw new Error('stripe'); }
-
-      setMsg('Redirecting to checkout…');
-
-      const {error} = await stripe.redirectToCheckout({ sessionId: j.id });
-
-      if(error){ setMsg('Checkout error: ' + error.message, 'err'); }
-
-    }
-
-
-
-    // الأزرار
-
-    $('#registerBtn').addEventListener('click', async (e)=>{
-
-      e.preventDefault();
-
-      try {
-
-        await saveProfile();
-
-        setMsg('Choose Trial or Pay to continue.', 'ok');
-
-      } catch(_) {}
-
-    });
-
-
-
-    $('#trialBtn').addEventListener('click', async (e)=>{
-
-      e.preventDefault();
-
-      try {
-
-        // نحفظ أولاً ثم نبدأ تجربة 30 يوم
-
-        await saveProfile();
-
-        await createSession(30);
-
-      } catch(_) {}
-
-    });
-
-
-
-    $('#payBtn').addEventListener('click', async (e)=>{
-
-      e.preventDefault();
-
-      try {
-
-        // حفظ سريع ثم دفع مباشر (بدون تجربة)
-
-        await saveProfile();
-
-        await createSession(0);
-
-      } catch(_) {}
-
-    });
-
-  </script>
+  <script src="js/main.js"></script>
 
 </body>
 
