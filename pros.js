@@ -1,21 +1,3 @@
-const startBtn = document.getElementById('startTrialBtn');
-
-const modal = document.getElementById('applyModal');
-
-const closeBtn = document.getElementById('closeModal');
-
-const form = document.getElementById('proApplyForm');
-
-const msg = document.getElementById('formMsg');
-
-
-
-startBtn.addEventListener('click', ()=>{ modal.classList.remove('hidden'); modal.setAttribute('aria-hidden','false'); });
-
-closeBtn.addEventListener('click', ()=>{ modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); });
-
-
-
 form.addEventListener('submit', async (e)=>{
 
   e.preventDefault();
@@ -26,13 +8,13 @@ form.addEventListener('submit', async (e)=>{
 
   const data = Object.fromEntries(new FormData(form).entries());
 
-  if(!data.agree){ msg.textContent='Please accept the terms.'; msg.className='msg error'; return; }
+  if (!data.agree) { msg.textContent = 'Please accept the terms.'; msg.className = 'msg error'; return; }
 
 
 
   try {
 
-    // 1) Save to our backend (which forwards to Google Sheets)
+    // 1) حفظ في Google Sheets عبر API
 
     const saveRes = await fetch('/api/pros/apply', {
 
@@ -44,9 +26,19 @@ form.addEventListener('submit', async (e)=>{
 
     });
 
-    const saveJson = await saveRes.json();
 
-    if(!saveRes.ok){ throw new Error(saveJson?.error || 'Failed to save application'); }
+
+    const saveRaw = await saveRes.text();
+
+    let saveJson; try { saveJson = JSON.parse(saveRaw); } catch { saveJson = null; }
+
+
+
+    if (!saveRes.ok || !saveJson?.ok) {
+
+      throw new Error((saveJson && saveJson.error) || saveRaw || 'Sheets relay error');
+
+    }
 
 
 
@@ -54,7 +46,7 @@ form.addEventListener('submit', async (e)=>{
 
 
 
-    // 2) Create Stripe Checkout Session (subscription w/ 30-day trial)
+    // 2) إنشاء جلسة Stripe
 
     const stripeRes = await fetch('/api/stripe/create-checkout-session', {
 
@@ -74,23 +66,35 @@ form.addEventListener('submit', async (e)=>{
 
         areas: data.areas,
 
-        services: data.services,
+        services: data.services
 
       })
 
     });
 
-    const stripeJson = await stripeRes.json();
-
-    if(!stripeRes.ok || !stripeJson?.url){ throw new Error(stripeJson?.error || 'Failed to create checkout session'); }
 
 
+    const stripeRaw = await stripeRes.text();
 
-    // 3) Redirect to Stripe
+    let stripeJson; try { stripeJson = JSON.parse(stripeRaw); } catch { stripeJson = null; }
+
+
+
+    if (!stripeRes.ok || !stripeJson?.url) {
+
+      throw new Error((stripeJson && stripeJson.error) || stripeRaw || 'Stripe API error');
+
+    }
+
+
+
+    // 3) التحويل إلى Stripe
 
     window.location.href = stripeJson.url;
 
-  } catch(err){
+
+
+  } catch (err) {
 
     msg.textContent = err.message || 'Something went wrong';
 
