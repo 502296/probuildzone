@@ -1,89 +1,139 @@
-// /api/stripe/create-checkout-session.js
+// /api/stripe/create-checkout-session.js  (no stripe SDK)
 
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-
-
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
 
 
-  const {
-
-    business, name, email, phone, license,
-
-    insurance, service, zips, website, notes
-
-  } = req.body || {};
-
-
-
   try {
 
-    const session = await stripe.checkout.sessions.create({
+    const { email = '', phone = '', company = '', full_name = '', areas = '', services = '' } = req.body || {};
 
-      mode: 'subscription',
-
-      payment_method_collection: 'always', // اجمع البطاقة الآن
-
-      customer_email: email,
+    if (!email) return res.status(400).json({ error: 'Email is required' });
 
 
 
-      // خلي Stripe يجمع العنوان والتلفون
+    const secret = process.env.STRIPE_SECRET_KEY;
 
-      billing_address_collection: 'required',
+    const priceId = process.env.STRIPE_PRICE_YEARLY;  // نستخدمه للسعر الشهري حاليًا
 
-      phone_number_collection: { enabled: true },
-
-
-
-      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
+    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:3000';
 
 
 
-      // 30 يوم تجربة + لو مافي بطاقة (نحن نجمعها) — احتياطيًا:
+    if (!secret)  return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
 
-      subscription_data: {
+    if (!priceId) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
 
-        trial_period_days: 30,
 
-        trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
 
-        metadata: { business, name, phone, license, insurance, service, zips, website, notes }
+    const params = new URLSearchParams();
+
+    // أساسيات الجلسة
+
+    params.append('mode', 'subscription');
+
+    params.append('success_url', `${baseUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`);
+
+    params.append('cancel_url', `${baseUrl}/pros.html?canceled=true`);
+
+    params.append('customer_email', email);
+
+
+
+    // عناصر السلة
+
+    params.append('line_items[0][price]', priceId);
+
+    params.append('line_items[0][quantity]', '1');
+
+
+
+    // نجمع البطاقة الآن لكن الفوترة بعد التجربة
+
+    params.append('payment_method_collection', 'always');
+
+    params.append('billing_address_collection', 'required');
+
+
+
+    // تفعيل جمع الهاتف في Checkout
+
+    params.append('phone_number_collection[enabled]', 'true');
+
+
+
+    // تجربة مجانية 30 يوم
+
+    params.append('subscription_data[trial_period_days]', '30');
+
+
+
+    // Metadata (اختياري لكنها مفيدة)
+
+    if (company)   params.append('subscription_data[metadata][company]', company);
+
+    if (full_name) params.append('subscription_data[metadata][full_name]', full_name);
+
+    if (areas)     params.append('subscription_data[metadata][areas]', areas);
+
+    if (services)  params.append('subscription_data[metadata][services]', services);
+
+    if (company)   params.append('metadata[company]', company);
+
+    if (full_name) params.append('metadata[full_name]', full_name);
+
+
+
+    // نصوص مخصصة في صفحة Checkout
+
+    params.append('custom_text[submit][message]', 'No charge today. Your 30-day free trial starts now.');
+
+    params.append('custom_text[after_submit][message]', 'Thanks! No charge until day 31.');
+
+
+
+    const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+
+      method: 'POST',
+
+      headers: {
+
+        'Authorization': `Bearer ${secret}`,
+
+        'Content-Type': 'application/x-www-form-urlencoded'
 
       },
 
-
-
-      // لو تحب تضيف حقول مخصصة داخل Checkout (بيتا عند Stripe)
-
-      // custom_fields: [{ key:'business', label:{type:'custom',text:'Business name'}, type:'text' }],
-
-
-
-      success_url: `${req.headers.origin}/success.html`,
-
-      cancel_url: `${req.headers.origin}/cancel.html`,
-
-      allow_promotion_codes: true
+      body: params.toString()
 
     });
 
 
 
-    return res.status(200).json({ url: session.url });
+    const raw = await resp.text();
+
+    let json; try { json = JSON.parse(raw); } catch { json = null; }
+
+
+
+    if (!resp.ok || !json?.url) {
+
+      // Stripe يرسل body مفيد عند الخطأ—نعرضه للمساعدة
+
+      return res.status(resp.status || 500).json({ error: json?.error?.message || raw.slice(0, 400) });
+
+    }
+
+
+
+    return res.status(200).json({ url: json.url });
 
   } catch (err) {
 
-    console.error('Stripe error:', err);
-
-    return res.status(500).json({ error: 'Failed to create checkout session' });
+    return res.status(500).json({ error: err.message || String(err) });
 
   }
 
-}
+};
