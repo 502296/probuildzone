@@ -1,80 +1,76 @@
-// api/stripe/create-checkout-session.js
+// /api/stripe/create-checkout-session.js
 
-const Stripe = require('stripe');
-
-
+import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
 
-  if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
-
-  try{
-
-    const { email, phone, company, full_name, areas, services } = req.body || {};
-
-    if(!email) return res.status(400).json({error:'Email is required'});
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
 
 
-    const priceId = process.env.STRIPE_PRICE_YEARLY; // price_...
+  const {
 
-    if(!priceId) return res.status(500).json({error:'Missing STRIPE_PRICE_YEARLY'});
+    business, name, email, phone, license,
 
+    insurance, service, zips, website, notes
 
-
-    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:3000';
-
-    const successUrl = `${baseUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`;
-
-    const cancelUrl  = `${baseUrl}/pros.html?canceled=true`;
+  } = req.body || {};
 
 
 
-    // Create Checkout Session for a subscription with a 30-day trial
+  try {
 
     const session = await stripe.checkout.sessions.create({
 
       mode: 'subscription',
 
-      payment_method_collection: 'always', // card now, but charge later after trial
+      payment_method_collection: 'always', // اجمع البطاقة الآن
 
-      customer_creation: 'always',
+      customer_email: email,
 
-      line_items: [{ price: priceId, quantity: 1 }],
+
+
+      // خلي Stripe يجمع العنوان والتلفون
+
+      billing_address_collection: 'required',
+
+      phone_number_collection: { enabled: true },
+
+
+
+      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
+
+
+
+      // 30 يوم تجربة + لو مافي بطاقة (نحن نجمعها) — احتياطيًا:
 
       subscription_data: {
 
         trial_period_days: 30,
 
-        metadata: { company, full_name, areas, services }
+        trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
+
+        metadata: { business, name, phone, license, insurance, service, zips, website, notes }
 
       },
 
-      customer_email: email,
 
-      phone_number_collection: { enabled: true },
 
-      billing_address_collection: 'required',
+      // لو تحب تضيف حقول مخصصة داخل Checkout (بيتا عند Stripe)
 
-      allow_promotion_codes: false,
+      // custom_fields: [{ key:'business', label:{type:'custom',text:'Business name'}, type:'text' }],
 
-      success_url: successUrl,
 
-      cancel_url: cancelUrl,
 
-      metadata: { company, full_name },
+      success_url: `${req.headers.origin}/success.html`,
 
-      custom_text: {
+      cancel_url: `${req.headers.origin}/cancel.html`,
 
-        submit: { message: 'No charge today. Your 30-day free trial starts now.' },
-
-        after_submit: { message: 'Thanks! No charge until day 31.' }
-
-      }
+      allow_promotion_codes: true
 
     });
 
@@ -82,10 +78,12 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({ url: session.url });
 
-  } catch (err){
+  } catch (err) {
 
-    return res.status(500).json({error: err.message});
+    console.error('Stripe error:', err);
+
+    return res.status(500).json({ error: 'Failed to create checkout session' });
 
   }
 
-};
+}
