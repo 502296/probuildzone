@@ -10,6 +10,14 @@
 
     }
 
-  }
+  },
+
+  "routes": [
+
+    { "src": "^/$", "dest": "/pros.html" },
+
+    { "src": "^/pros$", "dest": "/pros.html" }
+
+  ]
 
 }
