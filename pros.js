@@ -1,105 +1,75 @@
-form.addEventListener('submit', async (e)=>{
+// pros.js
 
-  e.preventDefault();
+(function () {
 
-  msg.textContent = 'Saving your application…'; msg.className = 'msg';
-
-
-
-  const data = Object.fromEntries(new FormData(form).entries());
-
-  if (!data.agree) { msg.textContent = 'Please accept the terms.'; msg.className = 'msg error'; return; }
+  function $ (id) { return document.getElementById(id); }
 
 
 
-  try {
+  function openModal() {
 
-    // 1) حفظ في Google Sheets عبر API
+    const modal = $('applyModal');
 
-    const saveRes = await fetch('/api/pros/apply', {
+    if (!modal) return console.error('Missing #applyModal');
 
-      method: 'POST',
+    modal.classList.remove('hidden');
 
-      headers: {'Content-Type':'application/json'},
-
-      body: JSON.stringify(data)
-
-    });
-
-
-
-    const saveRaw = await saveRes.text();
-
-    let saveJson; try { saveJson = JSON.parse(saveRaw); } catch { saveJson = null; }
-
-
-
-    if (!saveRes.ok || !saveJson?.ok) {
-
-      throw new Error((saveJson && saveJson.error) || saveRaw || 'Sheets relay error');
-
-    }
-
-
-
-    msg.textContent = 'Application saved. Creating your Stripe session…';
-
-
-
-    // 2) إنشاء جلسة Stripe
-
-    const stripeRes = await fetch('/api/stripe/create-checkout-session', {
-
-      method:'POST',
-
-      headers:{'Content-Type':'application/json'},
-
-      body: JSON.stringify({
-
-        email: data.email,
-
-        phone: data.phone,
-
-        company: data.company,
-
-        full_name: data.full_name,
-
-        areas: data.areas,
-
-        services: data.services
-
-      })
-
-    });
-
-
-
-    const stripeRaw = await stripeRes.text();
-
-    let stripeJson; try { stripeJson = JSON.parse(stripeRaw); } catch { stripeJson = null; }
-
-
-
-    if (!stripeRes.ok || !stripeJson?.url) {
-
-      throw new Error((stripeJson && stripeJson.error) || stripeRaw || 'Stripe API error');
-
-    }
-
-
-
-    // 3) التحويل إلى Stripe
-
-    window.location.href = stripeJson.url;
-
-
-
-  } catch (err) {
-
-    msg.textContent = err.message || 'Something went wrong';
-
-    msg.className = 'msg error';
+    modal.setAttribute('aria-hidden', 'false');
 
   }
 
-});
+  function closeModal() {
+
+    const modal = $('applyModal');
+
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+
+    modal.setAttribute('aria-hidden', 'true');
+
+  }
+
+
+
+  function boot() {
+
+    const startBtn = $('startTrialBtn');
+
+    const closeBtn = $('closeModal');
+
+    if (!startBtn) { console.error('Missing #startTrialBtn'); return; }
+
+
+
+    startBtn.addEventListener('click', openModal);
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+
+
+    // اجعلها متاحة كـ fallback عبر onclick في الـ HTML
+
+    window.showApplyModal = openModal;
+
+    window.hideApplyModal = closeModal;
+
+
+
+    // باقي كود الإرسال يبقى كما هو عندك…
+
+  }
+
+
+
+  if (document.readyState === 'loading') {
+
+    document.addEventListener('DOMContentLoaded', boot);
+
+  } else {
+
+    boot();
+
+  }
+
+})();
