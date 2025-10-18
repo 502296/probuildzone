@@ -12,7 +12,19 @@
 
   <style>
 
-    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#0f2a43;color:#fff}
+    :root{
+
+      --bg:#0f2a43; --panel:#0b1f31; --line:#1b3e60; --muted:#9fb6c9;
+
+      --accent:#F28C1B; --accent-ink:#0f2a43;
+
+    }
+
+    *{box-sizing:border-box}
+
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#fff}
+
+    a{color:var(--accent)}
 
     .container{max-width:980px;margin:0 auto;padding:24px}
 
@@ -22,31 +34,63 @@
 
     .hero{display:grid;gap:14px;margin:28px 0}
 
-    .card{background:#0b1f31;border:1px solid #1b3e60;border-radius:14px;padding:20px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
 
     .btn{padding:12px 18px;border:1px solid #365b7a;border-radius:10px;background:#0b1f31;color:#fff;cursor:pointer}
 
-    .btn-primary{background:#F28C1B;border-color:#F28C1B;color:#0f2a43;font-weight:800}
+    .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:800}
 
     .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+    .subtle{color:var(--muted);font-size:.95rem}
+
+    .badges{display:flex;gap:10px;align-items:center;margin-top:6px;font-size:.9rem;color:var(--muted)}
+
+    .lock{display:inline-flex;align-items:center;gap:8px}
+
+    .lock svg{width:16px;height:16px;opacity:.9}
+
+
 
     /* Modal */
 
     .modal[hidden]{display:none}
 
-    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999}
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999;padding:20px}
 
-    .modal-card{background:#0f2a43;color:#fff;padding:24px;border-radius:12px;min-width:320px;max-width:520px;border:1px solid #1b3e60}
+    .modal-card{background:var(--bg);color:#fff;padding:24px;border-radius:14px;min-width:320px;max-width:700px;border:1px solid var(--line)}
 
-    .grid{display:grid;gap:12px;margin:12px 0}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+
+    .step{display:inline-block;padding:6px 10px;border-radius:20px;border:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+
+    .title{margin:6px 0 0 0}
+
+    .grid{display:grid;gap:12px;margin:16px 0}
+
+    @media(min-width:720px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
 
     label{display:grid;gap:6px;font-size:.95rem}
 
-    input{padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff}
+    input,select,textarea{
 
-    .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+      padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff
+
+    }
+
+    textarea{min-height:80px;resize:vertical}
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    .actions{display:flex;gap:10px;justify-content:space-between;margin-top:16px;align-items:center}
+
+    .actions-right{display:flex;gap:10px}
 
     .msg{margin-top:10px;font-size:.9rem}
+
+    .muted{color:var(--muted);font-size:.9rem}
+
+    .badge{border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);font-size:.85rem}
 
   </style>
 
@@ -72,9 +116,31 @@
 
         <h1>Grow your business with ProBuildZone</h1>
 
-        <p>Start your <strong>30-day free trial</strong>. Annual plan – cancel anytime before trial ends.</p>
+        <p class="subtle">Start your <strong>30-day free trial</strong>. Annual plan – cancel anytime before trial ends.</p>
 
-        <button id="startTrialBtn" class="btn btn-primary" type="button">Start Free Trial</button>
+        <div class="badges">
+
+          <span class="lock">
+
+            <!-- lock icon -->
+
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
+
+            Secure checkout by Stripe
+
+          </span>
+
+          <span class="badge">No setup fees</span>
+
+          <span class="badge">Cancel anytime</span>
+
+        </div>
+
+        <div style="margin-top:14px">
+
+          <button id="startTrialBtn" class="btn btn-primary" type="button">Start Free Trial</button>
+
+        </div>
 
       </div>
 
@@ -90,31 +156,159 @@
 
     <div class="modal-card">
 
-      <h3>Start your 30-day free trial</h3>
+      <div class="modal-header">
+
+        <span class="step">Step 1 of 2 — Business Info</span>
+
+      </div>
+
+      <h3 class="title">Start your 30-day free trial</h3>
+
+
 
       <form id="trialForm">
 
-        <div class="grid">
+        <div class="grid cols-2">
 
-          <label>Company Name<input name="company" required placeholder="e.g., Royal Builders LLC"></label>
+          <label>Company Name
 
-          <label>Full Name<input name="name" required placeholder="Your name"></label>
+            <input name="company" required placeholder="e.g., Royal Builders LLC">
 
-          <label>Email<input type="email" name="email" required placeholder="name@company.com"></label>
+          </label>
 
-          <label>Phone<input name="phone" required placeholder="+1 (502) 555-1234"></label>
+          <label>Company Website (optional)
 
-          <label>Address<input name="address" required placeholder="Street, City, State"></label>
+            <input name="website" placeholder="https://yourcompany.com">
+
+          </label>
+
+          <label>Business Category
+
+            <select name="category" required>
+
+              <option value="" selected disabled>Select…</option>
+
+              <option>General Contractor</option>
+
+              <option>Porch/Deck Builder</option>
+
+              <option>Roofing</option>
+
+              <option>Flooring</option>
+
+              <option>Painting</option>
+
+              <option>Landscaping</option>
+
+              <option>Handyman</option>
+
+              <option>Other</option>
+
+            </select>
+
+          </label>
+
+          <label>Team Size
+
+            <select name="team_size" required>
+
+              <option value="" selected disabled>Select…</option>
+
+              <option>Solo</option>
+
+              <option>2–5</option>
+
+              <option>6–10</option>
+
+              <option>11–20</option>
+
+              <option>20+</option>
+
+            </select>
+
+          </label>
 
         </div>
+
+
+
+        <div class="grid cols-2">
+
+          <label>Full Name
+
+            <input name="name" required placeholder="Your name">
+
+          </label>
+
+          <label>Email
+
+            <input type="email" name="email" required placeholder="name@company.com">
+
+          </label>
+
+          <label>Phone
+
+            <input name="phone" required placeholder="+1 (502) 555-1234">
+
+          </label>
+
+          <label>Address
+
+            <input name="address" required placeholder="Street, City, State">
+
+          </label>
+
+        </div>
+
+
+
+        <label>Service Areas (cities or ZIPs)
+
+          <textarea name="service_areas" placeholder="Louisville, Jefferson County, 40214…"></textarea>
+
+        </label>
+
+
+
+        <div class="row">
+
+          <label class="row" style="gap:8px">
+
+            <input type="checkbox" name="accept_terms" required>
+
+            <span class="muted">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</span>
+
+          </label>
+
+        </div>
+
+
 
         <div class="actions">
 
-          <button type="button" id="cancelTrial" class="btn">Cancel</button>
+          <span class="muted lock">
 
-          <button type="submit" id="submitTrial" class="btn btn-primary">Continue</button>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
+
+            Card details are collected securely on Stripe.
+
+          </span>
+
+          <div class="actions-right">
+
+            <button type="button" id="cancelTrial" class="btn">Cancel</button>
+
+            <button type="submit" id="submitTrial" class="btn btn-primary">
+
+              Continue to Secure Payment
+
+            </button>
+
+          </div>
 
         </div>
+
+
 
         <p id="trialMsg" class="msg" aria-live="polite"></p>
 
@@ -138,11 +332,11 @@
 
       const data = new FormData(form);
 
-      return Object.fromEntries([...data.entries()].map(([k,v])=>[k, v.trim()]));
+      return Object.fromEntries([...data.entries()].map(([k,v])=>[k, typeof v==="string"? v.trim(): v]));
 
     };
 
-    const postJSON = async (url, payload)=>{
+    async function postJSON(url, payload){
 
       const res = await fetch(url, {
 
@@ -164,25 +358,21 @@
 
       return res.json();
 
-    };
+    }
 
-    const setLoading = (b)=>{
+    function setLoading(b){
 
       $("#submitTrial").disabled = b;
 
       $("#startTrialBtn")?.setAttribute("aria-busy", b ? "true" : "false");
 
-    };
+    }
 
 
-
-    // Handlers
 
     $("#startTrialBtn")?.addEventListener("click", () => {
 
-      openModal();
-
-      $("#trialMsg").textContent = "";
+      openModal(); $("#trialMsg").textContent = "";
 
     });
 
@@ -196,21 +386,15 @@
 
       e.preventDefault();
 
+      const form = e.currentTarget;
+
       $("#trialMsg").textContent = "";
 
       setLoading(true);
 
       try{
 
-        const payload = serializeForm(e.currentTarget);
-
-        // اختياري: حفظ مبدئي
-
-        // await postJSON("/api/pros/create", payload);
-
-
-
-        // Stripe checkout session
+        const payload = serializeForm(form);
 
         const { checkoutUrl } = await postJSON("/api/stripe/create-checkout-session", payload);
 
