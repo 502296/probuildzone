@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
 
@@ -8,129 +8,119 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <title>For Pros – Start Free Trial</title>
+  <title>ProBuildZone – For Pros</title>
 
-  <link rel="stylesheet" href="/pros.css"/>
+  <style>
+
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#0f2a43;color:#fff}
+
+    .container{max-width:980px;margin:0 auto;padding:24px}
+
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+
+    .brand{font-weight:800;letter-spacing:.3px}
+
+    .hero{display:grid;gap:14px;margin:28px 0}
+
+    .card{background:#0b1f31;border:1px solid #1b3e60;border-radius:14px;padding:20px}
+
+    .btn{padding:12px 18px;border:1px solid #365b7a;border-radius:10px;background:#0b1f31;color:#fff;cursor:pointer}
+
+    .btn-primary{background:#F28C1B;border-color:#F28C1B;color:#0f2a43;font-weight:800}
+
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+    /* Modal */
+
+    .modal[hidden]{display:none}
+
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999}
+
+    .modal-card{background:#0f2a43;color:#fff;padding:24px;border-radius:12px;min-width:320px;max-width:520px;border:1px solid #1b3e60}
+
+    .grid{display:grid;gap:12px;margin:12px 0}
+
+    label{display:grid;gap:6px;font-size:.95rem}
+
+    input{padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff}
+
+    .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+
+    .msg{margin-top:10px;font-size:.9rem}
+
+  </style>
 
 </head>
 
 <body>
 
-  <header class="hero">
+  <div class="container">
 
-    <h1>ProBuildZone — For Pros</h1>
+    <header>
 
-    <p>Get matched with homeowners. 30-day free trial. Cancel anytime.</p>
+      <div class="brand">ProBuildZone</div>
 
-    <button id="startTrialBtn" class="gold-btn">Start Free Trial</button>
+      <nav>
 
-    <div class="assurance">
+        <a href="/" class="btn">Home</a>
 
-      <strong>No charge today.</strong> We only charge after your 30-day trial if you don’t cancel.
+      </nav>
 
-    </div>
-
-  </header>
+    </header>
 
 
 
-  <!-- Modal -->
+    <section class="hero">
 
-  <div id="applyModal" class="modal hidden" aria-hidden="true">
+      <div class="card">
+
+        <h1>Grow your business with ProBuildZone</h1>
+
+        <p>Start your <strong>30-day free trial</strong>. Annual plan – cancel anytime before trial ends.</p>
+
+        <button id="startTrialBtn" class="btn btn-primary" type="button">Start Free Trial</button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+
+  <!-- Signup Modal -->
+
+  <div id="trialModal" class="modal" hidden>
 
     <div class="modal-card">
 
-      <button class="close" id="closeModal" aria-label="Close">×</button>
+      <h3>Start your 30-day free trial</h3>
 
-      <h2>Pro Application (30-Day Free Trial)</h2>
-
-      <p class="subtext">Fill your details. You’ll enter your card on the next step in Stripe. <strong>No charge for 30 days.</strong></p>
-
-
-
-      <form id="proApplyForm" novalidate>
+      <form id="trialForm">
 
         <div class="grid">
 
-          <label>Company Name
+          <label>Company Name<input name="company" required placeholder="e.g., Royal Builders LLC"></label>
 
-            <input name="company" required placeholder="Your company LLC"/>
+          <label>Full Name<input name="name" required placeholder="Your name"></label>
 
-          </label>
+          <label>Email<input type="email" name="email" required placeholder="name@company.com"></label>
 
-          <label>Full Name
+          <label>Phone<input name="phone" required placeholder="+1 (502) 555-1234"></label>
 
-            <input name="full_name" required placeholder="John Doe"/>
-
-          </label>
-
-          <label>Email
-
-            <input name="email" type="email" required placeholder="you@company.com"/>
-
-          </label>
-
-          <label>Phone
-
-            <input name="phone" required placeholder="+1 (___) ___-____"/>
-
-          </label>
-
-          <label>Address
-
-            <input name="address" placeholder="Street, City, State"/>
-
-          </label>
-
-          <label>Website (optional)
-
-            <input name="website" placeholder="https://…"/>
-
-          </label>
-
-          <label>Service Areas
-
-            <input name="areas" placeholder="e.g., Louisville, Shepherdsville, Elizabethtown"/>
-
-          </label>
-
-          <label>Trade / Services
-
-            <input name="services" placeholder="Carpentry, Decks, Porches, Roofing…"/>
-
-          </label>
+          <label>Address<input name="address" required placeholder="Street, City, State"></label>
 
         </div>
 
+        <div class="actions">
 
+          <button type="button" id="cancelTrial" class="btn">Cancel</button>
 
-        <label>Notes
-
-          <textarea name="notes" rows="3" placeholder="Anything we should know?"></textarea>
-
-        </label>
-
-
-
-        <label class="check">
-
-          <input type="checkbox" name="agree" required/>
-
-          I agree to the Terms of Service and acknowledge the 30-day free trial (no charge today).
-
-        </label>
-
-
-
-        <div class="cta-row">
-
-          <button type="submit" class="gold-btn full">Continue — Enter Card in Stripe</button>
-
-          <div class="tiny-note">You’ll be redirected to Stripe Checkout. <strong>No charge until day 31.</strong></div>
+          <button type="submit" id="submitTrial" class="btn btn-primary">Continue</button>
 
         </div>
 
-        <div id="formMsg" class="msg" role="status"></div>
+        <p id="trialMsg" class="msg" aria-live="polite"></p>
 
       </form>
 
@@ -140,7 +130,7 @@
 
 
 
-  <script src="/pros.js" defer></script>
+  <script type="module" src="/js/pros-trial.js"></script>
 
 </body>
 
