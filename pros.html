@@ -22,6 +22,8 @@
 
     *{box-sizing:border-box}
 
+    html,body{height:100%}
+
     body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#fff}
 
     a{color:var(--accent)}
@@ -56,15 +58,23 @@
 
     .modal[hidden]{display:none}
 
-    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999;padding:20px}
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999;padding:16px}
 
-    .modal-card{background:var(--bg);color:#fff;padding:24px;border-radius:14px;min-width:320px;max-width:700px;border:1px solid var(--line)}
+    .modal-card{
 
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+      background:var(--bg);color:#fff;border-radius:14px;border:1px solid var(--line);
+
+      width:min(700px,100%);max-height:90vh;display:flex;flex-direction:column;
+
+    }
+
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
 
     .step{display:inline-block;padding:6px 10px;border-radius:20px;border:1px solid var(--line);font-size:.85rem;color:var(--muted)}
 
-    .title{margin:6px 0 0 0}
+    .title{margin:6px 20px 0 20px}
+
+    .modal-body{padding:16px 20px;overflow:auto}
 
     .grid{display:grid;gap:12px;margin:16px 0}
 
@@ -72,17 +82,25 @@
 
     label{display:grid;gap:6px;font-size:.95rem}
 
-    input,select,textarea{
-
-      padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff
-
-    }
+    input,select,textarea{padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff}
 
     textarea{min-height:80px;resize:vertical}
 
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    .actions{display:flex;gap:10px;justify-content:space-between;margin-top:16px;align-items:center}
+    /* sticky actions bottom for mobile */
+
+    .actions-wrap{
+
+      position:sticky;bottom:0;background:linear-gradient(180deg, rgba(15,42,67,0.92), rgba(15,42,67,1));
+
+      border-top:1px solid var(--line);padding:12px 20px;margin-top:auto;
+
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+
+    }
+
+    .actions{display:flex;gap:10px;justify-content:space-between;align-items:center}
 
     .actions-right{display:flex;gap:10px}
 
@@ -122,8 +140,6 @@
 
           <span class="lock">
 
-            <!-- lock icon -->
-
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
 
             Secure checkout by Stripe
@@ -158,7 +174,7 @@
 
       <div class="modal-header">
 
-        <span class="step">Step 1 of 2 — Business Info</span>
+        <span class="step">Step 1 of 2 — Business Info <strong>(v7)</strong></span>
 
       </div>
 
@@ -166,143 +182,145 @@
 
 
 
-      <form id="trialForm">
+      <form id="trialForm" style="display:flex;flex-direction:column;min-height:0">
 
-        <div class="grid cols-2">
+        <div class="modal-body" id="scrollArea">
 
-          <label>Company Name
+          <div class="grid cols-2">
 
-            <input name="company" required placeholder="e.g., Royal Builders LLC">
+            <label>Company Name
 
-          </label>
+              <input name="company" required placeholder="e.g., Royal Builders LLC">
 
-          <label>Company Website (optional)
+            </label>
 
-            <input name="website" placeholder="https://yourcompany.com">
+            <label>Company Website (optional)
 
-          </label>
+              <input name="website" placeholder="https://yourcompany.com">
 
-          <label>Business Category
-
-            <select name="category" required>
-
-              <option value="" selected disabled>Select…</option>
-
-              <option>General Contractor</option>
-
-              <option>Porch/Deck Builder</option>
-
-              <option>Roofing</option>
-
-              <option>Flooring</option>
-
-              <option>Painting</option>
-
-              <option>Landscaping</option>
-
-              <option>Handyman</option>
-
-              <option>Other</option>
-
-            </select>
-
-          </label>
-
-          <label>Team Size
-
-            <select name="team_size" required>
-
-              <option value="" selected disabled>Select…</option>
-
-              <option>Solo</option>
-
-              <option>2–5</option>
-
-              <option>6–10</option>
-
-              <option>11–20</option>
-
-              <option>20+</option>
-
-            </select>
-
-          </label>
-
-        </div>
+            </label>
 
 
 
-        <div class="grid cols-2">
+            <label>Business Category
 
-          <label>Full Name
+              <select name="category" required>
 
-            <input name="name" required placeholder="Your name">
+                <option value="" selected disabled>Select…</option>
 
-          </label>
+                <option>General Contractor</option>
 
-          <label>Email
+                <option>Porch/Deck Builder</option>
 
-            <input type="email" name="email" required placeholder="name@company.com">
+                <option>Roofing</option>
 
-          </label>
+                <option>Flooring</option>
 
-          <label>Phone
+                <option>Painting</option>
 
-            <input name="phone" required placeholder="+1 (502) 555-1234">
+                <option>Landscaping</option>
 
-          </label>
+                <option>Handyman</option>
 
-          <label>Address
+                <option>Other</option>
 
-            <input name="address" required placeholder="Street, City, State">
+              </select>
 
-          </label>
-
-        </div>
+            </label>
 
 
 
-        <label>Service Areas (cities or ZIPs)
+            <!-- Business License (replaces Team Size) -->
 
-          <textarea name="service_areas" placeholder="Louisville, Jefferson County, 40214…"></textarea>
+            <label>Business License
 
-        </label>
+              <input name="business_license" required placeholder="License number / state">
+
+            </label>
+
+          </div>
 
 
 
-        <div class="row">
+          <div class="grid cols-2">
 
-          <label class="row" style="gap:8px">
+            <label>Full Name
 
-            <input type="checkbox" name="accept_terms" required>
+              <input name="name" required placeholder="Your name">
 
-            <span class="muted">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</span>
+            </label>
+
+            <label>Email
+
+              <input type="email" name="email" required placeholder="name@company.com">
+
+            </label>
+
+            <label>Phone
+
+              <input name="phone" required placeholder="+1 (502) 555-1234">
+
+            </label>
+
+            <label>Address
+
+              <input name="address" required placeholder="Street, City, State">
+
+            </label>
+
+          </div>
+
+
+
+          <label>Service Areas (cities or ZIPs)
+
+            <textarea name="service_areas" placeholder="Louisville, Jefferson County, 40214…"></textarea>
 
           </label>
 
-        </div>
+
+
+          <!-- Insurance (optional) -->
+
+          <div class="grid">
+
+            <label class="row" style="gap:8px">
+
+              <input type="checkbox" id="hasInsurance" name="has_insurance">
+
+              <span class="muted">We carry general liability insurance</span>
+
+            </label>
+
+            <div id="insuranceDetails" class="grid cols-2" style="display:none">
+
+              <label>Insurance Carrier (optional)
+
+                <input name="insurance_carrier" placeholder="e.g., State Farm">
+
+              </label>
+
+              <label>Policy # (optional)
+
+                <input name="insurance_policy" placeholder="e.g., GL-123456">
+
+              </label>
+
+            </div>
+
+          </div>
 
 
 
-        <div class="actions">
+          <div class="row">
 
-          <span class="muted lock">
+            <label class="row" style="gap:8px">
 
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
+              <input type="checkbox" name="accept_terms" required>
 
-            Card details are collected securely on Stripe.
+              <span class="muted">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</span>
 
-          </span>
-
-          <div class="actions-right">
-
-            <button type="button" id="cancelTrial" class="btn">Cancel</button>
-
-            <button type="submit" id="submitTrial" class="btn btn-primary">
-
-              Continue to Secure Payment
-
-            </button>
+            </label>
 
           </div>
 
@@ -310,7 +328,33 @@
 
 
 
-        <p id="trialMsg" class="msg" aria-live="polite"></p>
+        <!-- sticky action bar -->
+
+        <div class="actions-wrap">
+
+          <div class="actions">
+
+            <span class="muted lock">
+
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
+
+              Card details are collected securely on Stripe.
+
+            </span>
+
+            <div class="actions-right">
+
+              <button type="button" id="cancelTrial" class="btn">Cancel</button>
+
+              <button type="submit" id="submitTrial" class="btn btn-primary">Continue to Secure Payment</button>
+
+            </div>
+
+          </div>
+
+          <p id="trialMsg" class="msg" aria-live="polite"></p>
+
+        </div>
 
       </form>
 
@@ -328,6 +372,8 @@
 
     const closeModal = ()=> { $("#trialModal").hidden = true; };
 
+
+
     const serializeForm = (form)=>{
 
       const data = new FormData(form);
@@ -335,6 +381,8 @@
       return Object.fromEntries([...data.entries()].map(([k,v])=>[k, typeof v==="string"? v.trim(): v]));
 
     };
+
+
 
     async function postJSON(url, payload){
 
@@ -360,6 +408,8 @@
 
     }
 
+
+
     function setLoading(b){
 
       $("#submitTrial").disabled = b;
@@ -370,17 +420,29 @@
 
 
 
-    $("#startTrialBtn")?.addEventListener("click", () => {
+    // open/close
 
-      openModal(); $("#trialMsg").textContent = "";
-
-    });
+    $("#startTrialBtn")?.addEventListener("click", () => { openModal(); $("#trialMsg").textContent = ""; });
 
     $("#cancelTrial")?.addEventListener("click", () => closeModal());
 
     $("#trialModal")?.addEventListener("click",(e)=>{ if(e.target.id === "trialModal") closeModal(); });
 
 
+
+    // Insurance toggle
+
+    $("#hasInsurance")?.addEventListener("change", (e)=>{
+
+      const box = $("#insuranceDetails");
+
+      if(box){ box.style.display = e.currentTarget.checked ? "grid" : "none"; }
+
+    });
+
+
+
+    // Submit
 
     $("#trialForm")?.addEventListener("submit", async (e) => {
 
@@ -395,6 +457,16 @@
       try{
 
         const payload = serializeForm(form);
+
+
+
+        // اختياري: حفظ في قاعدة بيانات لاحقًا
+
+        // await postJSON("/api/pros/create", payload);
+
+
+
+        // Stripe Checkout (سيتم إدخال الكارد هناك)
 
         const { checkoutUrl } = await postJSON("/api/stripe/create-checkout-session", payload);
 
@@ -413,6 +485,14 @@
       }
 
     });
+
+
+
+    // تحسين تجربة الموبايل
+
+    const area = $("#scrollArea");
+
+    if(area){ area.addEventListener("focusin", ()=> { area.scrollTop = area.scrollHeight; }, true); }
 
   </script>
 
