@@ -60,11 +60,7 @@
 
       <div class="brand">ProBuildZone</div>
 
-      <nav>
-
-        <a href="/" class="btn">Home</a>
-
-      </nav>
+      <nav><a href="/" class="btn">Home</a></nav>
 
     </header>
 
@@ -130,7 +126,111 @@
 
 
 
-  <script type="module" src="/js/pros-trial.js"></script>
+  <script type="module">
+
+    const $ = (s, p=document) => p.querySelector(s);
+
+    const openModal = ()=> { $("#trialModal").hidden = false; };
+
+    const closeModal = ()=> { $("#trialModal").hidden = true; };
+
+    const serializeForm = (form)=>{
+
+      const data = new FormData(form);
+
+      return Object.fromEntries([...data.entries()].map(([k,v])=>[k, v.trim()]));
+
+    };
+
+    const postJSON = async (url, payload)=>{
+
+      const res = await fetch(url, {
+
+        method: "POST",
+
+        headers: {"Content-Type": "application/json"},
+
+        body: JSON.stringify(payload)
+
+      });
+
+      if(!res.ok){
+
+        const text = await res.text().catch(()=> "");
+
+        throw new Error(text || `Request failed: ${res.status}`);
+
+      }
+
+      return res.json();
+
+    };
+
+    const setLoading = (b)=>{
+
+      $("#submitTrial").disabled = b;
+
+      $("#startTrialBtn")?.setAttribute("aria-busy", b ? "true" : "false");
+
+    };
+
+
+
+    // Handlers
+
+    $("#startTrialBtn")?.addEventListener("click", () => {
+
+      openModal();
+
+      $("#trialMsg").textContent = "";
+
+    });
+
+    $("#cancelTrial")?.addEventListener("click", () => closeModal());
+
+    $("#trialModal")?.addEventListener("click",(e)=>{ if(e.target.id === "trialModal") closeModal(); });
+
+
+
+    $("#trialForm")?.addEventListener("submit", async (e) => {
+
+      e.preventDefault();
+
+      $("#trialMsg").textContent = "";
+
+      setLoading(true);
+
+      try{
+
+        const payload = serializeForm(e.currentTarget);
+
+        // اختياري: حفظ مبدئي
+
+        // await postJSON("/api/pros/create", payload);
+
+
+
+        // Stripe checkout session
+
+        const { checkoutUrl } = await postJSON("/api/stripe/create-checkout-session", payload);
+
+        window.location.href = checkoutUrl;
+
+      }catch(err){
+
+        console.error(err);
+
+        $("#trialMsg").textContent = "Something went wrong. Please try again.";
+
+      }finally{
+
+        setLoading(false);
+
+      }
+
+    });
+
+  </script>
 
 </body>
 
