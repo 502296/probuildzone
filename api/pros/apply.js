@@ -1,12 +1,18 @@
-// /api/pros/apply.js  (Vercel Serverless / Node 18+)
-
 module.exports = async (req, res) => {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-
-
   try {
+
+    // تأكد من بارس البودي حتى لو جاء نص
+
+    let body = req.body;
+
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+
+    body = body || {};
+
+
 
     const {
 
@@ -14,7 +20,7 @@ module.exports = async (req, res) => {
 
       address = '', website = '', areas = '', services = '', notes = ''
 
-    } = req.body || {};
+    } = body;
 
 
 
@@ -44,8 +50,6 @@ module.exports = async (req, res) => {
 
 
 
-    // استخدم fetch الأصلي (لا نحتاج node-fetch)
-
     const r = await fetch(GAS_URL, {
 
       method: 'POST',
@@ -60,11 +64,7 @@ module.exports = async (req, res) => {
 
     const txt = await r.text();
 
-    let json;
-
-    try { json = JSON.parse(txt); } catch { json = null; }
-
-
+    let json; try { json = JSON.parse(txt); } catch { json = null; }
 
     if (!r.ok || (json && json.ok === false)) {
 
