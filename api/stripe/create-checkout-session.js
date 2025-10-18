@@ -1,105 +1,89 @@
-module.exports = async (req, res) => {
+// /api/stripe/create-checkout-session.js
 
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  try {
-
-    // بارس البودي حتى لو جاء نص
-
-    let body = req.body;
-
-    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-
-    body = body || {};
+import Stripe from "stripe";
 
 
 
-    const { email = '', phone = '', company = '', full_name = '', areas = '', services = '' } = body;
+export default async function handler(req, res){
 
-    if (!email) return res.status(400).json({ error: 'Email is required' });
-
-
-
-    const secret  = process.env.STRIPE_SECRET_KEY;
-
-    const priceId = process.env.STRIPE_PRICE_YEARLY; // نستخدمه شهريًا الآن
-
-    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:3000';
-
-    if (!secret)  return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
-
-    if (!priceId) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
+  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
 
 
-    const p = new URLSearchParams();
+  try{
 
-    p.append('mode','subscription');
+    const { company="", name="", email="", phone="", address="" } = req.body || {};
 
-    p.append('success_url', `${baseUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`);
-
-    p.append('cancel_url', `${baseUrl}/pros.html?canceled=true`);
-
-    p.append('customer_email', email);
-
-    p.append('line_items[0][price]', priceId);
-
-    p.append('line_items[0][quantity]','1');
-
-    p.append('payment_method_collection','always');
-
-    p.append('billing_address_collection','required');
-
-    p.append('phone_number_collection[enabled]','true');
-
-    p.append('subscription_data[trial_period_days]','30');
-
-    if (company)   p.append('subscription_data[metadata][company]', company);
-
-    if (full_name) p.append('subscription_data[metadata][full_name]', full_name);
-
-    if (areas)     p.append('subscription_data[metadata][areas]', areas);
-
-    if (services)  p.append('subscription_data[metadata][services]', services);
-
-    if (company)   p.append('metadata[company]', company);
-
-    if (full_name) p.append('metadata[full_name]', full_name);
-
-    p.append('custom_text[submit][message]','No charge today. Your 30-day free trial starts now.');
-
-    p.append('custom_text[after_submit][message]','Thanks! No charge until day 31.');
+    if(!email || !name) return res.status(400).send("Missing name or email");
 
 
 
-    const resp = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-      method: 'POST',
 
-      headers: { 'Authorization': `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
 
-      body: p.toString()
+    // ابحث عن عميل موجود بنفس الإيميل أو أنشئ عميل جديد
+
+    const found = await stripe.customers.list({ email, limit: 1 });
+
+    const customer = found.data[0] || await stripe.customers.create({
+
+      name, email, phone,
+
+      address: address ? { line1: address } : undefined,
+
+      metadata: { company }
 
     });
 
 
 
-    const raw = await resp.text();
+    // أنشئ جلسة اشتراك سنوي مع 30 يوم تجربة
 
-    let json; try { json = JSON.parse(raw); } catch { json = null; }
+    const session = await stripe.checkout.sessions.create({
 
-    if (!resp.ok || !json?.url) {
+      mode: "subscription",
 
-      return res.status(resp.status || 500).json({ error: json?.error?.message || raw.slice(0, 400) });
+      customer: customer.id,
 
-    }
+      line_items: [
 
-    return res.status(200).json({ url: json.url });
+        { price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }
 
-  } catch (err) {
+      ],
 
-    return res.status(500).json({ error: err.message || String(err) });
+      subscription_data: {
+
+        trial_period_days: 30,
+
+        metadata: { company, name, phone, address }
+
+      },
+
+      allow_promotion_codes: true,
+
+      billing_address_collection: "required",
+
+      automatic_tax: { enabled: true },
+
+      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+
+      cancel_url: `${process.env.SITE_URL}/cancelled.html`,
+
+      client_reference_id: company || email
+
+    });
+
+
+
+    return res.status(200).json({ checkoutUrl: session.url });
+
+  }catch(err){
+
+    console.error("Stripe error:", err);
+
+    return res.status(500).send(err?.message || "Stripe error");
 
   }
 
-};
+}
