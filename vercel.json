@@ -4,11 +4,7 @@
 
   "functions": {
 
-    "api/**/*.js": {
-
-      "runtime": "nodejs18.x"
-
-    }
+    "api/**/*.js": { "runtime": "nodejs18.x" }
 
   },
 
@@ -17,6 +13,18 @@
     { "src": "^/$", "dest": "/pros.html" },
 
     { "src": "^/pros$", "dest": "/pros.html" }
+
+  ],
+
+  "headers": [
+
+    {
+
+      "source": "/:path*.html",
+
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+
+    }
 
   ]
 
