@@ -12,7 +12,21 @@ export default async function handler(req, res){
 
   try{
 
-    const { company="", name="", email="", phone="", address="" } = req.body || {};
+    const {
+
+      company="", website="", category="",
+
+      business_license="",
+
+      name="", email="", phone="", address="",
+
+      service_areas="",
+
+      has_insurance="", insurance_carrier="", insurance_policy=""
+
+    } = req.body || {};
+
+
 
     if(!email || !name) return res.status(400).send("Missing name or email");
 
@@ -22,7 +36,7 @@ export default async function handler(req, res){
 
 
 
-    // ابحث عن عميل موجود بنفس الإيميل أو أنشئ عميل جديد
+    // ابحث/أنشئ عميل
 
     const found = await stripe.customers.list({ email, limit: 1 });
 
@@ -32,13 +46,23 @@ export default async function handler(req, res){
 
       address: address ? { line1: address } : undefined,
 
-      metadata: { company }
+      metadata: {
+
+        company, website, category,
+
+        business_license,
+
+        service_areas,
+
+        has_insurance: has_insurance ? "yes" : "no",
+
+        insurance_carrier, insurance_policy
+
+      }
 
     });
 
 
-
-    // أنشئ جلسة اشتراك سنوي مع 30 يوم تجربة
 
     const session = await stripe.checkout.sessions.create({
 
@@ -46,25 +70,61 @@ export default async function handler(req, res){
 
       customer: customer.id,
 
-      line_items: [
-
-        { price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }
-
-      ],
+      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
 
       subscription_data: {
 
         trial_period_days: 30,
 
-        metadata: { company, name, phone, address }
+        metadata: {
+
+          company, website, category,
+
+          business_license,
+
+          service_areas,
+
+          has_insurance: has_insurance ? "yes" : "no",
+
+          insurance_carrier, insurance_policy
+
+        }
 
       },
 
-      allow_promotion_codes: true,
+
+
+      // ❖ نجعل Stripe يطلب بيانات إضافية في صفحة الدفع
+
+      custom_fields: [
+
+        {
+
+          key: "company_name",
+
+          label: { type: "custom", custom: "Company name" },
+
+          type: "text",
+
+          text: { default_value: company?.slice(0, 120) || "" }
+
+        }
+
+      ],
+
+      tax_id_collection: { enabled: true },        // يتيح إدخال Tax ID إن وُجد
+
+      automatic_tax: { enabled: true },            // احتساب الضرائب تلقائيًا
 
       billing_address_collection: "required",
 
-      automatic_tax: { enabled: true },
+      allow_promotion_codes: true,
+
+      // اجعل Stripe يعرض حقل الهاتف في checkout نفسه (إن أردت)
+
+      phone_number_collection: { enabled: true },
+
+
 
       success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
