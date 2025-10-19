@@ -1,17 +1,7 @@
 {
 
-  "name": "probuildzone",
-
   "private": true,
 
-  "type": "module",
-
-  "license": "UNLICENSED",
-
-  "dependencies": {
-
-    "stripe": "^16.0.0"
-
-  }
+  "type": "module"
 
 }
