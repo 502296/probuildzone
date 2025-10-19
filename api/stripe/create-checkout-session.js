@@ -1,62 +1,104 @@
 // /api/stripe/create-checkout-session.js
 
-import Stripe from "stripe";
+import Stripe from 'stripe';
 
 
 
-export default async function handler(req, res){
+export default async function handler(req, res) {
 
-  if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
 
 
-  try{
+  try {
 
     const {
 
-      company="", website="", category="",
+      companyName,
 
-      business_license="",
+      companyWebsite,
 
-      name="", email="", phone="", address="",
+      businessCategory,
 
-      service_areas="",
+      businessLicense,
 
-      has_insurance="", insurance_carrier="", insurance_policy=""
+      fullName,
+
+      email,
+
+      phone,
+
+      addressLine1,
+
+      addressLine2,
+
+      city,
+
+      state,
+
+      postalCode,
+
+      country
 
     } = req.body || {};
 
 
 
-    if(!email || !name) return res.status(400).send("Missing name or email");
+    if (!email) return res.status(400).json({ error: 'Missing email' });
 
 
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
 
 
 
-    // ابحث/أنشئ عميل
+    const priceId = process.env.STRIPE_PRICE_YEARLY;
 
-    const found = await stripe.customers.list({ email, limit: 1 });
+    if (!priceId) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
 
-    const customer = found.data[0] || await stripe.customers.create({
 
-      name, email, phone,
 
-      address: address ? { line1: address } : undefined,
+    const successUrl = process.env.STRIPE_SUCCESS_URL || `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
+
+    const cancelUrl  = process.env.STRIPE_CANCEL_URL  || `${process.env.SITE_URL}/cancel.html`;
+
+
+
+    // عميل أو إنشاء عميل جديد
+
+    const customer = await stripe.customers.create({
+
+      email,
+
+      name: fullName || companyName || undefined,
+
+      phone: phone || undefined,
+
+      address: (addressLine1 && city && country) ? {
+
+        line1: addressLine1,
+
+        line2: addressLine2 || null,
+
+        city,
+
+        state,
+
+        postal_code: postalCode || null,
+
+        country
+
+      } : undefined,
 
       metadata: {
 
-        company, website, category,
+        companyName: companyName || '',
 
-        business_license,
+        companyWebsite: companyWebsite || '',
 
-        service_areas,
+        businessCategory: businessCategory || '',
 
-        has_insurance: has_insurance ? "yes" : "no",
-
-        insurance_carrier, insurance_policy
+        businessLicense: businessLicense || '',
 
       }
 
@@ -66,83 +108,51 @@ export default async function handler(req, res){
 
     const session = await stripe.checkout.sessions.create({
 
-      mode: "subscription",
+      mode: 'subscription',
 
       customer: customer.id,
 
-      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
 
-      subscription_data: {
+      // لو السعر لا يحتوي trial، نفعلها من هنا:
 
-        trial_period_days: 30,
+      subscription_data: { trial_period_days: 30,
 
         metadata: {
 
-          company, website, category,
+          companyName: companyName || '',
 
-          business_license,
-
-          service_areas,
-
-          has_insurance: has_insurance ? "yes" : "no",
-
-          insurance_carrier, insurance_policy
+          businessLicense: businessLicense || '',
 
         }
 
       },
 
-
-
-      // ❖ نجعل Stripe يطلب بيانات إضافية في صفحة الدفع
-
-      custom_fields: [
-
-        {
-
-          key: "company_name",
-
-          label: { type: "custom", custom: "Company name" },
-
-          type: "text",
-
-          text: { default_value: company?.slice(0, 120) || "" }
-
-        }
-
-      ],
-
-      tax_id_collection: { enabled: true },        // يتيح إدخال Tax ID إن وُجد
-
-      automatic_tax: { enabled: true },            // احتساب الضرائب تلقائيًا
-
-      billing_address_collection: "required",
-
       allow_promotion_codes: true,
 
-      // اجعل Stripe يعرض حقل الهاتف في checkout نفسه (إن أردت)
+      success_url: successUrl,
 
-      phone_number_collection: { enabled: true },
+      cancel_url: cancelUrl,
 
+      metadata: {
 
+        form_fullName: fullName || '',
 
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        form_phone: phone || '',
 
-      cancel_url: `${process.env.SITE_URL}/cancelled.html`,
-
-      client_reference_id: company || email
+      }
 
     });
 
 
 
-    return res.status(200).json({ checkoutUrl: session.url });
+    return res.status(200).json({ url: session.url });
 
-  }catch(err){
+  } catch (err) {
 
-    console.error("Stripe error:", err);
+    console.error('Stripe error:', err);
 
-    return res.status(500).send(err?.message || "Stripe error");
+    return res.status(500).json({ error: err.message || 'Internal Server Error' });
 
   }
 
