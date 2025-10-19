@@ -1,4 +1,4 @@
-// /api/stripe/create-checkout-session.js
+// api/stripe/create-checkout-session.js
 
 import Stripe from 'stripe';
 
@@ -44,6 +44,12 @@ export default async function handler(req, res) {
 
 
 
+    if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
+
+    if (!process.env.STRIPE_PRICE_YEARLY) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
+
+    if (!process.env.SITE_URL) return res.status(500).json({ error: 'Missing SITE_URL' });
+
     if (!email) return res.status(400).json({ error: 'Missing email' });
 
 
@@ -51,20 +57,6 @@ export default async function handler(req, res) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
 
 
-
-    const priceId = process.env.STRIPE_PRICE_YEARLY;
-
-    if (!priceId) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
-
-
-
-    const successUrl = process.env.STRIPE_SUCCESS_URL || `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
-
-    const cancelUrl  = process.env.STRIPE_CANCEL_URL  || `${process.env.SITE_URL}/cancel.html`;
-
-
-
-    // عميل أو إنشاء عميل جديد
 
     const customer = await stripe.customers.create({
 
@@ -98,11 +90,17 @@ export default async function handler(req, res) {
 
         businessCategory: businessCategory || '',
 
-        businessLicense: businessLicense || '',
+        businessLicense: businessLicense || ''
 
       }
 
     });
+
+
+
+    const successUrl = process.env.STRIPE_SUCCESS_URL || `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
+
+    const cancelUrl  = process.env.STRIPE_CANCEL_URL  || `${process.env.SITE_URL}/cancel.html`;
 
 
 
@@ -112,17 +110,17 @@ export default async function handler(req, res) {
 
       customer: customer.id,
 
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
 
-      // لو السعر لا يحتوي trial، نفعلها من هنا:
+      subscription_data: {
 
-      subscription_data: { trial_period_days: 30,
+        trial_period_days: 30,
 
         metadata: {
 
           companyName: companyName || '',
 
-          businessLicense: businessLicense || '',
+          businessLicense: businessLicense || ''
 
         }
 
@@ -138,7 +136,7 @@ export default async function handler(req, res) {
 
         form_fullName: fullName || '',
 
-        form_phone: phone || '',
+        form_phone: phone || ''
 
       }
 
