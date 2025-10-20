@@ -1,14 +1,18 @@
 // /api/stripe/create-checkout-session.js
 
-import Stripe from "stripe";
+const Stripe = require('stripe');
 
 
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
 
-  if (req.method !== "POST") {
+  // اسمح فقط بالـ POST
 
-    return res.status(405).json({ error: "Method Not Allowed" });
+  if (req.method !== 'POST') {
+
+    res.status(405).json({ error: 'Method Not Allowed' });
+
+    return;
 
   }
 
@@ -16,54 +20,48 @@ export default async function handler(req, res) {
 
   try {
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const { STRIPE_SECRET_KEY, STRIPE_PRICE_ID, SITE_URL } = process.env;
+
+    if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_ID) {
+
+      res.status(500).json({ error: 'Missing STRIPE env vars' });
+
+      return;
+
+    }
+
+
+
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 
 
     const session = await stripe.checkout.sessions.create({
 
-      mode: "subscription",
+      mode: 'subscription',
 
-      line_items: [
+      line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
 
-        {
-
-          price: process.env.STRIPE_PRICE_ID,
-
-          quantity: 1
-
-        }
-
-      ],
-
-      subscription_data: {
-
-        trial_period_days: 30
-
-      },
+      subscription_data: { trial_period_days: 30 },
 
       allow_promotion_codes: true,
 
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${SITE_URL || 'http://localhost:3000'}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: `${process.env.SITE_URL}/cancel.html`
+      cancel_url: `${SITE_URL || 'http://localhost:3000'}/cancel.html`
 
     });
 
 
 
-    return res.status(200).json({ url: session.url });
+    res.status(200).json({ url: session.url });
 
   } catch (err) {
 
-    console.error("Stripe error:", err);
+    console.error('Stripe error:', err);
 
-    return res
-
-      .status(500)
-
-      .json({ error: "Stripe error", details: err.message });
+    res.status(500).json({ error: 'Stripe error', details: err.message });
 
   }
 
-}
+};
