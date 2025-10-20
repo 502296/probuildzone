@@ -1,6 +1,6 @@
 // /api/stripe/create-checkout-session.js
 
-// Runtime: Node 18 (تأكد من vercel.json)
+// يعمل على Vercel Node 18 بدون الاعتماد على body
 
 const Stripe = require('stripe');
 
@@ -8,33 +8,39 @@ const Stripe = require('stripe');
 
 module.exports = async (req, res) => {
 
+  // سموح بـ CORS لو احتجته
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+
+    res.status(200).end();
+
+    return;
+
+  }
+
+
+
+  if (req.method !== 'POST') {
+
+    res.status(405).json({ error: 'Method Not Allowed' });
+
+    return;
+
+  }
+
+
+
   try {
 
-    if (req.method !== 'POST') {
+    const { STRIPE_SECRET_KEY, STRIPE_PRICE_YEARLY, SITE_URL } = process.env;
 
-      res.status(405).json({ error: 'Method Not Allowed' });
-
-      return;
-
-    }
-
-
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const priceId = process.env.STRIPE_PRICE_YEARLY; // سعر سنوي مُفعّل عليه Trial من Stripe أو نضيف trial أدناه
-
-    const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
-
-
-
-    const { company, fullName, email, phone } = req.body || {};
-
-
-
-    // حقل Email مهم لخلق/ربط العميل على Stripe
-
-    if (!priceId || !process.env.STRIPE_SECRET_KEY) {
+    if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_YEARLY) {
 
       res.status(500).json({ error: 'Missing STRIPE env vars' });
 
@@ -42,13 +48,9 @@ module.exports = async (req, res) => {
 
     }
 
-    if (!email) {
 
-      res.status(400).json({ error: 'Missing email' });
 
-      return;
-
-    }
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 
 
@@ -56,31 +58,21 @@ module.exports = async (req, res) => {
 
       mode: 'subscription',
 
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: STRIPE_PRICE_YEARLY, quantity: 1 }],
 
-      // يمكنك استعمال الـ trial من السعر نفسه على Stripe، أو تفعيل أيام تجربة هنا:
+      // نحط التجربة هنا (حتى لو السعر ما عليه Trial)
 
       subscription_data: { trial_period_days: 30 },
 
-      customer_email: email,
-
-      metadata: {
-
-        company: company || '',
-
-        fullName: fullName || '',
-
-        phone: phone || '',
-
-        source: 'probuildzone-pros',
-
-      },
-
       allow_promotion_codes: true,
 
-      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      // نجمع الإيميل على صفحة Stripe مباشرة
 
-      cancel_url: `${siteUrl}/cancel.html`,
+      customer_creation: 'if_required',
+
+      success_url: `${SITE_URL || 'http://localhost:3000'}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+
+      cancel_url: `${SITE_URL || 'http://localhost:3000'}/cancel.html`
 
     });
 
