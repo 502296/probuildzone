@@ -1,13 +1,23 @@
 {
 
-  "name": "probuildzone",
+  "name": "probuildzone-pros",
 
   "version": "1.0.0",
 
   "private": true,
 
-  "scripts": {},
+  "type": "module",
 
-  "dependencies": {}
+  "scripts": {
+
+    "start": "node server.js"
+
+  },
+
+  "dependencies": {
+
+    "stripe": "^16.0.0"
+
+  }
 
 }
