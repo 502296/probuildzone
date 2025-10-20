@@ -1,106 +1,54 @@
-// api/stripe/create-checkout-session.js
+// /api/stripe/create-checkout-session.js
 
-import Stripe from 'stripe';
+// Runtime: Node 18 (تأكد من vercel.json)
 
-
-
-export default async function handler(req, res) {
-
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+const Stripe = require('stripe');
 
 
+
+module.exports = async (req, res) => {
 
   try {
 
-    const {
+    if (req.method !== 'POST') {
 
-      companyName,
+      res.status(405).json({ error: 'Method Not Allowed' });
 
-      companyWebsite,
+      return;
 
-      businessCategory,
-
-      businessLicense,
-
-      fullName,
-
-      email,
-
-      phone,
-
-      addressLine1,
-
-      addressLine2,
-
-      city,
-
-      state,
-
-      postalCode,
-
-      country
-
-    } = req.body || {};
+    }
 
 
 
-    if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    if (!process.env.STRIPE_PRICE_YEARLY) return res.status(500).json({ error: 'Missing STRIPE_PRICE_YEARLY' });
+    const priceId = process.env.STRIPE_PRICE_YEARLY; // سعر سنوي مُفعّل عليه Trial من Stripe أو نضيف trial أدناه
 
-    if (!process.env.SITE_URL) return res.status(500).json({ error: 'Missing SITE_URL' });
-
-    if (!email) return res.status(400).json({ error: 'Missing email' });
+    const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
 
 
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
+    const { company, fullName, email, phone } = req.body || {};
 
 
 
-    const customer = await stripe.customers.create({
+    // حقل Email مهم لخلق/ربط العميل على Stripe
 
-      email,
+    if (!priceId || !process.env.STRIPE_SECRET_KEY) {
 
-      name: fullName || companyName || undefined,
+      res.status(500).json({ error: 'Missing STRIPE env vars' });
 
-      phone: phone || undefined,
+      return;
 
-      address: (addressLine1 && city && country) ? {
+    }
 
-        line1: addressLine1,
+    if (!email) {
 
-        line2: addressLine2 || null,
+      res.status(400).json({ error: 'Missing email' });
 
-        city,
+      return;
 
-        state,
-
-        postal_code: postalCode || null,
-
-        country
-
-      } : undefined,
-
-      metadata: {
-
-        companyName: companyName || '',
-
-        companyWebsite: companyWebsite || '',
-
-        businessCategory: businessCategory || '',
-
-        businessLicense: businessLicense || ''
-
-      }
-
-    });
-
-
-
-    const successUrl = process.env.STRIPE_SUCCESS_URL || `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
-
-    const cancelUrl  = process.env.STRIPE_CANCEL_URL  || `${process.env.SITE_URL}/cancel.html`;
+    }
 
 
 
@@ -108,50 +56,44 @@ export default async function handler(req, res) {
 
       mode: 'subscription',
 
-      customer: customer.id,
+      line_items: [{ price: priceId, quantity: 1 }],
 
-      line_items: [{ price: process.env.STRIPE_PRICE_YEARLY, quantity: 1 }],
+      // يمكنك استعمال الـ trial من السعر نفسه على Stripe، أو تفعيل أيام تجربة هنا:
 
-      subscription_data: {
+      subscription_data: { trial_period_days: 30 },
 
-        trial_period_days: 30,
+      customer_email: email,
 
-        metadata: {
+      metadata: {
 
-          companyName: companyName || '',
+        company: company || '',
 
-          businessLicense: businessLicense || ''
+        fullName: fullName || '',
 
-        }
+        phone: phone || '',
+
+        source: 'probuildzone-pros',
 
       },
 
       allow_promotion_codes: true,
 
-      success_url: successUrl,
+      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: cancelUrl,
-
-      metadata: {
-
-        form_fullName: fullName || '',
-
-        form_phone: phone || ''
-
-      }
+      cancel_url: `${siteUrl}/cancel.html`,
 
     });
 
 
 
-    return res.status(200).json({ url: session.url });
+    res.status(200).json({ url: session.url });
 
   } catch (err) {
 
     console.error('Stripe error:', err);
 
-    return res.status(500).json({ error: err.message || 'Internal Server Error' });
+    res.status(500).json({ error: 'Stripe error', details: err.message });
 
   }
 
-}
+};
