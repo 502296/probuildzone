@@ -6,8 +6,6 @@ const Stripe = require('stripe');
 
 module.exports = async (req, res) => {
 
-  // اسمح فقط بالـ POST
-
   if (req.method !== 'POST') {
 
     res.status(405).json({ error: 'Method Not Allowed' });
