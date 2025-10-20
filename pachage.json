@@ -1,12 +1,14 @@
 {
 
+  "name": "probuildzone",
+
   "private": true,
 
-  "type": "module",
+  "type": "commonjs",
 
   "dependencies": {
 
-    "stripe": "^14.0.0"
+    "stripe": "^16.0.0"
 
   }
 
