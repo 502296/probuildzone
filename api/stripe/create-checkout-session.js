@@ -1,36 +1,14 @@
 // /api/stripe/create-checkout-session.js
 
-// يعمل على Vercel Node 18 بدون الاعتماد على body
-
-const Stripe = require('stripe');
+import Stripe from "stripe";
 
 
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
 
-  // سموح بـ CORS لو احتجته
+  if (req.method !== "POST") {
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-
-    res.status(200).end();
-
-    return;
-
-  }
-
-
-
-  if (req.method !== 'POST') {
-
-    res.status(405).json({ error: 'Method Not Allowed' });
-
-    return;
+    return res.status(405).json({ error: "Method Not Allowed" });
 
   }
 
@@ -38,54 +16,54 @@ module.exports = async (req, res) => {
 
   try {
 
-    const { STRIPE_SECRET_KEY, STRIPE_PRICE_YEARLY, SITE_URL } = process.env;
-
-    if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_YEARLY) {
-
-      res.status(500).json({ error: 'Missing STRIPE env vars' });
-
-      return;
-
-    }
-
-
-
-    const stripe = new Stripe(STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
     const session = await stripe.checkout.sessions.create({
 
-      mode: 'subscription',
+      mode: "subscription",
 
-      line_items: [{ price: STRIPE_PRICE_YEARLY, quantity: 1 }],
+      line_items: [
 
-      // نحط التجربة هنا (حتى لو السعر ما عليه Trial)
+        {
 
-      subscription_data: { trial_period_days: 30 },
+          price: process.env.STRIPE_PRICE_ID,
+
+          quantity: 1
+
+        }
+
+      ],
+
+      subscription_data: {
+
+        trial_period_days: 30
+
+      },
 
       allow_promotion_codes: true,
 
-      // نجمع الإيميل على صفحة Stripe مباشرة
+      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
-      customer_creation: 'if_required',
-
-      success_url: `${SITE_URL || 'http://localhost:3000'}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-
-      cancel_url: `${SITE_URL || 'http://localhost:3000'}/cancel.html`
+      cancel_url: `${process.env.SITE_URL}/cancel.html`
 
     });
 
 
 
-    res.status(200).json({ url: session.url });
+    return res.status(200).json({ url: session.url });
 
   } catch (err) {
 
-    console.error('Stripe error:', err);
+    console.error("Stripe error:", err);
 
-    res.status(500).json({ error: 'Stripe error', details: err.message });
+    return res
+
+      .status(500)
+
+      .json({ error: "Stripe error", details: err.message });
 
   }
 
-};
+}
