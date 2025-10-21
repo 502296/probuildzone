@@ -1,15 +1,7 @@
 {
-
-  "version": 2,
-
-  "functions": {
-
-    "api/**/*.js": {
-
-      "runtime": "nodejs20.x"
-
-    }
-
-  }
-
+"functions": {
+"your-function-name": {
+"runtime": "now-php@1.0.0"
+}
+}
 }
