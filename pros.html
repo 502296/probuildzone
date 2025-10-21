@@ -4,111 +4,53 @@
 
 <head>
 
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>ProBuildZone — For Pros</title>
 
-  <meta name="description" content="ProBuildZone Pro Onboarding">
-
   <style>
 
-    :root{
-
-      --pbz-blue:#0F2A43;
-
-      --pbz-orange:#F28C1B;
-
-      --muted:#5A6B7A;
-
-    }
+    :root{--pbz-blue:#0F2A43;--pbz-orange:#F28C1B;--muted:#5A6B7A;}
 
     *{box-sizing:border-box}
 
-    body{
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0f2337;color:#e9f0f7}
 
-      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    header{padding:18px 20px;text-align:center;font-weight:800}
 
-      background:#f5f7fb; color:var(--pbz-blue);
+    .wrap{max-width:980px;margin:0 auto;padding:24px 16px}
 
-    }
+    .card{background:#102a44;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:22px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
 
-    header{background:#fff;border-bottom:1px solid #e6e9ef;position:sticky;top:0;z-index:10}
+    h1{margin:0 0 8px;font-size:28px}
 
-    .wrap{max-width:980px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+    p{margin:0 0 16px;color:#b7c6d6}
 
-    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--pbz-blue)}
+    form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-    .brand img{height:40px;width:auto;display:block}
+    label{font-size:13px;font-weight:600;color:#dbe6f2}
 
-    .brand .title{font-weight:800;font-size:22px;line-height:1}
+    input,textarea{width:100%;padding:12px;border:1px solid #284563;border-radius:10px;background:#0e2031;color:#e9f0f7}
 
-    .brand .tag{color:var(--pbz-orange);font-weight:600;font-size:12px;opacity:.95}
+    input:focus,textarea:focus{outline:none;border-color:#3c6a95;box-shadow:0 0 0 3px rgba(60,106,149,.25)}
 
-    main{padding:28px 20px 60px}
-
-    .hero{max-width:980px;margin:0 auto 18px;display:grid;gap:8px}
-
-    .hero h1{margin:0;font-size:28px;color:var(--pbz-blue)}
-
-    .hero p{margin:0;color:var(--muted)}
-
-    .card{
-
-      max-width:980px;margin:0 auto;background:#fff;border:1px solid #e6e9ef;border-radius:14px;
-
-      box-shadow:0 6px 28px rgba(15,42,67,.06);padding:20px
-
-    }
-
-    form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-    label{font-size:13px;font-weight:600;color:var(--pbz-blue)}
-
-    input,textarea,select{
-
-      width:100%;padding:12px;border:1px solid #cfd8e3;border-radius:10px;font-size:14px;background:#fff;outline:0
-
-    }
-
-    input:focus,textarea:focus,select:focus{border-color:var(--pbz-blue);box-shadow:0 0 0 3px rgba(15,42,67,.12)}
-
-    textarea{min-height:110px;grid-column:span 2;resize:vertical}
+    textarea{min-height:110px;grid-column:span 2}
 
     .row-2{grid-column:span 2}
 
-    .checkbox{display:flex;align-items:center;gap:10px;padding:10px 0}
+    .hint{color:#9cb0c4;font-size:13px}
 
-    .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+    .actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
 
-    .hint{color:var(--muted);font-size:13px}
+    .btn{border:0;border-radius:12px;padding:14px 18px;font-weight:800;cursor:pointer}
 
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 18px;border-radius:12px;border:none;cursor:pointer;font-weight:800;letter-spacing:.2px;transition:transform .04s,box-shadow .2s,opacity .2s}
+    .btn-outline{background:transparent;color:#dbe6f2;border:1px solid #2e4a67}
 
-    .btn-primary{background:var(--pbz-orange);color:#0f2a43;box-shadow:0 8px 24px rgba(242,140,27,.32)}
+    .btn-primary{background:#F28C1B;color:#0F2A43}
 
-    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(242,140,27,.38)}
-
-    .btn-primary:active{transform:translateY(1px)}
-
-    .btn-outline{background:#fff;color:var(--pbz-blue);border:1px solid #d7dee7}
-
-    .footer{max-width:980px;margin:26px auto 0;color:var(--muted);font-size:12.5px;text-align:center}
-
-    @media (max-width:740px){
-
-      form{grid-template-columns:1fr}
-
-      textarea{grid-column:span 1}
-
-      .actions{flex-direction:column;align-items:stretch}
-
-      .brand img{height:36px}
-
-      .brand .title{font-size:20px}
-
-    }
+    @media (max-width:740px){form{grid-template-columns:1fr} textarea{grid-column:span 1} .actions{flex-direction:column;align-items:stretch}}
 
   </style>
 
@@ -116,45 +58,21 @@
 
 <body>
 
-  <header>
+  <header>ProBuildZone</header>
 
-    <div class="wrap">
+  <div class="wrap">
 
-      <a class="brand" href="/">
-
-        <!-- ضع مسار الشعار هنا -->
-
-        <img src="LOGO_URL" alt="ProBuildZone Logo">
-
-        <div>
-
-          <div class="title">ProBuildZone</div>
-
-          <div class="tag">Fair Prices · Local Pros</div>
-
-        </div>
-
-      </a>
-
-    </div>
-
-  </header>
-
-
-
-  <main>
-
-    <section class="hero">
+    <div class="card" style="margin-bottom:20px">
 
       <h1>Join ProBuildZone — Get Local Jobs</h1>
 
       <p>30-day free trial, then annual plan. Cancel anytime during trial.</p>
 
-    </section>
+    </div>
 
 
 
-    <section class="card">
+    <div class="card">
 
       <form id="proForm" autocomplete="on">
 
@@ -162,7 +80,7 @@
 
           <label for="company">Company Name</label>
 
-          <input id="company" name="company" placeholder="e.g., Bluegrass Builders LLC" required>
+          <input id="company" name="company" placeholder="e.g., Bluegrass Builders LLC" required />
 
         </div>
 
@@ -170,17 +88,15 @@
 
           <label for="fullName">Your Name</label>
 
-          <input id="fullName" name="fullName" placeholder="Full name" required>
+          <input id="fullName" name="fullName" placeholder="Full name" required />
 
         </div>
-
-
 
         <div>
 
           <label for="email">Email</label>
 
-          <input id="email" name="email" type="email" inputmode="email" placeholder="you@company.com" required>
+          <input id="email" name="email" type="email" placeholder="you@company.com" required />
 
         </div>
 
@@ -188,41 +104,33 @@
 
           <label for="phone">Phone</label>
 
-          <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(502) 555-0123">
+          <input id="phone" name="phone" type="tel" placeholder="(502) 555-0123" />
 
         </div>
-
-
 
         <div class="row-2">
 
           <label for="address">Business Address</label>
 
-          <input id="address" name="address" placeholder="Street, City, State">
+          <input id="address" name="address" placeholder="Street, City, State" />
 
         </div>
-
-
 
         <div>
 
           <label for="businessLicense">Business License / #</label>
 
-          <input id="businessLicense" name="businessLicense" placeholder="License number (if applicable)">
+          <input id="businessLicense" name="businessLicense" placeholder="License number (if applicable)" />
 
         </div>
 
+        <div style="display:flex;align-items:center;gap:8px;padding-top:8px">
 
+          <input id="insurance" name="insurance" type="checkbox" />
 
-        <div class="checkbox">
-
-          <input id="insurance" name="insurance" type="checkbox">
-
-          <label for="insurance">I have active liability insurance</label>
+          <label for="insurance" style="margin:0">I have active liability insurance</label>
 
         </div>
-
-
 
         <div class="row-2">
 
@@ -231,8 +139,6 @@
           <textarea id="notes" name="notes" placeholder="Tell homeowners what you specialize in..."></textarea>
 
         </div>
-
-
 
         <div class="actions row-2">
 
@@ -250,13 +156,9 @@
 
       </form>
 
-    </section>
+    </div>
 
-
-
-    <div class="footer">© 2025 ProBuildZone — Fair Prices · Local Pros</div>
-
-  </main>
+  </div>
 
 
 
@@ -264,113 +166,51 @@
 
     async function postJSON(url, data){
 
-      const r = await fetch(url,{
+      const r = await fetch(url,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data||{}) });
 
-        method:'POST',
-
-        headers:{'Content-Type':'application/json'},
-
-        body:JSON.stringify(data||{})
-
-      });
-
-      if(!r.ok){
-
-        const t = await r.text();
-
-        throw new Error(`Request failed (${r.status}): ${t}`);
-
-      }
+      if(!r.ok){ const t = await r.text(); throw new Error(`Request failed (${r.status}): ${t}`); }
 
       return r.json();
 
     }
 
-
-
     const btn = document.getElementById('startTrial');
 
     const form = document.getElementById('proForm');
 
-
-
     btn?.addEventListener('click', async (e)=>{
 
-      e.preventDefault();
-
-      btn.disabled = true;
-
-      btn.textContent = 'Please wait…';
+      e.preventDefault(); btn.disabled = true; btn.textContent = 'Please wait…';
 
       try{
 
-        const company = form.company?.value?.trim() || '';
+        const company = form.company?.value?.trim()||'';
 
-        const fullName = form.fullName?.value?.trim() || '';
+        const fullName = form.fullName?.value?.trim()||'';
 
-        const email = form.email?.value?.trim() || '';
+        const email = form.email?.value?.trim()||'';
 
-        const phone = form.phone?.value?.trim() || '';
+        const phone = form.phone?.value?.trim()||'';
 
-        const address = form.address?.value?.trim() || '';
+        const address = form.address?.value?.trim()||'';
 
-        const businessLicense = form.businessLicense?.value?.trim() || '';
+        const businessLicense = form.businessLicense?.value?.trim()||'';
 
-        const insurance = form.insurance?.checked ? 'yes' : 'no';
+        const insurance = form.insurance?.checked ? 'yes':'no';
 
-        const notes = form.notes?.value?.trim() || '';
-
-
+        const notes = form.notes?.value?.trim()||'';
 
         const profile = { company, fullName, email, phone, address, businessLicense, insurance, notes };
 
-
-
-        // 1) حفظ بيانات البروفايل (يزيل خطأ "Could not save profile")
-
         await postJSON('/api/pros/create', profile);
 
+        const session = await postJSON('/api/stripe/create-checkout-session', { email, metadata:{ source:'probuildzone', plan:'yearly' } });
 
+        if(session?.url){ window.location.href = session.url; }
 
-        // 2) إنشاء جلسة Stripe وتحويل المستخدم
+        else{ alert('Could not start checkout. Please try again.'); btn.disabled=false; btn.textContent='Start Free Trial'; }
 
-        const session = await postJSON('/api/stripe/create-checkout-session', {
-
-          email,
-
-          metadata: { source: 'probuildzone', plan: 'yearly' }
-
-          // لتمرير سعر مختلف: priceId: 'price_XXXX'
-
-        });
-
-
-
-        if(session?.url){
-
-          window.location.href = session.url;
-
-        }else{
-
-          alert('Could not start checkout. Please try again.');
-
-          btn.disabled = false;
-
-          btn.textContent = 'Start Free Trial';
-
-        }
-
-      }catch(err){
-
-        console.error(err);
-
-        alert('Something went wrong. Please try again.');
-
-        btn.disabled = false;
-
-        btn.textContent = 'Start Free Trial';
-
-      }
+      }catch(err){ console.error(err); alert('Something went wrong. Please try again.'); btn.disabled=false; btn.textContent='Start Free Trial'; }
 
     });
 
