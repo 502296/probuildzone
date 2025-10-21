@@ -4,9 +4,9 @@
 
   "private": true,
 
-  "type": "commonjs",
-
   "license": "MIT",
+
+  "type": "commonjs",
 
   "dependencies": {
 
