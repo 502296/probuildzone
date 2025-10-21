@@ -1,68 +1,182 @@
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2024-06-20' });
+// /api/stripe/create-checkout-session.js
 
 
 
-export default async function handler(req, res) {
+// ملاحظة: تأكد من تثبيت stripe في package.json
 
-  if (req.method !== 'POST') return res.status(405).json({ error:'Method not allowed' });
+const Stripe = require('stripe');
+
+
+
+// تأكد من ضبط مفاتيح البيئة في Vercel:
+
+// STRIPE_SECRET_KEY        = sk_live_... أو sk_test_...
+
+// STRIPE_PRICE_MONTHLY     = price_...  (سعر $25 للشهر)
+
+// SITE_URL                 = https://your-domain.com
+
+// TRIAL_DAYS               = 30  (اختياري — يمكن تركه فارغ لإلغاء التجربة المجانية)
+
+
+
+module.exports = async (req, res) => {
+
+  // CORS + Preflight
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+
+
+  if (req.method === 'OPTIONS') {
+
+    return res.status(200).end();
+
+  }
+
+
+
+  if (req.method !== 'POST') {
+
+    return res.status(405).json({ error: 'Method Not Allowed' });
+
+  }
 
 
 
   try {
 
-    const { form } = req.body || {};
-
-    const SITE_URL = process.env.SITE_URL;
-
-    const PRICE_ID = process.env.STRIPE_PRICE_YEARLY;
-
-    if (!SITE_URL || !PRICE_ID) return res.status(500).json({ error:'Missing SITE_URL or STRIPE_PRICE_YEARLY' });
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
-    const metadata = {
+    // بيانات النموذج القادم من pros.html (اختياري):
 
-      business_category: form?.businessCategory || '',
+    // نتوقع JSON مثل:
 
-      business_license: form?.businessLicense || '',
+    // { email, name, company, phone, address, city, state, zip }
 
-      full_name: form?.fullName || '',
+    const {
 
-      phone: form?.phone || '',
+      email,
 
-      address: form?.address || '',
+      name,
 
-      service_areas: form?.serviceAreas || '',
+      company,
 
-      insurance_carrier: form?.insuranceCarrier || '',
+      phone,
 
-      policy_number: form?.policyNumber || '',
+      address,
 
-      carries_insurance: form?.carriesInsurance ? 'yes' : 'no'
+      city,
 
-    };
+      state,
+
+      zip,
+
+    } = req.body || {};
 
 
+
+    const priceId = process.env.STRIPE_PRICE_MONTHLY;
+
+    if (!priceId) {
+
+      return res.status(400).json({ error: 'Missing STRIPE_PRICE_MONTHLY env var' });
+
+    }
+
+
+
+    const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
+
+    const successUrl = `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`;
+
+    const cancelUrl  = `${siteUrl}/cancel.html`;
+
+
+
+    // تجربة مجانية (إذا وُجد TRIAL_DAYS رقم صحيح > 0 سنستخدمه)
+
+    const trialDaysEnv = parseInt(process.env.TRIAL_DAYS, 10);
+
+    const useTrial = Number.isInteger(trialDaysEnv) && trialDaysEnv > 0;
+
+
+
+    // بناء الميتاداتا من المدخلات
+
+    const metadata = {};
+
+    if (name)    metadata.name    = String(name);
+
+    if (company) metadata.company = String(company);
+
+    if (phone)   metadata.phone   = String(phone);
+
+    if (address) metadata.address = String(address);
+
+    if (city)    metadata.city    = String(city);
+
+    if (state)   metadata.state   = String(state);
+
+    if (zip)     metadata.zip     = String(zip);
+
+
+
+    // إنشاء جلسة Checkout
 
     const session = await stripe.checkout.sessions.create({
 
       mode: 'subscription',
 
-      line_items: [{ price: PRICE_ID, quantity: 1 }],
+      line_items: [
 
-      subscription_data: { trial_period_days: 30, metadata },
+        {
 
-      success_url: `${SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+          price: priceId,
 
-      cancel_url: `${SITE_URL}/cancel.html`,
+          quantity: 1,
 
-      customer_email: form?.email || undefined,
+        },
 
-      metadata,
+      ],
 
-      allow_promotion_codes: true
+      // يُنصح بإرسال إيميل العميل إن توفر
+
+      customer_email: email || undefined,
+
+
+
+      success_url: successUrl,
+
+      cancel_url: cancelUrl,
+
+
+
+      allow_promotion_codes: true,
+
+
+
+      subscription_data: {
+
+        // إن رغبت بإرفاق البيانات مع الاشتراك
+
+        metadata,
+
+        ...(useTrial ? { trial_period_days: trialDaysEnv } : {}),
+
+      },
+
+
+
+      // جمع عنوان العميل (اختياري)
+
+      customer_creation: 'if_required',
 
     });
 
@@ -72,8 +186,16 @@ export default async function handler(req, res) {
 
   } catch (err) {
 
-    return res.status(500).json({ error: err?.message || 'Stripe error' });
+    console.error('Stripe Checkout Error:', err);
+
+    return res.status(500).json({
+
+      error: 'Failed to create checkout session',
+
+      details: err?.message || 'Unknown error',
+
+    });
 
   }
 
-}
+};
