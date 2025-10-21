@@ -14,67 +14,103 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+
+
   <style>
 
     :root{
 
-      --bg:#0e1623; --panel:#162235; --panel-2:#0f1a2a; --text:#e9eef7; --muted:#a7b3c7;
+      --navy:#0f2743;         /* أساس الهوية */
 
-      --accent:#f9a23a; --accent-2:#f0c14b; --danger:#ff6b6b; --ok:#66d18f;
+      --navy-2:#162235;
 
-      --field:#0f1a2a; --field-b:#22324e; --ring:#35507a66; --shadow:0 10px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.25);
+      --navy-3:#0f1a2a;
+
+      --orange:#f59e0b;       /* Accent */
+
+      --text:#e9eef7;
+
+      --muted:#a7b3c7;
+
+      --danger:#ff6b6b;
+
+      --ok:#66d18f;
+
+      --field:#0f1a2a;
+
+      --field-b:#22324e;
+
+      --ring:#35507a66;
+
+      --shadow: 0 10px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.25);
 
       --radius:14px;
 
     }
 
-    *{box-sizing:border-box} html,body{height:100%}
+    *{box-sizing:border-box}
+
+    html,body{height:100%}
 
     body{
 
-      margin:0; font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0;
+
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 
       color:var(--text);
 
-      background: radial-gradient(1200px 600px at 80% -200px, #1a2c49 0, #0e1623 60%),
+      background:
 
-                  linear-gradient(160deg,#0b1421,#0e1623);
+        radial-gradient(1200px 600px at 80% -200px, #1a2c49 0, #0e1623 60%),
+
+        linear-gradient(160deg, #0b1421, #0e1623);
 
       display:flex; align-items:flex-start; justify-content:center;
 
     }
 
-    .wrap{width:100%; max-width:980px; padding:32px 18px 64px}
+    .wrap{width:100%;max-width:980px;padding:32px 18px 64px}
 
 
 
-    /* Header */
+    /* ===== Brand (Inline SVG Logo + Wordmark) ===== */
 
-    .brand{ text-align:center; margin-bottom:22px; }
+    .brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:22px;text-align:center}
 
-    .brand .logo{
+    .logo-row{display:flex;align-items:center;gap:12px}
 
-      width:72px;height:72px;border-radius:14px;display:inline-block;
+    .logo-icon{
 
-      background:#122038 url("images/logo.png") center/contain no-repeat;
+      width:56px;height:56px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;
 
-      box-shadow:var(--shadow);
+      background:linear-gradient(180deg,#0f2136,#0b1627); border:1px solid #22324e99; box-shadow:var(--shadow)
 
     }
 
-    .brand h1{ margin:14px 0 6px; font-weight:800; letter-spacing:.3px; }
+    .logo-word{
 
-    .brand .strap{ color:var(--accent-2); font-weight:800; font-size:1.05rem; }
+      font-weight:800; font-size:28px; letter-spacing:.2px; color:#ffffff;
 
-    .brand .strap small{ color:var(--muted); font-weight:600; display:block; }
+      text-shadow:0 1px 0 rgba(0,0,0,.25);
+
+    }
+
+    .tagline{
+
+      color:var(--orange); font-weight:700; letter-spacing:.2px;
+
+    }
+
+    .subline{ color:var(--muted); font-weight:600; font-size:.95rem }
 
 
 
-    /* Card */
+    /* ===== Card ===== */
 
     .card{
 
-      background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
+      background:linear-gradient(180deg, var(--navy-2) 0%, var(--navy-3) 100%);
 
       border:1px solid #22324e99; border-radius:var(--radius); box-shadow:var(--shadow); padding:22px;
 
@@ -82,69 +118,79 @@
 
     .card .head{
 
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;
 
-      margin-bottom:18px; border-bottom:1px solid #1f2d45; padding-bottom:14px;
+      border-bottom:1px solid #1f2d45;padding-bottom:14px;
 
     }
 
-    .head h2{ margin:0; font-size:1.25rem }
+    .head h2{margin:0;font-size:1.25rem}
 
-    .price-badge{ background:#101929; border:1px solid #263a5c; border-radius:10px; padding:8px 12px; color:#cfe0ff; font-weight:800 }
+    .price-badge{background:#101929;border:1px solid #263a5c;border-radius:10px;padding:8px 12px;color:#cfe0ff;font-weight:800}
 
 
 
-    /* Grid form */
+    /* ===== Form ===== */
 
-    form{ display:grid; gap:14px }
+    form{display:grid;gap:14px}
 
-    .grid{ display:grid; gap:12px }
+    .grid{display:grid;gap:12px}
 
-    @media (min-width:720px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr} }
+    @media (min-width:720px){
 
-    label{ display:block; font-size:.9rem; color:#b9c6dc; margin-bottom:6px }
+      .grid-2{grid-template-columns:1fr 1fr}
+
+      .grid-3{grid-template-columns:1fr 1fr 1fr}
+
+    }
+
+    label{display:block;font-size:.9rem;color:#b9c6dc;margin-bottom:6px}
 
     input,select,textarea{
 
-      width:100%; padding:12px 14px; border-radius:10px; background:var(--field); color:var(--text);
+      width:100%;padding:12px 14px;border-radius:10px;background:var(--field);color:var(--text);
 
-      border:1px solid var(--field-b); outline:none; transition:border-color .15s, box-shadow .15s, background .15s;
+      border:1px solid var(--field-b);outline:none;transition:border-color .15s,box-shadow .15s,background .15s;
 
     }
 
-    input:focus,select:focus,textarea:focus{ border-color:#4b6fad; box-shadow:0 0 0 3px var(--ring); background:#0f1f35 }
+    input:focus,select:focus,textarea:focus{border-color:#4b6fad;box-shadow:0 0 0 3px var(--ring);background:#0f1f35}
 
-    textarea{ min-height:84px; resize:vertical }
+    textarea{min-height:84px;resize:vertical}
 
-    .inline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    .inline input[type="checkbox"]{ width:auto; accent-color:#f9a23a }
+    .inline input[type="checkbox"]{width:auto;accent-color:var(--orange)}
 
+    .note{font-size:.92rem;color:var(--muted)}
 
-
-    .note{ font-size:.92rem; color:var(--muted) }
-
-    .note.err{ color:var(--danger) } .note.ok{ color:var(--ok) }
+    .note.err{color:var(--danger)} .note.ok{color:var(--ok)}
 
 
 
-    .actions{ display:flex; gap:12px; justify-content:flex-end; align-items:center; margin-top:6px }
+    .actions{display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:6px}
 
-    .btn{ appearance:none; border:0; border-radius:12px; padding:12px 18px; font-weight:800; cursor:pointer;
+    .btn{
 
-          transition:transform .06s, box-shadow .12s, opacity .2s; box-shadow:0 6px 18px rgba(249,162,58,.25), 0 2px 6px rgba(0,0,0,.35) }
+      appearance:none;border:0;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer;
 
-    .btn:active{ transform:translateY(1px) }
+      transition:transform .06s, box-shadow .12s, opacity .2s;
 
-    .btn.primary{ background:linear-gradient(180deg,#ffb14d,#f9972e); color:#301a00 }
+      box-shadow:0 6px 18px rgba(249,162,58,.25), 0 2px 6px rgba(0,0,0,.35);
 
-    .btn.ghost{ background:transparent; border:1px solid #3b4f72; color:#cfe0ff }
+    }
+
+    .btn:active{transform:translateY(1px)}
+
+    .btn.primary{background:linear-gradient(180deg,#ffb14d,#f9972e);color:#301a00}
+
+    .btn.ghost{background:transparent;border:1px solid #3b4f72;color:#cfe0ff}
 
 
 
-    .foot{ margin-top:22px; border-top:1px dashed #2b3d5f; padding-top:12px; color:#9fb0ca; font-size:.9rem }
+    .foot{margin-top:22px;border-top:1px dashed #2b3d5f;padding-top:12px;color:#9fb0ca;font-size:.9rem}
 
-    .req{ color:#f7b267; font-weight:800 }
+    .req{color:#f7b267;font-weight:800}
 
   </style>
 
@@ -154,23 +200,49 @@
 
   <div class="wrap">
 
-    <!-- Brand header -->
+
+
+    <!-- ===== Inline SVG logo + Wordmark (no external image) ===== -->
 
     <div class="brand" role="banner" aria-label="ProBuildZone header">
 
-      <span class="logo" aria-hidden="true"></span>
+      <div class="logo-row">
 
-      <h1>ProBuildZone</h1>
+        <!-- Icon -->
 
-      <div class="strap">30-day free trial — then <b>$25/month</b></div>
+        <span class="logo-icon" aria-hidden="true">
 
-      <div class="strap"><small>Start your 30-day free trial. Then $25/month.</small></div>
+          <svg width="34" height="34" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
+            <!-- House outline -->
+
+            <path d="M6 23 L24 9 L42 23" stroke="var(--navy)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <path d="M10 21 V38 H38 V21" stroke="var(--navy)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- small window -->
+
+            <rect x="22" y="27" width="4" height="4" rx="0.8" fill="var(--orange)"/>
+
+          </svg>
+
+        </span>
+
+        <!-- Wordmark -->
+
+        <div class="logo-word">ProBuildZone</div>
+
+      </div>
+
+      <div class="tagline">Fair Prices • Local Pros</div>
+
+      <div class="subline">30-day free trial — then $25/month.</div>
 
     </div>
 
 
 
-    <!-- Form card -->
+    <!-- ===== Subscription Card ===== -->
 
     <div class="card">
 
@@ -318,7 +390,11 @@
 
 
 
-        <div class="note">By clicking “Continue to Secure Payment”, you’ll be redirected to Stripe Checkout to complete your $25/month subscription.</div>
+        <div class="note">
+
+          By clicking “Continue to Secure Payment”, you’ll be redirected to Stripe Checkout to complete your $25/month subscription.
+
+        </div>
 
 
 
