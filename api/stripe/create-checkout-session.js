@@ -1,8 +1,14 @@
 // /api/stripe/create-checkout-session.js
 
+const Stripe = require('stripe');
+
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+
+
 module.exports = async (req, res) => {
 
-  // CORS + Preflight
+  // CORS الخفيف (إن لزم)
 
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -12,85 +18,37 @@ module.exports = async (req, res) => {
 
 
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method === 'OPTIONS') {
+
+    return res.status(200).end();
+
+  }
+
+
 
   if (req.method !== 'POST') {
 
-    return res.status(405).json({ error: 'Method Not Allowed', hint: 'Use POST' });
+    return res.status(405).json({ error: 'Method not allowed' });
 
   }
 
 
 
-  // نحمّل stripe فقط عند الحاجة
-
-  let Stripe;
-
   try {
 
-    Stripe = require('stripe');
+    const { email, priceId, metadata } = req.body || {};
 
-  } catch (e) {
+    const price = priceId || process.env.STRIPE_PRICE_YEARLY;
 
-    console.error('PBZ: Stripe SDK missing:', e?.message);
+    if (!price) {
 
-    return res.status(500).json({ error: 'Stripe SDK missing. Add "stripe" to package.json' });
+      return res.status(400).json({ error: 'Missing price id (STRIPE_PRICE_YEARLY env or priceId in body).' });
 
-  }
-
-
-
-  // تحقق من المتغيّرات
-
-  const key = process.env.STRIPE_SECRET_KEY;
-
-  const priceId = process.env.STRIPE_PRICE_MONTHLY;
-
-  const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
+    }
 
 
 
-  if (!key)  return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY env var' });
-
-  if (!priceId) return res.status(500).json({ error: 'Missing STRIPE_PRICE_MONTHLY env var' });
-
-
-
-  try {
-
-    const stripe = new Stripe(key);
-
-    const { email, name, company, phone, address, city, state, zip } = req.body || {};
-
-
-
-    const successUrl = `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`;
-
-    const cancelUrl  = `${siteUrl}/cancel.html`;
-
-
-
-    const trialDaysEnv = parseInt(process.env.TRIAL_DAYS, 10);
-
-    const useTrial = Number.isInteger(trialDaysEnv) && trialDaysEnv > 0;
-
-
-
-    const metadata = {};
-
-    if (name)    metadata.name = String(name);
-
-    if (company) metadata.company = String(company);
-
-    if (phone)   metadata.phone = String(phone);
-
-    if (address) metadata.address = String(address);
-
-    if (city)    metadata.city = String(city);
-
-    if (state)   metadata.state = String(state);
-
-    if (zip)     metadata.zip = String(zip);
+    const site = process.env.SITE_URL || `https://${req.headers.host}`;
 
 
 
@@ -98,45 +56,35 @@ module.exports = async (req, res) => {
 
       mode: 'subscription',
 
-      line_items: [{ price: priceId, quantity: 1 }],
+      payment_method_types: ['card'],
 
       customer_email: email || undefined,
 
-      success_url: successUrl,
-
-      cancel_url: cancelUrl,
+      line_items: [{ price, quantity: 1 }],
 
       allow_promotion_codes: true,
 
-      subscription_data: {
+      // إن أردت فرض تجربة مجانية من هنا بدل إعدادها على السعر:
 
-        metadata,
+      // subscription_data: { trial_period_days: 30 },
 
-        ...(useTrial ? { trial_period_days: trialDaysEnv } : {})
+      success_url: `${site}/success?session_id={CHECKOUT_SESSION_ID}`,
 
-      },
+      cancel_url: `${site}/cancel`,
 
-      customer_creation: 'if_required'
+      metadata: metadata || {}
 
     });
 
 
 
-    return res.status(200).json({ url: session.url });
+    return res.status(200).json({ id: session.id, url: session.url });
 
   } catch (err) {
 
-    // نطبع للّوج ونرجّع رسالة مفهومة للواجهة
+    console.error('stripe/create-checkout-session error:', err);
 
-    console.error('PBZ: Stripe error:', err?.type || '', err?.message || err);
-
-    return res.status(500).json({
-
-      error: 'Failed to create checkout session',
-
-      details: err?.message || 'Unknown error'
-
-    });
+    return res.status(500).json({ error: 'Stripe error', details: err.message });
 
   }
 
