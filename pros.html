@@ -8,315 +8,335 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <title>ProBuildZone – For Pros</title>
+  <title>For Pros – Subscribe | $25/month</title>
+
+
+
+  <!-- نمط بسيط وأنيق؛ عدّل الألوان إن رغبت -->
 
   <style>
 
-    :root{
+    * { box-sizing: border-box; }
 
-      --bg:#0f2a43; --panel:#0b1f31; --line:#1b3e60; --muted:#9fb6c9;
+    body {
 
-      --accent:#F28C1B; --accent-ink:#0f2a43;
+      margin: 0;
 
-    }
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-    *{box-sizing:border-box}
+      background: #0f2a43;
 
-    html,body{height:100%}
+      color: #f7f9fc;
 
-    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#fff}
+      -webkit-font-smoothing: antialiased;
 
-    a{color:var(--accent)}
-
-    .container{max-width:980px;margin:0 auto;padding:24px}
-
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-
-    .brand{font-weight:800;letter-spacing:.3px}
-
-    .hero{display:grid;gap:14px;margin:28px 0}
-
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
-
-    .btn{padding:12px 18px;border:1px solid #365b7a;border-radius:10px;background:#0b1f31;color:#fff;cursor:pointer}
-
-    .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:800}
-
-    .btn[disabled]{opacity:.6;cursor:not-allowed}
-
-    .subtle{color:var(--muted);font-size:.95rem}
-
-    .badges{display:flex;gap:10px;align-items:center;margin-top:6px;font-size:.9rem;color:var(--muted)}
-
-    .lock{display:inline-flex;align-items:center;gap:8px}
-
-    .lock svg{width:16px;height:16px;opacity:.9}
-
-
-
-    .modal[hidden]{display:none}
-
-    .modal{position:fixed;inset:0;display:grid;place-items:center;background:#0008;z-index:9999;padding:16px}
-
-    .modal-card{
-
-      background:var(--bg);color:#fff;border-radius:14px;border:1px solid var(--line);
-
-      width:min(700px,100%);max-height:90vh;display:flex;flex-direction:column;
+      -moz-osx-font-smoothing: grayscale;
 
     }
 
-    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
-
-    .step{display:inline-block;padding:6px 10px;border-radius:20px;border:1px solid var(--line);font-size:.85rem;color:var(--muted)}
-
-    .title{margin:6px 20px 0 20px}
-
-    .modal-body{padding:16px 20px;overflow:auto}
-
-    .grid{display:grid;gap:12px;margin:16px 0}
-
-    @media(min-width:720px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
-
-    label{display:grid;gap:6px;font-size:.95rem}
-
-    input,select,textarea{padding:10px;border:1px solid #365b7a;border-radius:8px;background:#0b1f31;color:#fff}
-
-    textarea{min-height:80px;resize:vertical}
-
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    a { color: #f7f9fc; }
 
 
 
-    .actions-wrap{
+    .wrap {
 
-      position:sticky;bottom:0;background:linear-gradient(180deg, rgba(15,42,67,0.92), rgba(15,42,67,1));
+      min-height: 100dvh;
 
-      border-top:1px solid var(--line);padding:12px 20px;margin-top:auto;
+      display: grid;
 
-      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+      place-items: center;
+
+      padding: 24px;
 
     }
 
-    .actions{display:flex;gap:10px;justify-content:space-between;align-items:center}
 
-    .actions-right{display:flex;gap:10px}
 
-    .msg{margin-top:10px;font-size:.9rem}
+    .card {
 
-    .muted{color:var(--muted);font-size:.9rem}
+      width: 100%;
 
-    .badge{border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);font-size:.85rem}
+      max-width: 760px;
+
+      background: #142b3f;
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      border-radius: 14px;
+
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+
+      overflow: hidden;
+
+    }
+
+
+
+    .header {
+
+      padding: 18px 22px;
+
+      background: linear-gradient(180deg, #183650, #142b3f);
+
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+    }
+
+    .header h1 {
+
+      font-size: 20px;
+
+      margin: 0;
+
+      letter-spacing: .3px;
+
+      font-weight: 700;
+
+    }
+
+    .plan {
+
+      font-size: 13px;
+
+      opacity: .9;
+
+    }
+
+
+
+    .body {
+
+      padding: 22px;
+
+      display: grid;
+
+      gap: 18px;
+
+    }
+
+
+
+    .grid {
+
+      display: grid;
+
+      gap: 14px;
+
+    }
+
+    @media (min-width: 720px) {
+
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+
+      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    }
+
+
+
+    label {
+
+      display: block;
+
+      font-size: 13px;
+
+      margin-bottom: 6px;
+
+      opacity: .9;
+
+    }
+
+    input {
+
+      width: 100%;
+
+      height: 44px;
+
+      border-radius: 10px;
+
+      border: 1px solid rgba(255,255,255,0.15);
+
+      background: rgba(255,255,255,0.06);
+
+      color: #fff;
+
+      padding: 0 12px;
+
+      outline: none;
+
+    }
+
+    input::placeholder { color: rgba(255,255,255,0.55); }
+
+
+
+    .hint {
+
+      font-size: 12px;
+
+      opacity: .8;
+
+    }
+
+
+
+    .footer {
+
+      padding: 20px 22px;
+
+      display: flex;
+
+      gap: 12px;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      border-top: 1px solid rgba(255,255,255,0.06);
+
+      background: #12283a;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .btn {
+
+      appearance: none;
+
+      border: 0;
+
+      border-radius: 12px;
+
+      padding: 12px 18px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: transform .05s ease, box-shadow .2s ease, opacity .2s ease;
+
+      white-space: nowrap;
+
+    }
+
+    .btn-primary {
+
+      background: #F28C1B;
+
+      color: #0f2a43;
+
+      box-shadow: 0 6px 18px rgba(242,140,27,.35);
+
+    }
+
+    .btn-primary:active { transform: translateY(1px) scale(.99); }
+
+    .btn[disabled] {
+
+      opacity: .6;
+
+      pointer-events: none;
+
+    }
+
+
+
+    .price-line {
+
+      font-weight: 700;
+
+      letter-spacing: .3px;
+
+    }
+
+
+
+    .spinner {
+
+      display: inline-block;
+
+      width: 16px; height: 16px;
+
+      border: 2px solid rgba(255,255,255,.35);
+
+      border-top-color: #fff;
+
+      border-radius: 50%;
+
+      animation: spin 1s linear infinite;
+
+      vertical-align: -3px;
+
+      margin-inline-start: 8px;
+
+      visibility: hidden;
+
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+
+
+    .note {
+
+      font-size: 12px;
+
+      opacity: .8;
+
+    }
+
+    .ok { color: #9ff1c3; }
+
+    .err { color: #ffb3b3; }
 
   </style>
 
 </head>
 
-
-
 <body>
 
-  <div class="container">
+  <div class="wrap">
 
-    <header>
+    <div class="card" role="region" aria-labelledby="cardTitle">
 
-      <div class="brand">ProBuildZone</div>
+      <div class="header">
 
-      <nav><a href="/" class="btn">Home</a></nav>
+        <h1 id="cardTitle">Pro Subscription</h1>
 
-    </header>
-
-
-
-    <section class="hero">
-
-      <div class="card">
-
-        <h1>Grow your business with ProBuildZone</h1>
-
-        <p class="subtle">Start your <strong>30-day free trial</strong>. Annual plan – cancel anytime before trial ends.</p>
-
-        <div class="badges">
-
-          <span class="lock">
-
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
-
-            Secure checkout by Stripe
-
-          </span>
-
-          <span class="badge">No setup fees</span>
-
-          <span class="badge">Cancel anytime</span>
-
-        </div>
-
-        <div style="margin-top:14px">
-
-          <button id="startTrialBtn" class="btn btn-primary" type="button">Start Free Trial</button>
-
-        </div>
+        <div class="plan">$25/month <span class="hint">(+ optional free trial)</span></div>
 
       </div>
 
-    </section>
-
-  </div>
 
 
+      <form id="pros-form" class="body" novalidate>
 
-  <!-- Signup Modal -->
+        <div class="grid grid-2">
 
-  <div id="trialModal" class="modal" hidden>
+          <div>
 
-    <div class="modal-card">
+            <label for="name">Full Name *</label>
 
-      <div class="modal-header">
-
-        <span class="step">Business Info <strong></strong></span>
-
-      </div>
-
-      <h3 class="title">Start your 30-day free trial</h3>
-
-
-
-      <form id="trialForm" style="display:flex;flex-direction:column;min-height:0">
-
-        <div class="modal-body" id="scrollArea">
-
-          <div class="grid cols-2">
-
-            <label>Company Name
-
-              <input name="company" required placeholder="e.g., Royal Builders LLC">
-
-            </label>
-
-            <label>Company Website (optional)
-
-              <input name="website" placeholder="https://yourcompany.com">
-
-            </label>
-
-
-
-            <label>Business Category
-
-              <select name="category" required>
-
-                <option value="" selected disabled>Select…</option>
-
-                <option>General Contractor</option>
-
-                <option>Porch/Deck Builder</option>
-
-                <option>Roofing</option>
-
-                <option>Flooring</option>
-
-                <option>Painting</option>
-
-                <option>Landscaping</option>
-
-                <option>Handyman</option>
-
-                <option>Other</option>
-
-              </select>
-
-            </label>
-
-
-
-            <label>Business License
-
-              <input name="business_license" required placeholder="License number / state">
-
-            </label>
+            <input id="name" name="name" type="text" placeholder="Your full name" required />
 
           </div>
 
+          <div>
 
+            <label for="company">Business / Company</label>
 
-          <div class="grid cols-2">
-
-            <label>Full Name
-
-              <input name="name" required placeholder="Your name">
-
-            </label>
-
-            <label>Email
-
-              <input type="email" name="email" required placeholder="name@company.com">
-
-            </label>
-
-            <label>Phone
-
-              <input name="phone" required placeholder="+1 (502) 555-1234">
-
-            </label>
-
-            <label>Address
-
-              <input name="address" required placeholder="Street, City, State">
-
-            </label>
-
-          </div>
-
-
-
-          <label>Service Areas (cities or ZIPs)
-
-            <textarea name="service_areas" placeholder="Louisville, Jefferson County, 40214…"></textarea>
-
-          </label>
-
-
-
-          <div class="grid">
-
-            <label class="row" style="gap:8px">
-
-              <input type="checkbox" id="hasInsurance" name="has_insurance">
-
-              <span class="muted">We carry general liability insurance</span>
-
-            </label>
-
-            <div id="insuranceDetails" class="grid cols-2" style="display:none">
-
-              <label>Insurance Carrier (optional)
-
-                <input name="insurance_carrier" placeholder="e.g., State Farm">
-
-              </label>
-
-              <label>Policy # (optional)
-
-                <input name="insurance_policy" placeholder="e.g., GL-123456">
-
-              </label>
-
-            </div>
-
-          </div>
-
-
-
-          <div class="row">
-
-            <label class="row" style="gap:8px">
-
-              <input type="checkbox" name="accept_terms" required>
-
-              <span class="muted">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</span>
-
-            </label>
+            <input id="company" name="company" type="text" placeholder="Your business name" />
 
           </div>
 
@@ -324,35 +344,105 @@
 
 
 
-        <!-- sticky action bar -->
+        <div class="grid grid-2">
 
-        <div class="actions-wrap">
+          <div>
 
-          <div class="actions">
+            <label for="email">Email *</label>
 
-            <span class="muted lock">
-
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z"/></svg>
-
-              Card details are collected securely on Stripe.
-
-            </span>
-
-            <div class="actions-right">
-
-              <button type="button" id="cancelTrial" class="btn">Cancel</button>
-
-              <button type="button" id="payBtn" class="btn btn-primary" onclick="submitProsAndPay(event)">Continue to Secure Payment</button>
-
-            </div>
+            <input id="email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
 
           </div>
 
-          <p id="trialMsg" class="msg" aria-live="polite"></p>
+          <div>
+
+            <label for="phone">Phone</label>
+
+            <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="+1 (___) ___-____" />
+
+          </div>
 
         </div>
+
+
+
+        <div class="grid">
+
+          <div>
+
+            <label for="address">Street Address</label>
+
+            <input id="address" name="address" type="text" placeholder="123 Main St" />
+
+          </div>
+
+        </div>
+
+
+
+        <div class="grid grid-3">
+
+          <div>
+
+            <label for="city">City</label>
+
+            <input id="city" name="city" type="text" placeholder="City" />
+
+          </div>
+
+          <div>
+
+            <label for="state">State</label>
+
+            <input id="state" name="state" type="text" placeholder="KY" />
+
+          </div>
+
+          <div>
+
+            <label for="zip">ZIP</label>
+
+            <input id="zip" name="zip" type="text" inputmode="numeric" placeholder="402XX" />
+
+          </div>
+
+        </div>
+
+
+
+        <p class="hint">
+
+          By clicking “Continue to Secure Payment”, you’ll be redirected to Stripe Checkout to complete your
+
+          <span class="price-line">$25/month</span> subscription.
+
+        </p>
 
       </form>
+
+
+
+      <div class="footer">
+
+        <div class="note">
+
+          <span id="status" class="ok" aria-live="polite"></span>
+
+        </div>
+
+        <div>
+
+          <button id="pay-btn" class="btn btn-primary">
+
+            Continue to Secure Payment
+
+            <span id="spin" class="spinner" aria-hidden="true"></span>
+
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
@@ -360,155 +450,185 @@
 
 
 
-  <!-- Original script -->
-
-  <script type="module">
-
-    const $ = (s, p=document) => p.querySelector(s);
-
-    const openModal = ()=> { $("#trialModal").hidden = false; };
-
-    const closeModal = ()=> { $("#trialModal").hidden = true; };
-
-    const serializeForm = (form)=>{
-
-      const data = new FormData(form);
-
-      return Object.fromEntries([...data.entries()].map(([k,v])=>[k, typeof v==="string"? v.trim(): v]));
-
-    };
-
-    async function postJSON(url, payload){
-
-      const res = await fetch(url, {
-
-        method: "POST",
-
-        headers: {"Content-Type": "application/json"},
-
-        body: JSON.stringify(payload)
-
-      });
-
-      if(!res.ok){
-
-        const text = await res.text().catch(()=> "");
-
-        throw new Error(text || `Request failed: ${res.status}`);
-
-      }
-
-      return res.json();
-
-    }
-
-    function setLoading(b){
-
-      $("#submitTrial").disabled = b;
-
-      $("#startTrialBtn")?.setAttribute("aria-busy", b ? "true" : "false");
-
-    }
-
-    $("#startTrialBtn")?.addEventListener("click", () => { openModal(); $("#trialMsg").textContent = ""; });
-
-    $("#cancelTrial")?.addEventListener("click", () => closeModal());
-
-    $("#trialModal")?.addEventListener("click",(e)=>{ if(e.target.id === "trialModal") closeModal(); });
-
-    $("#hasInsurance")?.addEventListener("change", (e)=>{
-
-      const box = $("#insuranceDetails");
-
-      if(box){ box.style.display = e.currentTarget.checked ? "grid" : "none"; }
-
-    });
-
-  </script>
-
-
-
-  <!-- Added payment script -->
+  <!-- سكربت الاستدعاء إلى API: يرسل بيانات النموذج ثم يوجّه إلى Stripe -->
 
   <script>
 
-    async function submitProsAndPay(e){
+    const form = document.getElementById('pros-form');
+
+    const payBtn = document.getElementById('pay-btn');
+
+    const spin = document.getElementById('spin');
+
+    const statusEl = document.getElementById('status');
+
+
+
+    function setLoading(loading) {
+
+      if (loading) {
+
+        payBtn.setAttribute('disabled', 'true');
+
+        spin.style.visibility = 'visible';
+
+      } else {
+
+        payBtn.removeAttribute('disabled');
+
+        spin.style.visibility = 'hidden';
+
+      }
+
+    }
+
+
+
+    function getPayload() {
+
+      return {
+
+        email:   document.querySelector('#email')?.value?.trim() || '',
+
+        name:    document.querySelector('#name')?.value?.trim() || '',
+
+        company: document.querySelector('#company')?.value?.trim() || '',
+
+        phone:   document.querySelector('#phone')?.value?.trim() || '',
+
+        address: document.querySelector('#address')?.value?.trim() || '',
+
+        city:    document.querySelector('#city')?.value?.trim() || '',
+
+        state:   document.querySelector('#state')?.value?.trim() || '',
+
+        zip:     document.querySelector('#zip')?.value?.trim() || '',
+
+      };
+
+    }
+
+
+
+    function validateRequired() {
+
+      // حقول أساسية: الاسم + الإيميل
+
+      const email = document.getElementById('email');
+
+      const name  = document.getElementById('name');
+
+      let ok = true;
+
+
+
+      if (!name.value.trim()) {
+
+        name.focus();
+
+        ok = false;
+
+      } else if (!email.value.trim() || !email.validity.valid) {
+
+        email.focus();
+
+        ok = false;
+
+      }
+
+      return ok;
+
+    }
+
+
+
+    payBtn.addEventListener('click', async (e) => {
 
       e.preventDefault();
 
-      const btn = document.getElementById('payBtn');
+      statusEl.textContent = '';
 
-      const msg = document.getElementById('trialMsg');
+      if (!validateRequired()) {
 
-      const formEl = document.getElementById('trialForm');
+        statusEl.textContent = 'Please fill the required fields (Name & Email).';
 
-      btn.disabled = true;
+        statusEl.className = 'note err';
 
-      msg.textContent = '';
+        return;
 
-      const fd = new FormData(formEl);
-
-      const payload = Object.fromEntries([...fd.entries()].map(([k,v])=>[k, typeof v==="string"? v.trim(): v]));
-
-      payload.has_insurance = formEl.querySelector('#hasInsurance')?.checked || false;
+      }
 
 
+
+      setLoading(true);
 
       try {
 
-        const saveRes = await fetch('/api/pros/create', {
+        const payload = getPayload();
+
+
+
+        const res = await fetch('/api/stripe/create-checkout-session', {
 
           method: 'POST',
 
-          headers: {'Content-Type':'application/json'},
+          headers: { 'Content-Type': 'application/json' },
 
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
 
         });
 
-        const saveJson = await saveRes.json().catch(()=> ({}));
 
-        if(!saveRes.ok || (saveJson && saveJson.ok === false)){
 
-          throw new Error('Saving failed');
+        const data = await res.json();
+
+
+
+        if (!res.ok) {
+
+          statusEl.textContent = data?.error || 'Something went wrong. Please try again.';
+
+          statusEl.className = 'note err';
+
+          setLoading(false);
+
+          return;
 
         }
 
 
 
-        const stripeRes = await fetch('/api/stripe/create-checkout-session', {
+        if (data?.url) {
 
-          method: 'POST',
+          statusEl.textContent = 'Redirecting to secure payment…';
 
-          headers: {'Content-Type':'application/json'},
+          statusEl.className = 'note ok';
 
-          body: JSON.stringify(payload)
+          window.location.href = data.url; // تحويل إلى Stripe Checkout
 
-        });
+        } else {
 
-        const stripeJson = await stripeRes.json();
+          statusEl.textContent = 'No checkout URL returned.';
 
-        if(!stripeRes.ok || !stripeJson.checkoutUrl){
+          statusEl.className = 'note err';
 
-          throw new Error(stripeJson.error || 'Stripe error');
+          setLoading(false);
 
         }
-
-        window.location.href = stripeJson.checkoutUrl;
-
-
 
       } catch (err) {
 
         console.error(err);
 
-        msg.textContent = 'Something went wrong. Please try again.';
+        statusEl.textContent = 'Network error. Please try again.';
 
-        btn.disabled = false;
+        statusEl.className = 'note err';
+
+        setLoading(false);
 
       }
 
-    }
+    });
 
   </script>
 
