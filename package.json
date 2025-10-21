@@ -4,20 +4,8 @@
 
   "private": true,
 
-  "version": "1.0.0",
-
   "type": "module",
 
-  "scripts": {
-
-    "build": "echo \"no build step\""
-
-  },
-
-  "dependencies": {
-
-    "stripe": "^14.25.0"
-
-  }
+  "scripts": { "build": "echo \"no build step\"" }
 
 }
