@@ -2,12 +2,22 @@
 
   "name": "probuildzone",
 
-  "version": "1.0.0",
-
   "private": true,
 
-  "dependencies": { "stripe": "^16.0.0" },
+  "version": "1.0.0",
 
-  "engines": { "node": ">=20" }
+  "type": "module",
+
+  "scripts": {
+
+    "build": "echo \"no build step\""
+
+  },
+
+  "dependencies": {
+
+    "stripe": "^14.25.0"
+
+  }
 
 }
