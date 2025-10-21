@@ -1,28 +1,8 @@
 // /api/stripe/create-checkout-session.js
 
-
-
-// ملاحظة: تأكد من تثبيت stripe في package.json
-
-const Stripe = require('stripe');
-
-
-
-// تأكد من ضبط مفاتيح البيئة في Vercel:
-
-// STRIPE_SECRET_KEY        = sk_live_... أو sk_test_...
-
-// STRIPE_PRICE_MONTHLY     = price_...  (سعر $25 للشهر)
-
-// SITE_URL                 = https://your-domain.com
-
-// TRIAL_DAYS               = 30  (اختياري — يمكن تركه فارغ لإلغاء التجربة المجانية)
-
-
-
 module.exports = async (req, res) => {
 
-  // CORS + Preflight
+  // CORS + preflight
 
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -30,19 +10,21 @@ module.exports = async (req, res) => {
 
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-
-  if (req.method === 'OPTIONS') {
-
-    return res.status(200).end();
-
-  }
+  if (req.method !== 'POST')   return res.status(405).json({ error: 'Method Not Allowed' });
 
 
 
-  if (req.method !== 'POST') {
+  let Stripe;
 
-    return res.status(405).json({ error: 'Method Not Allowed' });
+  try {
+
+    Stripe = require('stripe'); // يتعطل هنا إذا stripe غير مثبتة
+
+  } catch (e) {
+
+    return res.status(500).json({ error: "Stripe SDK missing. Add `stripe` to package.json." });
 
   }
 
@@ -52,63 +34,29 @@ module.exports = async (req, res) => {
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-
-
-    // بيانات النموذج القادم من pros.html (اختياري):
-
-    // نتوقع JSON مثل:
-
-    // { email, name, company, phone, address, city, state, zip }
-
-    const {
-
-      email,
-
-      name,
-
-      company,
-
-      phone,
-
-      address,
-
-      city,
-
-      state,
-
-      zip,
-
-    } = req.body || {};
+    const { email, name, company, phone, address, city, state, zip } = req.body || {};
 
 
 
     const priceId = process.env.STRIPE_PRICE_MONTHLY;
 
-    if (!priceId) {
-
-      return res.status(400).json({ error: 'Missing STRIPE_PRICE_MONTHLY env var' });
-
-    }
+    if (!priceId) return res.status(400).json({ error: 'Missing STRIPE_PRICE_MONTHLY env var' });
 
 
 
-    const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
+    const siteUrl   = process.env.SITE_URL || 'http://localhost:3000';
 
-    const successUrl = `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl= `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`;
 
-    const cancelUrl  = `${siteUrl}/cancel.html`;
+    const cancelUrl = `${siteUrl}/cancel.html`;
 
 
-
-    // تجربة مجانية (إذا وُجد TRIAL_DAYS رقم صحيح > 0 سنستخدمه)
 
     const trialDaysEnv = parseInt(process.env.TRIAL_DAYS, 10);
 
-    const useTrial = Number.isInteger(trialDaysEnv) && trialDaysEnv > 0;
+    const useTrial     = Number.isInteger(trialDaysEnv) && trialDaysEnv > 0;
 
 
-
-    // بناء الميتاداتا من المدخلات
 
     const metadata = {};
 
@@ -128,55 +76,29 @@ module.exports = async (req, res) => {
 
 
 
-    // إنشاء جلسة Checkout
-
     const session = await stripe.checkout.sessions.create({
 
       mode: 'subscription',
 
-      line_items: [
-
-        {
-
-          price: priceId,
-
-          quantity: 1,
-
-        },
-
-      ],
-
-      // يُنصح بإرسال إيميل العميل إن توفر
+      line_items: [{ price: priceId, quantity: 1 }],
 
       customer_email: email || undefined,
-
-
 
       success_url: successUrl,
 
       cancel_url: cancelUrl,
 
-
-
       allow_promotion_codes: true,
-
-
 
       subscription_data: {
 
-        // إن رغبت بإرفاق البيانات مع الاشتراك
-
         metadata,
 
-        ...(useTrial ? { trial_period_days: trialDaysEnv } : {}),
+        ...(useTrial ? { trial_period_days: trialDaysEnv } : {})
 
       },
 
-
-
-      // جمع عنوان العميل (اختياري)
-
-      customer_creation: 'if_required',
+      customer_creation: 'if_required'
 
     });
 
@@ -188,13 +110,7 @@ module.exports = async (req, res) => {
 
     console.error('Stripe Checkout Error:', err);
 
-    return res.status(500).json({
-
-      error: 'Failed to create checkout session',
-
-      details: err?.message || 'Unknown error',
-
-    });
+    return res.status(500).json({ error: 'Failed to create checkout session', details: err?.message || 'Unknown error' });
 
   }
 
