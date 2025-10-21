@@ -6,22 +6,8 @@
 
   "private": true,
 
-  "license": "MIT",
+  "dependencies": { "stripe": "^16.0.0" },
 
-  "engines": { "node": ">=18" },
-
-  "dependencies": {
-
-    "stripe": "^16.0.0"
-
-  },
-
-  "scripts": {
-
-    "dev": "vercel dev",
-
-    "start": "node server.js"
-
-  }
+  "engines": { "node": ">=20" }
 
 }
