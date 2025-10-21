@@ -1,20 +1,12 @@
 {
 
-  "name": "probuildzone-pros-backend",
+  "name": "probuildzone",
 
   "private": true,
 
-  "license": "MIT",
-
   "type": "commonjs",
 
-  "scripts": {
-
-    "dev": "vercel dev",
-
-    "start": "node server.js"
-
-  },
+  "license": "MIT",
 
   "dependencies": {
 
