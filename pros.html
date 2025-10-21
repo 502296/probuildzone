@@ -1,304 +1,258 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
 
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>For Pros – Subscribe | $25/month</title>
+  <title>ProBuildZone – Pro Subscription</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 
-
-  <!-- نمط بسيط وأنيق؛ عدّل الألوان إن رغبت -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
 
-    * { box-sizing: border-box; }
+    :root{
 
-    body {
+      --bg:#0e1623;
 
-      margin: 0;
+      --panel:#162235;
 
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --panel-2:#0f1a2a;
 
-      background: #0f2a43;
+      --text:#e9eef7;
 
-      color: #f7f9fc;
+      --muted:#a7b3c7;
 
-      -webkit-font-smoothing: antialiased;
+      --accent:#f9a23a;
 
-      -moz-osx-font-smoothing: grayscale;
+      --accent-2:#f0c14b;
 
-    }
+      --danger:#ff6b6b;
 
-    a { color: #f7f9fc; }
+      --ok:#66d18f;
 
+      --field:#0f1a2a;
 
+      --field-b:#22324e;
 
-    .wrap {
+      --ring:#35507a66;
 
-      min-height: 100dvh;
+      --shadow: 0 10px 30px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.25);
 
-      display: grid;
-
-      place-items: center;
-
-      padding: 24px;
+      --radius:14px;
 
     }
 
+    *{box-sizing:border-box}
 
+    html,body{height:100%}
 
-    .card {
+    body{
 
-      width: 100%;
+      margin:0;
 
-      max-width: 760px;
+      font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-      background: #142b3f;
+      color:var(--text);
 
-      border: 1px solid rgba(255,255,255,0.08);
+      background:
 
-      border-radius: 14px;
+        radial-gradient(1200px 600px at 80% -200px, #1a2c49 0, #0e1623 60%) ,
 
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+        linear-gradient(160deg, #0b1421, #0e1623);
 
-      overflow: hidden;
-
-    }
-
-
-
-    .header {
-
-      padding: 18px 22px;
-
-      background: linear-gradient(180deg, #183650, #142b3f);
-
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 12px;
-
-    }
-
-    .header h1 {
-
-      font-size: 20px;
-
-      margin: 0;
-
-      letter-spacing: .3px;
-
-      font-weight: 700;
-
-    }
-
-    .plan {
-
-      font-size: 13px;
-
-      opacity: .9;
+      display:flex;align-items:flex-start;justify-content:center;
 
     }
 
 
 
-    .body {
+    .wrap{width:100%;max-width:980px;padding:32px 18px 64px}
 
-      padding: 22px;
+    /* Header */
 
-      display: grid;
+    .brand{
 
-      gap: 18px;
+      text-align:center;margin-bottom:22px;
+
+    }
+
+    .brand .logo{
+
+      width:72px;height:72px;border-radius:14px;display:inline-block;
+
+      background:#122038 url("images/logo.png") center/contain no-repeat;
+
+      box-shadow:var(--shadow);
+
+    }
+
+    .brand h1{
+
+      margin:14px 0 6px;font-weight:800;letter-spacing:.3px;
+
+    }
+
+    .brand .strap{
+
+      color:var(--accent-2);
+
+      font-weight:700;
+
+      font-size:1.05rem;
+
+    }
+
+    .brand .strap small{color:var(--muted);font-weight:600}
+
+
+
+    /* Card */
+
+    .card{
+
+      background:linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+
+      border:1px solid #22324e99;
+
+      border-radius:var(--radius);
+
+      box-shadow:var(--shadow);
+
+      padding:22px;
+
+    }
+
+    .card .head{
+
+      display:flex;align-items:center;justify-content:space-between;
+
+      gap:12px;margin-bottom:18px;
+
+      border-bottom:1px solid #1f2d45; padding-bottom:14px;
+
+    }
+
+    .head h2{margin:0;font-size:1.25rem}
+
+    .price-badge{
+
+      background:#101929;border:1px solid #263a5c;border-radius:10px;
+
+      padding:8px 12px;color:#cfe0ff;font-weight:700
 
     }
 
 
 
-    .grid {
+    /* Grid form */
 
-      display: grid;
+    form{display:grid;gap:14px}
 
-      gap: 14px;
+    .grid{display:grid;gap:12px}
 
-    }
+    @media (min-width:720px){
 
-    @media (min-width: 720px) {
+      .grid-2{grid-template-columns:1fr 1fr}
 
-      .grid-2 { grid-template-columns: 1fr 1fr; }
-
-      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+      .grid-3{grid-template-columns:1fr 1fr 1fr}
 
     }
 
+    label{display:block;font-size:.9rem;color:#b9c6dc;margin-bottom:6px}
 
+    input,select,textarea{
 
-    label {
+      width:100%;padding:12px 14px;border-radius:10px;
 
-      display: block;
+      background:var(--field);color:var(--text);
 
-      font-size: 13px;
+      border:1px solid var(--field-b);outline:none;
 
-      margin-bottom: 6px;
-
-      opacity: .9;
-
-    }
-
-    input {
-
-      width: 100%;
-
-      height: 44px;
-
-      border-radius: 10px;
-
-      border: 1px solid rgba(255,255,255,0.15);
-
-      background: rgba(255,255,255,0.06);
-
-      color: #fff;
-
-      padding: 0 12px;
-
-      outline: none;
+      transition:border-color .15s, box-shadow .15s, background .15s;
 
     }
 
-    input::placeholder { color: rgba(255,255,255,0.55); }
+    input:focus,select:focus,textarea:focus{
 
+      border-color:#4b6fad;box-shadow:0 0 0 3px var(--ring);
 
-
-    .hint {
-
-      font-size: 12px;
-
-      opacity: .8;
+      background:#0f1f35;
 
     }
 
+    textarea{min-height:84px;resize:vertical}
 
 
-    .footer {
 
-      padding: 20px 22px;
+    .inline{
 
-      display: flex;
-
-      gap: 12px;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      border-top: 1px solid rgba(255,255,255,0.06);
-
-      background: #12283a;
-
-      flex-wrap: wrap;
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap
 
     }
 
+    .inline input[type="checkbox"]{width:auto;accent-color:#f9a23a}
 
 
-    .btn {
 
-      appearance: none;
+    .note{font-size:.92rem;color:var(--muted)}
 
-      border: 0;
+    .note.err{color:var(--danger)}
 
-      border-radius: 12px;
+    .note.ok{color:var(--ok)}
 
-      padding: 12px 18px;
 
-      font-weight: 700;
 
-      cursor: pointer;
+    .actions{
 
-      transition: transform .05s ease, box-shadow .2s ease, opacity .2s ease;
-
-      white-space: nowrap;
+      display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:6px
 
     }
 
-    .btn-primary {
+    .btn{
 
-      background: #F28C1B;
+      appearance:none;border:0;border-radius:12px;
 
-      color: #0f2a43;
+      padding:12px 18px;font-weight:800;cursor:pointer;
 
-      box-shadow: 0 6px 18px rgba(242,140,27,.35);
+      transition:transform .06s ease, box-shadow .12s ease, opacity .2s ease;
+
+      box-shadow:0 6px 18px rgba(249,162,58,.25), 0 2px 6px rgba(0,0,0,.35);
 
     }
 
-    .btn-primary:active { transform: translateY(1px) scale(.99); }
+    .btn:active{transform:translateY(1px)}
 
-    .btn[disabled] {
+    .btn.primary{
 
-      opacity: .6;
+      background:linear-gradient(180deg, #ffb14d, #f9972e);
 
-      pointer-events: none;
+      color:#301a00;
+
+    }
+
+    .btn.ghost{
+
+      background:transparent;border:1px solid #3b4f72;color:#cfe0ff
 
     }
 
 
 
-    .price-line {
+    .foot{
 
-      font-weight: 700;
+      margin-top:22px;border-top:1px dashed #2b3d5f;padding-top:12px;
 
-      letter-spacing: .3px;
-
-    }
-
-
-
-    .spinner {
-
-      display: inline-block;
-
-      width: 16px; height: 16px;
-
-      border: 2px solid rgba(255,255,255,.35);
-
-      border-top-color: #fff;
-
-      border-radius: 50%;
-
-      animation: spin 1s linear infinite;
-
-      vertical-align: -3px;
-
-      margin-inline-start: 8px;
-
-      visibility: hidden;
+      color:#9fb0ca;font-size:.9rem
 
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-
-
-    .note {
-
-      font-size: 12px;
-
-      opacity: .8;
-
-    }
-
-    .ok { color: #9ff1c3; }
-
-    .err { color: #ffb3b3; }
+    .req{color:#f7b267;font-weight:800}
 
   </style>
 
@@ -308,35 +262,53 @@
 
   <div class="wrap">
 
-    <div class="card" role="region" aria-labelledby="cardTitle">
+    <!-- Brand header -->
 
-      <div class="header">
+    <div class="brand" role="banner" aria-label="ProBuildZone header">
 
-        <h1 id="cardTitle">Pro Subscription</h1>
+      <span class="logo" aria-hidden="true"></span>
 
-        <div class="plan">$25/month <span class="hint">(+ optional free trial)</span></div>
+      <h1>ProBuildZone</h1>
+
+      <div class="strap">30 يوم <b>مجاناً</b> — بعد الشهر يُخصم <b>$25/شهريًا</b></div>
+
+      <div class="strap"><small>Start your 30-day free trial. Then $25/month.</small></div>
+
+    </div>
+
+
+
+    <!-- Form card -->
+
+    <div class="card">
+
+      <div class="head">
+
+        <h2>Pro Subscription</h2>
+
+        <div class="price-badge">$25/month</div>
 
       </div>
 
 
 
-      <form id="pros-form" class="body" novalidate>
+      <form id="pro-form" novalidate>
 
         <div class="grid grid-2">
 
           <div>
 
-            <label for="name">Full Name *</label>
+            <label for="name">الاسم الكامل *</label>
 
-            <input id="name" name="name" type="text" placeholder="Your full name" required />
+            <input id="name" name="name" placeholder="اسمك الكامل" required>
 
           </div>
 
           <div>
 
-            <label for="company">Business / Company</label>
+            <label for="company">اسم الشركة (اختياري)</label>
 
-            <input id="company" name="company" type="text" placeholder="Your business name" />
+            <input id="company" name="company" placeholder="مثال: ABC LLC">
 
           </div>
 
@@ -348,31 +320,17 @@
 
           <div>
 
-            <label for="email">Email *</label>
+            <label for="email">البريد الإلكتروني *</label>
 
-            <input id="email" name="email" type="email" inputmode="email" placeholder="you@example.com" required />
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
 
           </div>
 
           <div>
 
-            <label for="phone">Phone</label>
+            <label for="phone">الهاتف (اختياري)</label>
 
-            <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="+1 (___) ___-____" />
-
-          </div>
-
-        </div>
-
-
-
-        <div class="grid">
-
-          <div>
-
-            <label for="address">Street Address</label>
-
-            <input id="address" name="address" type="text" placeholder="123 Main St" />
+            <input id="phone" name="phone" type="tel" placeholder="+1 (___) ___-____">
 
           </div>
 
@@ -384,25 +342,25 @@
 
           <div>
 
-            <label for="city">City</label>
+            <label for="address">العنوان</label>
 
-            <input id="city" name="city" type="text" placeholder="City" />
-
-          </div>
-
-          <div>
-
-            <label for="state">State</label>
-
-            <input id="state" name="state" type="text" placeholder="KY" />
+            <input id="address" name="address" placeholder="123 Main St">
 
           </div>
 
           <div>
 
-            <label for="zip">ZIP</label>
+            <label for="city">المدينة</label>
 
-            <input id="zip" name="zip" type="text" inputmode="numeric" placeholder="402XX" />
+            <input id="city" name="city" placeholder="City">
+
+          </div>
+
+          <div>
+
+            <label for="state">الولاية</label>
+
+            <input id="state" name="state" placeholder="KY">
 
           </div>
 
@@ -410,39 +368,83 @@
 
 
 
-        <p class="hint">
+        <div class="grid grid-2">
 
-          By clicking “Continue to Secure Payment”, you’ll be redirected to Stripe Checkout to complete your
+          <div>
 
-          <span class="price-line">$25/month</span> subscription.
+            <label for="zip">الرمز البريدي</label>
 
-        </p>
+            <input id="zip" name="zip" placeholder="402xx">
+
+          </div>
+
+          <div>
+
+            <label for="license">رقم التسجيل/الترخيص (اختياري)</label>
+
+            <input id="license" name="license" placeholder="License / Registration #">
+
+          </div>
+
+        </div>
+
+
+
+        <div class="grid">
+
+          <div class="inline">
+
+            <input id="has-ins" type="checkbox">
+
+            <label for="has-ins">لدينا تأمين مسؤولية عامة (اختياري)</label>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="grid grid-2" id="ins-optional" style="display:none">
+
+          <div>
+
+            <label for="ins-carrier">شركة التأمين (اختياري)</label>
+
+            <input id="ins-carrier" placeholder="Carrier">
+
+          </div>
+
+          <div>
+
+            <label for="ins-policy">رقم الوثيقة (اختياري)</label>
+
+            <input id="ins-policy" placeholder="Policy #">
+
+          </div>
+
+        </div>
+
+
+
+        <div class="note">بالنقر على "Continue to Secure Payment" سيتم تحويلك إلى Stripe لإكمال اشتراكك.</div>
+
+
+
+        <div class="actions">
+
+          <button type="button" class="btn ghost" id="cancel-btn">Cancel</button>
+
+          <button type="button" class="btn primary" id="pay-btn">Continue to Secure Payment</button>
+
+        </div>
+
+
+
+        <div id="status" class="foot note"></div>
+
+        <div class="foot note"><span class="req">(*)</span> الحقول المطلوبة: الاسم + البريد.</div>
 
       </form>
-
-
-
-      <div class="footer">
-
-        <div class="note">
-
-          <span id="status" class="ok" aria-live="polite"></span>
-
-        </div>
-
-        <div>
-
-          <button id="pay-btn" class="btn btn-primary">
-
-            Continue to Secure Payment
-
-            <span id="spin" class="spinner" aria-hidden="true"></span>
-
-          </button>
-
-        </div>
-
-      </div>
 
     </div>
 
@@ -450,109 +452,57 @@
 
 
 
-  <!-- سكربت الاستدعاء إلى API: يرسل بيانات النموذج ثم يوجّه إلى Stripe -->
-
   <script>
 
-    const form = document.getElementById('pros-form');
+    // إظهار/إخفاء حقول التأمين الاختيارية
 
-    const payBtn = document.getElementById('pay-btn');
+    const hasIns = document.getElementById('has-ins');
 
-    const spin = document.getElementById('spin');
+    const insBlock = document.getElementById('ins-optional');
+
+    hasIns.addEventListener('change', () => {
+
+      insBlock.style.display = hasIns.checked ? 'grid' : 'none';
+
+    });
+
+
 
     const statusEl = document.getElementById('status');
 
+    function setStatus(msg, kind='note'){ statusEl.textContent = msg; statusEl.className = 'foot note ' + (kind||''); }
 
-
-    function setLoading(loading) {
-
-      if (loading) {
-
-        payBtn.setAttribute('disabled', 'true');
-
-        spin.style.visibility = 'visible';
-
-      } else {
-
-        payBtn.removeAttribute('disabled');
-
-        spin.style.visibility = 'hidden';
-
-      }
-
-    }
+    function setLoading(is){ document.getElementById('pay-btn').disabled = !!is; }
 
 
 
-    function getPayload() {
+    document.getElementById('cancel-btn').addEventListener('click', () => {
 
-      return {
+      window.location.href = '/';
 
-        email:   document.querySelector('#email')?.value?.trim() || '',
-
-        name:    document.querySelector('#name')?.value?.trim() || '',
-
-        company: document.querySelector('#company')?.value?.trim() || '',
-
-        phone:   document.querySelector('#phone')?.value?.trim() || '',
-
-        address: document.querySelector('#address')?.value?.trim() || '',
-
-        city:    document.querySelector('#city')?.value?.trim() || '',
-
-        state:   document.querySelector('#state')?.value?.trim() || '',
-
-        zip:     document.querySelector('#zip')?.value?.trim() || '',
-
-      };
-
-    }
+    });
 
 
 
-    function validateRequired() {
+    document.getElementById('pay-btn').addEventListener('click', async () => {
 
-      // حقول أساسية: الاسم + الإيميل
+      setStatus('');
 
-      const email = document.getElementById('email');
-
-      const name  = document.getElementById('name');
-
-      let ok = true;
+      setLoading(true);
 
 
 
-      if (!name.value.trim()) {
+      // تحقق بسيط من الحقول المطلوبة
 
-        name.focus();
+      const name = document.getElementById('name').value.trim();
 
-        ok = false;
+      const email = document.getElementById('email').value.trim();
 
-      } else if (!email.value.trim() || !email.validity.valid) {
+      if (!name || !email){
 
-        email.focus();
+        setStatus('Please fill the required fields (Name & Email).', 'err');
 
-        ok = false;
-
-      }
-
-      return ok;
-
-    }
-
-
-
-    payBtn.addEventListener('click', async (e) => {
-
-      e.preventDefault();
-
-      statusEl.textContent = '';
-
-      if (!validateRequired()) {
-
-        statusEl.textContent = 'Please fill the required fields (Name & Email).';
-
-        statusEl.className = 'note err';
+        setLoading(false);
 
         return;
 
@@ -560,19 +510,45 @@
 
 
 
-      setLoading(true);
+      const payload = {
+
+        name,
+
+        email,
+
+        company:   document.getElementById('company').value.trim() || undefined,
+
+        phone:     document.getElementById('phone').value.trim()   || undefined,
+
+        address:   document.getElementById('address').value.trim() || undefined,
+
+        city:      document.getElementById('city').value.trim()    || undefined,
+
+        state:     document.getElementById('state').value.trim()   || undefined,
+
+        zip:       document.getElementById('zip').value.trim()     || undefined,
+
+        license:   document.getElementById('license').value.trim() || undefined,
+
+        hasInsurance: hasIns.checked || undefined,
+
+        insuranceCarrier: document.getElementById('ins-carrier').value.trim() || undefined,
+
+        insurancePolicy:  document.getElementById('ins-policy').value.trim()  || undefined,
+
+      };
+
+
 
       try {
 
-        const payload = getPayload();
+        const API_BASE = window.location.origin;
 
-
-
-        const res = await fetch('/api/stripe/create-checkout-session', {
+        const res = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
 
           method: 'POST',
 
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
 
           body: JSON.stringify(payload),
 
@@ -580,15 +556,17 @@
 
 
 
-        const data = await res.json();
+        let data = null;
+
+        try { data = await res.json(); } catch(e) { /* ignore bad JSON */ }
 
 
 
         if (!res.ok) {
 
-          statusEl.textContent = data?.error || 'Something went wrong. Please try again.';
+          const msg = (data && (data.error || data.details)) ? `${data.error} — ${data.details || ''}`.trim() : `HTTP ${res.status}`;
 
-          statusEl.className = 'note err';
+          setStatus(msg || 'Something went wrong. Please try again.', 'err');
 
           setLoading(false);
 
@@ -598,31 +576,25 @@
 
 
 
-        if (data?.url) {
+        if (data && data.url) {
 
-          statusEl.textContent = 'Redirecting to secure payment…';
+          setStatus('Redirecting to Stripe…', 'ok');
 
-          statusEl.className = 'note ok';
-
-          window.location.href = data.url; // تحويل إلى Stripe Checkout
+          window.location.href = data.url;
 
         } else {
 
-          statusEl.textContent = 'No checkout URL returned.';
-
-          statusEl.className = 'note err';
+          setStatus('No checkout URL returned.', 'err');
 
           setLoading(false);
 
         }
 
-      } catch (err) {
+      } catch (e) {
 
-        console.error(err);
+        console.error(e);
 
-        statusEl.textContent = 'Network error. Please try again.';
-
-        statusEl.className = 'note err';
+        setStatus('Network error. Please try again.', 'err');
 
         setLoading(false);
 
