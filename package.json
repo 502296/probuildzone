@@ -2,15 +2,25 @@
 
   "name": "probuildzone",
 
+  "version": "1.0.0",
+
   "private": true,
 
   "license": "MIT",
 
-  "type": "commonjs",
+  "engines": { "node": ">=18" },
 
   "dependencies": {
 
     "stripe": "^16.0.0"
+
+  },
+
+  "scripts": {
+
+    "dev": "vercel dev",
+
+    "start": "node server.js"
 
   }
 
