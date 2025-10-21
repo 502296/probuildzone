@@ -1,14 +1,18 @@
 // /api/stripe/create-checkout-session.js
 
+// Creates a Stripe Checkout Session for a MONTHLY subscription with optional trial days.
+
+
+
 const Stripe = require('stripe');
 
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
 
 
 
 module.exports = async (req, res) => {
 
-  // CORS الخفيف (إن لزم)
+  // --- CORS (مهم إذا كان الموقع على دومين و الـ API على دومين/ساب دومين آخر)
 
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -16,39 +20,61 @@ module.exports = async (req, res) => {
 
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-
-  if (req.method === 'OPTIONS') {
-
-    return res.status(200).end();
-
-  }
-
-
-
-  if (req.method !== 'POST') {
-
-    return res.status(405).json({ error: 'Method not allowed' });
-
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
 
 
   try {
 
-    const { email, priceId, metadata } = req.body || {};
+    const body = req.body || {};
 
-    const price = priceId || process.env.STRIPE_PRICE_YEARLY;
+    const priceId = process.env.STRIPE_PRICE_MONTHLY;
 
-    if (!price) {
+    const siteURL = (process.env.SITE_URL || 'https://probuildzone.com').replace(/\/+$/, '');
 
-      return res.status(400).json({ error: 'Missing price id (STRIPE_PRICE_YEARLY env or priceId in body).' });
+    const trialDays = parseInt(process.env.STRIPE_TRIAL_DAYS || '0', 10);
+
+
+
+    if (!priceId) {
+
+      return res.status(400).json({ error: 'Missing STRIPE_PRICE_MONTHLY' });
 
     }
 
 
 
-    const site = process.env.SITE_URL || `https://${req.headers.host}`;
+    const subscription_data = {
+
+      metadata: {
+
+        source: 'probuildzone',
+
+        plan: 'monthly',
+
+        email: body.email || ''
+
+      }
+
+    };
+
+
+
+    if (trialDays > 0) {
+
+      subscription_data.trial_period_days = trialDays;
+
+      // اختياري: ماذا يحدث إذا انتهت التجربة بدون وسيلة دفع؟
+
+      // subscription_data.trial_settings = {
+
+      //   end_behavior: { missing_payment_method: 'cancel' }
+
+      // };
+
+    }
 
 
 
@@ -58,33 +84,33 @@ module.exports = async (req, res) => {
 
       payment_method_types: ['card'],
 
-      customer_email: email || undefined,
+      billing_address_collection: 'auto',
 
-      line_items: [{ price, quantity: 1 }],
+      customer_email: body.email || undefined, // يملأ الإيميل تلقائياً في Checkout
 
       allow_promotion_codes: true,
 
-      // إن أردت فرض تجربة مجانية من هنا بدل إعدادها على السعر:
+      line_items: [{ price: priceId, quantity: 1 }],
 
-      // subscription_data: { trial_period_days: 30 },
+      subscription_data,
 
-      success_url: `${site}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteURL}/pros.html?status=success&session_id={{CHECKOUT_SESSION_ID}}`,
 
-      cancel_url: `${site}/cancel`,
+      cancel_url: `${siteURL}/pros.html?status=cancel`
 
-      metadata: metadata || {}
+      // automatic_tax: { enabled: true }, // اختياري
 
     });
 
 
 
-    return res.status(200).json({ id: session.id, url: session.url });
+    return res.status(200).json({ url: session.url, id: session.id });
 
   } catch (err) {
 
-    console.error('stripe/create-checkout-session error:', err);
+    console.error('create-checkout-session error:', err);
 
-    return res.status(500).json({ error: 'Stripe error', details: err.message });
+    return res.status(500).json({ error: 'Server error', details: err.message });
 
   }
 
