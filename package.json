@@ -4,8 +4,12 @@
 
   "private": true,
 
-  "type": "module",
+  "version": "1.0.0",
 
-  "scripts": { "build": "echo \"no build step\"" }
+  "dependencies": {
+
+    "stripe": "^14.25.0"
+
+  }
 
 }
