@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
 
     const { email, trial } = req.body || {};
 
-    const price = process.env.STRIPE_PRICE_YEARLY; // price_... للاشتراك السنوي
+    const price = process.env.STRIPE_PRICE_MONTHLY; // price_... لخطة $25 شهرياً
 
     const successUrl = `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
 
@@ -36,11 +36,11 @@ module.exports = async (req, res) => {
 
       customer_email: email || undefined,
 
-      // مفعّل تجربة 30 يوم من السيرفر (بدون كشف أي مفاتيح بالفرونت)
-
       subscription_data: trial ? { trial_period_days: 30 } : {},
 
       allow_promotion_codes: true,
+
+      // يُفضّل تفعيل تحصيل الضرائب التلقائي من Dashboard إن رغبت
 
       success_url: successUrl,
 
