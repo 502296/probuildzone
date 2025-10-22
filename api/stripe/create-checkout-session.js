@@ -1,30 +1,28 @@
-const Stripe = require('stripe');
-
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
-
-// POST /api/stripe/create-checkout-session
 
 module.exports = async (req, res) => {
 
-  if (req.method !== 'POST') {
-
-    res.status(405).json({ error: 'Method not allowed' });
-
-    return;
-
-  }
-
   try {
 
-    const { email, trial } = req.body || {};
+    if (req.method !== 'POST') {
 
-    const price = process.env.STRIPE_PRICE_MONTHLY; // price_... لخطة $25 شهرياً
+      res.status(405).json({ error: 'Method Not Allowed' });
 
-    const successUrl = `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
+      return;
 
-    const cancelUrl  = `${process.env.SITE_URL}/cancel.html`;
+    }
+
+
+
+    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_MONTHLY || !process.env.SITE_URL) {
+
+      res.status(500).json({ error: 'Server misconfigured: missing environment variables' });
+
+      return;
+
+    }
 
 
 
@@ -32,19 +30,13 @@ module.exports = async (req, res) => {
 
       mode: 'subscription',
 
-      line_items: [{ price, quantity: 1 }],
-
-      customer_email: email || undefined,
-
-      subscription_data: trial ? { trial_period_days: 30 } : {},
+      line_items: [{ price: process.env.STRIPE_PRICE_MONTHLY, quantity: 1 }],
 
       allow_promotion_codes: true,
 
-      // يُفضّل تفعيل تحصيل الضرائب التلقائي من Dashboard إن رغبت
+      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
-      success_url: successUrl,
-
-      cancel_url: cancelUrl
+      cancel_url: `${process.env.SITE_URL}/cancel.html`
 
     });
 
@@ -52,9 +44,11 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ url: session.url });
 
-  } catch (e) {
+  } catch (err) {
 
-    res.status(400).json({ error: e.message });
+    console.error('Stripe error:', err.message);
+
+    res.status(500).json({ error: 'Something went wrong' });
 
   }
 
