@@ -1,98 +1,44 @@
-// /api/pros/create.js
+// POST /api/pros/create
 
 module.exports = async (req, res) => {
 
-  // CORS الخفيف (إن لزم)
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-
-
-  if (req.method === 'OPTIONS') {
-
-    return res.status(200).end();
-
-  }
-
-
-
   if (req.method !== 'POST') {
 
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+
+    return;
 
   }
-
-
 
   try {
 
     const body = req.body || {};
 
-
-
-    // حقول متوقعة من النموذج — عدّل الأسماء لتطابق الحقول لديك
-
     const required = ['company', 'fullName', 'email'];
 
-    const missing = required.filter((k) => !body[k]);
+    for (const f of required) {
 
+      if (!body[f]) {
 
+        res.status(400).json({ error: `Missing field: ${f}` });
 
-    if (missing.length) {
+        return;
 
-      return res.status(400).json({
-
-        ok: false,
-
-        error: 'Missing fields',
-
-        fields: missing
-
-      });
+      }
 
     }
 
 
 
-    // لاحقًا: احفظ بـ Google Sheets/Supabase/Email
+    // TODO لاحقاً: نحفظ في Google Sheets / Supabase
 
-    // الآن نرجّع OK وبنفس البيانات لتأكيد الاستلام
+    // حالياً نُرجع OK فقط
 
-    return res.status(200).json({
+    res.status(200).json({ ok: true });
 
-      ok: true,
+  } catch (e) {
 
-      received: {
-
-        company: body.company,
-
-        fullName: body.fullName,
-
-        phone: body.phone || null,
-
-        email: body.email,
-
-        address: body.address || null,
-
-        businessLicense: body.businessLicense || null,
-
-        insurance: body.insurance || null,
-
-        notes: body.notes || null
-
-      }
-
-    });
-
-  } catch (err) {
-
-    console.error('pros/create error:', err);
-
-    return res.status(500).json({ ok: false, error: 'Server error', details: err.message });
+    res.status(400).json({ error: e.message });
 
   }
 
