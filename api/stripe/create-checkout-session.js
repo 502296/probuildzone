@@ -1,56 +1,30 @@
-// /api/stripe/create-checkout-session.js
-
 const Stripe = require('stripe');
 
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
+
+
+// POST /api/stripe/create-checkout-session
 
 module.exports = async (req, res) => {
 
+  if (req.method !== 'POST') {
+
+    res.status(405).json({ error: 'Method not allowed' });
+
+    return;
+
+  }
+
   try {
 
-    if (req.method !== 'POST') {
+    const { email, trial } = req.body || {};
 
-      res.status(405).json({ error: 'Method Not Allowed' });
+    const price = process.env.STRIPE_PRICE_YEARLY; // price_... للاشتراك السنوي
 
-      return;
+    const successUrl = `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`;
 
-    }
-
-
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-    const {
-
-      company_name,
-
-      full_name,
-
-      email,
-
-      phone,
-
-      address,
-
-      license,
-
-      has_insurance, // true/false
-
-      notes
-
-    } = req.body || {};
-
-
-
-    // يدعم طريقتين:
-
-    // 1) سعر سنوي واحد فيه ترايل من داخل Stripe: STRIPE_PRICE_YEARLY
-
-    // 2) أو تحديد أيام التجربة من البيئة TRIAL_DAYS (إن لم يكن السعر يحتوي ترايل)
-
-    const priceId = process.env.STRIPE_PRICE_YEARLY; // price_...
-
-    const trialDays = process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS, 10) : undefined;
+    const cancelUrl  = `${process.env.SITE_URL}/cancel.html`;
 
 
 
@@ -58,49 +32,19 @@ module.exports = async (req, res) => {
 
       mode: 'subscription',
 
-      line_items: [{ price: priceId, quantity: 1 }],
-
-      allow_promotion_codes: true,
-
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-
-      cancel_url: `${process.env.SITE_URL}/cancel.html`,
-
-      automatic_tax: { enabled: true },
+      line_items: [{ price, quantity: 1 }],
 
       customer_email: email || undefined,
 
-      subscription_data: {
+      // مفعّل تجربة 30 يوم من السيرفر (بدون كشف أي مفاتيح بالفرونت)
 
-        trial_period_days: trialDays, // يُتجاهل تلقائياً إذا كان السعر مُعدّ بترال من Stripe
+      subscription_data: trial ? { trial_period_days: 30 } : {},
 
-        metadata: {
+      allow_promotion_codes: true,
 
-          company_name: company_name || '',
+      success_url: successUrl,
 
-          full_name: full_name || '',
-
-          phone: phone || '',
-
-          address: address || '',
-
-          business_license: license || '',
-
-          has_insurance: String(has_insurance || false),
-
-          notes: notes || ''
-
-        }
-
-      },
-
-      metadata: {
-
-        source: 'probuildzone-pros',
-
-        company_name: company_name || ''
-
-      }
+      cancel_url: cancelUrl
 
     });
 
@@ -108,11 +52,9 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ url: session.url });
 
-  } catch (err) {
+  } catch (e) {
 
-    console.error('create-checkout-session error:', err);
-
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(400).json({ error: e.message });
 
   }
 
