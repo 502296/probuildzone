@@ -1,45 +1,39 @@
-// POST /api/pros/create
-
 module.exports = async (req, res) => {
+// Check if the request method is POST
+if (req.method !== 'POST') {
+res.status(405).json({ error: 'Method not allowed' });
+return;
+}
 
-  if (req.method !== 'POST') {
+try {
+// Extract body, default to empty object if undefined
+const body = req.body || {};
 
-    res.status(405).json({ error: 'Method not allowed' });
+// Define required fields
+const required = ['company', 'fullName', 'email'];
 
-    return;
+// Validate required fields
+for (const field of required) {
+if (!body[field]) {
+res.status(400).json({ error: `Missing field: ${field}` });
+return;
+}
+}
 
-  }
+// Additional validation (optional)
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+res.status(400).json({ error: 'Invalid email format' });
+return;
+}
 
-  try {
+// TODO: Save to Google Sheets / Supabase later
+// For now, return a success response with a mock ID
+const mockProId = `PRO-${Date.now()}`; // Example: PRO-1634823901234
+res.status(200).json({ ok: true, proId: mockProId });
 
-    const body = req.body || {};
-
-    const required = ['company', 'fullName', 'email'];
-
-    for (const f of required) {
-
-      if (!body[f]) {
-
-        res.status(400).json({ error: `Missing field: ${f}` });
-
-        return;
-
-      }
-
-    }
-
-
-
-    // TODO لاحقاً: نحفظ في Google Sheets / Supabase
-
-    // حالياً نُرجع OK فقط
-
-    res.status(200).json({ ok: true });
-
-  } catch (e) {
-
-    res.status(400).json({ error: e.message });
-
-  }
-
+} catch (e) {
+// Log the error for debugging (optional, Vercel logs it automatically)
+console.error('Error in /api/pros/create:', e.message);
+res.status(400).json({ error: e.message || 'An unexpected error occurred' });
+}
 };
