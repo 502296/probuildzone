@@ -2,20 +2,6 @@
 
 
 
-// التحقق من الإعدادات الآتية من pros.html
-
-const { PUBLISHABLE_KEY, PRICE_ID_YEARLY, API_BASE } = window.PBZ_STRIPE || {};
-
-if (!PUBLISHABLE_KEY) console.warn("⚠️ Missing Stripe publishable key");
-
-if (!PRICE_ID_YEARLY) console.warn("⚠️ Missing Stripe yearly price id");
-
-
-
-const stripe = Stripe(PUBLISHABLE_KEY);
-
-
-
 // مساعد لقراءة قيمة حقل
 
 const val = (id) => (document.getElementById(id)?.value || "").trim();
@@ -24,7 +10,7 @@ const msg = document.getElementById("proMsg");
 
 
 
-// دالة إنشاء Session والانتقال لصفحة الدفع
+// دالة إنشاء Session والانتقال لصفحة الدفع عبر Netlify Function
 
 async function createCheckout({ trialDays = 0 }) {
 
@@ -52,7 +38,7 @@ async function createCheckout({ trialDays = 0 }) {
 
     zips: val("zips"),
 
-    site: val("site")
+    site: val("site"),
 
   };
 
@@ -72,23 +58,15 @@ async function createCheckout({ trialDays = 0 }) {
 
   try {
 
-    // 1) خزّن البروفايل (Endpoint تجريبي من السيرفر)
+    // 1) (اختياري لاحقًا) حفظ البروفايل في Sheets/Supabase
 
-    await fetch(`${API_BASE}/api/pros/create`, {
-
-      method: "POST",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(data)
-
-    });
+    // يمكن إضافة Function أخرى لاحقًا مثل: /.netlify/functions/save-pro-profile
 
 
 
-    // 2) أنشئ Checkout Session
+    // 2) إنشاء Checkout Session لاشتراك شهري مع فترة تجريبية
 
-    const res = await fetch(`${API_BASE}/api/stripe/create-checkout-session`, {
+    const res = await fetch("/.netlify/functions/create-checkout-session", {
 
       method: "POST",
 
@@ -96,21 +74,35 @@ async function createCheckout({ trialDays = 0 }) {
 
       body: JSON.stringify({
 
-        price_id: PRICE_ID_YEARLY,
+        mode: "subscription",
 
-        // تمرير بيانات مفيدة إلى Stripe (تظهر في الـ metadata)
+        priceName: "MONTHLY",          // سنقرأه في السيرفر كـ STRIPE_PRICE_MONTHLY
 
-        metadata: { biz: data.biz, email: data.email, phone: data.phone },
-
-        // لإظهار البريد داخل Checkout ولربط الزبون
+        trial_days: trialDays,         // 30 للتجربة أو 0 للدفع المباشر
 
         customer_email: data.email,
 
-        // للتجربة المجانية (0 أو 30)
+        metadata: {
 
-        trial_days: trialDays
+          biz: data.biz,
 
-      })
+          name: data.name,
+
+          phone: data.phone,
+
+          license: data.license,
+
+          insurance: data.insurance || "",
+
+          primary: data.primary || "",
+
+          zips: data.zips || "",
+
+          site: data.site || ""
+
+        }
+
+      }),
 
     });
 
@@ -118,15 +110,13 @@ async function createCheckout({ trialDays = 0 }) {
 
     const j = await res.json();
 
-    if (!res.ok || !j.id) throw new Error(j.error || "Failed to create session");
+    if (!res.ok || !j.url) throw new Error(j.error || "Failed to create session");
 
 
 
     // 3) تحويل الزبون إلى Stripe Checkout
 
-    const { error } = await stripe.redirectToCheckout({ sessionId: j.id });
-
-    if (error) throw error;
+    window.location.href = j.url;
 
   } catch (e) {
 
@@ -146,16 +136,16 @@ document.getElementById("startTrialBtn")?.addEventListener("click", (e) => {
 
   e.preventDefault();
 
-  createCheckout({ trialDays: 30 }); // 30 يوم مجانًا
+  createCheckout({ trialDays: 30 }); // 30 يوم مجانًا ثم $25/شهر
 
 });
 
 
 
-document.getElementById("payYearlyBtn")?.addEventListener("click", (e) => {
+document.getElementById("payMonthlyBtn")?.addEventListener("click", (e) => {
 
   e.preventDefault();
 
-  createCheckout({ trialDays: 0 }); // دفع مباشر
+  createCheckout({ trialDays: 0 });  // دفع مباشر $25/شهر بدون فترة تجريبية
 
 });
