@@ -1,14 +1,10 @@
 {
 
-  "name": "probuildzone",
-
-  "version": "1.0.0",
-
-  "private": true,
-
   "dependencies": {
 
-    "stripe": "^14.22.0"
+    "stripe": "^16.0.0",
+
+    "googleapis": "^131.0.0"
 
   }
 
