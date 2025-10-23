@@ -16,27 +16,41 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+
+
   <style>
 
     :root{
 
-      --pbz-blue:#0F2A43;
+      /* لوحة أزرق فاتح */
 
-      --pbz-orange:#F28C1B;
+      --pbz-blue: #0F2A43;       /* أزرق غامق للنصوص */
 
-      --ink:#1b2b3a;
+      --sky-50:  #f0f7ff;        /* خلفية فاتحة جداً */
 
-      --muted:#667889;
+      --sky-100: #e1f0ff;
 
-      --bg:#eef2f6;           /* رمادي فاتح */
+      --sky-200: #cfe6ff;
 
-      --card:#ffffff;
+      --sky-300: #b9dbff;
 
-      --line:#dde5ee;
+      --sky-500: #3ea8ff;        /* أزرق زر */
 
-      --focus:rgba(15,42,67,.14);
+      --sky-600: #1f93f5;        /* Hover */
+
+      --ink:     #173047;
+
+      --muted:   #5f7286;
+
+      --card:    #ffffff;
+
+      --line:    #dbe7f5;
+
+      --focus:   rgba(62,168,255,.25);
 
     }
+
+
 
     *{box-sizing:border-box}
 
@@ -48,7 +62,7 @@
 
       font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-      background:var(--bg);
+      background: linear-gradient(180deg, var(--sky-50), var(--sky-100));
 
       color:var(--ink);
 
@@ -64,7 +78,9 @@
 
       position:sticky;top:0;z-index:30;
 
-      background:var(--card);
+      background:rgba(255,255,255,.85);
+
+      backdrop-filter: blur(6px);
 
       border-bottom:1px solid var(--line);
 
@@ -92,7 +108,7 @@
 
     .hero-card{
 
-      background:linear-gradient(180deg,#f9fbfd,#f1f6fa);
+      background:linear-gradient(180deg, var(--sky-100), #ffffff);
 
       border:1px solid var(--line);
 
@@ -100,17 +116,17 @@
 
       padding:22px 20px;
 
-      box-shadow:0 6px 24px rgba(15,42,67,.06);
+      box-shadow:0 10px 28px rgba(31,147,245,.10);
 
     }
 
     .hero-card h1{margin:0 0 6px;font-size:26px;line-height:1.2;color:var(--pbz-blue)}
 
-    .hero-card p{margin:0;color:#2c3b4a}
+    .hero-card p{margin:0;color:#24415a}
 
 
 
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(15,42,67,.06)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(31,147,245,.08)}
 
     .form{padding:20px}
 
@@ -120,19 +136,17 @@
 
     input,textarea{
 
-      width:100%;padding:12px;border:1px solid #cfd8e3;border-radius:12px;background:#fff;color:#102538;font-size:14px;outline:none
+      width:100%;padding:12px;border:1px solid #cfe1f5;border-radius:12px;background:#fff;color:#102538;font-size:14px;outline:none
 
     }
 
-    input:focus,textarea:focus{border-color:#9fb3c9;box-shadow:0 0 0 3px var(--focus)}
+    input:focus,textarea:focus{border-color:#9ec9ff;box-shadow:0 0 0 3px var(--focus)}
 
     textarea{min-height:110px;resize:vertical;grid-column:span 2}
 
     .row-2{grid-column:span 2}
 
 
-
-    /* Checkbox row — صف مستقل ومريح على الهاتف */
 
     .insurance-row{
 
@@ -144,7 +158,7 @@
 
     }
 
-    .insurance-row input{width:auto;accent-color:var(--pbz-orange)}
+    .insurance-row input{width:auto;accent-color:var(--sky-600)}
 
 
 
@@ -164,13 +178,21 @@
 
       display:inline-flex;align-items:center;justify-content:center;gap:10px;
 
-      padding:14px 18px;border-radius:14px;border:1px solid #d7dee7;cursor:pointer;font-weight:800;letter-spacing:.2px;background:#fff
+      padding:14px 18px;border-radius:14px;border:1px solid #cfe1f5;cursor:pointer;font-weight:800;letter-spacing:.2px;background:#fff;
+
+      transition:transform .05s ease, box-shadow .15s ease, background .15s ease;
 
     }
 
-    .btn-primary{background:var(--pbz-orange);color:#0F2A43;border:0;box-shadow:0 8px 22px rgba(242,140,27,.32)}
+    .btn-primary{
 
-    .btn-primary:hover{transform:translateY(-1px)}
+      background:var(--sky-500);color:#07253a;border:0;
+
+      box-shadow:0 10px 24px rgba(62,168,255,.35)
+
+    }
+
+    .btn-primary:hover{transform:translateY(-1px); background:var(--sky-600)}
 
     .btn-primary:active{transform:translateY(1px)}
 
@@ -216,6 +238,8 @@
 
 </head>
 
+
+
 <body>
 
   <header>
@@ -223,8 +247,6 @@
     <div class="nav">
 
       <a class="brand" href="/">
-
-        <!-- بدّل LOGO_URL بمسار شعارك لو موجود -->
 
         <img src="LOGO_URL" alt="ProBuildZone Logo" onerror="this.style.display='none'">
 
@@ -256,7 +278,7 @@
 
           <h1>Join ProBuildZone — Get Local Jobs</h1>
 
-          <p>Start your <b>30-day free trial</b>. Annual plan after trial — cancel anytime during the trial.</p>
+          <p>Start your <b>30-day free trial</b>. Monthly plan after trial — cancel anytime during the trial.</p>
 
         </div>
 
@@ -326,8 +348,6 @@
 
 
 
-          <!-- Checkbox: صف مستقل -->
-
           <div class="insurance-row">
 
             <input id="insurance" name="insurance" type="checkbox">
@@ -350,7 +370,7 @@
 
           <div class="actions">
 
-            <div class="hint">By starting your free trial, you agree to our <a href="/privacy.html">Terms</a> & <a href="/privacy.html">Privacy</a>.</div>
+            <div class="hint">By starting your free trial, you agree to our <a href="/terms.html">Terms</a> & <a href="/privacy.html">Privacy</a>.</div>
 
             <div>
 
@@ -384,43 +404,7 @@
 
   <script>
 
-    // ========= Settings =========
-
-    // لو APIs على نفس الدومين (Vercel) اتركها فارغة ''
-
-    // لو APIs على ساب-دومين (api.probuildzone.com) غيّرها كما يلي:
-
-    // const API_BASE = 'https://api.probuildzone.com';
-
-    const API_BASE = '';
-
-
-
     document.getElementById('year').textContent = new Date().getFullYear();
-
-
-
-    async function postJSON(path, data){
-
-      const url = (API_BASE || '') + path;
-
-      const r = await fetch(url,{
-
-        method:'POST',
-
-        headers:{'Content-Type':'application/json'},
-
-        body: JSON.stringify(data||{})
-
-      });
-
-      const text = await r.text();
-
-      if(!r.ok) throw new Error(`Request failed (${r.status}): ${text.slice(0,200)}`);
-
-      try{ return JSON.parse(text); }catch(e){ return {}; }
-
-    }
 
 
 
@@ -435,6 +419,30 @@
       toast.classList.add('show');
 
       setTimeout(()=> toast.classList.remove('show'), 2200);
+
+    }
+
+
+
+    // استدعاء Netlify Function مباشرة
+
+    async function createStripeSession(payload){
+
+      const r = await fetch('/.netlify/functions/create-checkout-session', {
+
+        method:'POST',
+
+        headers:{'Content-Type':'application/json'},
+
+        body: JSON.stringify(payload || {})
+
+      });
+
+      const text = await r.text();
+
+      if(!r.ok) throw new Error(`create-session failed (${r.status}): ${text.slice(0,200)}`);
+
+      try{ return JSON.parse(text); }catch(e){ return {}; }
 
     }
 
@@ -458,21 +466,13 @@
 
       try{
 
+        // قراءة الحقول (يمكن إرسالها كـ metadata لاحقًا)
+
         const company = form.company?.value?.trim() || '';
 
         const fullName = form.fullName?.value?.trim() || '';
 
         const email = form.email?.value?.trim() || '';
-
-        const phone = form.phone?.value?.trim() || '';
-
-        const address = form.address?.value?.trim() || '';
-
-        const businessLicense = form.businessLicense?.value?.trim() || '';
-
-        const insurance = form.insurance?.checked ? 'yes' : 'no';
-
-        const notes = form.notes?.value?.trim() || '';
 
 
 
@@ -488,31 +488,39 @@
 
 
 
-        const profile = { company, fullName, email, phone, address, businessLicense, insurance, notes };
+        // محاولة حفظ الملف التعريفي بشكل غير معطّل (اختياري)
+
+        // لو عندك Endpoint لاحقًا غيّر الرابط هنا
+
+        try{
+
+          const profile = {
+
+            company, fullName, email,
+
+            phone: form.phone?.value?.trim() || '',
+
+            address: form.address?.value?.trim() || '',
+
+            businessLicense: form.businessLicense?.value?.trim() || '',
+
+            insurance: form.insurance?.checked ? 'yes' : 'no',
+
+            notes: form.notes?.value?.trim() || ''
+
+          };
+
+          // إرسال غير معطِّل (لن يوقف Stripe لو فشل)
+
+          navigator.sendBeacon && navigator.sendBeacon('/collect-profile', new Blob([JSON.stringify(profile)],{type:'application/json'}));
+
+        }catch(_){/* لا شيء */ }
 
 
 
-        // 1) Save profile (removes any "Could not save profile" errors)
+        // إنشاء جلسة Stripe
 
-        await postJSON('/api/pros/create', profile);
-
-
-
-        // 2) Create Stripe session
-
-        const session = await postJSON('/api/stripe/create-checkout-session', {
-
-          email,
-
-          metadata: { source: 'probuildzone', plan: 'yearly' }
-
-          // لو تريد Price محدد:
-
-          // priceId: 'price_XXXX'
-
-        });
-
-
+        const session = await createStripeSession({ email });
 
         if(session?.url){
 
