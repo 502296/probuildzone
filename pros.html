@@ -16,41 +16,41 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-
-
   <style>
 
     :root{
 
-      /* لوحة أزرق فاتح */
+      --pbz-blue:#0F2A43;
 
-      --pbz-blue: #0F2A43;       /* أزرق غامق للنصوص */
+      --ink:#173047;
 
-      --sky-50:  #f0f7ff;        /* خلفية فاتحة جداً */
+      --muted:#5f7286;
 
-      --sky-100: #e1f0ff;
+      --card:#ffffff;
 
-      --sky-200: #cfe6ff;
+      --line:#dbe7f5;
 
-      --sky-300: #b9dbff;
+      --focus:rgba(62,168,255,.25);
 
-      --sky-500: #3ea8ff;        /* أزرق زر */
 
-      --sky-600: #1f93f5;        /* Hover */
 
-      --ink:     #173047;
+      /* الذهبي للزر */
 
-      --muted:   #5f7286;
+      --gold:#f4c045;
 
-      --card:    #ffffff;
+      --gold-hover:#ffd876;
 
-      --line:    #dbe7f5;
+      --gold-text:#0f2a43;
 
-      --focus:   rgba(62,168,255,.25);
+
+
+      /* خلفيات */
+
+      --sky-50:#f0f7ff;
+
+      --sky-100:#e1f0ff;
 
     }
-
-
 
     *{box-sizing:border-box}
 
@@ -58,11 +58,9 @@
 
     body{
 
-      margin:0;
+      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 
-      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
-      background: linear-gradient(180deg, var(--sky-50), var(--sky-100));
+      background:linear-gradient(180deg, var(--sky-50), var(--sky-100));
 
       color:var(--ink);
 
@@ -70,21 +68,7 @@
 
     a{color:inherit;text-decoration:none}
 
-
-
-    /* Header */
-
-    header{
-
-      position:sticky;top:0;z-index:30;
-
-      background:rgba(255,255,255,.85);
-
-      backdrop-filter: blur(6px);
-
-      border-bottom:1px solid var(--line);
-
-    }
+    header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
 
     .nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 18px}
 
@@ -94,37 +78,13 @@
 
     .brand .name{font-size:20px;color:var(--pbz-blue)}
 
-    .brand .tag{font-size:12px;color:var(--muted);font-weight:600}
-
-
-
-    /* Layout */
-
     main{padding:26px 16px}
 
-    .wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:20px}
+    .wrap{max-width:1080px;margin:0 auto;display:grid;gap:20px}
 
-    .hero{display:grid;gap:6px}
-
-    .hero-card{
-
-      background:linear-gradient(180deg, var(--sky-100), #ffffff);
-
-      border:1px solid var(--line);
-
-      border-radius:16px;
-
-      padding:22px 20px;
-
-      box-shadow:0 10px 28px rgba(31,147,245,.10);
-
-    }
+    .hero-card{background:linear-gradient(180deg, var(--sky-100), #fff);border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:0 10px 28px rgba(31,147,245,.10)}
 
     .hero-card h1{margin:0 0 6px;font-size:26px;line-height:1.2;color:var(--pbz-blue)}
-
-    .hero-card p{margin:0;color:#24415a}
-
-
 
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(31,147,245,.08)}
 
@@ -146,33 +106,17 @@
 
     .row-2{grid-column:span 2}
 
+    .insurance-row{grid-column:span 2;display:flex;align-items:center;gap:10px;padding-top:2px}
 
+    .insurance-row input{width:auto;accent-color:#1f93f5}
 
-    .insurance-row{
+    .actions{grid-column:span 2;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
 
-      grid-column:span 2;
+    .hint{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px}
 
-      display:flex;align-items:center;gap:10px;
+    .agree{display:flex;align-items:center;gap:8px}
 
-      padding-top:2px;
-
-    }
-
-    .insurance-row input{width:auto;accent-color:var(--sky-600)}
-
-
-
-    .actions{
-
-      grid-column:span 2;
-
-      display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:6px
-
-    }
-
-    .hint{color:var(--muted);font-size:13px}
-
-
+    .agree input{accent-color:var(--gold)}
 
     .btn{
 
@@ -180,35 +124,31 @@
 
       padding:14px 18px;border-radius:14px;border:1px solid #cfe1f5;cursor:pointer;font-weight:800;letter-spacing:.2px;background:#fff;
 
-      transition:transform .05s ease, box-shadow .15s ease, background .15s ease;
+      transition:transform .05s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
 
     }
 
     .btn-primary{
 
-      background:var(--sky-500);color:#07253a;border:0;
+      background:var(--gold); color:var(--gold-text); border:0;
 
-      box-shadow:0 10px 24px rgba(62,168,255,.35)
+      box-shadow:0 10px 24px rgba(244,192,69,.35)
 
     }
 
-    .btn-primary:hover{transform:translateY(-1px); background:var(--sky-600)}
+    .btn-primary:hover{transform:translateY(-1px); background:var(--gold-hover)}
 
     .btn-primary:active{transform:translateY(1px)}
 
-
+    .btn-primary[disabled]{opacity:.55; cursor:not-allowed; transform:none}
 
     .footer{max-width:1080px;margin:26px auto 6px;color:var(--muted);font-size:12.5px;text-align:center}
-
-
-
-    /* Toast */
 
     .toast{
 
       position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
 
-      background:#0F2A43;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);
+      background:#9b1c1c;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);
 
       opacity:0;pointer-events:none;transition:.3s ease;z-index:40
 
@@ -216,19 +156,11 @@
 
     .toast.show{opacity:1;pointer-events:auto}
 
-
-
     @media (max-width:860px){
 
       form{grid-template-columns:1fr}
 
       textarea{grid-column:span 1}
-
-      .insurance-row{align-items:center}
-
-      .brand img{height:36px}
-
-      .brand .name{font-size:18px}
 
       .actions{flex-direction:column;align-items:stretch}
 
@@ -237,8 +169,6 @@
   </style>
 
 </head>
-
-
 
 <body>
 
@@ -250,13 +180,7 @@
 
         <img src="LOGO_URL" alt="ProBuildZone Logo" onerror="this.style.display='none'">
 
-        <div>
-
-          <div class="name">ProBuildZone</div>
-
-          <div class="tag"></div>
-
-        </div>
+        <div class="name">ProBuildZone</div>
 
       </a>
 
@@ -270,23 +194,15 @@
 
     <div class="wrap">
 
-      <!-- Hero -->
+      <section class="hero-card">
 
-      <section class="hero">
+        <h1>Join ProBuildZone — Get Local Jobs</h1>
 
-        <div class="hero-card">
-
-          <h1>Join ProBuildZone — Get Local Jobs</h1>
-
-          <p>Start your <b>30-day free trial</b>. Monthly plan after trial — cancel anytime during the trial.</p>
-
-        </div>
+        <p>Start your <b>30-day free trial</b>. Monthly plan after trial — cancel anytime during the trial.</p>
 
       </section>
 
 
-
-      <!-- Form -->
 
       <section class="card form">
 
@@ -370,13 +286,23 @@
 
           <div class="actions">
 
-            <div class="hint">By starting your free trial, you agree to our <a href="/terms.html">Terms</a> & <a href="/privacy.html">Privacy</a>.</div>
+            <div class="hint">
+
+              <label class="agree">
+
+                <input id="agree" type="checkbox" aria-describedby="termsNote">
+
+                <span>By starting your free trial, you agree to our <a href="/terms.html" target="_blank" rel="noopener">Terms</a> &amp; <a href="/privacy.html" target="_blank" rel="noopener">Privacy</a>.</span>
+
+              </label>
+
+            </div>
 
             <div>
 
               <button class="btn" type="reset">Reset</button>
 
-              <button class="btn btn-primary" id="startTrial" type="button">Start Free Trial</button>
+              <button class="btn btn-primary" id="startTrial" type="button" disabled>Start Free Trial</button>
 
             </div>
 
@@ -388,15 +314,11 @@
 
     </div>
 
-
-
     <div class="footer">© <span id="year"></span> ProBuildZone — Fair Prices · Local Pros</div>
 
   </main>
 
 
-
-  <!-- Toast -->
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -410,7 +332,7 @@
 
     const toast = document.getElementById('toast');
 
-    function showToast(msg, ok=true){
+    function showToast(msg, ok=false){
 
       toast.textContent = msg;
 
@@ -418,13 +340,23 @@
 
       toast.classList.add('show');
 
-      setTimeout(()=> toast.classList.remove('show'), 2200);
+      setTimeout(()=> toast.classList.remove('show'), 2400);
 
     }
 
 
 
-    // استدعاء Netlify Function مباشرة
+    // تفعيل/تعطيل الزر حسب Checkbox الموافقة
+
+    const agree = document.getElementById('agree');
+
+    const btn   = document.getElementById('startTrial');
+
+    agree.addEventListener('change', ()=> { btn.disabled = !agree.checked; });
+
+
+
+    // دالة تستدعي Netlify Function وتُظهر سبب الخطأ الحقيقي
 
     async function createStripeSession(payload){
 
@@ -440,7 +372,13 @@
 
       const text = await r.text();
 
-      if(!r.ok) throw new Error(`create-session failed (${r.status}): ${text.slice(0,200)}`);
+      if(!r.ok){
+
+        console.error('create-session failed', r.status, text);
+
+        throw new Error(`Could not start checkout (${r.status}).`);
+
+      }
 
       try{ return JSON.parse(text); }catch(e){ return {}; }
 
@@ -450,23 +388,19 @@
 
     const form = document.getElementById('proForm');
 
-    const btn  = document.getElementById('startTrial');
 
 
-
-    btn?.addEventListener('click', async (e)=>{
+    btn.addEventListener('click', async (e)=>{
 
       e.preventDefault();
 
-      btn.disabled = true;
+      if(btn.disabled) return;
 
-      btn.textContent = 'Please wait…';
+      btn.disabled = true; const prev = btn.textContent; btn.textContent = 'Please wait…';
 
 
 
       try{
-
-        // قراءة الحقول (يمكن إرسالها كـ metadata لاحقًا)
 
         const company = form.company?.value?.trim() || '';
 
@@ -474,88 +408,65 @@
 
         const email = form.email?.value?.trim() || '';
 
-
-
         if(!company || !fullName || !email){
 
           showToast('Please complete Company, Name and Email.', false);
 
-          btn.disabled = false; btn.textContent = 'Start Free Trial';
+          btn.disabled = !agree.checked; btn.textContent = prev; return;
 
-          return;
+        }
+
+        if(!agree.checked){
+
+          showToast('Please agree to the Terms & Privacy to continue.', false);
+
+          btn.disabled = false; btn.textContent = prev; return;
 
         }
 
 
 
-        // محاولة حفظ الملف التعريفي بشكل غير معطّل (اختياري)
+        // خزّن بيانات النموذج مؤقتًا قبل التحويل الى Stripe
 
-        // لو عندك Endpoint لاحقًا غيّر الرابط هنا
+        const payloadToSave = {
 
-        try{
+          biz: company,
 
-          const profile = {
+          name: fullName,
 
-            company, fullName, email,
+          email: email,
 
-            phone: form.phone?.value?.trim() || '',
+          phone: form.phone?.value?.trim() || '',
 
-            address: form.address?.value?.trim() || '',
+          address: form.address?.value?.trim() || '',
 
-            businessLicense: form.businessLicense?.value?.trim() || '',
+          license: form.businessLicense?.value?.trim() || '',
 
-            insurance: form.insurance?.checked ? 'yes' : 'no',
+          insurance: form.insurance?.checked ? 'YES' : 'NO',
 
-            notes: form.notes?.value?.trim() || ''
+          notes: form.notes?.value?.trim() || '',
 
-          };
+          status: 'trial_active'
 
-          // إرسال غير معطِّل (لن يوقف Stripe لو فشل)
+        };
 
-          navigator.sendBeacon && navigator.sendBeacon('/collect-profile', new Blob([JSON.stringify(profile)],{type:'application/json'}));
-
-        }catch(_){/* لا شيء */ }
+        sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
 
 
 
-        // إنشاء جلسة Stripe
-        // تخزين بيانات النموذج مؤقتًا قبل التحويل الى Stripe
-
-const payloadToSave = {
-
-  biz: company,
-
-  name: fullName,
-
-  email: email,
-
-  phone: form.phone?.value?.trim() || '',
-
-  address: form.address?.value?.trim() || '',
-
-  license: form.businessLicense?.value?.trim() || '',
-
-  insurance: form.insurance?.checked ? 'YES' : 'NO',
-
-  notes: form.notes?.value?.trim() || '',
-
-  status: 'trial_active'
-
-};
-
-sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
+        // أنشئ جلسة Stripe
 
         const session = await createStripeSession({ email });
 
         if(session?.url){
 
-          window.location.href = session.url;
+          location.href = session.url;
 
         }else{
 
           showToast('Could not start checkout. Please try again.', false);
 
-          btn.disabled = false; btn.textContent = 'Start Free Trial';
+          btn.disabled = !agree.checked; btn.textContent = prev;
 
         }
 
@@ -563,9 +474,9 @@ sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
 
         console.error(err);
 
-        showToast('Something went wrong. Please try again.', false);
+        showToast(err.message || 'Something went wrong. Please try again.', false);
 
-        btn.disabled = false; btn.textContent = 'Start Free Trial';
+        btn.disabled = !agree.checked; btn.textContent = 'Start Free Trial';
 
       }
 
