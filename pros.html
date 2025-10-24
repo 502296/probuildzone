@@ -16,27 +16,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  .agree{
 
-  display:flex; align-items:center; gap:10px;
-
-  color:var(--muted); font-size:13px;
-
-}
-
-.agree input{ margin:0; accent-color: var(--gold); }
-
-.agree a{ font-weight:700; }
-
-
-
-@media (max-width:860px){
-
-  form{ grid-template-columns:1fr; }
-
-  .actions{ flex-direction:column; align-items:stretch; }
-
-}
 
   <style>
 
@@ -54,9 +34,11 @@
 
       --focus:rgba(62,168,255,.25);
 
+      --sky-50:#f0f7ff;
 
+      --sky-100:#e1f0ff;
 
-      /* الذهبي للزر */
+      /* الذهبي */
 
       --gold:#f4c045;
 
@@ -64,15 +46,9 @@
 
       --gold-text:#0f2a43;
 
-
-
-      /* خلفيات */
-
-      --sky-50:#f0f7ff;
-
-      --sky-100:#e1f0ff;
-
     }
+
+
 
     *{box-sizing:border-box}
 
@@ -80,7 +56,9 @@
 
     body{
 
-      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      margin:0;
+
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 
       background:linear-gradient(180deg, var(--sky-50), var(--sky-100));
 
@@ -89,6 +67,10 @@
     }
 
     a{color:inherit;text-decoration:none}
+
+
+
+    /* Header */
 
     header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
 
@@ -100,13 +82,29 @@
 
     .brand .name{font-size:20px;color:var(--pbz-blue)}
 
+
+
+    /* Layout */
+
     main{padding:26px 16px}
 
     .wrap{max-width:1080px;margin:0 auto;display:grid;gap:20px}
 
-    .hero-card{background:linear-gradient(180deg, var(--sky-100), #fff);border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:0 10px 28px rgba(31,147,245,.10)}
+    .hero-card{
+
+      background:linear-gradient(180deg, var(--sky-100), #fff);
+
+      border:1px solid var(--line);border-radius:16px;padding:22px 20px;
+
+      box-shadow:0 10px 28px rgba(31,147,245,.10)
+
+    }
 
     .hero-card h1{margin:0 0 6px;font-size:26px;line-height:1.2;color:var(--pbz-blue)}
+
+    .hero-card p{margin:0;color:#24415a}
+
+
 
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(31,147,245,.08)}
 
@@ -132,51 +130,79 @@
 
     .insurance-row input{width:auto;accent-color:#1f93f5}
 
-    .actions{grid-column:span 2;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
 
-    .hint{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px}
 
-    .agree{display:flex;align-items:center;gap:8px}
+    .actions{
 
-    .agree input{accent-color:var(--gold)}
+      grid-column:span 2;display:flex;flex-wrap:wrap;
+
+      justify-content:space-between;align-items:center;gap:12px;margin-top:6px
+
+    }
+
+
+
+    /* موافقة الشروط (ملاصقة ومريحة للموبايل) */
+
+    .agree{
+
+      display:flex;align-items:center;gap:10px;
+
+      color:var(--muted);font-size:13px;line-height:1.4
+
+    }
+
+    .agree input{margin:0;accent-color:var(--gold)}
+
+    .agree a{font-weight:700}
+
+
 
     .btn{
 
       display:inline-flex;align-items:center;justify-content:center;gap:10px;
 
-      padding:14px 18px;border-radius:14px;border:1px solid #cfe1f5;cursor:pointer;font-weight:800;letter-spacing:.2px;background:#fff;
+      padding:14px 18px;border-radius:14px;border:1px solid #e7e2cf;cursor:pointer;font-weight:800;letter-spacing:.2px;
 
-      transition:transform .05s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease;
+      transition:transform .05s ease, box-shadow .15s ease, background .15s ease, opacity .15s;
 
-    }
-
-    .btn-primary{
-
-      background:var(--gold); color:var(--gold-text); border:0;
-
-      box-shadow:0 10px 24px rgba(244,192,69,.35)
+      user-select:none;background:#fff
 
     }
 
-    .btn-primary:hover{transform:translateY(-1px); background:var(--gold-hover)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
 
-    .btn-primary:active{transform:translateY(1px)}
 
-    .btn-primary[disabled]{opacity:.55; cursor:not-allowed; transform:none}
+
+    .btn-gold{background:var(--gold);color:var(--gold-text);border:0;box-shadow:0 10px 24px rgba(244,192,69,.35)}
+
+    .btn-gold:hover{transform:translateY(-1px);background:var(--gold-hover)}
+
+    .btn-gold:active{transform:translateY(1px)}
+
+
 
     .footer{max-width:1080px;margin:26px auto 6px;color:var(--muted);font-size:12.5px;text-align:center}
+
+
+
+    /* Toast */
 
     .toast{
 
       position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
 
-      background:#9b1c1c;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);
+      background:#0F2A43;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);
 
       opacity:0;pointer-events:none;transition:.3s ease;z-index:40
 
     }
 
     .toast.show{opacity:1;pointer-events:auto}
+
+    .toast.error{background:#9b1c1c}
+
+
 
     @media (max-width:860px){
 
@@ -191,6 +217,8 @@
   </style>
 
 </head>
+
+
 
 <body>
 
@@ -216,6 +244,8 @@
 
     <div class="wrap">
 
+      <!-- Hero -->
+
       <section class="hero-card">
 
         <h1>Join ProBuildZone — Get Local Jobs</h1>
@@ -225,6 +255,8 @@
       </section>
 
 
+
+      <!-- Form -->
 
       <section class="card form">
 
@@ -308,23 +340,19 @@
 
           <div class="actions">
 
-            <div class="hint">
+            <label class="agree">
 
-              <label class="agree">
+              <input id="agree" type="checkbox" required>
 
-                <input id="agree" type="checkbox" aria-describedby="termsNote">
+              <span>By starting your free trial, you agree to our <a href="/terms.html">Terms</a> &amp; <a href="/privacy.html">Privacy</a>.</span>
 
-                <span>By starting your free trial, you agree to our <a href="/terms.html" target="_blank" rel="noopener">Terms</a> &amp; <a href="/privacy.html" target="_blank" rel="noopener">Privacy</a>.</span>
-
-              </label>
-
-            </div>
+            </label>
 
             <div>
 
               <button class="btn" type="reset">Reset</button>
 
-              <button class="btn btn-primary" id="startTrial" type="button" disabled>Start Free Trial</button>
+              <button class="btn btn-gold" id="startTrial" type="button" disabled>Start Free Trial</button>
 
             </div>
 
@@ -342,23 +370,29 @@
 
 
 
+  <!-- Toast -->
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 
 
   <script>
 
+    // السنة الحالية
+
     document.getElementById('year').textContent = new Date().getFullYear();
 
 
 
+    // Toast
+
     const toast = document.getElementById('toast');
 
-    function showToast(msg, ok=false){
+    function showToast(msg, ok = true){
 
       toast.textContent = msg;
 
-      toast.style.background = ok ? '#0F2A43' : '#9b1c1c';
+      toast.classList.toggle('error', !ok);
 
       toast.classList.add('show');
 
@@ -368,17 +402,21 @@
 
 
 
-    // تفعيل/تعطيل الزر حسب Checkbox الموافقة
+    // تفعيل/تعطيل الزر حسب الموافقة
 
     const agree = document.getElementById('agree');
 
     const btn   = document.getElementById('startTrial');
 
-    agree.addEventListener('change', ()=> { btn.disabled = !agree.checked; });
+    const form  = document.getElementById('proForm');
+
+    function syncBtn(){ btn.disabled = !agree.checked; }
+
+    agree.addEventListener('change', syncBtn); syncBtn();
 
 
 
-    // دالة تستدعي Netlify Function وتُظهر سبب الخطأ الحقيقي
+    // نداء الفنكشن مع رسائل خطأ واضحة
 
     async function createStripeSession(payload){
 
@@ -408,9 +446,7 @@
 
 
 
-    const form = document.getElementById('proForm');
-
-
+    // زر البدء
 
     btn.addEventListener('click', async (e)=>{
 
@@ -418,37 +454,43 @@
 
       if(btn.disabled) return;
 
-      btn.disabled = true; const prev = btn.textContent; btn.textContent = 'Please wait…';
+
+
+      // تحقق أساسي
+
+      const company  = form.company?.value?.trim() || '';
+
+      const fullName = form.fullName?.value?.trim() || '';
+
+      const email    = form.email?.value?.trim() || '';
+
+      if(!company || !fullName || !email){
+
+        showToast('Please complete Company, Name and Email.', false);
+
+        return;
+
+      }
+
+      if(!agree.checked){
+
+        showToast('Please agree to Terms & Privacy to continue.', false);
+
+        return;
+
+      }
+
+
+
+      // تعطيل الزر أثناء الطلب
+
+      const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Please wait…';
 
 
 
       try{
 
-        const company = form.company?.value?.trim() || '';
-
-        const fullName = form.fullName?.value?.trim() || '';
-
-        const email = form.email?.value?.trim() || '';
-
-        if(!company || !fullName || !email){
-
-          showToast('Please complete Company, Name and Email.', false);
-
-          btn.disabled = !agree.checked; btn.textContent = prev; return;
-
-        }
-
-        if(!agree.checked){
-
-          showToast('Please agree to the Terms & Privacy to continue.', false);
-
-          btn.disabled = false; btn.textContent = prev; return;
-
-        }
-
-
-
-        // خزّن بيانات النموذج مؤقتًا قبل التحويل الى Stripe
+        // خزّن بيانات النموذج لـ success.html
 
         const payloadToSave = {
 
@@ -456,7 +498,7 @@
 
           name: fullName,
 
-          email: email,
+          email,
 
           phone: form.phone?.value?.trim() || '',
 
@@ -476,7 +518,7 @@
 
 
 
-        // أنشئ جلسة Stripe
+        // إنشاء جلسة Stripe
 
         const session = await createStripeSession({ email });
 
@@ -484,11 +526,11 @@
 
           location.href = session.url;
 
-        }else{
+        } else {
 
           showToast('Could not start checkout. Please try again.', false);
 
-          btn.disabled = !agree.checked; btn.textContent = prev;
+          btn.disabled = false; btn.textContent = prev;
 
         }
 
@@ -498,7 +540,7 @@
 
         showToast(err.message || 'Something went wrong. Please try again.', false);
 
-        btn.disabled = !agree.checked; btn.textContent = 'Start Free Trial';
+        btn.disabled = false; btn.textContent = prev;
 
       }
 
