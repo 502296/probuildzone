@@ -16,31 +16,33 @@ exports.handler = async (event) => {
 
 
 
-    // === 1) إعداد الاعتماد (Service Account) ===
+    // 1) Env checks
 
     const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
-    const privateKey = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+    const privateKey  = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 
-    const sheetId    = process.env.SHEET_ID;      // Spreadsheet ID
+    const sheetId     = process.env.SHEET_ID;
 
-    const tabName    = process.env.SHEET_TAB || 'Sheet1';
+    const tabNameEnv  = process.env.SHEET_TAB;
+
+    const tabName     = tabNameEnv && tabNameEnv.trim() ? tabNameEnv.trim() : 'Sheet1';
 
 
 
     if (!clientEmail || !privateKey || !sheetId) {
 
-      return {
+      const msg = `Missing envs: email=${!!clientEmail} key=${!!privateKey} sheet=${!!sheetId}`;
 
-        statusCode: 500,
+      console.error(msg);
 
-        body: JSON.stringify({ error: 'Missing Google Sheet credentials (GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SHEET_ID)' })
-
-      };
+      return { statusCode: 500, body: JSON.stringify({ ok:false, error: msg }) };
 
     }
 
 
+
+    // 2) Auth
 
     const jwt = new google.auth.JWT(
 
@@ -56,123 +58,107 @@ exports.handler = async (event) => {
 
     await jwt.authorize();
 
-
-
     const sheets = google.sheets({ version: 'v4', auth: jwt });
 
 
 
-    // === 2) قراءة جسم الطلب (بيانات النموذج) ===
+    // 3) Parse payload
 
     const body = JSON.parse(event.body || '{}');
 
-
-
     const {
 
-      biz = '',              // Company Name
+      biz = '', name = '', email = '', phone = '',
 
-      name = '',             // Full Name
+      address = '', license = '', insurance = '',
 
-      email = '',
+      notes = '', status = 'trial_active',
 
-      phone = '',
-
-      address = '',          // Business Address (حقل "primary" أو "address" حسب واجهتك)
-
-      license = '',
-
-      insurance = '',        // "true"/"false" أو "on"/""
-
-      notes = '',            // ملاحظات
-
-      stripe_customer_id = '',   // نتركها فارغة الآن (تُملأ لاحقًا عبر webhook)
-
-      stripe_subscription_id = ''// نتركها فارغة الآن
+      stripe_customer_id = '', stripe_subscription_id = '', session_id = ''
 
     } = body;
 
 
 
-    // تحضير القيم بترتيب الأعمدة لديك:
-
-    // Timestamp | Company Name | Full Name | Email | Phone | Business Address | Business License | Has Insurance | Notes | Status | Stripe Customer ID | Subscription ID
-
     const timestamp = new Date().toISOString();
 
-    const hasInsurance = (String(insurance).toLowerCase() === 'true' || String(insurance).toLowerCase() === 'on') ? 'YES' : (insurance ? 'YES' : 'NO');
-
-    const status = 'Pending';
+    const hasInsurance = (String(insurance).toLowerCase() === 'true' || String(insurance).toLowerCase() === 'yes' || String(insurance).toLowerCase() === 'on') ? 'YES' : (insurance ? 'YES' : 'NO');
 
 
 
     const row = [
 
-      timestamp,
+      timestamp,          // Timestamp
 
-      biz,
+      biz,                // Company Name
 
-      name,
+      name,               // Full Name
 
-      email,
+      email,              // Email
 
-      phone,
+      phone,              // Phone
 
-      address,
+      address,            // Business Address
 
-      license,
+      license,            // Business License
 
-      hasInsurance,
+      hasInsurance,       // Has Insurance
 
-      notes,
+      notes,              // Notes
 
-      status,
+      status,             // Status
 
-      stripe_customer_id,
-
-      stripe_subscription_id
+      stripe_customer_id || stripe_subscription_id || session_id // Stripe Customer/Subscription/Session
 
     ];
 
 
 
-    // === 3) الإضافة إلى الشيت ===
+    // 4) Append
 
-    await sheets.spreadsheets.values.append({
+    try {
 
-      spreadsheetId: sheetId,
+      const range = `${tabName}!A:K`;  // 11 أعمدة حسب الشيت الظاهر بالصورة
 
-      range: `${tabName}!A:Z`,
+      await sheets.spreadsheets.values.append({
 
-      valueInputOption: 'RAW',
+        spreadsheetId: sheetId,
 
-      requestBody: { values: [row] }
+        range,
 
-    });
+        valueInputOption: 'USER_ENTERED',
+
+        requestBody: { values: [row] }
+
+      });
+
+    } catch (appendErr) {
+
+      console.error('Append error:', appendErr);
+
+      // احتمال اسم التاب غير موجود → أعد رسالة واضحة
+
+      return {
+
+        statusCode: 500,
+
+        body: JSON.stringify({ ok:false, error: `Append failed. Check SHEET_TAB ("${tabName}") exists. Details: ${appendErr.message}` })
+
+      };
+
+    }
 
 
 
-    return {
-
-      statusCode: 200,
-
-      body: JSON.stringify({ ok: true })
-
-    };
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
 
 
 
   } catch (err) {
 
-    console.error('save-profile error:', err);
+    console.error('save-profile fatal error:', err);
 
-    return {
-
-      statusCode: 500,
-
-      body: JSON.stringify({ error: 'Failed to save profile' })
-
-    };
+    return { statusCode: 500, body: JSON.stringify({ ok:false, error: err.message || 'Failed to save profile' }) };
 
   }
 
