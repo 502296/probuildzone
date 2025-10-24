@@ -6,6 +6,32 @@ const Stripe = require('stripe');
 
 exports.handler = async (event) => {
 
+  // سمح لطلبات الـOPTIONS (بعض المتصفحات/شبكات الجوال ترسلها أولاً)
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return {
+
+      statusCode: 200,
+
+      headers: {
+
+        'Access-Control-Allow-Origin': '*',
+
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+        'Access-Control-Allow-Headers': 'Content-Type'
+
+      },
+
+      body: 'ok'
+
+    };
+
+  }
+
+
+
   if (event.httpMethod !== 'POST') {
 
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -16,11 +42,11 @@ exports.handler = async (event) => {
 
   try {
 
-    const secret = process.env.STRIPE_SECRET_KEY;
+    const secret  = process.env.STRIPE_SECRET_KEY;
 
-    const priceId = process.env.STRIPE_PRICE_MONTHLY; // يجب أن يبدأ بـ price_
+    const priceId = process.env.STRIPE_PRICE_MONTHLY;  // يجب أن يبدأ بـ price_
 
-    const siteUrl = process.env.SITE_URL;             // مثل https://probuildzone.com أو https://probuildzone.netlify.app
+    const siteUrl = process.env.SITE_URL;              // https://probuildzone.com أو netlify.app
 
 
 
@@ -36,9 +62,9 @@ exports.handler = async (event) => {
 
 
 
-    const stripe = new Stripe(secret);
-
     const { email } = JSON.parse(event.body || '{}');
+
+    const stripe = new Stripe(secret);
 
 
 
@@ -64,7 +90,13 @@ exports.handler = async (event) => {
 
 
 
-    return { statusCode: 200, body: JSON.stringify({ ok:true, url: session.url }) };
+    return {
+
+      statusCode: 200,
+
+      body: JSON.stringify({ ok: true, url: session.url })
+
+    };
 
   } catch (err) {
 
