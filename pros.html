@@ -519,6 +519,31 @@
 
 
         // إنشاء جلسة Stripe
+        // تخزين بيانات النموذج مؤقتًا قبل التحويل الى Stripe
+
+const payloadToSave = {
+
+  biz: company,
+
+  name: fullName,
+
+  email: email,
+
+  phone: form.phone?.value?.trim() || '',
+
+  address: form.address?.value?.trim() || '',
+
+  license: form.businessLicense?.value?.trim() || '',
+
+  insurance: form.insurance?.checked ? 'YES' : 'NO',
+
+  notes: form.notes?.value?.trim() || '',
+
+  status: 'trial_active'
+
+};
+
+sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
 
         const session = await createStripeSession({ email });
 
