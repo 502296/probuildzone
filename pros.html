@@ -478,140 +478,61 @@
 
 
 
-    // Create checkout session via Netlify Function
-
+    // Creat
     async function createStripeSession(payload){
-
       const r = await fetch('/.netlify/functions/create-checkout-session', {
-
         method:'POST',
-
         headers:{'Content-Type':'application/json'},
-
         body: JSON.stringify(payload || {})
-
       });
-
       const text = await r.text();
-
       if(!r.ok){
-
         console.error('create-session failed', r.status, text);
-
-        // يظهر سبب عام للمستخدم، والتفاصيل في الـconsole/Netlify logs
-
         throw new Error(`Could not start checkout (${r.status}).`);
-
       }
-
       try{ return JSON.parse(text); }catch(e){ return {}; }
-
     }
-
-
-
-    // Handle CTA click
-
     btn.addEventListener('click', async (e)=>{
-
       e.preventDefault();
-
       if(btn.disabled) return;
-
-
-
-      // Basic validation
-
       const company  = form.company?.value?.trim() || '';
-
       const fullName = form.fullName?.value?.trim() || '';
-
       const email    = form.email?.value?.trim() || '';
-
       if(!company || !fullName || !email){
-
         showToast('Please complete Company, Name and Email.', false);
-
         return;
-
       }
-
       if(!agree.checked){
-
         showToast('Please agree to Terms & Privacy to continue.', false);
-
         return;
-
       }
-
-
-
-      // Disable CTA during request
-
       const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Please wait…';
-
-
-
       try{
-
-        // Save form data for success.html → Google Sheet
-
         const payloadToSave = {
-
           biz: company,
-
           name: fullName,
-
           email,
-
           phone: form.phone?.value?.trim() || '',
-
           address: form.address?.value?.trim() || '',
-
           license: form.businessLicense?.value?.trim() || '',
-
           insurance: form.insurance?.checked ? 'YES' : 'NO',
-
           notes: form.notes?.value?.trim() || '',
-
           status: 'trial_active'
-
         };
-
         sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
-
-
-
-        // Create Stripe session
-
         const session = await createStripeSession({ email });
-
         if(session?.url){
-
           location.href = session.url;
-
         } else {
-
           showToast('Could not start checkout. Please try again.', false);
-
           btn.disabled = false; btn.textContent = prev;
-
         }
-
       }catch(err){
-
         console.error(err);
-
         showToast(err.message || 'Something went wrong. Please try again.', false);
-
         btn.disabled = false; btn.textContent = prev;
-
       }
-
     });
-
   </script>
-
 </body>
-
 </html>
