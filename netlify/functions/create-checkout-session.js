@@ -6,117 +6,71 @@ const Stripe = require('stripe');
 
 exports.handler = async (event) => {
 
+  if (event.httpMethod !== 'POST') {
+
+    return { statusCode: 405, body: 'Method Not Allowed' };
+
+  }
+
+
+
   try {
 
-    if (event.httpMethod !== 'POST') {
+    const secret = process.env.STRIPE_SECRET_KEY;
 
-      return { statusCode: 405, body: 'Method Not Allowed' };
+    const priceId = process.env.STRIPE_PRICE_MONTHLY; // يجب أن يبدأ بـ price_
 
-    }
-
-
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-
-      apiVersion: '2024-06-20',
-
-    });
+    const siteUrl = process.env.SITE_URL;             // مثل https://probuildzone.com أو https://probuildzone.netlify.app
 
 
 
-    const SITE_URL = process.env.SITE_URL || 'http://localhost:8888';
+    if (!secret || !priceId || !siteUrl) {
 
+      const msg = `Missing env: STRIPE_SECRET_KEY=${!!secret}, STRIPE_PRICE_MONTHLY=${!!priceId}, SITE_URL=${!!siteUrl}`;
 
+      console.error(msg);
 
-    const body = JSON.parse(event.body || '{}');
-
-    const {
-
-      mode = 'subscription',
-
-      priceName = 'MONTHLY',
-
-      trial_days = 0,
-
-      customer_email,
-
-      metadata = {},
-
-    } = body;
-
-
-
-    // نستخدم اشتراك شهري واحد فقط
-
-    const priceId =
-
-      priceName === 'MONTHLY'
-
-        ? process.env.STRIPE_PRICE_MONTHLY // price_...
-
-        : null;
-
-
-
-    if (!priceId) {
-
-      return {
-
-        statusCode: 400,
-
-        body: JSON.stringify({ error: 'Missing STRIPE_PRICE_MONTHLY' }),
-
-      };
+      return { statusCode: 500, body: JSON.stringify({ ok:false, error: msg }) };
 
     }
 
 
 
-    // إنشاء session مع trial optional
+    const stripe = new Stripe(secret);
+
+    const { email } = JSON.parse(event.body || '{}');
+
+
 
     const session = await stripe.checkout.sessions.create({
 
-      mode,
+      mode: 'subscription',
+
+      payment_method_types: ['card'],
+
+      customer_email: email || undefined,
+
+      allow_promotion_codes: true,
 
       line_items: [{ price: priceId, quantity: 1 }],
 
-      success_url: `${SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: `${SITE_URL}/cancel.html`,
+      cancel_url: `${siteUrl}/pros.html`,
 
-      customer_email: customer_email || undefined,
-
-      metadata,
-
-      subscription_data:
-
-        trial_days > 0 ? { trial_period_days: trial_days } : undefined,
-
-      allow_promotion_codes: true,
+      billing_address_collection: 'auto'
 
     });
 
 
 
-    return {
-
-      statusCode: 200,
-
-      body: JSON.stringify({ url: session.url }),
-
-    };
+    return { statusCode: 200, body: JSON.stringify({ ok:true, url: session.url }) };
 
   } catch (err) {
 
-    console.error('Checkout error:', err);
+    console.error('create-checkout-session error:', err);
 
-    return {
-
-      statusCode: 500,
-
-      body: JSON.stringify({ error: 'Failed to create session' }),
-
-    };
+    return { statusCode: 500, body: JSON.stringify({ ok:false, error: err.message || 'Failed to create session' }) };
 
   }
 
