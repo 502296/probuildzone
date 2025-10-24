@@ -32,4 +32,64 @@
 
   </div>
 
+  <script>
+
+  // 1) قراءة session_id من لينك Stripe
+
+  const u = new URL(window.location.href);
+
+  const session_id = u.searchParams.get('session_id') || '';
+
+
+
+  // 2) قراءة بيانات النموذج التي خزناها قبل الدفع
+
+  const stored = sessionStorage.getItem('pbz_profile');
+
+  const formData = stored ? JSON.parse(stored) : {};
+
+
+
+  // 3) إرسالها إلى Netlify Function: save-profile
+
+  fetch('/.netlify/functions/save-profile', {
+
+    method:'POST',
+
+    headers:{'Content-Type':'application/json'},
+
+    body: JSON.stringify({
+
+      ...formData,
+
+      stripe_customer_id: '',
+
+      stripe_subscription_id: '',
+
+      session_id
+
+    })
+
+  })
+
+  .then(r=>r.json())
+
+  .then(()=>{
+
+    // حذف التخزين حتى لا يتكرر الإرسال بالرجوع لنفس الصفحة
+
+    sessionStorage.removeItem('pbz_profile');
+
+    console.log('✅ Saved to Sheet');
+
+  })
+
+  .catch(err=>{
+
+    console.warn('Failed to save profile', err);
+
+  });
+
+</script>
+
 </body></html>
