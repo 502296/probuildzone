@@ -16,6 +16,28 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+  .agree{
+
+  display:flex; align-items:center; gap:10px;
+
+  color:var(--muted); font-size:13px;
+
+}
+
+.agree input{ margin:0; accent-color: var(--gold); }
+
+.agree a{ font-weight:700; }
+
+
+
+@media (max-width:860px){
+
+  form{ grid-template-columns:1fr; }
+
+  .actions{ flex-direction:column; align-items:stretch; }
+
+}
+
   <style>
 
     :root{
