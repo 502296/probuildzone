@@ -22,7 +22,7 @@
 
     :root{
 
-      /* Brand */
+      /* Brand + neutrals */
 
       --pbz-blue:#0F2A43;
 
@@ -36,19 +36,21 @@
 
 
 
-      /* Surface */
+      /* Surfaces */
 
-      --bg-0:#f5f9ff;  /* خلفية أفتح */
+      --bg-0:#f7fbff;
 
-      --bg-1:#eaf3ff;  /* بطاقات هيرو */
+      --bg-1:#eaf3ff;
 
       --card:#ffffff;
 
 
 
-      /* Accent (gold button) */
+      /* Accent gold */
 
       --gold:#f4c045;
+
+      --gold-700:#d9a82e;
 
       --gold-hover:#ffd876;
 
@@ -72,6 +74,8 @@
 
       color:var(--ink);
 
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+
     }
 
     a{color:inherit;text-decoration:none}
@@ -92,7 +96,7 @@
 
     }
 
-    .nav{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 18px}
+    .nav{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 18px}
 
     .brand{display:flex;align-items:center;gap:12px;font-weight:800}
 
@@ -154,6 +158,8 @@
 
       background:#fff;color:var(--ink);font-size:14px;outline:none;
 
+      transition:border-color .15s ease, box-shadow .15s ease;
+
     }
 
     input::placeholder, textarea::placeholder{color:#9ab0c6}
@@ -166,7 +172,7 @@
 
 
 
-    /* Insurance checkbox row */
+    /* Insurance row */
 
     .inline-check{grid-column:span 2;display:flex;align-items:center;gap:10px}
 
@@ -186,19 +192,75 @@
 
 
 
-    /* Terms agree (checkbox + text ملاصق) */
+    /* ======= Premium Agree checkbox ======= */
 
     .agree{
 
-      display:flex;align-items:center;gap:10px;
+      display:grid;
 
-      color:var(--muted);font-size:13px;line-height:1.4
+      grid-template-columns: 26px 1fr;   /* large box + text */
+
+      column-gap:12px;
+
+      align-items:start;
+
+      color:var(--muted);
+
+      font-size:13px;
+
+      line-height:1.5;
+
+      max-width:100%;
 
     }
 
-    .agree input{margin:0;accent-color:var(--gold)}
+    .agree input[type="checkbox"]{
 
-    .agree a{font-weight:700}
+      /* hide native style, build custom */
+
+      appearance:none; -webkit-appearance:none; -moz-appearance:none;
+
+      width:26px; height:26px;
+
+      border-radius:8px;                     /* modern rounded */
+
+      border:2px solid var(--gold);          /* golden outline */
+
+      background:#fff;
+
+      display:grid; place-items:center;
+
+      box-shadow:0 2px 6px rgba(0,0,0,.05);
+
+      cursor:pointer;
+
+      transition:background .15s ease, box-shadow .15s ease, border-color .15s ease, transform .05s ease;
+
+    }
+
+    .agree input[type="checkbox"]:active{ transform:scale(.98); }
+
+    .agree input[type="checkbox"]::after{
+
+      content:""; width:14px; height:14px; border-radius:4px;
+
+      transform:scale(0); transition:transform .12s ease-out;
+
+      background:linear-gradient(180deg, var(--gold), var(--gold-700));
+
+      /* check icon overlay */
+
+      mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="white" d="M7.5 13.5L3.8 9.8l-1.6 1.6L7.5 18l10-10-1.6-1.6z"/></svg>') center/contain no-repeat;
+
+      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="white" d="M7.5 13.5L3.8 9.8l-1.6 1.6L7.5 18l10-10-1.6-1.6z"/></svg>') center/contain no-repeat;
+
+    }
+
+    .agree input[type="checkbox"]:checked::after{ transform:scale(1); }
+
+    .agree span{ display:block; word-break:break-word; }
+
+    .agree a{font-weight:700; color:var(--pbz-blue)}
 
 
 
@@ -260,7 +322,9 @@
 
       .span-2{grid-column:span 1}
 
-      .actions{flex-direction:column;align-items:stretch}
+      .actions{flex-direction:column;align-items:stretch;gap:16px}
+
+      .agree{width:100%}
 
     }
 
@@ -478,61 +542,136 @@
 
 
 
-    // Creat
+    // Create checkout session via Netlify Function
+
     async function createStripeSession(payload){
+
       const r = await fetch('/.netlify/functions/create-checkout-session', {
+
         method:'POST',
+
         headers:{'Content-Type':'application/json'},
+
         body: JSON.stringify(payload || {})
+
       });
+
       const text = await r.text();
+
       if(!r.ok){
+
         console.error('create-session failed', r.status, text);
+
         throw new Error(`Could not start checkout (${r.status}).`);
+
       }
+
       try{ return JSON.parse(text); }catch(e){ return {}; }
+
     }
+
+
+
+    // CTA handler
+
     btn.addEventListener('click', async (e)=>{
+
       e.preventDefault();
+
       if(btn.disabled) return;
+
+
+
+      // Basic validation
+
       const company  = form.company?.value?.trim() || '';
+
       const fullName = form.fullName?.value?.trim() || '';
+
       const email    = form.email?.value?.trim() || '';
+
       if(!company || !fullName || !email){
+
         showToast('Please complete Company, Name and Email.', false);
+
         return;
+
       }
+
       if(!agree.checked){
+
         showToast('Please agree to Terms & Privacy to continue.', false);
+
         return;
+
       }
+
+
+
       const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Please wait…';
+
+
+
       try{
+
+        // Save form data → used on success.html to write to Google Sheet
+
         const payloadToSave = {
+
           biz: company,
+
           name: fullName,
+
           email,
+
           phone: form.phone?.value?.trim() || '',
+
           address: form.address?.value?.trim() || '',
+
           license: form.businessLicense?.value?.trim() || '',
+
           insurance: form.insurance?.checked ? 'YES' : 'NO',
+
           notes: form.notes?.value?.trim() || '',
+
           status: 'trial_active'
+
         };
+
         sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
+
+
+
+        // Create Stripe session
+
         const session = await createStripeSession({ email });
+
         if(session?.url){
+
           location.href = session.url;
+
         } else {
+
           showToast('Could not start checkout. Please try again.', false);
+
           btn.disabled = false; btn.textContent = prev;
+
         }
+
       }catch(err){
+
         console.error(err);
+
         showToast(err.message || 'Something went wrong. Please try again.', false);
+
         btn.disabled = false; btn.textContent = prev;
+
       }
+
     });
+
   </script>
+
 </body>
+
 </html>
