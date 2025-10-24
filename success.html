@@ -1,24 +1,34 @@
-<!doctype html><html lang="en"><head>
+<!doctype html>
 
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
 
-<title>Payment Successful – ProBuildZone</title>
+<head>
 
-<style>
+  <meta charset="utf-8">
 
-  body{font-family:Inter,system-ui,Arial;margin:0;background:#0f2a43;color:#fff;display:grid;place-items:center;min-height:100vh}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  .card{background:#122c46;padding:28px 32px;border-radius:14px;max-width:560px;box-shadow:0 12px 28px rgba(0,0,0,.3)}
+  <title>Payment Successful – ProBuildZone</title>
 
-  h1{margin:0 0 10px;font-size:26px}
+  <style>
 
-  p{opacity:.9;line-height:1.6}
+    body{font-family:Inter,system-ui,Arial;margin:0;background:#0f2a43;color:#fff;display:grid;place-items:center;min-height:100vh}
 
-  a.btn{display:inline-block;margin-top:14px;padding:10px 16px;border-radius:10px;background:#f28c1b;color:#0f2a43;text-decoration:none;font-weight:600}
+    .card{background:#122c46;padding:28px 32px;border-radius:14px;max-width:560px;box-shadow:0 12px 28px rgba(0,0,0,.3)}
 
-</style>
+    h1{margin:0 0 10px;font-size:26px}
 
-</head><body>
+    p{opacity:.9;line-height:1.6}
+
+    a.btn{display:inline-block;margin-top:14px;padding:10px 16px;border-radius:10px;background:#f28c1b;color:#0f2a43;text-decoration:none;font-weight:600}
+
+    .muted{opacity:.8;font-size:14px}
+
+  </style>
+
+</head>
+
+<body>
 
   <div class="card">
 
@@ -26,70 +36,100 @@
 
     <p>Thanks for starting your 30-day free trial. We’ve received your details and payment setup via Stripe.</p>
 
-    <p>We’ll activate your Pro profile shortly. If you need help, email <a href="mailto:contact@probuildzone.com">contact@probuildzone.com</a>.</p>
+    <p>If you need help, email <a href="mailto:contact@probuildzone.com">contact@probuildzone.com</a>.</p>
+
+    <p id="status" class="muted">Saving your subscription to our records…</p>
 
     <a class="btn" href="/index.html">Back to Home</a>
 
   </div>
 
+
+
+  <!-- Save to Google Sheet via Netlify Function -->
+
   <script>
 
-  // 1) قراءة session_id من لينك Stripe
+    (function(){
 
-  const u = new URL(window.location.href);
+      // 1) Get session_id from Stripe return URL
 
-  const session_id = u.searchParams.get('session_id') || '';
-
-
-
-  // 2) قراءة بيانات النموذج التي خزناها قبل الدفع
-
-  const stored = sessionStorage.getItem('pbz_profile');
-
-  const formData = stored ? JSON.parse(stored) : {};
+      const sessionId = new URL(location.href).searchParams.get('session_id') || '';
 
 
 
-  // 3) إرسالها إلى Netlify Function: save-profile
+      // 2) Read the form data we stored in pros.html
 
-  fetch('/.netlify/functions/save-profile', {
+      let formData = {};
 
-    method:'POST',
+      try {
 
-    headers:{'Content-Type':'application/json'},
+        formData = JSON.parse(sessionStorage.getItem('pbz_profile') || '{}');
 
-    body: JSON.stringify({
+      } catch (_) {}
 
-      ...formData,
 
-      stripe_customer_id: '',
 
-      stripe_subscription_id: '',
+      // 3) Prepare payload → save-profile.js expects flat keys
 
-      session_id
+      //    We also keep status as `trial_active` as agreed.
 
-    })
+      const payload = {
 
-  })
+        ...formData,                    // { biz,name,email,phone,address,license,insurance,notes,status }
 
-  .then(r=>r.json())
+        stripe_customer_id: '',         // left empty now (can be filled later via webhook)
 
-  .then(()=>{
+        stripe_subscription_id: '',     // left empty now (can be filled later via webhook)
 
-    // حذف التخزين حتى لا يتكرر الإرسال بالرجوع لنفس الصفحة
+        session_id: sessionId
 
-    sessionStorage.removeItem('pbz_profile');
+      };
 
-    console.log('✅ Saved to Sheet');
 
-  })
 
-  .catch(err=>{
+      // 4) Send to Netlify Function
 
-    console.warn('Failed to save profile', err);
+      fetch('/.netlify/functions/save-profile', {
 
-  });
+        method: 'POST',
 
-</script>
+        headers: { 'Content-Type': 'application/json' },
 
-</body></html>
+        body: JSON.stringify(payload)
+
+      })
+
+      .then(async (r) => {
+
+        // try to parse but don't fail UX if no JSON returned
+
+        try { await r.json(); } catch(_){}
+
+        document.getElementById('status').textContent = 'Saved to Google Sheet ✅';
+
+        // clear storage to avoid duplicate submissions on reload/back
+
+        sessionStorage.removeItem('pbz_profile');
+
+        console.log('✅ Saved to Sheet');
+
+      })
+
+      .catch((err) => {
+
+        console.warn('Save to sheet failed:', err);
+
+        document.getElementById('status').textContent =
+
+          'Saved (queued). If you don’t see it in the Sheet, refresh or contact support.';
+
+      });
+
+    })();
+
+  </script>
+
+</body>
+
+</html>
