@@ -6,9 +6,31 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-
 
 
 
+const CORS = {
+
+  'Access-Control-Allow-Origin': '*',
+
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+  'Access-Control-Allow-Headers': 'Content-Type'
+
+};
+
+
+
 exports.handler = async (event) => {
 
-  // السماح فقط بـ POST
+  // 1) CORS preflight
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return { statusCode: 200, headers: CORS, body: 'ok' };
+
+  }
+
+
+
+  // 2) امنع أي ميثود غير POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -16,9 +38,9 @@ exports.handler = async (event) => {
 
       statusCode: 405,
 
-      headers: { 'Allow': 'POST', 'Content-Type': 'application/json' },
+      headers: { ...CORS, Allow: 'POST' },
 
-      body: JSON.stringify({ error: 'Method Not Allowed. Use POST.' })
+      body: JSON.stringify({ ok: false, error: 'Method Not Allowed. Use POST.' })
 
     };
 
@@ -28,19 +50,29 @@ exports.handler = async (event) => {
 
   try {
 
-    const data = JSON.parse(event.body || '{}');
-
-
-
     const priceId =
 
-      data.priceId ||
+      process.env.STRIPE_PRICE_MONTHLY || // price_... (لو تريد الشهري $25)
 
-      process.env.STRIPE_PRICE_YEARLY ||     // price_... للاشتراك السنوي
-
-      process.env.STRIPE_PRICE_MONTHLY;      // (اختياري) لو عندك الشهري
+      process.env.STRIPE_PRICE_YEARLY;    // أو السنوي $300
 
 
+
+    const siteUrl = process.env.SITE_URL; // مثال: https://probuildzone.netlify.app أو دومينك
+
+    if (!process.env.STRIPE_SECRET_KEY || !priceId || !siteUrl) {
+
+      const msg = `Missing env: STRIPE_SECRET_KEY=${!!process.env.STRIPE_SECRET_KEY}, PRICE=${!!priceId}, SITE_URL=${!!siteUrl}`;
+
+      console.error(msg);
+
+      return { statusCode: 500, headers: CORS, body: JSON.stringify({ ok:false, error: msg }) };
+
+    }
+
+
+
+    const body = JSON.parse(event.body || '{}');
 
     const session = await stripe.checkout.sessions.create({
 
@@ -48,43 +80,33 @@ exports.handler = async (event) => {
 
       payment_method_types: ['card'],
 
-      line_items: [{ price: priceId, quantity: 1 }],
+      customer_email: body.email || undefined,
 
       allow_promotion_codes: true,
 
-      subscription_data: { trial_period_days: 30 }, // 30 يوم تجربة
+      line_items: [{ price: priceId, quantity: 1 }],
 
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      // لو تريد تجربة 30 يوم فعل السطر التالي:
 
-      cancel_url: `${process.env.SITE_URL}/cancel.html`
+      subscription_data: { trial_period_days: 30 },
+
+      success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+
+      cancel_url: `${siteUrl}/pros.html`,
+
+      billing_address_collection: 'auto'
 
     });
 
 
 
-    return {
-
-      statusCode: 200,
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ url: session.url })
-
-    };
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok:true, url: session.url }) };
 
   } catch (err) {
 
-    console.error('Stripe create session error:', err);
+    console.error('create-checkout-session error:', err);
 
-    return {
-
-      statusCode: 500,
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ error: 'Failed to create checkout session' })
-
-    };
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ ok:false, error: err.message }) };
 
   }
 
