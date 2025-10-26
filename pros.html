@@ -1,677 +1,329 @@
 <!doctype html>
-
 <html lang="en" dir="ltr">
-
 <head>
-
-  <meta charset="utf-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>ProBuildZone — For Pros</title>
-
-  <meta name="description" content="ProBuildZone Pro Onboarding">
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-
-
-  <style>
-
-    :root{
-
-      /* Brand + neutrals */
-
-      --pbz-blue:#0F2A43;
-
-      --ink:#102538;
-
-      --muted:#5f7286;
-
-      --line:#dbe7f5;
-
-      --focus:rgba(62,168,255,.25);
-
-
-
-      /* Surfaces */
-
-      --bg-0:#f7fbff;
-
-      --bg-1:#eaf3ff;
-
-      --card:#ffffff;
-
-
-
-      /* Accent gold */
-
-      --gold:#f4c045;
-
-      --gold-700:#d9a82e;
-
-      --gold-hover:#ffd876;
-
-      --gold-text:#0f2a43;
-
-    }
-
-
-
-    *{box-sizing:border-box}
-
-    html,body{height:100%}
-
-    body{
-
-      margin:0;
-
-      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-
-      background:linear-gradient(180deg, var(--bg-0), #ffffff);
-
-      color:var(--ink);
-
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-
-    }
-
-    a{color:inherit;text-decoration:none}
-
-
-
-    /* Header */
-
-    header{
-
-      position:sticky;top:0;z-index:30;
-
-      background:rgba(255,255,255,.85);
-
-      backdrop-filter: blur(6px);
-
-      border-bottom:1px solid var(--line);
-
-    }
-
-    .nav{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 18px}
-
-    .brand{display:flex;align-items:center;gap:12px;font-weight:800}
-
-    .brand img{height:40px;width:auto;border-radius:8px;display:block}
-
-    .brand .name{font-size:20px;color:var(--pbz-blue)}
-
-
-
-    /* Layout */
-
-    main{padding:26px 16px}
-
-    .wrap{max-width:980px;margin:0 auto;display:grid;gap:22px}
-
-
-
-    /* Hero */
-
-    .hero{
-
-      background:linear-gradient(180deg, var(--bg-1), #fff);
-
-      border:1px solid var(--line); border-radius:16px; padding:22px 20px;
-
-      box-shadow:0 10px 28px rgba(31,147,245,.10)
-
-    }
-
-    .hero h1{margin:0 0 8px;font-size:28px;line-height:1.2;color:var(--pbz-blue)}
-
-    .hero p{margin:0;color:#24415a}
-
-
-
-    /* Card/Form */
-
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 36px rgba(31,147,245,.08)}
-
-    .form{padding:22px}
-
-    form{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-
-
-
-    .group{display:flex;flex-direction:column;gap:8px}
-
-    label{font-size:13px;font-weight:700;color:var(--pbz-blue)}
-
-    input,textarea{
-
-      width:100%;
-
-      padding:12px 14px;
-
-      border:1px solid #cfe1f5;
-
-      border-radius:12px;
-
-      background:#fff;color:var(--ink);font-size:14px;outline:none;
-
-      transition:border-color .15s ease, box-shadow .15s ease;
-
-    }
-
-    input::placeholder, textarea::placeholder{color:#9ab0c6}
-
-    input:focus,textarea:focus{border-color:#9ec9ff;box-shadow:0 0 0 3px var(--focus)}
-
-    textarea{min-height:110px;resize:vertical}
-
-    .span-2{grid-column:span 2}
-
-
-
-    /* Insurance row */
-
-    .inline-check{grid-column:span 2;display:flex;align-items:center;gap:10px}
-
-    .inline-check input{width:auto;accent-color:#1f93f5}
-
-
-
-    /* Actions row */
-
-    .actions{
-
-      grid-column:span 2;display:flex;flex-wrap:wrap;
-
-      justify-content:space-between;align-items:center;gap:12px;margin-top:2px
-
-    }
-
-
-
-    /* ======= Premium Agree checkbox ======= */
-
-    .agree{
-
-      display:grid;
-
-      grid-template-columns: 26px 1fr;   /* large box + text */
-
-      column-gap:12px;
-
-      align-items:start;
-
-      color:var(--muted);
-
-      font-size:13px;
-
-      line-height:1.5;
-
-      max-width:100%;
-
-    }
-
-    .agree input[type="checkbox"]{
-
-      /* hide native style, build custom */
-
-      appearance:none; -webkit-appearance:none; -moz-appearance:none;
-
-      width:26px; height:26px;
-
-      border-radius:8px;                     /* modern rounded */
-
-      border:2px solid var(--gold);          /* golden outline */
-
-      background:#fff;
-
-      display:grid; place-items:center;
-
-      box-shadow:0 2px 6px rgba(0,0,0,.05);
-
-      cursor:pointer;
-
-      transition:background .15s ease, box-shadow .15s ease, border-color .15s ease, transform .05s ease;
-
-    }
-
-    .agree input[type="checkbox"]:active{ transform:scale(.98); }
-
-    .agree input[type="checkbox"]::after{
-
-      content:""; width:14px; height:14px; border-radius:4px;
-
-      transform:scale(0); transition:transform .12s ease-out;
-
-      background:linear-gradient(180deg, var(--gold), var(--gold-700));
-
-      /* check icon overlay */
-
-      mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="white" d="M7.5 13.5L3.8 9.8l-1.6 1.6L7.5 18l10-10-1.6-1.6z"/></svg>') center/contain no-repeat;
-
-      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="white" d="M7.5 13.5L3.8 9.8l-1.6 1.6L7.5 18l10-10-1.6-1.6z"/></svg>') center/contain no-repeat;
-
-    }
-
-    .agree input[type="checkbox"]:checked::after{ transform:scale(1); }
-
-    .agree span{ display:block; word-break:break-word; }
-
-    .agree a{font-weight:700; color:var(--pbz-blue)}
-
-
-
-    /* Buttons */
-
-    .btn{
-
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-
-      padding:14px 18px;border-radius:14px;border:1px solid #e7e2cf;
-
-      cursor:pointer;font-weight:800;letter-spacing:.2px;
-
-      transition:transform .05s ease, box-shadow .15s ease, background .15s ease, opacity .15s;
-
-      user-select:none;background:#fff
-
-    }
-
-    .btn[disabled]{opacity:.6;cursor:not-allowed}
-
-    .btn-gold{background:var(--gold);color:var(--gold-text);border:0;box-shadow:0 10px 24px rgba(244,192,69,.35)}
-
-    .btn-gold:hover{transform:translateY(-1px);background:var(--gold-hover)}
-
-    .btn-gold:active{transform:translateY(1px)}
-
-
-
-    /* Footer */
-
-    .footer{max-width:980px;margin:26px auto 6px;color:var(--muted);font-size:12.5px;text-align:center}
-
-
-
-    /* Toast */
-
-    .toast{
-
-      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
-
-      background:#0F2A43;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);
-
-      opacity:0;pointer-events:none;transition:.3s ease;z-index:40
-
-    }
-
-    .toast.show{opacity:1;pointer-events:auto}
-
-    .toast.error{background:#9b1c1c}
-
-
-
-    /* Responsive */
-
-    @media (max-width:860px){
-
-      form{grid-template-columns:1fr}
-
-      .span-2{grid-column:span 1}
-
-      .actions{flex-direction:column;align-items:stretch;gap:16px}
-
-      .agree{width:100%}
-
-    }
-
-  </style>
-
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ProBuildZone — For Pros</title>
+<meta name="description" content="ProBuildZone Pro Onboarding">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--pbz-blue:#0F2A43;
+--pbz-blue-2:#0b2033;
+--gold:#D4AF37;
+--gold-700:#b9962f;
+--muted:#6b7a8c;
+--bg:#f6f7fb;
+--card:#ffffff;
+--error:#b00020;
+--ok:#0a8f55;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+margin:0;
+font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+color:#111;
+background:linear-gradient(180deg, #0f2a43 0%, #103252 35%, #0f2a43 100%) fixed;
+}
+
+/* Header */
+header{
+position:sticky; top:0; z-index:50;
+background:rgba(255,255,255,.06);
+backdrop-filter: blur(6px);
+border-bottom:1px solid rgba(255,255,255,.12);
+}
+.nav{max-width:980px; margin:0 auto; display:flex; align-items:center; gap:14px; padding:10px 16px; color:#fff}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff}
+.brand img{height:28px; width:auto; display:block}
+.name{font-weight:800; letter-spacing:.3px}
+
+/* Main wrapper */
+.wrap{max-width:980px; margin:0 auto; padding:22px 16px 120px}
+
+/* Hero */
+.hero{
+background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+border:1px solid rgba(255,255,255,.12);
+color:#fff; border-radius:18px; padding:24px 22px; margin-bottom:18px;
+box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
+.hero h1{margin:0 0 6px; font-size:26px}
+.hero p{margin:0; color:#e6edf6}
+
+/* Card */
+.card{
+background:var(--card); border-radius:18px; padding:20px;
+border:1px solid #e7eef6; box-shadow: 0 10px 28px rgba(3,20,33,.15);
+}
+
+/* Form grid */
+form{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.span-2{grid-column:1 / -1}
+.group label{display:block; font-weight:700; color:var(--pbz-blue); margin:4px 0 6px}
+.group input, .group select, .group textarea{
+width:100%; padding:12px 13px; border-radius:12px; border:1px solid #d7e1ec;
+background:#fff; outline:0; font-size:15px;
+}
+.group input:focus, .group select:focus, .group textarea:focus{
+border-color: var(--pbz-blue);
+box-shadow: 0 0 0 3px rgba(15,42,67,.15);
+}
+textarea{min-height:110px; resize:vertical}
+
+/* Agree (custom checkbox with golden outline) */
+.agree{display:grid; grid-template-columns:26px 1fr; column-gap:12px; align-items:start; color:var(--muted); font-size:13px; line-height:1.5}
+.agree input[type="checkbox"]{
+appearance:none; -webkit-appearance:none; -moz-appearance:none;
+width:26px; height:26px; border-radius:8px;
+border:2px solid var(--gold); background:#fff; position:relative; cursor:pointer;
+transition:background .15s ease, box-shadow .15s ease, border-color .15s ease, transform .05s ease;
+}
+.agree input[type="checkbox"]:active{ transform:scale(.98);}
+.agree input[type="checkbox"]::after{
+content:""; width:14px; height:14px; border-radius:4px; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0);
+background:linear-gradient(180deg, var(--gold), var(--gold-700));
+box-shadow: inset 0 0 0 2px rgba(255,255,255,.75);
+transition:transform .12s ease-out;
+}
+.agree input[type="checkbox"]:checked::after{ transform:translate(-50%,-50%) scale(1); }
+.agree a{color:var(--pbz-blue); font-weight:700; text-decoration:none}
+
+/* Buttons */
+.actions{display:flex; gap:12px; flex-wrap:wrap}
+.btn{
+display:inline-flex; align-items:center; justify-content:center;
+padding:14px 18px; border-radius:14px; border:1px solid #e7e2cf; font-weight:800; letter-spacing:.2px; cursor:pointer; user-select:none; background:#fff;
+transition:transform .05s ease, box-shadow .15s ease, background .15s ease, opacity .15s;
+}
+.btn[disabled]{opacity:.6; cursor:not-allowed}
+.btn-gold{
+color:var(--gold-700); border:0; background:#fff;
+box-shadow:0 12px 24px rgba(244,192,69,.35);
+}
+.btn-gold:hover{ transform:translateY(-1px)}
+.btn-gold:active{ transform:translateY(0)}
+.btn-reset{background:#f0f4f8}
+
+/* Fixed CTA on mobile */
+.cta-bar{
+position:fixed; left:0; right:0; bottom:0; z-index:60;
+background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 18%, rgba(255,255,255,1) 38%);
+padding:10px 12px 14px; border-top:1px solid #e7eef6;
+display:none;
+}
+.cta-inner{max-width:980px; margin:0 auto; display:flex; gap:10px; justify-content:flex-end}
+@media (max-width:768px){
+.cta-bar{display:block}
+}
+
+/* Footer */
+.footer{max-width:980px; margin:26px auto; color:#fff; font-size:12.5px; text-align:center}
+
+/* Toast */
+.toast{
+position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+background:#0F2A43; color:#fff; padding:12px 14px; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.18);
+display:none; z-index:80; font-weight:700; letter-spacing:.2px; max-width:92%; text-align:center;
+}
+.toast.ok{background:var(--ok)}
+.toast.err{background:var(--error)}
+</style>
 </head>
-
-
-
 <body>
-
-  <header>
-
-    <div class="nav">
-
-      <a class="brand" href="/">
-
-        <img src="LOGO_URL" alt="ProBuildZone Logo" onerror="this.style.display='none'">
-
-        <div class="name">ProBuildZone</div>
-
-      </a>
-
-    </div>
-
-  </header>
-
-
-
-  <main>
-
-    <div class="wrap">
-
-      <!-- Hero -->
-
-      <section class="hero">
-
-        <h1>Join ProBuildZone — Get Local Jobs</h1>
-
-        <p>Start your <b>30-day free trial</b>. Monthly plan after trial — cancel anytime during the trial.</p>
-
-      </section>
-
-
-
-      <!-- Form -->
-
-      <section class="card form">
-
-        <form id="proForm" autocomplete="on" novalidate>
-
-          <div class="group">
-
-            <label for="company">Company Name</label>
-
-            <input id="company" name="company" placeholder="e.g., Bluegrass Builders LLC" required>
-
-          </div>
-
-
-
-          <div class="group">
-
-            <label for="fullName">Your Name</label>
-
-            <input id="fullName" name="fullName" placeholder="Full name" required>
-
-          </div>
-
-
-
-          <div class="group">
-
-            <label for="email">Email</label>
-
-            <input id="email" name="email" type="email" inputmode="email" placeholder="you@company.com" required>
-
-          </div>
-
-
-
-          <div class="group">
-
-            <label for="phone">Phone</label>
-
-            <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(502) 555-0123">
-
-          </div>
-
-
-
-          <div class="group span-2">
-
-            <label for="address">Business Address</label>
-
-            <input id="address" name="address" placeholder="Street, City, State">
-
-          </div>
-
-
-
-          <div class="group">
-
-            <label for="businessLicense">Business License / #</label>
-
-            <input id="businessLicense" name="businessLicense" placeholder="License number (if applicable)">
-
-          </div>
-
-
-
-          <div class="inline-check">
-
-            <input id="insurance" name="insurance" type="checkbox">
-
-            <label for="insurance">I have active liability insurance</label>
-
-          </div>
-
-
-
-          <div class="group span-2">
-
-            <label for="notes">Notes (Optional)</label>
-
-            <textarea id="notes" name="notes" placeholder="Tell homeowners what you specialize in..."></textarea>
-
-          </div>
-
-
-
-          <div class="actions">
-
-            <label class="agree">
-
-              <input id="agree" type="checkbox" required>
-
-              <span>By starting your free trial, you agree to our <a href="/terms.html">Terms</a> &amp; <a href="/privacy.html">Privacy</a>.</span>
-
-            </label>
-
-
-
-            <div>
-
-              <button class="btn" type="reset">Reset</button>
-
-              <button class="btn btn-gold" id="startTrial" type="button" disabled>Start Free Trial</button>
-
-            </div>
-
-          </div>
-
-        </form>
-
-      </section>
-
-    </div>
-
-
-
-    <div class="footer">© <span id="year"></span> ProBuildZone — Fair Prices · Local Pros</div>
-
-  </main>
-
-
-
-  <!-- Toast -->
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-
-
-  <script>
-
-    // السنة الحالية
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-
-
-    // Toast helper
-
-    const toast = document.getElementById('toast');
-
-    function showToast(msg, ok = true){
-
-      toast.textContent = msg;
-
-      toast.classList.toggle('error', !ok);
-
-      toast.classList.add('show');
-
-      setTimeout(()=> toast.classList.remove('show'), 2400);
-
-    }
-
-
-
-    // Elements
-
-    const agree = document.getElementById('agree');
-
-    const btn   = document.getElementById('startTrial');
-
-    const form  = document.getElementById('proForm');
-
-
-
-    // Enable/disable CTA based on agree
-
-    function syncBtn(){ btn.disabled = !agree.checked; }
-
-    agree.addEventListener('change', syncBtn); syncBtn();
-
-
-
-    // Create checkout session via Netlify Function
-
-    async function createStripeSession(payload){
-
-      const r = await fetch('/.netlify/functions/create-checkout-session', {
-
-        method:'POST',
-
-        headers:{'Content-Type':'application/json'},
-
-        body: JSON.stringify(payload || {})
-
-      });
-
-      const text = await r.text();
-
-      if(!r.ok){
-
-        console.error('create-session failed', r.status, text);
-
-        throw new Error(`Could not start checkout (${r.status}).`);
-
-      }
-
-      try{ return JSON.parse(text); }catch(e){ return {}; }
-
-    }
-
-
-
-    // CTA handler
-
-    btn.addEventListener('click', async (e)=>{
-
-      e.preventDefault();
-
-      if(btn.disabled) return;
-
-
-
-      // Basic validation
-
-      const company  = form.company?.value?.trim() || '';
-
-      const fullName = form.fullName?.value?.trim() || '';
-
-      const email    = form.email?.value?.trim() || '';
-
-      if(!company || !fullName || !email){
-
-        showToast('Please complete Company, Name and Email.', false);
-
-        return;
-
-      }
-
-      if(!agree.checked){
-
-        showToast('Please agree to Terms & Privacy to continue.', false);
-
-        return;
-
-      }
-
-
-
-      const prev = btn.textContent; btn.disabled = true; btn.textContent = 'Please wait…';
-
-
-
-      try{
-
-        // Save form data → used on success.html to write to Google Sheet
-
-        const payloadToSave = {
-
-          biz: company,
-
-          name: fullName,
-
-          email,
-
-          phone: form.phone?.value?.trim() || '',
-
-          address: form.address?.value?.trim() || '',
-
-          license: form.businessLicense?.value?.trim() || '',
-
-          insurance: form.insurance?.checked ? 'YES' : 'NO',
-
-          notes: form.notes?.value?.trim() || '',
-
-          status: 'trial_active'
-
-        };
-
-        sessionStorage.setItem('pbz_profile', JSON.stringify(payloadToSave));
-
-
-
-        // Create Stripe session
-
-        const session = await createStripeSession({ email });
-
-        if(session?.url){
-
-          location.href = session.url;
-
-        } else {
-
-          showToast('Could not start checkout. Please try again.', false);
-
-          btn.disabled = false; btn.textContent = prev;
-
-        }
-
-      }catch(err){
-
-        console.error(err);
-
-        showToast(err.message || 'Something went wrong. Please try again.', false);
-
-        btn.disabled = false; btn.textContent = prev;
-
-      }
-
-    });
-
-  </script>
-
+<header>
+<div class="nav">
+<a class="brand" href="/">
+<img src="" alt="ProBuildZone Logo" onerror="this.style.display='none'">
+<div class="name">ProBuildZone</div>
+</a>
+</div>
+</header>
+
+<main>
+<div class="wrap">
+<!-- Hero -->
+<section class="hero">
+<h1>ProBuildZone — For Pros</h1>
+<p>Start your <strong>30-day free trial</strong>. Fair Prices • Local Pros</p>
+</section>
+
+<!-- Form Card -->
+<section class="card">
+<form id="prosForm" autocomplete="on">
+<div class="group">
+<label for="company">Company Name</label>
+<input id="company" name="company" placeholder="Your company LLC" required>
+</div>
+
+<div class="group">
+<label for="fullName">Your Name</label>
+<input id="fullName" name="fullName" placeholder="Full name" required>
+</div>
+
+<div class="group">
+<label for="email">Email</label>
+<input id="email" name="email" type="email" placeholder="you@company.com" required>
+</div>
+
+<div class="group">
+<label for="phone">Phone</label>
+<input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(502) 555-0123" required>
+</div>
+
+<div class="group span-2">
+<label for="address">Business Address</label>
+<input id="address" name="address" placeholder="Street, City, State" required>
+</div>
+
+<div class="group">
+<label for="license">Business License</label>
+<input id="license" name="license" placeholder="License # / State" required>
+</div>
+
+<div class="group">
+<label for="insurance">Insurance (Optional)</label>
+<select id="insurance" name="insurance">
+<option value="">Not provided</option>
+<option value="General Liability">General Liability</option>
+<option value="Workers’ Comp">Workers’ Comp</option>
+<option value="Both">Both</option>
+</select>
+</div>
+
+<div class="group span-2">
+<label for="services">Services & Notes (optional)</label>
+<textarea id="services" name="services" placeholder="e.g., Decks, Roofing, Remodeling…"></textarea>
+</div>
+
+<div class="group span-2">
+<label class="agree">
+<input id="agree" type="checkbox" required>
+<span>By starting your free trial, you agree to our <a href="terms.html" target="_blank" rel="noopener">Terms</a> &amp; <a href="privacy.html" target="_blank" rel="noopener">Privacy</a>.</span>
+</label>
+</div>
+
+<div class="span-2 actions">
+<button class="btn btn-reset" id="resetBtn" type="reset">Reset</button>
+<!-- زر علوي (للديسكتوب) -->
+<button class="btn btn-gold" id="startTrial" type="button" disabled>Start Free Trial</button>
+</div>
+</form>
+</section>
+
+<div class="footer"><span id="year"></span> ProBuildZone – Fair Prices • Local Pros</div>
+</div>
+</main>
+
+<!-- CTA سفلية للموبايل -->
+<div class="cta-bar">
+<div class="cta-inner">
+<button class="btn btn-gold" id="startTrialBottom" type="button" disabled>Start Free Trial</button>
+</div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const form = document.getElementById('prosForm');
+const agree = document.getElementById('agree');
+const btnTop = document.getElementById('startTrial');
+const btnBottom = document.getElementById('startTrialBottom');
+const toastEl = document.getElementById('toast');
+const yearEl = document.getElementById('year');
+yearEl.textContent = new Date().getFullYear();
+
+function showToast(message, ok=false){
+toastEl.textContent = message;
+toastEl.classList.remove('ok','err');
+toastEl.classList.add(ok ? 'ok' : 'err');
+toastEl.style.display = 'block';
+clearTimeout(showToast.t);
+showToast.t = setTimeout(()=>{ toastEl.style.display='none'; }, 3800);
+}
+
+function formValid(){
+const required = ['company','fullName','email','phone','address','license'];
+for(const id of required){
+const v = document.getElementById(id)?.value?.trim();
+if(!v) return false;
+}
+const mail = document.getElementById('email').value.trim();
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return false;
+return agree.checked;
+}
+
+function syncDisabled(){
+const ok = formValid();
+btnTop.disabled = !ok;
+btnBottom.disabled = !ok;
+}
+
+form.addEventListener('input', syncDisabled);
+agree.addEventListener('change', syncDisabled);
+syncDisabled();
+
+// جمع البيانات
+function collectPayload(){
+const data = new FormData(form);
+const payload = Object.fromEntries(data.entries());
+// خطة الاشتراك: سنة + تجربة 30 يوم
+payload.plan = 'yearly';
+payload.trialDays = 30;
+return payload;
+}
+
+async function createStripeSession(payload){
+try {
+const response = await fetch('/.netlify/functions/create-checkout-session', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(payload)
+});
+const text = await response.text();
+console.log('API Response:', response.status, text); // لفحص الرد
+if (!response.ok) {
+throw new Error(`Could not start checkout (${response.status}): ${text}`);
+}
+const session = JSON.parse(text);
+if (session?.url && session.url.startsWith('http')) {
+return session;
+} else {
+throw new Error('Invalid checkout URL received.');
+}
+} catch (err) {
+console.error('Fetch error:', err);
+throw err;
+}
+}
+
+async function start(e){
+e?.preventDefault?.();
+const btn = (e?.currentTarget?.id === 'startTrialBottom') ? btnBottom : btnTop;
+if (btn.disabled) return;
+const prev = btn.textContent;
+btn.textContent = 'Starting…';
+btn.disabled = true;
+
+try {
+const payload = collectPayload();
+const session = await createStripeSession(payload);
+location.href = session.url;
+} catch (err) {
+console.error('Checkout error:', err);
+showToast(err.message || 'Something went wrong. Please try again.', false);
+btn.disabled = false;
+btn.textContent = prev;
+}
+}
+
+btnTop.addEventListener('click', start);
+btnBottom.addEventListener('click', start);
+document.getElementById('resetBtn').addEventListener('click', () => setTimeout(syncDisabled, 0));
+</script>
 </body>
-
 </html>
