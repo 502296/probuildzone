@@ -5,129 +5,135 @@
 
 <head>
 
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <title>ProBuildZone — Pro Onboarding</title>
+  <title>ProBuildZone — For Pros</title>
 
-  <meta name="description" content="ProBuildZone Pro Onboarding" />
+  <meta name="description" content="ProBuildZone Pro Onboarding">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
 
     :root{
 
-      --bg:#0F2A43;          /* الخلفية الجانبية */
+      --pbz-blue:#0F2A43; --pbz-blue-2:#0b2033;
 
-      --card:#ffffff;        /* بطاقة الفورم */
+      --gold:#D4AF37; --gold-700:#b9962f;
 
-      --text:#14212e;        /* نص أساسي */
+      --muted:#6b7a8c; --bg:#f6f7fb; --card:#ffffff;
 
-      --muted:#6b7c8f;
-
-      --accent:#d4af37;      /* ذهبي ناعم */
-
-      --accent-press:#b7902c;
-
-      --danger:#c92a2a;
-
-      --ok:#0f9d58;
-
-      --shadow:0 20px 40px rgba(0,0,0,.18);
-
-      --radius:14px;
-
-      --input:#f5f7fa;
-
-      --border:#e6edf4;
+      --error:#b00020; --ok:#0a8f55;
 
     }
 
     *{box-sizing:border-box}
 
+    html,body{height:100%}
+
     body{
 
-      margin:0;background:
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:#111;
 
-      radial-gradient(1200px 500px at 50% -200px, rgba(255,255,255,.08), transparent),
-
-      linear-gradient(180deg, #10304e 0%, #0b2238 100%);
-
-      min-height:100vh; color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-
-      display:flex; align-items:flex-start; justify-content:center; padding:40px 16px;
+      background:linear-gradient(180deg, #0f2a43 0%, #103252 35%, #0f2a43 100%) fixed;
 
     }
 
-    .wrap{width:100%; max-width:880px}
+    header{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.06); backdrop-filter: blur(6px); border-bottom:1px solid rgba(255,255,255,.12);}
 
-    .brand{
+    .nav{max-width:980px; margin:0 auto; display:flex; align-items:center; gap:14px; padding:10px 16px; color:#fff}
 
-      color:#fff; font-weight:800; letter-spacing:.5px; font-size:22px; margin-bottom:18px; text-align:center;
+    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff}
+
+    .brand img{height:28px; width:auto; display:block}
+
+    .name{font-weight:800; letter-spacing:.3px}
+
+    .wrap{max-width:980px; margin:0 auto; padding:22px 16px 120px}
+
+    .hero{
+
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+
+      border:1px solid rgba(255,255,255,.12); color:#fff; border-radius:18px; padding:24px 22px; margin-bottom:18px;
+
+      box-shadow: 0 8px 24px rgba(0,0,0,.15);
+
+    }
+
+    .hero h1{margin:0 0 6px; font-size:26px}
+
+    .hero p{margin:0; color:#e6edf6}
+
+    .card{background:var(--card); border-radius:18px; padding:20px; border:1px solid #e7eef6; box-shadow: 0 10px 28px rgba(3,20,33,.15);}
+
+    form{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+
+    .span-2{grid-column:1 / -1}
+
+    .group label{display:block; font-weight:700; color:var(--pbz-blue); margin:4px 0 6px}
+
+    .group input, .group select, .group textarea{
+
+      width:100%; padding:12px 13px; border-radius:12px; border:1px solid #d7e1ec; background:#fff; outline:0; font-size:15px;
 
     }
 
-    .card{
-
-      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
-
-      padding:22px; border:1px solid var(--border);
-
-    }
-
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-
-    @media (max-width:720px){ .grid{grid-template-columns:1fr} }
-
-    label{display:block; font-size:14px; color:var(--muted); margin:2px 4px 6px}
-
-    input, select, textarea{
-
-      width:100%; padding:14px 12px; border-radius:10px; border:1px solid var(--border);
-
-      background:var(--input); outline:none; font-size:16px;
-
-    }
+    .group input:focus, .group select:focus, .group textarea:focus{ border-color: var(--pbz-blue); box-shadow: 0 0 0 3px rgba(15,42,67,.15); }
 
     textarea{min-height:110px; resize:vertical}
 
-    .row{margin-bottom:14px}
+    .agree{display:grid; grid-template-columns:26px 1fr; column-gap:12px; align-items:start; color:var(--muted); font-size:13px; line-height:1.5}
 
-    .note{font-size:13px; color:var(--muted)}
+    .agree input[type="checkbox"]{
 
-    .actions{display:flex; gap:10px; margin-top:8px}
-
-    .btn{
-
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-
-      padding:12px 16px; border-radius:10px; border:1px solid transparent; cursor:pointer; font-weight:650;
-
-      transition:.18s ease; user-select:none;
+      appearance:none; width:26px; height:26px; border-radius:8px; border:2px solid var(--gold); background:#fff; position:relative; cursor:pointer; transition:.15s;
 
     }
 
-    .btn.secondary{background:#f1f4f8; color:#233041}
+    .agree input[type="checkbox"]:active{ transform:scale(.98);}
 
-    .btn.secondary:hover{background:#e8eef6}
+    .agree input[type="checkbox"]::after{
 
-    .btn.gold{background:var(--accent); color:#1a1a1a}
+      content:""; width:14px; height:14px; border-radius:4px; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0);
 
-    .btn.gold:hover{background:var(--accent-press)}
+      background:linear-gradient(180deg, var(--gold), var(--gold-700)); box-shadow: inset 0 0 0 2px rgba(255,255,255,.75); transition:.12s ease-out;
 
-    .btn[disabled]{opacity:.7; cursor:not-allowed}
+    }
 
-    .check{display:flex; align-items:flex-start; gap:10px; margin:8px 0 2px}
+    .agree input[type="checkbox"]:checked::after{ transform:translate(-50%,-50%) scale(1); }
 
-    .error{margin-top:12px; padding:10px 12px; border:1px solid #ffd1d1; background:#fff4f4; color:var(--danger); border-radius:10px; display:none}
+    .agree a{color:var(--pbz-blue); font-weight:700; text-decoration:none}
 
-    .ok{margin-top:12px; padding:10px 12px; border:1px solid #ccebdc; background:#f2fbf6; color:var(--ok); border-radius:10px; display:none}
+    .actions{display:flex; gap:12px; flex-wrap:wrap}
 
-    .footer{text-align:center; color:#dbe6f3; font-size:12px; margin-top:14px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:14px 18px; border-radius:14px; border:1px solid #e7e2cf; font-weight:800; letter-spacing:.2px; cursor:pointer; user-select:none; background:#fff; transition:.18s}
 
-    .spinner{width:16px;height:16px;border-radius:50%;border:3px solid rgba(0,0,0,.15);border-top-color:#000;animation:spin .9s linear infinite}
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
 
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .btn-gold{color:var(--gold-700); border:0; background:#fff; box-shadow:0 12px 24px rgba(244,192,69,.35);}
+
+    .btn-gold:hover{ transform:translateY(-1px)}
+
+    .btn-gold:active{ transform:translateY(0)}
+
+    .btn-reset{background:#f0f4f8}
+
+    .cta-bar{position:fixed; left:0; right:0; bottom:0; z-index:60; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 18%, rgba(255,255,255,1) 38%); padding:10px 12px 14px; border-top:1px solid #e7eef6; display:none;}
+
+    .cta-inner{max-width:980px; margin:0 auto; display:flex; gap:10px; justify-content:flex-end}
+
+    @media (max-width:768px){ .cta-bar{display:block} }
+
+    .footer{max-width:980px; margin:26px auto; color:#fff; font-size:12.5px; text-align:center}
+
+    .toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#0F2A43; color:#fff; padding:12px 14px; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.18); display:none; z-index:80; font-weight:700; letter-spacing:.2px; max-width:92%; text-align:center;}
+
+    .toast.ok{background:var(--ok)} .toast.err{background:var(--error)}
 
   </style>
 
@@ -135,293 +141,275 @@
 
 <body>
 
-  <div class="wrap">
+<header>
 
-    <div class="brand">ProBuildZone</div>
+  <div class="nav">
 
-
-
-    <div class="card">
-
-      <form id="proForm" novalidate>
-
-        <div class="grid">
-
-          <div class="row">
-
-            <label for="company">Business / Company</label>
-
-            <input id="company" name="company" placeholder="e.g., Summit Builders LLC" autocomplete="organization" />
-
-          </div>
-
-          <div class="row">
-
-            <label for="fullName">Owner Full Name</label>
-
-            <input id="fullName" name="fullName" placeholder="Your full name" autocomplete="name" />
-
-          </div>
-
-
-
-          <div class="row">
-
-            <label for="email">Email</label>
-
-            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
-
-          </div>
-
-          <div class="row">
-
-            <label for="phone">Phone</label>
-
-            <input id="phone" name="phone" inputmode="tel" placeholder="(555) 555-5555" autocomplete="tel" />
-
-          </div>
-
-
-
-          <div class="row">
-
-            <label for="address">Business Address</label>
-
-            <input id="address" name="address" placeholder="Street, City, State" autocomplete="address-line1" />
-
-          </div>
-
-          <div class="row">
-
-            <label for="insurance">Insurance (Optional)</label>
-
-            <select id="insurance" name="insurance">
-
-              <option value="">—</option>
-
-              <option>General Liability</option>
-
-              <option>Workers’ Compensation</option>
-
-              <option>Bonded</option>
-
-            </select>
-
-          </div>
-
-
-
-          <div class="row">
-
-            <label for="license">Business License</label>
-
-            <input id="license" name="license" placeholder="e.g., KY-123456" />
-
-          </div>
-
-          <div class="row">
-
-            <label for="services">Services & Notes (optional)</label>
-
-            <textarea id="services" name="services" placeholder="Tell homeowners what you do best…"></textarea>
-
-          </div>
-
-        </div>
-
-
-
-        <div class="check">
-
-          <input id="agree" type="checkbox" />
-
-          <label for="agree" class="note">By starting your free trial, you agree to our <a href="#" target="_blank" rel="noopener">Terms</a> &amp; <a href="#" target="_blank" rel="noopener">Privacy</a>.</label>
-
-        </div>
-
-
-
-        <div class="actions">
-
-          <button type="reset" class="btn secondary">Reset</button>
-
-          <button id="pay" type="button" class="btn gold">
-
-            <span class="label">Continue to Secure Payment</span>
-
-            <span class="spinner" id="spin" style="display:none"></span>
-
-          </button>
-
-        </div>
-
-
-
-        <div id="msgError" class="error"></div>
-
-        <div id="msgOk" class="ok"></div>
-
-      </form>
-
-    </div>
-
-
-
-    <div class="footer">© 2025 ProBuildZone — Fair Design • Local Pros</div>
+    <a class="brand" href="/"><img src="" alt="ProBuildZone Logo" onerror="this.style.display='none'"><div class="name">ProBuildZone</div></a>
 
   </div>
 
-
-
-  <script>
-
-    const $ = s => document.querySelector(s);
-
-    const show = (el, b=true)=> el.style.display = b ? 'block' : 'none';
+</header>
 
 
 
-    const btn = $('#pay');
+<main>
 
-    const spin = $('#spin');
+  <div class="wrap">
 
-    const err = $('#msgError');
+    <section class="hero">
 
-    const ok  = $('#msgOk');
+      <h1>ProBuildZone — For Pros</h1>
+
+      <p>Start your <strong>30-day free trial</strong>. Fair Prices • Local Pros</p>
+
+    </section>
 
 
 
-    function setLoading(state){
+    <section class="card">
 
-      btn.disabled = state;
+      <form id="prosForm" autocomplete="on">
 
-      show(spin, state);
+        <div class="group"><label for="company">Company Name</label><input id="company" name="company" placeholder="Your company LLC" required></div>
 
-      btn.querySelector('.label').textContent = state ? 'Redirecting…' : 'Continue to Secure Payment';
+        <div class="group"><label for="fullName">Your Name</label><input id="fullName" name="fullName" placeholder="Full name" required></div>
+
+        <div class="group"><label for="email">Email</label><input id="email" name="email" type="email" placeholder="you@company.com" required></div>
+
+        <div class="group"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(502) 555-0123" required></div>
+
+        <div class="group span-2"><label for="address">Business Address</label><input id="address" name="address" placeholder="Street, City, State" required></div>
+
+        <div class="group"><label for="license">Business License</label><input id="license" name="license" placeholder="License # / State" required></div>
+
+        <div class="group"><label for="insurance">Insurance (Optional)</label>
+
+          <select id="insurance" name="insurance">
+
+            <option value="">Not provided</option>
+
+            <option value="General Liability">General Liability</option>
+
+            <option value="Workers’ Comp">Workers’ Comp</option>
+
+            <option value="Both">Both</option>
+
+          </select>
+
+        </div>
+
+        <div class="group span-2"><label for="services">Services & Notes (optional)</label><textarea id="services" name="services" placeholder="e.g., Decks, Roofing, Remodeling…"></textarea></div>
+
+
+
+        <div class="group span-2">
+
+          <label class="agree">
+
+            <input id="agree" type="checkbox" required>
+
+            <span>By starting your free trial, you agree to our <a href="terms.html" target="_blank" rel="noopener">Terms</a> &amp; <a href="privacy.html" target="_blank" rel="noopener">Privacy</a>.</span>
+
+          </label>
+
+        </div>
+
+
+
+        <div class="span-2 actions">
+
+          <button class="btn btn-reset" id="resetBtn" type="reset">Reset</button>
+
+          <button class="btn btn-gold" id="startTrial" type="button" disabled>Start Free Trial</button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+
+
+    <div class="footer"><span id="year"></span> ProBuildZone – Fair Prices • Local Pros</div>
+
+  </div>
+
+</main>
+
+
+
+<div class="cta-bar"><div class="cta-inner"><button class="btn btn-gold" id="startTrialBottom" type="button" disabled>Start Free Trial</button></div></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+
+
+<script>
+
+  // 👇 بدّل هذا القيمـة باسم موقعك على Netlify (الدومين الافتراضي)
+
+  const FUNCTIONS_BASE = 'https://YOUR-SITE-NAME.netlify.app/.netlify/functions';
+
+
+
+  const form = document.getElementById('prosForm');
+
+  const agree = document.getElementById('agree');
+
+  const btnTop = document.getElementById('startTrial');
+
+  const btnBottom = document.getElementById('startTrialBottom');
+
+  const toastEl = document.getElementById('toast');
+
+  const yearEl = document.getElementById('year');
+
+  yearEl.textContent = new Date().getFullYear();
+
+
+
+  function showToast(message, ok=false){
+
+    toastEl.textContent = message;
+
+    toastEl.classList.remove('ok','err');
+
+    toastEl.classList.add(ok ? 'ok' : 'err');
+
+    toastEl.style.display = 'block';
+
+    clearTimeout(showToast.t);
+
+    showToast.t = setTimeout(()=>{ toastEl.style.display='none'; }, 3800);
+
+  }
+
+
+
+  function formValid(){
+
+    const required = ['company','fullName','email','phone','address','license'];
+
+    for(const id of required){ if(!document.getElementById(id)?.value?.trim()) return false; }
+
+    const mail = document.getElementById('email').value.trim();
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return false;
+
+    return agree.checked;
+
+  }
+
+  function syncDisabled(){
+
+    const ok = formValid();
+
+    btnTop.disabled = !ok; btnBottom.disabled = !ok;
+
+  }
+
+  form.addEventListener('input', syncDisabled);
+
+  agree.addEventListener('change', syncDisabled);
+
+  syncDisabled();
+
+
+
+  function collectPayload(){
+
+    const data = new FormData(form);
+
+    const payload = Object.fromEntries(data.entries());
+
+    // ✅ اشتراك شهري + 30 يوم تجربة
+
+    payload.plan = 'monthly';
+
+    payload.trialDays = 30;
+
+    // يلتقط backend price من STRIPE_PRICE_MONTHLY تلقائيًا
+
+    return payload;
+
+  }
+
+
+
+  async function createStripeSession(payload){
+
+    const res = await fetch(`${FUNCTIONS_BASE}/create-checkout-session`, {
+
+      method: 'POST',
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify(payload)
+
+    });
+
+    const text = await res.text();
+
+    console.log('API Response:', res.status, text);
+
+    if (!res.ok) throw new Error(`Could not start checkout (${res.status}): ${text}`);
+
+    const json = JSON.parse(text);
+
+    if (json?.url?.startsWith('http')) return json;
+
+    throw new Error('Invalid checkout URL received.');
+
+  }
+
+
+
+  async function start(e){
+
+    e?.preventDefault?.();
+
+    const btn = (e?.currentTarget?.id === 'startTrialBottom') ? btnBottom : btnTop;
+
+    if (btn.disabled) return;
+
+    const prev = btn.textContent; btn.textContent = 'Starting…'; btn.disabled = true;
+
+    try{
+
+      const payload = collectPayload();
+
+      const session = await createStripeSession(payload);
+
+      location.href = session.url; // Redirect to Stripe
+
+    }catch(err){
+
+      console.error(err);
+
+      showToast(err.message || 'Something went wrong. Please try again.');
+
+      btn.disabled = false; btn.textContent = prev;
 
     }
 
+  }
 
 
-    async function startCheckout(){
 
-      err.textContent=''; show(err,false); show(ok,false);
+  btnTop.addEventListener('click', start);
 
+  btnBottom.addEventListener('click', start);
 
+  document.getElementById('resetBtn').addEventListener('click', () => setTimeout(syncDisabled, 0));
 
-      // تحقق بسيط
 
-      if (!$('#email').value.trim()){
 
-        err.textContent = 'Please enter a valid email.'; show(err,true); return;
+  // Safety: منع أي submit افتراضي
 
-      }
+  form.addEventListener('submit', e => e.preventDefault());
 
-      if (!$('#agree').checked){
-
-        err.textContent = 'Please accept Terms & Privacy to continue.'; show(err,true); return;
-
-      }
-
-
-
-      setLoading(true);
-
-      try{
-
-        const payload = {
-
-          customer_email: $('#email').value.trim(),
-
-          metadata: {
-
-            company: $('#company').value.trim(),
-
-            fullName: $('#fullName').value.trim(),
-
-            phone: $('#phone').value.trim(),
-
-            address: $('#address').value.trim(),
-
-            license: $('#license').value.trim(),
-
-            insurance: $('#insurance').value,
-
-            notes: $('#services').value.trim(),
-
-            source: 'pros_onboarding_v1'
-
-          }
-
-          // لو تريد خطة أخرى: أرسل priceId هنا
-
-          // priceId: 'price_XXXX'
-
-        };
-
-
-
-        const res = await fetch('/.netlify/functions/create-checkout-session', {
-
-          method: 'POST',
-
-          headers: { 'Content-Type': 'application/json' },
-
-          body: JSON.stringify(payload)
-
-        });
-
-
-
-        if (!res.ok){
-
-          // لو رجعت 405 هنا فالغالب الزر كان submit أو الـfunction غير منشورة
-
-          const text = await res.text();
-
-          throw new Error(`Checkout failed (${res.status}). ${text.slice(0,120)}`);
-
-        }
-
-
-
-        const data = await res.json();
-
-        if (data && data.url){
-
-          window.location.href = data.url; // التحويل إلى Stripe
-
-          return;
-
-        }
-
-        throw new Error('No redirect URL received from server.');
-
-      } catch(e){
-
-        console.error(e);
-
-        err.textContent = e.message || 'Something went wrong. Please try again.';
-
-        show(err,true);
-
-        setLoading(false);
-
-      }
-
-    }
-
-
-
-    btn.addEventListener('click', startCheckout);
-
-
-
-    // منع أي submit افتراضي للفورم (سُترة أمان)
-
-    document.getElementById('proForm').addEventListener('submit', e => e.preventDefault());
-
-  </script>
+</script>
 
 </body>
 
