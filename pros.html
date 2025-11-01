@@ -324,6 +324,26 @@ btn.textContent = prev;
 btnTop.addEventListener('click', start);
 btnBottom.addEventListener('click', start);
 document.getElementById('resetBtn').addEventListener('click', () => setTimeout(syncDisabled, 0));
+</script>  
+<button id="pay">Continue to Secure Payment</button>
+<script>
+  document.getElementById('pay').addEventListener('click', async () => {
+    const res = await fetch('/.netlify/functions/create-checkout-session', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        customer_email: document.querySelector('#email')?.value || undefined,
+        metadata: { source: 'pros_onboarding_v1' 
+      })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Something went wrong. Please try again.');
+      console.error(data);
+    }
+  });
 </script>
 </body>
 </html>
