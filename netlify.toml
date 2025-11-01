@@ -1,0 +1,19 @@
+[build]
+
+  publish = "public"
+
+  functions = "netlify/functions"
+
+
+
+# يسمح للـHTML يستخدم History API إن احتجت
+
+[[redirects]]
+
+  from = "/*"
+
+  to = "/index.html"
+
+  status = 200
+
+  force = false
