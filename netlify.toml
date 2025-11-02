@@ -1,5 +1,25 @@
+# netlify.toml
 [build]
   publish = "."
   functions = "netlify/functions"
 [functions]
   node_bundler = "esbuild"
+  # يفضل تضمن stripe صراحةً
+  external_node_modules = ["stripe"]
+# توجيه زر الدفع إلى وظيفة نتليفاي
+[[redirects]]
+  from = "/api/stripe/create-checkout-session"
+  to = "/.netlify/functions/create-checkout-session"
+  status = 200
+  force = true
+# (اختياري) إن كنت تستعمل حفظ البروفايل بنفس المسار القديم
+[[redirects]]
+  from = "/api/pros/save-profile"
+  to = "/.netlify/functions/save-profile"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/api/stripe/webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force = true
