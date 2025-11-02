@@ -1,89 +1,108 @@
+// netlify/functions/create-checkout-session.js
+
+
 
 const Stripe = require('stripe');
 
-
-
-const ORIGIN = process.env.ALLOWED_ORIGIN || '*';
-
-const JSON_HDRS = {
-
-  'Access-Control-Allow-Origin': ORIGIN,
-
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-
-  'Content-Type': 'application/json'
-
-};
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
 exports.handler = async (event) => {
 
+  // السماح بطلبات OPTIONS (ضرورية لـ CORS)
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return {
+
+      statusCode: 200,
+
+      headers: {
+
+        'Access-Control-Allow-Origin': '*',
+
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+        'Access-Control-Allow-Headers': 'Content-Type',
+
+      },
+
+      body: 'ok',
+
+    };
+
+  }
+
+
+
+  // نرفض أي طريقة غير POST
+
+  if (event.httpMethod !== 'POST') {
+
+    return {
+
+      statusCode: 405,
+
+      body: 'Method Not Allowed',
+
+    };
+
+  }
+
+
+
   try {
 
-    // CORS preflight
+    const data = JSON.parse(event.body);
 
-    if (event.httpMethod === 'OPTIONS') {
-
-      return { statusCode: 200, headers: JSON_HDRS, body: JSON.stringify({ ok: true }) };
-
-    }
+    const siteUrl = process.env.SITE_URL || 'https://probuildzone.netlify.app';
 
 
 
-    if (event.httpMethod !== 'POST') {
-
-      return { statusCode: 405, headers: JSON_HDRS, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-
-    }
-
-
-
-    // Parse body safely
-
-    let body = {};
-
-    try { body = JSON.parse(event.body || '{}'); } catch (_) {}
-
-
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
-
-
-
-    // نستخدم السعر الشهري من البيئة؛ يمكن تمرير priceId من الواجهة إن لزم
-
-    const priceId = body.priceId || process.env.STRIPE_PRICE_MONTHLY;
-
-
-
-    if (!priceId) {
-
-      return { statusCode: 400, headers: JSON_HDRS, body: JSON.stringify({ error: 'Missing price id' }) };
-
-    }
-
-
+    // إنشاء جلسة Checkout في Stripe
 
     const session = await stripe.checkout.sessions.create({
 
       mode: 'subscription',
 
-      line_items: [{ price: priceId, quantity: 1 }],
+      payment_method_types: ['card'],
 
-      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      line_items: [
 
-      cancel_url: `${process.env.SITE_URL}/cancel.html`,
+        {
+
+          price: process.env.STRIPE_PRICE_YEARLY, // أو STRIPE_PRICE_MONTHLY
+
+          quantity: 1,
+
+        },
+
+      ],
 
       allow_promotion_codes: true,
 
-      billing_address_collection: 'auto',
+      success_url: `${siteUrl}/success.html`,
 
-      customer_email: body.customer_email || undefined,
+      cancel_url: `${siteUrl}/cancel.html`,
 
-      metadata: body.metadata || {}
+      metadata: {
+
+        name: data.name || '',
+
+        email: data.email || '',
+
+        phone: data.phone || '',
+
+        address: data.address || '',
+
+        license: data.license || '',
+
+        insurance: data.insurance || '',
+
+        notes: data.notes || '',
+
+      },
 
     });
 
@@ -93,23 +112,19 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      headers: JSON_HDRS,
+      headers: { 'Access-Control-Allow-Origin': '*' },
 
-      body: JSON.stringify({ url: session.url })
+      body: JSON.stringify({ url: session.url }),
 
     };
 
   } catch (err) {
 
-    console.error('create-checkout-session error:', err);
-
     return {
 
       statusCode: 500,
 
-      headers: JSON_HDRS, // ← مهم جدًا في مسار الخطأ
-
-      body: JSON.stringify({ error: 'Failed to create checkout session' })
+      body: `Error creating checkout session: ${err.message}`,
 
     };
 
