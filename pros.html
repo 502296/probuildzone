@@ -1,395 +1,420 @@
-
 <!doctype html>
 
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
 
-  <meta charset="utf-8"/>
+<meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>ProBuildZone — For Pros</title>
+<title>ProBuildZone — Start Free Trial</title>
 
-  <meta name="description" content="ProBuildZone Pro Onboarding">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
 
-  <style>
+  :root{
 
-    :root{
+    --pbz-blue:#0F2A43;
 
-      --pbz-blue:#0F2A43; --pbz-blue-2:#0b2033;
+    --pbz-blue-2:#0b2033;
 
-      --gold:#D4AF37; --gold-700:#b9962f;
+    --gold:#D4AF37;
 
-      --muted:#6b7a8c; --bg:#f6f7fb; --card:#ffffff;
+    --gold-700:#b9962f;
 
-      --error:#b00020; --ok:#0a8f55;
+    --muted:#6b7a8c;
 
-    }
+    --card:#ffffff;
 
-    *{box-sizing:border-box}
+    --bg:#f6f7fb;
 
-    html,body{height:100%}
+    --danger:#b00020;
 
-    body{
+  }
 
-      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:#111;
+  *{box-sizing:border-box}
 
-      background:linear-gradient(180deg, #0f2a43 0%, #103252 35%, #0f2a43 100%) fixed;
+  body{
 
-    }
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 
-    header{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.06); backdrop-filter: blur(6px); border-bottom:1px solid rgba(255,255,255,.12);}
+    color:#111; background:var(--bg);
 
-    .nav{max-width:980px; margin:0 auto; display:flex; align-items:center; gap:14px; padding:10px 16px; color:#fff}
+  }
 
-    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff}
+  .wrap{max-width:880px;margin:32px auto;padding:16px}
 
-    .brand img{height:28px; width:auto; display:block}
+  .card{
 
-    .name{font-weight:800; letter-spacing:.3px}
+    background:var(--card); border:1px solid #e7e7e7; border-radius:14px; padding:22px;
 
-    .wrap{max-width:980px; margin:0 auto; padding:22px 16px 120px}
+    box-shadow:0 10px 24px rgba(15,42,67,.08);
 
-    .hero{
+  }
 
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  h1{margin:0 0 8px 0; color:var(--pbz-blue)}
 
-      border:1px solid rgba(255,255,255,.12); color:#fff; border-radius:18px; padding:24px 22px; margin-bottom:18px;
+  .sub{color:var(--muted); margin:0 0 20px 0}
 
-      box-shadow: 0 8px 24px rgba(0,0,0,.15);
 
-    }
 
-    .hero h1{margin:0 0 6px; font-size:26px}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
 
-    .hero p{margin:0; color:#e6edf6}
+  .grid-1{display:grid; grid-template-columns:1fr; gap:14px}
 
-    .card{background:var(--card); border-radius:18px; padding:20px; border:1px solid #e7eef6; box-shadow: 0 10px 28px rgba(3,20,33,.15);}
+  label{display:block; font-weight:600; margin:6px 0}
 
-    form{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  input,select,textarea{
 
-    .span-2{grid-column:1 / -1}
+    width:100%; padding:12px 14px; border:1px solid #d9d9df; border-radius:10px; font-size:16px;
 
-    .group label{display:block; font-weight:700; color:var(--pbz-blue); margin:4px 0 6px}
+    background:#fff; outline:none;
 
-    .group input, .group select, .group textarea{
+  }
 
-      width:100%; padding:12px 13px; border-radius:12px; border:1px solid #d7e1ec; background:#fff; outline:0; font-size:15px;
+  textarea{min-height:90px; resize:vertical}
 
-    }
+  .row{margin-top:6px}
 
-    .group input:focus, .group select:focus, .group textarea:focus{ border-color: var(--pbz-blue); box-shadow: 0 0 0 3px rgba(15,42,67,.15); }
+  .hint{font-size:13px; color:var(--muted)}
 
-    textarea{min-height:110px; resize:vertical}
 
-    .agree{display:grid; grid-template-columns:26px 1fr; column-gap:12px; align-items:start; color:var(--muted); font-size:13px; line-height:1.5}
 
-    .agree input[type="checkbox"]{
+  .actions{display:flex; gap:12px; align-items:center; margin-top:18px}
 
-      appearance:none; width:26px; height:26px; border-radius:8px; border:2px solid var(--gold); background:#fff; position:relative; cursor:pointer; transition:.15s;
+  .btn{
 
-    }
+    border:0; padding:12px 18px; border-radius:12px; font-weight:700; cursor:pointer;
 
-    .agree input[type="checkbox"]:active{ transform:scale(.98);}
+    transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
 
-    .agree input[type="checkbox"]::after{
+  }
 
-      content:""; width:14px; height:14px; border-radius:4px; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0);
+  .btn.gold{background:linear-gradient(180deg,var(--gold),#e3c257); color:#141414;
 
-      background:linear-gradient(180deg, var(--gold), var(--gold-700)); box-shadow: inset 0 0 0 2px rgba(255,255,255,.75); transition:.12s ease-out;
+            box-shadow:0 6px 20px rgba(212,175,55,.35)}
 
-    }
+  .btn.gold:disabled{background:#e9dfb7;color:#7a6b2a; cursor:not-allowed; box-shadow:none; opacity:.7}
 
-    .agree input[type="checkbox"]:checked::after{ transform:translate(-50%,-50%) scale(1); }
+  .btn.gold:active{transform:translateY(1px)}
 
-    .agree a{color:var(--pbz-blue); font-weight:700; text-decoration:none}
+  .btn.reset{background:#eef2f6;color:#1b2a38}
 
-    .actions{display:flex; gap:12px; flex-wrap:wrap}
 
-    .btn{display:inline-flex; align-items:center; justify-content:center; padding:14px 18px; border-radius:14px; border:1px solid #e7e2cf; font-weight:800; letter-spacing:.2px; cursor:pointer; user-select:none; background:#fff; transition:.18s}
 
-    .btn[disabled]{opacity:.6; cursor:not-allowed}
+  .checkline{display:flex; gap:10px; align-items:flex-start; margin-top:6px}
 
-    .btn-gold{color:var(--gold-700); border:0; background:#fff; box-shadow:0 12px 24px rgba(244,192,69,.35);}
+  .checkline input{width:18px;height:18px;margin-top:2px}
 
-    .btn-gold:hover{ transform:translateY(-1px)}
+  .badge{display:none; margin-top:14px; padding:11px 14px; border-radius:10px; font-weight:600}
 
-    .btn-gold:active{ transform:translateY(0)}
+  .badge.err{display:block; background:#fde9ec; color:#7d0e21; border:1px solid #f6c7cf}
 
-    .btn-reset{background:#f0f4f8}
 
-    .cta-bar{position:fixed; left:0; right:0; bottom:0; z-index:60; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.9) 18%, rgba(255,255,255,1) 38%); padding:10px 12px 14px; border-top:1px solid #e7eef6; display:none;}
 
-    .cta-inner{max-width:980px; margin:0 auto; display:flex; gap:10px; justify-content:flex-end}
+  /* device-based visibility */
 
-    @media (max-width:768px){ .cta-bar{display:block} }
+  .mobile-only{display:none}
 
-    .footer{max-width:980px; margin:26px auto; color:#fff; font-size:12.5px; text-align:center}
+  .desktop-only{display:none}
 
-    .toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:#0F2A43; color:#fff; padding:12px 14px; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.18); display:none; z-index:80; font-weight:700; letter-spacing:.2px; max-width:92%; text-align:center;}
+  @media (max-width:720px){
 
-    .toast.ok{background:var(--ok)} .toast.err{background:var(--error)}
+    .grid{grid-template-columns:1fr}
 
-  </style>
+  }
+
+</style>
 
 </head>
 
 <body>
 
-<header>
-
-  <div class="nav">
-
-    <a class="brand" href="/"><img src="" alt="ProBuildZone Logo" onerror="this.style.display='none'"><div class="name">ProBuildZone</div></a>
-
-  </div>
-
-</header>
-
-
-
-<main>
-
   <div class="wrap">
 
-    <section class="hero">
+    <div class="card">
 
-      <h1>ProBuildZone — For Pros</h1>
+      <h1>Start your Pro Trial</h1>
 
-      <p>Start your <strong>30-day free trial</strong>. Fair Prices • Local Pros</p>
-
-    </section>
+      <p class="sub">Join ProBuildZone Pros. Full access to private projects & leads.</p>
 
 
 
-    <section class="card">
+      <form id="proForm" novalidate>
 
-      <form id="prosForm" autocomplete="on">
+        <div class="grid">
 
-        <div class="group"><label for="company">Company Name</label><input id="company" name="company" placeholder="Your company LLC" required></div>
+          <div class="row">
 
-        <div class="group"><label for="fullName">Your Name</label><input id="fullName" name="fullName" placeholder="Full name" required></div>
+            <label for="full_name">Full name</label>
 
-        <div class="group"><label for="email">Email</label><input id="email" name="email" type="email" placeholder="you@company.com" required></div>
+            <input id="full_name" name="full_name" autocomplete="name" required />
 
-        <div class="group"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(502) 555-0123" required></div>
+          </div>
 
-        <div class="group span-2"><label for="address">Business Address</label><input id="address" name="address" placeholder="Street, City, State" required></div>
+          <div class="row">
 
-        <div class="group"><label for="license">Business License</label><input id="license" name="license" placeholder="License # / State" required></div>
+            <label for="email">Email</label>
 
-        <div class="group"><label for="insurance">Insurance (Optional)</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
 
-          <select id="insurance" name="insurance">
+          </div>
 
-            <option value="">Not provided</option>
+          <div class="row mobile-only">
 
-            <option value="General Liability">General Liability</option>
+            <label for="phone">Phone (mobile)</label>
 
-            <option value="Workers’ Comp">Workers’ Comp</option>
+            <input id="phone" name="phone" inputmode="tel" placeholder="(502) 555-0123" />
 
-            <option value="Both">Both</option>
+            <div class="hint">Shown on phones only</div>
 
-          </select>
+          </div>
+
+          <div class="row desktop-only">
+
+            <label for="website">Company website (desktop)</label>
+
+            <input id="website" name="website" placeholder="https://example.com" />
+
+            <div class="hint">Shown on desktops only</div>
+
+          </div>
+
+          <div class="row">
+
+            <label for="address">Business address</label>
+
+            <input id="address" name="address" placeholder="Street, City, State" />
+
+          </div>
+
+          <div class="row">
+
+            <label for="license">Business license / #</label>
+
+            <input id="license" name="license" placeholder="License # / State" />
+
+          </div>
+
+          <div class="row">
+
+            <label for="insurance">Insurance (Optional)</label>
+
+            <select id="insurance" name="insurance">
+
+              <option value="not_provided" selected>Not provided</option>
+
+              <option value="general_liability">General Liability</option>
+
+              <option value="workers_comp">Workers’ Compensation</option>
+
+              <option value="both">Both</option>
+
+            </select>
+
+          </div>
+
+          <div class="row grid-1">
+
+            <label for="notes">Services & notes (optional)</label>
+
+            <textarea id="notes" name="notes" placeholder="e.g., Decks, Roofing, Remodeling..."></textarea>
+
+          </div>
 
         </div>
 
-        <div class="group span-2"><label for="services">Services & Notes (optional)</label><textarea id="services" name="services" placeholder="e.g., Decks, Roofing, Remodeling…"></textarea></div>
 
 
+        <div class="checkline">
 
-        <div class="group span-2">
+          <input id="agree" type="checkbox" />
 
-          <label class="agree">
-
-            <input id="agree" type="checkbox" required>
-
-            <span>By starting your free trial, you agree to our <a href="terms.html" target="_blank" rel="noopener">Terms</a> &amp; <a href="privacy.html" target="_blank" rel="noopener">Privacy</a>.</span>
-
-          </label>
+          <label for="agree">By starting your free trial, you agree to our <a href="/terms.html">Terms</a> &amp; <a href="/privacy.html">Privacy</a>.</label>
 
         </div>
 
 
 
-        <div class="span-2 actions">
+        <div id="err" class="badge err"></div>
 
-          <button class="btn btn-reset" id="resetBtn" type="reset">Reset</button>
 
-          <button class="btn btn-gold" id="startTrial" type="button" disabled>Start Free Trial</button>
+
+        <div class="actions">
+
+          <button type="button" class="btn reset" id="resetBtn">Reset</button>
+
+          <button type="button" class="btn gold" id="startBtn" disabled>Start Free Trial</button>
 
         </div>
 
       </form>
 
-    </section>
 
 
+      <p class="hint" style="margin-top:18px">© 2025 ProBuildZone — Fair Prices • Local Pros</p>
 
-    <div class="footer"><span id="year"></span> ProBuildZone – Fair Prices • Local Pros</div>
+    </div>
 
   </div>
-
-</main>
-
-
-
-<div class="cta-bar"><div class="cta-inner"><button class="btn btn-gold" id="startTrialBottom" type="button" disabled>Start Free Trial</button></div></div>
-
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 
 
 <script>
 
-  // 👇 بدّل هذا القيمـة باسم موقعك على Netlify (الدومين الافتراضي)
+(function(){
 
-  const FUNCTIONS_BASE = 'https://YOUR-SITE-NAME.netlify.app/.netlify/functions';
+  // Device-based show/hide
+
+  const isMobile = /iPhone|Android.+Mobile|iPad|iPod/i.test(navigator.userAgent);
+
+  document.querySelectorAll('.mobile-only').forEach(el => el.style.display = isMobile ? '' : 'none');
+
+  document.querySelectorAll('.desktop-only').forEach(el => el.style.display = isMobile ? 'none' : '');
 
 
 
-  const form = document.getElementById('prosForm');
+  const form = document.getElementById('proForm');
 
   const agree = document.getElementById('agree');
 
-  const btnTop = document.getElementById('startTrial');
+  const startBtn = document.getElementById('startBtn');
 
-  const btnBottom = document.getElementById('startTrialBottom');
+  const resetBtn = document.getElementById('resetBtn');
 
-  const toastEl = document.getElementById('toast');
-
-  const yearEl = document.getElementById('year');
-
-  yearEl.textContent = new Date().getFullYear();
+  const errBox = document.getElementById('err');
 
 
 
-  function showToast(message, ok=false){
+  // Enable button only if agreed & minimal required fields present
 
-    toastEl.textContent = message;
+  function canSubmit(){
 
-    toastEl.classList.remove('ok','err');
+    const name = document.getElementById('full_name').value.trim();
 
-    toastEl.classList.add(ok ? 'ok' : 'err');
+    const email = document.getElementById('email').value.trim();
 
-    toastEl.style.display = 'block';
-
-    clearTimeout(showToast.t);
-
-    showToast.t = setTimeout(()=>{ toastEl.style.display='none'; }, 3800);
+    return agree.checked && name.length >= 2 && /\S+@\S+\.\S+/.test(email);
 
   }
 
+  function updateBtn(){ startBtn.disabled = !canSubmit(); }
 
+  form.addEventListener('input', updateBtn);
 
-  function formValid(){
-
-    const required = ['company','fullName','email','phone','address','license'];
-
-    for(const id of required){ if(!document.getElementById(id)?.value?.trim()) return false; }
-
-    const mail = document.getElementById('email').value.trim();
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return false;
-
-    return agree.checked;
-
-  }
-
-  function syncDisabled(){
-
-    const ok = formValid();
-
-    btnTop.disabled = !ok; btnBottom.disabled = !ok;
-
-  }
-
-  form.addEventListener('input', syncDisabled);
-
-  agree.addEventListener('change', syncDisabled);
-
-  syncDisabled();
+  agree.addEventListener('change', updateBtn);
 
 
 
-  function collectPayload(){
+  resetBtn.addEventListener('click', () => {
 
-    const data = new FormData(form);
+    form.reset();
 
-    const payload = Object.fromEntries(data.entries());
+    updateBtn();
 
-    // ✅ اشتراك شهري + 30 يوم تجربة
+    errBox.style.display = 'none';
 
-    payload.plan = 'monthly';
-
-    payload.trialDays = 30;
-
-    // يلتقط backend price من STRIPE_PRICE_MONTHLY تلقائيًا
-
-    return payload;
-
-  }
+  });
 
 
 
-  async function createStripeSession(payload){
+  async function startSubscription(){
 
-    const res = await fetch(`${FUNCTIONS_BASE}/create-checkout-session`, {
-
-      method: 'POST',
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify(payload)
-
-    });
-
-    const text = await res.text();
-
-    console.log('API Response:', res.status, text);
-
-    if (!res.ok) throw new Error(`Could not start checkout (${res.status}): ${text}`);
-
-    const json = JSON.parse(text);
-
-    if (json?.url?.startsWith('http')) return json;
-
-    throw new Error('Invalid checkout URL received.');
-
-  }
+    errBox.style.display = 'none';
 
 
 
-  async function start(e){
+    if(!canSubmit()){
 
-    e?.preventDefault?.();
+      errBox.textContent = 'Please fill name & valid email and agree to Terms.';
 
-    const btn = (e?.currentTarget?.id === 'startTrialBottom') ? btnBottom : btnTop;
+      errBox.style.display = 'block';
 
-    if (btn.disabled) return;
+      return;
 
-    const prev = btn.textContent; btn.textContent = 'Starting…'; btn.disabled = true;
+    }
+
+
+
+    const payload = {
+
+      name: document.getElementById('full_name').value.trim(),
+
+      email: document.getElementById('email').value.trim(),
+
+      phone: document.getElementById('phone') ? document.getElementById('phone').value.trim() : '',
+
+      website: document.getElementById('website') ? document.getElementById('website').value.trim() : '',
+
+      address: document.getElementById('address').value.trim(),
+
+      license: document.getElementById('license').value.trim(),
+
+      insurance: document.getElementById('insurance').value,
+
+      notes: document.getElementById('notes').value.trim(),
+
+      source: 'pros.html'
+
+    };
+
+
+
+    startBtn.disabled = true;
+
+    startBtn.textContent = 'Processing…';
+
+
 
     try{
 
-      const payload = collectPayload();
+      const res = await fetch('/.netlify/functions/create-checkout-session', {
 
-      const session = await createStripeSession(payload);
+        method: 'POST',
 
-      location.href = session.url; // Redirect to Stripe
+        headers: { 'Content-Type': 'application/json' },
 
-    }catch(err){
+        body: JSON.stringify(payload)
 
-      console.error(err);
+      });
 
-      showToast(err.message || 'Something went wrong. Please try again.');
 
-      btn.disabled = false; btn.textContent = prev;
+
+      if(!res.ok){
+
+        const txt = await res.text();
+
+        throw new Error(txt || ('HTTP ' + res.status));
+
+      }
+
+
+
+      const data = await res.json();
+
+      if(data && data.url){
+
+        window.location.href = data.url; // Stripe Checkout
+
+      }else{
+
+        throw new Error('No checkout URL returned from server.');
+
+      }
+
+    }catch(e){
+
+      errBox.textContent = 'Failed to fetch session: ' + (e.message || e);
+
+      errBox.style.display = 'block';
+
+      startBtn.disabled = false;
+
+      startBtn.textContent = 'Start Free Trial';
 
     }
 
@@ -397,17 +422,13 @@
 
 
 
-  btnTop.addEventListener('click', start);
+  startBtn.addEventListener('click', startSubscription);
 
-  btnBottom.addEventListener('click', start);
+  // initial state
 
-  document.getElementById('resetBtn').addEventListener('click', () => setTimeout(syncDisabled, 0));
+  updateBtn();
 
-
-
-  // Safety: منع أي submit افتراضي
-
-  form.addEventListener('submit', e => e.preventDefault());
+})();
 
 </script>
 
