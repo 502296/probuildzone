@@ -1,16 +1,12 @@
 // netlify/functions/create-checkout-session.js
 
-
-
 const Stripe = require('stripe');
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 
 exports.handler = async (event) => {
 
-  // السماح بطلبات OPTIONS (ضرورية لـ CORS)
+  // السماح بالـ CORS + Preflight
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -36,17 +32,9 @@ exports.handler = async (event) => {
 
 
 
-  // نرفض أي طريقة غير POST
-
   if (event.httpMethod !== 'POST') {
 
-    return {
-
-      statusCode: 405,
-
-      body: 'Method Not Allowed',
-
-    };
+    return { statusCode: 405, body: 'Method Not Allowed' };
 
   }
 
@@ -54,13 +42,33 @@ exports.handler = async (event) => {
 
   try {
 
-    const data = JSON.parse(event.body);
+    const secret  = process.env.STRIPE_SECRET_KEY;
 
-    const siteUrl = process.env.SITE_URL || 'https://probuildzone.netlify.app';
+    const priceId = process.env.STRIPE_PRICE_YEARLY; // أو MONTHLY حسب خطتك
+
+    const siteUrl = process.env.SITE_URL;            // مثال: https://probuildzone.com
 
 
 
-    // إنشاء جلسة Checkout في Stripe
+    if (!secret || !priceId || !siteUrl) {
+
+      return { statusCode: 500, body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_YEARLY / SITE_URL)' };
+
+    }
+
+
+
+    const stripe = new Stripe(secret);
+
+
+
+    // نتوقع JSON من الواجهة
+
+    const data = JSON.parse(event.body || '{}');
+
+    const { name, email, phone, address, license, insurance, notes } = data;
+
+
 
     const session = await stripe.checkout.sessions.create({
 
@@ -68,41 +76,21 @@ exports.handler = async (event) => {
 
       payment_method_types: ['card'],
 
-      line_items: [
+      line_items: [{ price: priceId, quantity: 1 }],
 
-        {
+      subscription_data: {
 
-          price: process.env.STRIPE_PRICE_YEARLY, // أو STRIPE_PRICE_MONTHLY
+        trial_period_days: 30,
 
-          quantity: 1,
+        metadata: { name, email, phone, address, license, insurance, notes },
 
-        },
+      },
 
-      ],
-
-      allow_promotion_codes: true,
+      customer_email: email,
 
       success_url: `${siteUrl}/success.html`,
 
       cancel_url: `${siteUrl}/cancel.html`,
-
-      metadata: {
-
-        name: data.name || '',
-
-        email: data.email || '',
-
-        phone: data.phone || '',
-
-        address: data.address || '',
-
-        license: data.license || '',
-
-        insurance: data.insurance || '',
-
-        notes: data.notes || '',
-
-      },
 
     });
 
@@ -112,7 +100,7 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
 
       body: JSON.stringify({ url: session.url }),
 
@@ -120,11 +108,15 @@ exports.handler = async (event) => {
 
   } catch (err) {
 
+    console.error('Stripe session error:', err);
+
     return {
 
       statusCode: 500,
 
-      body: `Error creating checkout session: ${err.message}`,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({ error: err.message }),
 
     };
 
