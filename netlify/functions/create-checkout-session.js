@@ -46,19 +46,19 @@ exports.handler = async (event) => {
 
     const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
-    const siteUrl = process.env.SITE_URL;
+    const siteUrl = process.env.SITE_URL; // مثال أثناء الاختبار: https://probuildzone.netlify.app
 
 
 
     if (!secret || !priceId || !siteUrl) {
 
-      return { statusCode: 500, body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_*/ SITE_URL)' };
+      return { statusCode: 500, body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)' };
 
     }
 
 
 
-    const stripe = new Stripe(secret);
+    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' }); // ثابتة وحديثة
 
     const data = JSON.parse(event.body || '{}');
 
