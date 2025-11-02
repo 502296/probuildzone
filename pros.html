@@ -28,9 +28,9 @@
 
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#fff;color:#111}
 
-    .container{max-width:720px;margin:32px auto;padding:16px}
+    .container{max-width:780px;margin:32px auto;padding:16px}
 
-    h1{font-size:24px;margin:0 0 12px}
+    h1{font-size:26px;margin:0 0 16px}
 
     .card{background:var(--card);border:1px solid #e7e8ec;border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(15,42,67,.06)}
 
@@ -67,6 +67,8 @@
   <div class="container">
 
     <h1>ProBuildZone — Start Free Trial</h1>
+
+
 
     <div class="card">
 
@@ -122,7 +124,7 @@
 
             <label for="license">Business license / #</label>
 
-            <input id="license" name="license" placeholder="MY-123456" required>
+            <input id="license" name="license" placeholder="KY-123456" required>
 
           </div>
 
@@ -184,7 +186,7 @@
 
           <button type="reset" class="btn">Reset</button>
 
-          <!-- مهم: type="button" حتى لا يعمل submit GET -->
+          <!-- مهم: button وليس submit -->
 
           <button id="startBtn" type="button" class="btn btn-gold">Start Free Trial</button>
 
@@ -200,13 +202,19 @@
 
   <script>
 
-    const $ = (s) => document.querySelector(s);
+    const $ = (s)=>document.querySelector(s);
 
     const alertBox = $('#alert');
 
     const startBtn = $('#startBtn');
 
     const form = $('#prosForm');
+
+
+
+    // لو أنت على netlify.app نستخدم مسار نسبي، غير ذلك نستخدم دومين netlify مباشرة
+
+    const NETLIFY_BASE = location.hostname.endsWith('netlify.app') ? '' : 'https://probuildzone.netlify.app';
 
 
 
@@ -248,8 +256,6 @@
 
 
 
-      // تحقق بسيط
-
       if(!payload.name || !payload.email || !payload.phone || !payload.license){
 
         showError('Please fill name, email, phone, and license.');
@@ -266,7 +272,7 @@
 
       try{
 
-        const res = await fetch('/.netlify/functions/create-checkout-session', {
+        const res = await fetch(`${NETLIFY_BASE}/.netlify/functions/create-checkout-session`, {
 
           method: 'POST',
 
@@ -294,7 +300,7 @@
 
         if(data && data.url){
 
-          window.location.href = data.url;
+          window.location.href = data.url; // فتح Stripe Checkout
 
         } else {
 
