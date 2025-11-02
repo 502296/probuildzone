@@ -1,19 +1,5 @@
 [build]
-
-  publish = "public"
-
+  publish = "."
   functions = "netlify/functions"
-
-
-
-# يسمح للـHTML يستخدم History API إن احتجت
-
-[[redirects]]
-
-  from = "/*"
-
-  to = "/index.html"
-
-  status = 200
-
-  force = false
+[functions]
+  node_bundler = "esbuild"
