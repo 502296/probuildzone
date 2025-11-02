@@ -4,9 +4,9 @@
 
 <head>
 
-<meta charset="utf-8" />
+<meta charset="utf-8"/>
 
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
 <title>ProBuildZone — Start Free Trial</title>
 
@@ -18,115 +18,63 @@
 
   :root{
 
-    --pbz-blue:#0F2A43;
+    --pbz-blue:#0F2A43; --pbz-blue-2:#0b2033;
 
-    --pbz-blue-2:#0b2033;
+    --gold:#D4AF37; --gold-700:#b9962f;
 
-    --gold:#D4AF37;
-
-    --gold-700:#b9962f;
-
-    --muted:#6b7a8c;
-
-    --card:#ffffff;
-
-    --bg:#f6f7fb;
-
-    --danger:#b00020;
+    --muted:#6b7a8c; --card:#ffffff; --bg:#f6f7fb; --danger:#b00020;
 
   }
 
   *{box-sizing:border-box}
 
-  body{
-
-    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-
-    color:#111; background:var(--bg);
-
-  }
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111;background:var(--bg)}
 
   .wrap{max-width:880px;margin:32px auto;padding:16px}
 
-  .card{
+  .card{background:var(--card);border:1px solid #e7e7e7;border-radius:14px;padding:22px;box-shadow:0 10px 24px rgba(15,42,67,.08)}
 
-    background:var(--card); border:1px solid #e7e7e7; border-radius:14px; padding:22px;
+  h1{margin:0 0 8px;color:var(--pbz-blue)}
 
-    box-shadow:0 10px 24px rgba(15,42,67,.08);
+  .sub{color:var(--muted);margin:0 0 20px}
 
-  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
-  h1{margin:0 0 8px 0; color:var(--pbz-blue)}
+  .grid-1{display:grid;grid-template-columns:1fr;gap:14px}
 
-  .sub{color:var(--muted); margin:0 0 20px 0}
+  label{display:block;font-weight:600;margin:6px 0}
 
+  input,select,textarea{width:100%;padding:12px 14px;border:1px solid #d9d9df;border-radius:10px;font-size:16px;background:#fff;outline:none}
 
-
-  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-
-  .grid-1{display:grid; grid-template-columns:1fr; gap:14px}
-
-  label{display:block; font-weight:600; margin:6px 0}
-
-  input,select,textarea{
-
-    width:100%; padding:12px 14px; border:1px solid #d9d9df; border-radius:10px; font-size:16px;
-
-    background:#fff; outline:none;
-
-  }
-
-  textarea{min-height:90px; resize:vertical}
+  textarea{min-height:90px;resize:vertical}
 
   .row{margin-top:6px}
 
-  .hint{font-size:13px; color:var(--muted)}
+  .hint{font-size:13px;color:var(--muted)}
 
+  .actions{display:flex;gap:12px;align-items:center;margin-top:18px}
 
+  .btn{border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;transition:transform .06s ease,box-shadow .2s ease,background .2s ease}
 
-  .actions{display:flex; gap:12px; align-items:center; margin-top:18px}
+  .btn.gold{background:linear-gradient(180deg,var(--gold),#e3c257);color:#141414;box-shadow:0 6px 20px rgba(212,175,55,.35)}
 
-  .btn{
-
-    border:0; padding:12px 18px; border-radius:12px; font-weight:700; cursor:pointer;
-
-    transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
-
-  }
-
-  .btn.gold{background:linear-gradient(180deg,var(--gold),#e3c257); color:#141414;
-
-            box-shadow:0 6px 20px rgba(212,175,55,.35)}
-
-  .btn.gold:disabled{background:#e9dfb7;color:#7a6b2a; cursor:not-allowed; box-shadow:none; opacity:.7}
+  .btn.gold:disabled{background:#e9dfb7;color:#7a6b2a;cursor:not-allowed;box-shadow:none;opacity:.7}
 
   .btn.gold:active{transform:translateY(1px)}
 
   .btn.reset{background:#eef2f6;color:#1b2a38}
 
-
-
-  .checkline{display:flex; gap:10px; align-items:flex-start; margin-top:6px}
+  .checkline{display:flex;gap:10px;align-items:flex-start;margin-top:6px}
 
   .checkline input{width:18px;height:18px;margin-top:2px}
 
-  .badge{display:none; margin-top:14px; padding:11px 14px; border-radius:10px; font-weight:600}
+  .badge{display:none;margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:600}
 
-  .badge.err{display:block; background:#fde9ec; color:#7d0e21; border:1px solid #f6c7cf}
+  .badge.err{display:block;background:#fde9ec;color:#7d0e21;border:1px solid #f6c7cf}
 
+  .mobile-only{display:none} .desktop-only{display:none}
 
-
-  /* device-based visibility */
-
-  .mobile-only{display:none}
-
-  .desktop-only{display:none}
-
-  @media (max-width:720px){
-
-    .grid{grid-template-columns:1fr}
-
-  }
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} }
 
 </style>
 
@@ -144,6 +92,8 @@
 
 
 
+      <!-- مهم: لا action ولا method. الإرسال سيتم عبر fetch POST -->
+
       <form id="proForm" novalidate>
 
         <div class="grid">
@@ -152,53 +102,69 @@
 
             <label for="full_name">Full name</label>
 
-            <input id="full_name" name="full_name" autocomplete="name" required />
+            <input id="full_name" name="full_name" autocomplete="name" required/>
 
           </div>
+
+
 
           <div class="row">
 
             <label for="email">Email</label>
 
-            <input id="email" name="email" type="email" autocomplete="email" required />
+            <input id="email" name="email" type="email" autocomplete="email" required/>
 
           </div>
 
-          <div class="row mobile-only">
 
-            <label for="phone">Phone (mobile)</label>
 
-            <input id="phone" name="phone" inputmode="tel" placeholder="(502) 555-0123" />
+          <!-- Phone for Pros (مطلوب) -->
 
-            <div class="hint">Shown on phones only</div>
+          <div class="row">
+
+            <label for="phone">Phone</label>
+
+            <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
+
+                   placeholder="(502) 555-0123" required/>
 
           </div>
+
+
+
+          <!-- Website (اختياري لسطح المكتب) -->
 
           <div class="row desktop-only">
 
             <label for="website">Company website (desktop)</label>
 
-            <input id="website" name="website" placeholder="https://example.com" />
+            <input id="website" name="website" placeholder="https://example.com"/>
 
             <div class="hint">Shown on desktops only</div>
 
           </div>
 
+
+
           <div class="row">
 
             <label for="address">Business address</label>
 
-            <input id="address" name="address" placeholder="Street, City, State" />
+            <input id="address" name="address" placeholder="Street, City, State"/>
 
           </div>
+
+
 
           <div class="row">
 
             <label for="license">Business license / #</label>
 
-            <input id="license" name="license" placeholder="License # / State" />
+            <input id="license" name="license" placeholder="License # / State"/>
 
           </div>
+
+
 
           <div class="row">
 
@@ -218,6 +184,8 @@
 
           </div>
 
+
+
           <div class="row grid-1">
 
             <label for="notes">Services & notes (optional)</label>
@@ -232,9 +200,11 @@
 
         <div class="checkline">
 
-          <input id="agree" type="checkbox" />
+          <input id="agree" type="checkbox"/>
 
-          <label for="agree">By starting your free trial, you agree to our <a href="/terms.html">Terms</a> &amp; <a href="/privacy.html">Privacy</a>.</label>
+          <label for="agree">By starting your free trial, you agree to our
+
+            <a href="/terms.html">Terms</a> &amp; <a href="/privacy.html">Privacy</a>.</label>
 
         </div>
 
@@ -246,7 +216,7 @@
 
         <div class="actions">
 
-          <button type="button" class="btn reset" id="resetBtn">Reset</button>
+          <button type="reset" class="btn reset" id="resetBtn">Reset</button>
 
           <button type="button" class="btn gold" id="startBtn" disabled>Start Free Trial</button>
 
@@ -268,37 +238,31 @@
 
 (function(){
 
-  // Device-based show/hide
+  // إظهار/إخفاء عناصر حسب الجهاز
 
   const isMobile = /iPhone|Android.+Mobile|iPad|iPod/i.test(navigator.userAgent);
-
-  document.querySelectorAll('.mobile-only').forEach(el => el.style.display = isMobile ? '' : 'none');
 
   document.querySelectorAll('.desktop-only').forEach(el => el.style.display = isMobile ? 'none' : '');
 
 
 
-  const form = document.getElementById('proForm');
+  const $ = (s)=>document.querySelector(s);
 
-  const agree = document.getElementById('agree');
-
-  const startBtn = document.getElementById('startBtn');
-
-  const resetBtn = document.getElementById('resetBtn');
-
-  const errBox = document.getElementById('err');
+  const form = $('#proForm'), agree = $('#agree'), startBtn = $('#startBtn'), errBox = $('#err');
 
 
-
-  // Enable button only if agreed & minimal required fields present
 
   function canSubmit(){
 
-    const name = document.getElementById('full_name').value.trim();
+    const name = $('#full_name').value.trim();
 
-    const email = document.getElementById('email').value.trim();
+    const email = $('#email').value.trim();
 
-    return agree.checked && name.length >= 2 && /\S+@\S+\.\S+/.test(email);
+    const phone = $('#phone').value.trim();
+
+    const emailOK = /\S+@\S+\.\S+/.test(email);
+
+    return agree.checked && name.length >= 2 && emailOK && phone.length >= 6;
 
   }
 
@@ -310,27 +274,13 @@
 
 
 
-  resetBtn.addEventListener('click', () => {
-
-    form.reset();
-
-    updateBtn();
-
-    errBox.style.display = 'none';
-
-  });
-
-
-
   async function startSubscription(){
 
     errBox.style.display = 'none';
 
-
-
     if(!canSubmit()){
 
-      errBox.textContent = 'Please fill name & valid email and agree to Terms.';
+      errBox.textContent = 'Please fill name, valid email & phone and agree to Terms.';
 
       errBox.style.display = 'block';
 
@@ -342,21 +292,21 @@
 
     const payload = {
 
-      name: document.getElementById('full_name').value.trim(),
+      name:   $('#full_name').value.trim(),
 
-      email: document.getElementById('email').value.trim(),
+      email:  $('#email').value.trim(),
 
-      phone: document.getElementById('phone') ? document.getElementById('phone').value.trim() : '',
+      phone:  $('#phone').value.trim(),
 
-      website: document.getElementById('website') ? document.getElementById('website').value.trim() : '',
+      website:($('#website')?.value || '').trim(),
 
-      address: document.getElementById('address').value.trim(),
+      address:($('#address')?.value || '').trim(),
 
-      license: document.getElementById('license').value.trim(),
+      license:($('#license')?.value || '').trim(),
 
-      insurance: document.getElementById('insurance').value,
+      insurance:($('#insurance')?.value || 'not_provided'),
 
-      notes: document.getElementById('notes').value.trim(),
+      notes:  ($('#notes')?.value || '').trim(),
 
       source: 'pros.html'
 
@@ -364,9 +314,9 @@
 
 
 
-    startBtn.disabled = true;
+    const original = startBtn.textContent;
 
-    startBtn.textContent = 'Processing…';
+    startBtn.disabled = true; startBtn.textContent = 'Processing…';
 
 
 
@@ -374,9 +324,9 @@
 
       const res = await fetch('/.netlify/functions/create-checkout-session', {
 
-        method: 'POST',
+        method:'POST',
 
-        headers: { 'Content-Type': 'application/json' },
+        headers:{'Content-Type':'application/json'},
 
         body: JSON.stringify(payload)
 
@@ -386,25 +336,19 @@
 
       if(!res.ok){
 
-        const txt = await res.text();
+        const text = await res.text();
 
-        throw new Error(txt || ('HTTP ' + res.status));
-
-      }
-
-
-
-      const data = await res.json();
-
-      if(data && data.url){
-
-        window.location.href = data.url; // Stripe Checkout
-
-      }else{
-
-        throw new Error('No checkout URL returned from server.');
+        throw new Error(text || ('HTTP '+res.status));
 
       }
+
+
+
+      const data = await res.json();   // { url: "https://checkout.stripe.com/..." }
+
+      if(data && data.url) window.location.href = data.url;
+
+      else throw new Error('No checkout URL returned.');
 
     }catch(e){
 
@@ -412,9 +356,7 @@
 
       errBox.style.display = 'block';
 
-      startBtn.disabled = false;
-
-      startBtn.textContent = 'Start Free Trial';
+      startBtn.disabled = false; startBtn.textContent = original;
 
     }
 
@@ -422,11 +364,13 @@
 
 
 
-  startBtn.addEventListener('click', startSubscription);
+  $('#startBtn').addEventListener('click', startSubscription);
 
-  // initial state
+  $('#resetBtn').addEventListener('click', ()=>{ form.reset(); updateBtn(); errBox.style.display='none'; });
 
-  updateBtn();
+
+
+  updateBtn(); // حالة أولية
 
 })();
 
