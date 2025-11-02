@@ -7,9 +7,7 @@
     "build": "echo \"Static site\"",
     "start": "netlify dev"
   },
-  "engines": {
-    "node": ">=18"
-  },
+  "engines": { "node": ">=18" },
   "dependencies": {
     "googleapis": "^131.0.0",
     "stripe": "^16.0.0"
