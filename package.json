@@ -1,26 +1,15 @@
 
 {
-
   "name": "probuildzone",
-
   "version": "1.0.0",
-
   "private": true,
-
   "scripts": {
-
     "dev": "netlify dev",
-
     "build": "echo \"Static site\"",
-
     "start": "netlify dev"
-
   },
-
   "dependencies": {
-
+    "googleapis": "^131.0.0"
     "stripe": "^16.0.0"
-
   }
-
 }
