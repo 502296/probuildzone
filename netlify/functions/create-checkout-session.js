@@ -1,12 +1,8 @@
-// netlify/functions/create-checkout-session.js
-
 const Stripe = require('stripe');
 
 
 
 exports.handler = async (event) => {
-
-  // CORS + Preflight
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -60,11 +56,15 @@ exports.handler = async (event) => {
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' }); // ثابتة وحديثة
 
+
+
     const data = JSON.parse(event.body || '{}');
 
     const { name, email, phone, address, license, insurance, notes } = data;
 
 
+
+    // إنشاء الـ Stripe session (ما غيرناه)
 
     const session = await stripe.checkout.sessions.create({
 
@@ -89,6 +89,66 @@ exports.handler = async (event) => {
       cancel_url: `${siteUrl}/cancel.html`,
 
     });
+
+
+
+    // ------------- send to Google Sheets (new) -------------
+
+    try {
+
+      const gsUrl = process.env.GS_WEBAPP_URL;
+
+      if (gsUrl) {
+
+        const payload = {
+
+          name,
+
+          email,
+
+          phone,
+
+          address,
+
+          license,
+
+          insurance,
+
+          notes,
+
+          source_env: siteUrl,
+
+          stripe_session_id: session.id,
+
+        };
+
+
+
+        // Netlify على Node 18 فيه fetch جاهز
+
+        fetch(gsUrl, {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify(payload),
+
+        }).catch((err) => {
+
+          console.error('Error sending to Google Sheets (fetch catch):', err);
+
+        });
+
+      }
+
+    } catch (err) {
+
+      console.error('GSheets integration failed:', err);
+
+    }
+
+    // -------------------------------------------------------
 
 
 
