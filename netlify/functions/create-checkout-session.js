@@ -1,5 +1,9 @@
 const Stripe = require('stripe');
 
+// إضافة fetch لأن بعض بيئات نتلايفاي ما فيها fetch جاهز
+
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)); // <-- added
+
 
 
 exports.handler = async (event) => {
@@ -30,7 +34,7 @@ exports.handler = async (event) => {
 
   if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: 'Method Not Allowed' }; 
 
   }
 
@@ -42,7 +46,7 @@ exports.handler = async (event) => {
 
     const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
-    const siteUrl = process.env.SITE_URL; // مثال أثناء الاختبار: https://probuildzone.netlify.app
+    const siteUrl = process.env.SITE_URL;
 
 
 
@@ -54,17 +58,13 @@ exports.handler = async (event) => {
 
 
 
-    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' }); // ثابتة وحديثة
-
-
+    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
     const data = JSON.parse(event.body || '{}');
 
     const { name, email, phone, address, license, insurance, notes } = data;
 
 
-
-    // إنشاء الـ Stripe session (ما غيرناه)
 
     const session = await stripe.checkout.sessions.create({
 
@@ -92,15 +92,15 @@ exports.handler = async (event) => {
 
 
 
-    // ------------- send to Google Sheets (new) -------------
+    // ===== هنا الإضافة فقط =====
 
-    try {
+    try { // <-- added
 
-      const gsUrl = process.env.GS_WEBAPP_URL;
+      const gsUrl = process.env.GS_WEBAPP_URL; // <-- added
 
-      if (gsUrl) {
+      if (gsUrl) { // <-- added
 
-        const payload = {
+        const payload = { // <-- added
 
           name,
 
@@ -122,11 +122,7 @@ exports.handler = async (event) => {
 
         };
 
-
-
-        // Netlify على Node 18 فيه fetch جاهز
-
-        fetch(gsUrl, {
+        await fetch(gsUrl, { // <-- added
 
           method: 'POST',
 
@@ -134,21 +130,19 @@ exports.handler = async (event) => {
 
           body: JSON.stringify(payload),
 
-        }).catch((err) => {
-
-          console.error('Error sending to Google Sheets (fetch catch):', err);
-
         });
 
       }
 
-    } catch (err) {
+    } catch (sheetErr) {
 
-      console.error('GSheets integration failed:', err);
+      console.error('Sheet error:', sheetErr); // <-- added
+
+      // ما نرمي خطأ للفرونت عشان Stripe يظل شغال
 
     }
 
-    // -------------------------------------------------------
+    // ===== نهاية الإضافة =====
 
 
 
