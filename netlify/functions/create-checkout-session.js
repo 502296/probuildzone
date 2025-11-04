@@ -2,15 +2,15 @@
 
 
 
-const Stripe = require('stripe');
+const Stripe = require("stripe");
 
 
 
 exports.handler = async (event) => {
 
-  // CORS للمتصفح
+  // CORS + السماح لـ POST فقط
 
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
 
     return {
 
@@ -18,15 +18,15 @@ exports.handler = async (event) => {
 
       headers: {
 
-        'Access-Control-Allow-Origin': '*',
+        "Access-Control-Allow-Origin": "*",
 
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
 
-        'Access-Control-Allow-Headers': 'Content-Type',
+        "Access-Control-Allow-Headers": "Content-Type",
 
       },
 
-      body: 'ok',
+      body: "ok",
 
     };
 
@@ -34,9 +34,9 @@ exports.handler = async (event) => {
 
 
 
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
 
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: "Method Not Allowed" };
 
   }
 
@@ -44,15 +44,17 @@ exports.handler = async (event) => {
 
   try {
 
-    // 1) env vars
+    // متغيرات البيئة
 
-    const secret  = process.env.STRIPE_SECRET_KEY;
+    const secret = process.env.STRIPE_SECRET_KEY;
 
-    const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
+    const priceId =
+
+      process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
     const siteUrl = process.env.SITE_URL;
 
-    const gsUrl   = process.env.GS_WEBAPP_URL; // ← هذا اللي حطّيناه في نتلايفاي
+    const gsUrl = process.env.GS_WEBAPP_URL; // ← هنا نحط رابط الويب آب لو موجود
 
 
 
@@ -62,7 +64,9 @@ exports.handler = async (event) => {
 
         statusCode: 500,
 
-        body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)',
+        body:
+
+          "Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)",
 
       };
 
@@ -70,45 +74,41 @@ exports.handler = async (event) => {
 
 
 
-    // 2) بيانات جاية من الصفحة (لو حبيت تستخدمها)
+    // نقرأ بيانات الفورم اللي جت من الصفحة
 
-    const bodyData = JSON.parse(event.body || '{}');
+    const data = JSON.parse(event.body || "{}");
 
     const {
 
-      name,
+      name = "",
 
-      email,
+      email = "",
 
-      phone,
+      phone = "",
 
-      address,
+      address = "",
 
-      license,
+      license = "",
 
-      insurance,
+      insurance = "",
 
-      notes,
+      notes = "",
 
-      zip,
-
-      notify_opt_in,
-
-    } = bodyData;
+    } = data;
 
 
 
-    // 3) Stripe
+    // Stripe
 
-    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
+    const stripe = new Stripe(secret, { apiVersion: "2024-06-20" });
 
 
 
     const session = await stripe.checkout.sessions.create({
 
-      mode: 'subscription',
+      mode: "subscription",
 
-      payment_method_types: ['card'],
+      payment_method_types: ["card"],
 
       line_items: [{ price: priceId, quantity: 1 }],
 
@@ -132,15 +132,11 @@ exports.handler = async (event) => {
 
           notes,
 
-          zip,
-
-          notify_opt_in,
-
         },
 
       },
 
-      customer_email: email,
+      customer_email: email || undefined,
 
       success_url: `${siteUrl}/success.html`,
 
@@ -150,19 +146,25 @@ exports.handler = async (event) => {
 
 
 
-    // 4) إرسال البيانات إلى Google Apps Script (اللي سوّيناه قبل شوي)
+    // بعد ما نجح Stripe نحاول نرسل للـGoogle Apps Script
+
+    let sheetStatus = "skipped";
 
     if (gsUrl) {
 
       try {
 
-        await fetch(gsUrl, {
+        // Netlify على Node 18 فيه fetch، فما نحتاج require('node-fetch')
 
-          method: 'POST',
+        const res = await fetch(gsUrl, {
 
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+
+          headers: { "Content-Type": "application/json" },
 
           body: JSON.stringify({
+
+            timestamp: new Date().toISOString(),
 
             name,
 
@@ -178,33 +180,37 @@ exports.handler = async (event) => {
 
             notes,
 
-            zip,
-
-            notify_opt_in,
-
-            session_id: session.id,
+            stripe_session_id: session.id,
 
           }),
 
         });
 
-      } catch (sheetErr) {
 
-        // ما نخرب الدفع لو الشيت فشل
 
-        console.error('Sheet error:', sheetErr);
+        if (res.ok) {
+
+          sheetStatus = "ok";
+
+        } else {
+
+          sheetStatus = "failed:" + (await res.text());
+
+          console.error("GS script error:", sheetStatus);
+
+        }
+
+      } catch (gsErr) {
+
+        sheetStatus = "failed:" + gsErr.message;
+
+        console.error("GS fetch failed:", gsErr);
 
       }
-
-    } else {
-
-      console.warn('GS_WEBAPP_URL is not set – skipping sheet save.');
 
     }
 
 
-
-    // 5) رجّع رابط سترايب للواجهة
 
     return {
 
@@ -212,19 +218,25 @@ exports.handler = async (event) => {
 
       headers: {
 
-        'Access-Control-Allow-Origin': '*',
+        "Access-Control-Allow-Origin": "*",
 
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
 
       },
 
-      body: JSON.stringify({ url: session.url }),
+      body: JSON.stringify({
+
+        url: session.url,
+
+        sheet: sheetStatus,
+
+      }),
 
     };
 
   } catch (err) {
 
-    console.error('Stripe session error:', err);
+    console.error("create-checkout-session error:", err);
 
     return {
 
@@ -232,9 +244,9 @@ exports.handler = async (event) => {
 
       headers: {
 
-        'Access-Control-Allow-Origin': '*',
+        "Access-Control-Allow-Origin": "*",
 
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
 
       },
 
