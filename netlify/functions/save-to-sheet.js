@@ -4,7 +4,7 @@
 
 exports.handler = async (event) => {
 
-  // نسمح بس POST
+  // نقبل بس POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -14,11 +14,23 @@ exports.handler = async (event) => {
 
 
 
-  const gsUrl = process.env.GS_WEBAPP_URL; // من env
+  // رابط الويب أب اللي حطّيته في نتلايفي
+
+  const gsUrl = process.env.GS_WEBAPP_URL;
+
+
 
   if (!gsUrl) {
 
-    return { statusCode: 500, body: 'GS_WEBAPP_URL is missing' };
+    console.error('GS_WEBAPP_URL is missing');
+
+    return {
+
+      statusCode: 500,
+
+      body: 'GS_WEBAPP_URL is missing in environment variables',
+
+    };
 
   }
 
@@ -30,27 +42,33 @@ exports.handler = async (event) => {
 
 
 
-    const res = await fetch(gsUrl, {
+    // نبعث نفس الداتا للـ Google Apps Script
+
+    const resp = await fetch(gsUrl, {
 
       method: 'POST',
 
       headers: { 'Content-Type': 'application/json' },
 
-      body
+      body,
 
     });
 
 
 
-    const text = await res.text(); // نشوفه لو فيه خطأ
+    if (!resp.ok) {
 
+      const text = await resp.text();
 
+      console.error('GS script error:', text);
 
-    if (!res.ok) {
+      return {
 
-      console.error('Google Script error:', text);
+        statusCode: 500,
 
-      return { statusCode: 500, body: text };
+        body: 'Google Script returned error: ' + text,
+
+      };
 
     }
 
@@ -60,15 +78,21 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      body: text
+      body: 'OK',
 
     };
 
   } catch (err) {
 
-    console.error('save-to-sheet failed:', err);
+    console.error('save-to-sheet err:', err);
 
-    return { statusCode: 500, body: err.message };
+    return {
+
+      statusCode: 500,
+
+      body: 'Failed to call Google Script: ' + err.message,
+
+    };
 
   }
 
