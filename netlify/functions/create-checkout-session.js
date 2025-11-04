@@ -4,8 +4,6 @@
 
 const Stripe = require('stripe');
 
-const { google } = require('googleapis');
-
 
 
 exports.handler = async (event) => {
@@ -46,17 +44,17 @@ exports.handler = async (event) => {
 
   try {
 
-    const secret = process.env.STRIPE_SECRET_KEY;
+    const secret  = process.env.STRIPE_SECRET_KEY;
 
     const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
     const siteUrl = process.env.SITE_URL;
 
+    const gsUrl  = "https://script.google.com/macros/s/AKfycbyrPVGLAESUPdUvKxc3YpS-77CiZoipZo91y_yaKkwiTuHp5eDHsfDlKF6qA1ZXUSI3/exec";  // 👈 هنا رابط الويب آب
+
 
 
     if (!secret || !priceId || !siteUrl) {
-
-      console.error('Missing Stripe envs');
 
       return {
 
@@ -69,8 +67,6 @@ exports.handler = async (event) => {
     }
 
 
-
-    // ========== STRIPE (زي ما هو) ==========
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -101,6 +97,8 @@ exports.handler = async (event) => {
     } = data;
 
 
+
+    // 1) أنشئ جلسة Stripe
 
     const session = await stripe.checkout.sessions.create({
 
@@ -146,113 +144,61 @@ exports.handler = async (event) => {
 
     });
 
-    // =======================================
+
+
+    // 2) ابعث نفس الداتا للـ Google Web App (لو موجود)
+
+    if (gsUrl) {
+
+      const payload = {
+
+        name,
+
+        email,
+
+        phone,
+
+        address,
+
+        license,
+
+        insurance,
+
+        notes,
+
+        zip,
+
+        notify_opt_in,
+
+        session_id: session.id,
+
+      };
 
 
 
-    // ========== GOOGLE SHEETS ==========
+      // نتلايفاي على Node 18 فعنده fetch
 
-    try {
+      try {
 
-      const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
+        await fetch(gsUrl, {
 
-      if (!serviceAccountJson) {
+          method: 'POST',
 
-        console.error('GOOGLE_SERVICE_ACCOUNT env var missing');
+          headers: { 'Content-Type': 'application/json' },
 
-      } else {
-
-        // لو كان ستنقل من env غالباً في مسافات -> نضمن parse
-
-        const creds = JSON.parse(serviceAccountJson);
-
-
-
-        const auth = new google.auth.JWT(
-
-          creds.client_email,
-
-          null,
-
-          creds.private_key,
-
-          ['https://www.googleapis.com/auth/spreadsheets']
-
-        );
-
-
-
-        const sheets = google.sheets({ version: 'v4', auth });
-
-
-
-        const SHEET_ID = '1NRblw2ZWin5juRvPHCSfCOuQ6oHtN-qopUQShY7OgDLQ';
-
-        const SHEET_NAME = 'Pros';
-
-
-
-        const row = [
-
-          new Date().toISOString(),
-
-          name || '',
-
-          email || '',
-
-          phone || '',
-
-          address || '',
-
-          license || '',
-
-          insurance || '',
-
-          notes || '',
-
-          zip || '',
-
-          notify_opt_in || '',
-
-          siteUrl,
-
-          session.id,
-
-        ];
-
-
-
-        await sheets.spreadsheets.values.append({
-
-          spreadsheetId: SHEET_ID,
-
-          range: `${SHEET_NAME}!A:Z`,
-
-          valueInputOption: 'USER_ENTERED',
-
-          requestBody: {
-
-            values: [row],
-
-          },
+          body: JSON.stringify(payload),
 
         });
 
+      } catch (sheetErr) {
 
+        console.error('Error calling GS web app:', sheetErr);
 
-        console.log('✅ Sheet append success');
+        // ما نرجّع خطأ للمستخدم عشان ما نخرب الـ Stripe
 
       }
 
-    } catch (sheetErr) {
-
-      // ما نخليها تكسر Stripe
-
-      console.error('❌ Sheet error:', sheetErr);
-
     }
-
-    // ===================================
 
 
 
@@ -271,6 +217,8 @@ exports.handler = async (event) => {
       body: JSON.stringify({ url: session.url }),
 
     };
+
+
 
   } catch (err) {
 
@@ -294,4 +242,4 @@ exports.handler = async (event) => {
 
   }
 
-};
+};  
