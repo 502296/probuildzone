@@ -2,11 +2,25 @@ const Stripe = require('stripe');
 
 
 
-// بعض بيئات نتلايفاي ما يكون فيها fetch جاهز
+// نحاول نستخدم fetch المدمج أولاً (نتلايفاي Node 18 عنده fetch)
 
-const fetch = (...args) =>
+// ولو ما كان موجود نرجع لـ node-fetch
 
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const ensureFetch = async (...args) => {
+
+  if (typeof fetch !== 'undefined') {
+
+    return fetch(...args);
+
+  } else {
+
+    const { default: nodeFetch } = await import('node-fetch');
+
+    return nodeFetch(...args);
+
+  }
+
+};
 
 
 
@@ -114,7 +128,7 @@ exports.handler = async (event) => {
 
     try {
 
-      // نأخذ الـURL من الـenv أولاً
+      // خذه من الـenv (الأفضل) ولو مو موجود استخدم الاحتياطي
 
       const gsUrl =
 
@@ -154,7 +168,7 @@ exports.handler = async (event) => {
 
 
 
-        const res = await fetch(gsUrl, {
+        const res = await ensureFetch(gsUrl, {
 
           method: 'POST',
 
@@ -166,9 +180,7 @@ exports.handler = async (event) => {
 
 
 
-        // نحاول نقرأ الرد حتى لو مو JSON
-
-        let text = await res.text();
+        const text = await res.text();
 
         console.log('GSHEET RESPONSE STATUS:', res.status);
 
