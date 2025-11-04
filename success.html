@@ -1,111 +1,51 @@
-<!doctype html>
+<script>
 
-<html>
+  // هذي الداتا اللي خزّناها من فورم الاشتراك
 
-<head>
-
-  <meta charset="utf-8" />
-
-  <title>Success – ProBuildZone</title>
-
-  <style>
-
-    body { font-family: system-ui, sans-serif; background:#0f2d46; color:#fff; display:flex; justify-content:center; padding:40px; }
-
-    .card { background:#0f2d46; border-radius:16px; padding:30px; max-width:480px; width:100%; box-shadow:0 18px 40px rgba(0,0,0,.3); }
-
-    a.btn { display:inline-block; background:#f6a623; color:#000; padding:10px 18px; border-radius:10px; text-decoration:none; margin-top:16px; font-weight:600; }
-
-    #sheetStatus { margin-top:14px; font-size:13px; opacity:.9; }
-
-  </style>
-
-</head>
-
-<body>
-
-  <div class="card">
-
-    <h1>🎉 You’re in!</h1>
-
-    <p>Thanks for starting your 30-day free trial.<br>We’ve received your details and payment setup via Stripe.</p>
-
-    <p>If you need help, email<br><strong>contact@probuildzone.com</strong></p>
+  const data = sessionStorage.getItem('probuildzone_form');
 
 
 
-    <p id="sheetStatus">Saving your subscription to our records…</p>
+  if (data) {
 
+    // نرسلها للفنكشن الجديدة
 
+    fetch('/.netlify/functions/save-to-sheet', {
 
-    <a href="/" class="btn">Back to Home</a>
+      method: 'POST',
 
-  </div>
+      headers: { 'Content-Type': 'application/json' },
 
+      body: data
 
+    })
 
-  <script>
+    .then(res => {
 
-    (async function () {
+      if (!res.ok) throw new Error('save failed');
 
-      const el = document.getElementById('sheetStatus');
+      console.log('✅ Saved to sheet');
 
-      const raw = sessionStorage.getItem('pbz_pro_form');
+      // لو تبي تشيل الرسالة الحمراء القديمة، هنا مكانها
 
+    })
 
+    .catch(err => {
 
-      if (!raw) {
+      console.error('❌ Could not save to Sheet:', err);
 
-        el.textContent = 'No local form data found – you are still subscribed.';
+      // هنا تقدر تخلّي نفس الجملة اللي تظهر لك
 
-        return;
+      const p = document.querySelector('#sheetStatus');
 
-      }
+      if (p) p.textContent = 'Could not save to Sheet. Please contact support.';
 
+    });
 
+  } else {
 
-      try {
+    console.log('⚠️ No form data in sessionStorage');
 
-        const res = await fetch('/.netlify/functions/save-to-sheet', {
+  }
 
-          method: 'POST',
-
-          headers: { 'Content-Type': 'application/json' },
-
-          body: raw
-
-        });
-
-
-
-        if (res.ok) {
-
-          el.textContent = 'Saved to Sheet ✅';
-
-          // نحذفها بعد الحفظ
-
-          sessionStorage.removeItem('pbz_pro_form');
-
-        } else {
-
-          const txt = await res.text();
-
-          el.textContent = 'Could not save to Sheet. ' + txt;
-
-        }
-
-      } catch (err) {
-
-        el.textContent = 'Could not save to Sheet. Please contact support.';
-
-        console.error(err);
-
-      }
-
-    })();
-
-  </script>
-
-</body>
-
-</html>
+</script>
