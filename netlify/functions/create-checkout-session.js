@@ -56,6 +56,8 @@ exports.handler = async (event) => {
 
     if (!secret || !priceId || !siteUrl) {
 
+      console.error('Missing Stripe envs');
+
       return {
 
         statusCode: 500,
@@ -68,7 +70,7 @@ exports.handler = async (event) => {
 
 
 
-    // ========== STRIPE ==========
+    // ========== STRIPE (زي ما هو) ==========
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -144,7 +146,7 @@ exports.handler = async (event) => {
 
     });
 
-    // =============================
+    // =======================================
 
 
 
@@ -154,51 +156,15 @@ exports.handler = async (event) => {
 
       const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
 
-
-
       if (!serviceAccountJson) {
 
-        console.error('❌ GOOGLE_SERVICE_ACCOUNT is missing');
+        console.error('GOOGLE_SERVICE_ACCOUNT env var missing');
 
       } else {
 
-        // لو لصقته وفيه \n بالـ JSON ما عندنا مشكلة
+        // لو كان ستنقل من env غالباً في مسافات -> نضمن parse
 
-        let creds;
-
-        try {
-
-          creds = JSON.parse(serviceAccountJson);
-
-        } catch (parseErr) {
-
-          console.error('❌ Could not parse GOOGLE_SERVICE_ACCOUNT JSON:', parseErr.message);
-
-          throw new Error('Bad GOOGLE_SERVICE_ACCOUNT JSON');
-
-        }
-
-
-
-        // أحياناً المفتاح يجي مع \\n فلازم نرجعه \n
-
-        if (creds.private_key) {
-
-          creds.private_key = creds.private_key.replace(/\\n/g, '\n');
-
-        }
-
-
-
-        // نتأكد إن الثلاثة موجودة
-
-        if (!creds.client_email || !creds.private_key) {
-
-          console.error('❌ GOOGLE_SERVICE_ACCOUNT JSON missing client_email or private_key');
-
-          throw new Error('Service account JSON incomplete');
-
-        }
+        const creds = JSON.parse(serviceAccountJson);
 
 
 
@@ -280,13 +246,13 @@ exports.handler = async (event) => {
 
     } catch (sheetErr) {
 
-      console.error('❌ Sheet error:', sheetErr.message);
+      // ما نخليها تكسر Stripe
 
-      // ما نوقف Stripe
+      console.error('❌ Sheet error:', sheetErr);
 
     }
 
-    // ================================
+    // ===================================
 
 
 
