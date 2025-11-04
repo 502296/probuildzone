@@ -1,42 +1,16 @@
 // netlify/functions/create-checkout-session.js
 
-
-
-const Stripe = require("stripe");
+const Stripe = require('stripe');
 
 
 
 exports.handler = async (event) => {
 
-  // CORS + السماح لـ POST فقط
+  // نسمح بس بالـ POST
 
-  if (event.httpMethod === "OPTIONS") {
+  if (event.httpMethod !== 'POST') {
 
-    return {
-
-      statusCode: 200,
-
-      headers: {
-
-        "Access-Control-Allow-Origin": "*",
-
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-
-        "Access-Control-Allow-Headers": "Content-Type",
-
-      },
-
-      body: "ok",
-
-    };
-
-  }
-
-
-
-  if (event.httpMethod !== "POST") {
-
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return { statusCode: 405, body: 'Method Not Allowed' };
 
   }
 
@@ -44,17 +18,11 @@ exports.handler = async (event) => {
 
   try {
 
-    // متغيرات البيئة
+    const secret  = process.env.STRIPE_SECRET_KEY;
 
-    const secret = process.env.STRIPE_SECRET_KEY;
-
-    const priceId =
-
-      process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
+    const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
     const siteUrl = process.env.SITE_URL;
-
-    const gsUrl = process.env.GS_WEBAPP_URL; // ← هنا نحط رابط الويب آب لو موجود
 
 
 
@@ -64,9 +32,7 @@ exports.handler = async (event) => {
 
         statusCode: 500,
 
-        body:
-
-          "Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)",
+        body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)',
 
       };
 
@@ -74,41 +40,47 @@ exports.handler = async (event) => {
 
 
 
-    // نقرأ بيانات الفورم اللي جت من الصفحة
+    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
-    const data = JSON.parse(event.body || "{}");
+
+
+    // الداتا اللي جاية من الفورم
+
+    const data = JSON.parse(event.body || '{}');
+
+
 
     const {
 
-      name = "",
+      biz,
 
-      email = "",
+      name,
 
-      phone = "",
+      email,
 
-      address = "",
+      phone,
 
-      license = "",
+      address,
 
-      insurance = "",
+      license,
 
-      notes = "",
+      insurance,
+
+      notes,
+
+      zip,
+
+      notify_opt_in,
 
     } = data;
 
 
 
-    // Stripe
-
-    const stripe = new Stripe(secret, { apiVersion: "2024-06-20" });
-
-
-
     const session = await stripe.checkout.sessions.create({
 
-      mode: "subscription",
+      mode: 'subscription',
 
-      payment_method_types: ["card"],
+      payment_method_types: ['card'],
 
       line_items: [{ price: priceId, quantity: 1 }],
 
@@ -117,6 +89,8 @@ exports.handler = async (event) => {
         trial_period_days: 30,
 
         metadata: {
+
+          biz,
 
           name,
 
@@ -132,11 +106,15 @@ exports.handler = async (event) => {
 
           notes,
 
+          zip,
+
+          notify_opt_in,
+
         },
 
       },
 
-      customer_email: email || undefined,
+      customer_email: email,
 
       success_url: `${siteUrl}/success.html`,
 
@@ -146,109 +124,27 @@ exports.handler = async (event) => {
 
 
 
-    // بعد ما نجح Stripe نحاول نرسل للـGoogle Apps Script
-
-    let sheetStatus = "skipped";
-
-    if (gsUrl) {
-
-      try {
-
-        // Netlify على Node 18 فيه fetch، فما نحتاج require('node-fetch')
-
-        const res = await fetch(gsUrl, {
-
-          method: "POST",
-
-          headers: { "Content-Type": "application/json" },
-
-          body: JSON.stringify({
-
-            timestamp: new Date().toISOString(),
-
-            name,
-
-            email,
-
-            phone,
-
-            address,
-
-            license,
-
-            insurance,
-
-            notes,
-
-            stripe_session_id: session.id,
-
-          }),
-
-        });
-
-
-
-        if (res.ok) {
-
-          sheetStatus = "ok";
-
-        } else {
-
-          sheetStatus = "failed:" + (await res.text());
-
-          console.error("GS script error:", sheetStatus);
-
-        }
-
-      } catch (gsErr) {
-
-        sheetStatus = "failed:" + gsErr.message;
-
-        console.error("GS fetch failed:", gsErr);
-
-      }
-
-    }
-
-
-
     return {
 
       statusCode: 200,
 
       headers: {
 
-        "Access-Control-Allow-Origin": "*",
-
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
 
       },
 
-      body: JSON.stringify({
-
-        url: session.url,
-
-        sheet: sheetStatus,
-
-      }),
+      body: JSON.stringify({ url: session.url }),
 
     };
 
   } catch (err) {
 
-    console.error("create-checkout-session error:", err);
+    console.error('Stripe error:', err);
 
     return {
 
       statusCode: 500,
-
-      headers: {
-
-        "Access-Control-Allow-Origin": "*",
-
-        "Content-Type": "application/json",
-
-      },
 
       body: JSON.stringify({ error: err.message }),
 
