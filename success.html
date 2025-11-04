@@ -1,51 +1,75 @@
 <script>
 
-  // هذي الداتا اللي خزّناها من فورم الاشتراك
+  // هذا مثال للداتا اللي تبغى تحفظها
 
-  const data = sessionStorage.getItem('probuildzone_form');
+  const data = {
+
+    email: localStorage.getItem('pbz_email') || '',
+
+    name: localStorage.getItem('pbz_name') || '',
+
+    biz: localStorage.getItem('pbz_biz') || '',
+
+    phone: localStorage.getItem('pbz_phone') || '',
+
+    address: localStorage.getItem('pbz_address') || '',
+
+    license: localStorage.getItem('pbz_license') || '',
+
+    insurance: localStorage.getItem('pbz_insurance') || '',
+
+    notes: localStorage.getItem('pbz_notes') || '',
+
+  };
 
 
 
-  if (data) {
+  // نعرض "جاري الحفظ..." مثل اللي عندك
 
-    // نرسلها للفنكشن الجديدة
+  const msg = document.querySelector('#save-msg'); // حط id في الصفحة لو ما عندك
 
-    fetch('/.netlify/functions/save-to-sheet', {
+  if (msg) msg.textContent = 'Saving your subscription to our records...';
 
-      method: 'POST',
 
-      headers: { 'Content-Type': 'application/json' },
 
-      body: data
+  fetch('/.netlify/functions/save-profile', {
 
-    })
+    method: 'POST',
+
+    headers: { 'Content-Type': 'application/json' },
+
+    body: JSON.stringify(data),
+
+  })
+
+    .then(r => r.json())
 
     .then(res => {
 
-      if (!res.ok) throw new Error('save failed');
+      console.log('save-profile response:', res);
 
-      console.log('✅ Saved to sheet');
+      if (msg) {
 
-      // لو تبي تشيل الرسالة الحمراء القديمة، هنا مكانها
+        if (res.ok) {
+
+          msg.textContent = 'Saved to Google Sheet ✅';
+
+        } else {
+
+          msg.textContent = 'Could not save to Sheet. Please contact support.';
+
+        }
+
+      }
 
     })
 
     .catch(err => {
 
-      console.error('❌ Could not save to Sheet:', err);
+      console.error(err);
 
-      // هنا تقدر تخلّي نفس الجملة اللي تظهر لك
-
-      const p = document.querySelector('#sheetStatus');
-
-      if (p) p.textContent = 'Could not save to Sheet. Please contact support.';
+      if (msg) msg.textContent = 'Could not save to Sheet. Please contact support.';
 
     });
-
-  } else {
-
-    console.log('⚠️ No form data in sessionStorage');
-
-  }
 
 </script>
