@@ -8,7 +8,7 @@ const Stripe = require('stripe');
 
 exports.handler = async (event) => {
 
-  // نسمح بس بالـ POST
+  // نسمح فقط بالـ POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -20,13 +20,15 @@ exports.handler = async (event) => {
 
   try {
 
+    // ناخذ المتغيرات من Netlify
+
     const secret   = process.env.STRIPE_SECRET_KEY;
 
     const priceId  = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
     const siteUrl  = process.env.SITE_URL;
 
-    const gsUrl    = process.env.GS_WEBAPP_URL;   // 👈 هذا رابط Google Apps Script
+    const gsUrl    = process.env.GS_WEBAPP_URL; // 👈 رابط الويب آب تبع جوجل
 
 
 
@@ -48,11 +50,9 @@ exports.handler = async (event) => {
 
 
 
-    // الداتا الجاية من الفورم
+    // الداتا القادمة من الفورم
 
     const data = JSON.parse(event.body || '{}');
-
-
 
     const {
 
@@ -80,7 +80,7 @@ exports.handler = async (event) => {
 
 
 
-    // 1) نعمل جلسة Stripe
+    // نعمل جلسة سترايب
 
     const session = await stripe.checkout.sessions.create({
 
@@ -130,9 +130,11 @@ exports.handler = async (event) => {
 
 
 
-    // 2) نحاول نرسل نفس الداتا إلى Google Sheet (لو متوفر الرابط)
+    // 👇 هنا نحاول نرسل نسخة من الداتا للـ Google Apps Script
 
     if (gsUrl) {
+
+      // ما نخليه يفشل الطلب الرئيسي لو صار خطأ هنا
 
       try {
 
@@ -143,6 +145,8 @@ exports.handler = async (event) => {
           headers: { 'Content-Type': 'application/json' },
 
           body: JSON.stringify({
+
+            ts: new Date().toISOString(),
 
             biz,
 
@@ -164,7 +168,7 @@ exports.handler = async (event) => {
 
             notify_opt_in,
 
-            created_at: new Date().toISOString(),
+            source: 'netlify-fn',
 
           }),
 
@@ -172,9 +176,9 @@ exports.handler = async (event) => {
 
       } catch (err) {
 
-        // ما نوقف Stripe لو الـ Sheet فشل
+        console.error('GS_WEBAPP_URL fetch failed:', err.message);
 
-        console.error('Failed to send to Google Script:', err);
+        // ما نرمي error علشان المستخدم يكمل
 
       }
 
@@ -182,7 +186,7 @@ exports.handler = async (event) => {
 
 
 
-    // نرجّع رابط Stripe
+    // نرجع رابط سترايب للفرونت
 
     return {
 
@@ -193,8 +197,6 @@ exports.handler = async (event) => {
       body: JSON.stringify({ url: session.url }),
 
     };
-
-
 
   } catch (err) {
 
