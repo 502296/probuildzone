@@ -4,7 +4,7 @@
 
 const Stripe = require('stripe');
 
-const { google } = require('googleapis'); // 👈 هذا اللي يربط مع Google Sheets
+const { google } = require('googleapis');
 
 
 
@@ -68,7 +68,7 @@ exports.handler = async (event) => {
 
 
 
-    // ================== STRIPE (مثل ما هو) ==================
+    // ============ STRIPE ============ //
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -144,13 +144,11 @@ exports.handler = async (event) => {
 
     });
 
-    // =========================================================
+    // ============ END STRIPE ============ //
 
 
 
-    // ============ GOOGLE SHEETS ============
-
-
+    // ============ GOOGLE SHEETS ============ //
 
     try {
 
@@ -166,13 +164,19 @@ exports.handler = async (event) => {
 
 
 
+        // مهم جداً: رجّع \n إلى أسطر حقيقية
+
+        const fixedPrivateKey = (creds.private_key || '').replace(/\\n/g, '\n');
+
+
+
         const auth = new google.auth.JWT(
 
           creds.client_email,
 
           null,
 
-          creds.private_key,
+          fixedPrivateKey,
 
           ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -183,8 +187,6 @@ exports.handler = async (event) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
 
-
-        // 👇 هذا هو الشيت تبعك
 
         const SHEET_ID = '1NRblw2ZWin5juRvPHCSfCOuQ6oHtN-qopUQShY7OgDLQ';
 
@@ -246,15 +248,13 @@ exports.handler = async (event) => {
 
     } catch (sheetErr) {
 
-      // لو في مشكلة ما نخليها تخرب على Stripe
-
       console.error('❌ Sheet error:', sheetErr);
+
+      // ما نرجع 500 عشان ما نخرب على Stripe
 
     }
 
-
-
-    // =========================================================
+    // ============ END GOOGLE SHEETS ============ //
 
 
 
