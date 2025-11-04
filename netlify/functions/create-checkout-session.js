@@ -46,7 +46,7 @@ exports.handler = async (event) => {
 
   try {
 
-    const secret  = process.env.STRIPE_SECRET_KEY;
+    const secret = process.env.STRIPE_SECRET_KEY;
 
     const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
@@ -68,7 +68,7 @@ exports.handler = async (event) => {
 
 
 
-    // ============ STRIPE ============ //
+    // ========== STRIPE ==========
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -144,29 +144,61 @@ exports.handler = async (event) => {
 
     });
 
-    // ============ END STRIPE ============ //
+    // =============================
 
 
 
-    // ============ GOOGLE SHEETS ============ //
+    // ========== GOOGLE SHEETS ==========
 
     try {
 
       const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
 
+
+
       if (!serviceAccountJson) {
 
-        console.error('GOOGLE_SERVICE_ACCOUNT env var missing');
+        console.error('❌ GOOGLE_SERVICE_ACCOUNT is missing');
 
       } else {
 
-        const creds = JSON.parse(serviceAccountJson);
+        // لو لصقته وفيه \n بالـ JSON ما عندنا مشكلة
+
+        let creds;
+
+        try {
+
+          creds = JSON.parse(serviceAccountJson);
+
+        } catch (parseErr) {
+
+          console.error('❌ Could not parse GOOGLE_SERVICE_ACCOUNT JSON:', parseErr.message);
+
+          throw new Error('Bad GOOGLE_SERVICE_ACCOUNT JSON');
+
+        }
 
 
 
-        // مهم جداً: رجّع \n إلى أسطر حقيقية
+        // أحياناً المفتاح يجي مع \\n فلازم نرجعه \n
 
-        const fixedPrivateKey = (creds.private_key || '').replace(/\\n/g, '\n');
+        if (creds.private_key) {
+
+          creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+
+        }
+
+
+
+        // نتأكد إن الثلاثة موجودة
+
+        if (!creds.client_email || !creds.private_key) {
+
+          console.error('❌ GOOGLE_SERVICE_ACCOUNT JSON missing client_email or private_key');
+
+          throw new Error('Service account JSON incomplete');
+
+        }
 
 
 
@@ -176,7 +208,7 @@ exports.handler = async (event) => {
 
           null,
 
-          fixedPrivateKey,
+          creds.private_key,
 
           ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -248,13 +280,13 @@ exports.handler = async (event) => {
 
     } catch (sheetErr) {
 
-      console.error('❌ Sheet error:', sheetErr);
+      console.error('❌ Sheet error:', sheetErr.message);
 
-      // ما نرجع 500 عشان ما نخرب على Stripe
+      // ما نوقف Stripe
 
     }
 
-    // ============ END GOOGLE SHEETS ============ //
+    // ================================
 
 
 
