@@ -1,126 +1,88 @@
-// pros.js  — Netlify + Stripe Checkout (Monthly + 30d trial)
+// pros.js  – send form data to Netlify, Netlify → Stripe + Google Sheet
 
 (function () {
 
-  // Helpers
+  // هيلبر صغير يجيب القيمة سواء كانت بالـ id أو بالـ name
 
-  function $(id) { return document.getElementById(id); }
+  function getVal(idOrName) {
 
-  function show(el) { el && el.classList.remove('hidden'); }
+    const byId = document.getElementById(idOrName);
 
-  function hide(el) { el && el.classList.add('hidden'); }
+    if (byId) return byId.value.trim();
 
 
 
-  // Modal controls
+    const byName = document.querySelector(`[name="${idOrName}"]`);
 
-  function openModal() {
+    if (byName) return byName.value.trim();
 
-    const modal = $('applyModal');
 
-    if (!modal) return console.error('Missing #applyModal');
 
-    show(modal);
-
-    modal.setAttribute('aria-hidden', 'false');
+    return "";
 
   }
 
 
 
-  function closeModal() {
+  async function handleSubmit(e) {
 
-    const modal = $('applyModal');
-
-    if (!modal) return;
-
-    hide(modal);
-
-    modal.setAttribute('aria-hidden', 'true');
-
-  }
+    if (e && e.preventDefault) e.preventDefault();
 
 
 
-  // Error / status helpers
+    // الزر عشان نطفيه أثناء الإرسال
 
-  function setBusy(isBusy) {
+    const btn =
 
-    const btn = $('applySubmitBtn');
+      document.getElementById("startTrialBtn") ||
 
-    if (!btn) return;
+      document.getElementById("start-free-trial") ||
 
-    btn.disabled = !!isBusy;
+      (e && e.submitter);
 
-    btn.setAttribute('aria-busy', isBusy ? 'true' : 'false');
 
-    if (isBusy) {
 
-      btn.dataset._prevText = btn.innerText;
+    if (btn) {
 
-      btn.innerText = 'Processing...';
+      btn.disabled = true;
 
-    } else {
-
-      if (btn.dataset._prevText) btn.innerText = btn.dataset._prevText;
+      btn.textContent = "Processing...";
 
     }
 
-  }
 
 
+    // نجمع بيانات الفورم – غيّر الأسماء تحت لو IDs عندك مختلفة
 
-  function showError(msg) {
+    const payload = {
 
-    // عنصر رسالة خطأ اختياري
+      name: getVal("businessName") || getVal("ownerName") || getVal("biz") || getVal("fullName"),
 
-    const e = $('applyError');
+      email: getVal("email"),
 
-    if (e) {
+      phone: getVal("phone"),
 
-      e.textContent = msg || 'Something went wrong. Please try again.';
+      address: getVal("businessAddress") || getVal("address"),
 
-      show(e);
+      license: getVal("license") || getVal("businessLicense"),
 
-    } else {
+      insurance: getVal("insurance"),
 
-      // fallback
+      notes: getVal("notes") || getVal("services"),
 
-      alert(msg || 'Something went wrong. Please try again.');
-
-    }
-
-  }
-
-
-
-  async function startCheckout(e) {
-
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-
-    hide($('applyError'));
-
-    setBusy(true);
+    };
 
 
 
     try {
 
-      // إن أردت إرسال بيانات النموذج كمرجع، استخرجها هنا:
+      const res = await fetch("/.netlify/functions/create-checkout-session", {
 
-      // const name = ($('fullName') || {}).value?.trim();
+        method: "POST",
 
-      // const phone = ($('phone') || {}).value?.trim();
+        headers: { "Content-Type": "application/json" },
 
-
-
-      const res = await fetch('/.netlify/functions/create-checkout-session', {
-
-        method: 'POST',
-
-        headers: { 'Content-Type': 'application/json' }
-
-        // body: JSON.stringify({ name, phone })
+        body: JSON.stringify(payload),
 
       });
 
@@ -128,27 +90,45 @@
 
       if (!res.ok) {
 
-        const t = await res.text().catch(()=>'');
+        const text = await res.text();
 
-        throw new Error(`create-session failed: ${res.status} ${t}`);
+        throw new Error("Function error: " + text);
 
       }
 
 
 
-      const { url } = await res.json();
+      const data = await res.json();
 
-      if (!url) throw new Error('No session URL returned');
 
-      window.location.href = url; // إلى Stripe Checkout
+
+      if (data.url) {
+
+        // روح على Stripe
+
+        window.location.href = data.url;
+
+      } else {
+
+        alert("Did not get checkout URL.");
+
+      }
 
     } catch (err) {
 
       console.error(err);
 
-      showError('Something went wrong. Please try again.');
+      alert("Something went wrong. Please try again.");
 
-      setBusy(false);
+    } finally {
+
+      if (btn) {
+
+        btn.disabled = false;
+
+        btn.textContent = "Start Free Trial";
+
+      }
 
     }
 
@@ -158,69 +138,39 @@
 
   function boot() {
 
-    const startBtn = $('startTrialBtn');   // الزر في الصفحة لفتح المودال
+    // لو عندك <form id="proForm">
 
-    const closeBtn = $('closeModal');      // زر إغلاق المودال (اختياري)
-
-    const form = $('applyForm');           // نموذج داخل المودال
-
-    const submitBtn = $('applySubmitBtn'); // زر الإرسال داخل المودال
-
-
-
-    if (!startBtn) {
-
-      console.error('Missing #startTrialBtn');
-
-      return;
-
-    }
-
-
-
-    // افتح المودال
-
-    startBtn.addEventListener('click', openModal);
-
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-
-
-    // إرسال النموذج → يبدأ Stripe Checkout
+    const form = document.getElementById("proForm");
 
     if (form) {
 
-      form.addEventListener('submit', startCheckout);
-
-    }
-
-    if (submitBtn) {
-
-      // لو الزر داخل فورم ونريد منع submit الافتراضي أو لو زر مستقل
-
-      submitBtn.addEventListener('click', startCheckout);
-
-      submitBtn.setAttribute('type', 'button'); // يمنع submit مزدوج
+      form.addEventListener("submit", handleSubmit);
 
     }
 
 
 
-    // Fallbacks لو استُخدمت خصائص onclick في الـ HTML
+    // ولو عندك زر فقط بدون form
 
-    window.showApplyModal = openModal;
+    const btn =
 
-    window.hideApplyModal = closeModal;
+      document.getElementById("startTrialBtn") ||
 
-    window.startProMonthlyTrial = startCheckout;
+      document.getElementById("start-free-trial");
+
+    if (btn && !form) {
+
+      btn.addEventListener("click", handleSubmit);
+
+    }
 
   }
 
 
 
-  if (document.readyState === 'loading') {
+  if (document.readyState === "loading") {
 
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener("DOMContentLoaded", boot);
 
   } else {
 
