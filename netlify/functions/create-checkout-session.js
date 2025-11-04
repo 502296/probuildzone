@@ -72,13 +72,13 @@ exports.handler = async (event) => {
 
 
 
-    // 👇 Stripe مثل ما هو
+    // 👇 Stripe مثل ما هو (ما لمسته)
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
     const data = JSON.parse(event.body || '{}');
 
-    const { name, email, phone, address, license, insurance, notes } = data;
+    const { name, email, phone, address, license, insurance, notes, zip, notify_opt_in } = data;
 
 
 
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
 
         trial_period_days: 30,
 
-        metadata: { name, email, phone, address, license, insurance, notes },
+        metadata: { name, email, phone, address, license, insurance, notes, zip, notify_opt_in },
 
       },
 
@@ -114,7 +114,7 @@ exports.handler = async (event) => {
 
     try {
 
-      // لو موجود في نتلايفاي خذه، لو مش موجود استخدم الرابط اللي جربته ونجح
+      // نأخذ الـURL من الـenv أولاً
 
       const gsUrl =
 
@@ -128,19 +128,23 @@ exports.handler = async (event) => {
 
         const payload = {
 
-          name,
+          name: name || '',
 
-          email,
+          email: email || '',
 
-          phone,
+          phone: phone || '',
 
-          address,
+          address: address || '',
 
-          license,
+          license: license || '',
 
-          insurance,
+          insurance: insurance || '',
 
-          notes,
+          notes: notes || '',
+
+          zip: zip || '',
+
+          notify_opt_in: notify_opt_in || '',
 
           source_env: siteUrl,
 
@@ -150,7 +154,7 @@ exports.handler = async (event) => {
 
 
 
-        await fetch(gsUrl, {
+        const res = await fetch(gsUrl, {
 
           method: 'POST',
 
@@ -159,6 +163,16 @@ exports.handler = async (event) => {
           body: JSON.stringify(payload),
 
         });
+
+
+
+        // نحاول نقرأ الرد حتى لو مو JSON
+
+        let text = await res.text();
+
+        console.log('GSHEET RESPONSE STATUS:', res.status);
+
+        console.log('GSHEET RESPONSE BODY:', text);
 
       } else {
 
