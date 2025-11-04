@@ -1,5 +1,7 @@
 // netlify/functions/create-checkout-session.js
 
+
+
 const Stripe = require('stripe');
 
 
@@ -18,11 +20,13 @@ exports.handler = async (event) => {
 
   try {
 
-    const secret  = process.env.STRIPE_SECRET_KEY;
+    const secret   = process.env.STRIPE_SECRET_KEY;
 
-    const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
+    const priceId  = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
-    const siteUrl = process.env.SITE_URL;
+    const siteUrl  = process.env.SITE_URL;
+
+    const gsUrl    = process.env.GS_WEBAPP_URL;   // 👈 هذا رابط Google Apps Script
 
 
 
@@ -44,7 +48,7 @@ exports.handler = async (event) => {
 
 
 
-    // الداتا اللي جاية من الفورم
+    // الداتا الجاية من الفورم
 
     const data = JSON.parse(event.body || '{}');
 
@@ -75,6 +79,8 @@ exports.handler = async (event) => {
     } = data;
 
 
+
+    // 1) نعمل جلسة Stripe
 
     const session = await stripe.checkout.sessions.create({
 
@@ -124,19 +130,71 @@ exports.handler = async (event) => {
 
 
 
+    // 2) نحاول نرسل نفس الداتا إلى Google Sheet (لو متوفر الرابط)
+
+    if (gsUrl) {
+
+      try {
+
+        await fetch(gsUrl, {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify({
+
+            biz,
+
+            name,
+
+            email,
+
+            phone,
+
+            address,
+
+            license,
+
+            insurance,
+
+            notes,
+
+            zip,
+
+            notify_opt_in,
+
+            created_at: new Date().toISOString(),
+
+          }),
+
+        });
+
+      } catch (err) {
+
+        // ما نوقف Stripe لو الـ Sheet فشل
+
+        console.error('Failed to send to Google Script:', err);
+
+      }
+
+    }
+
+
+
+    // نرجّع رابط Stripe
+
     return {
 
       statusCode: 200,
 
-      headers: {
-
-        'Content-Type': 'application/json',
-
-      },
+      headers: { 'Content-Type': 'application/json' },
 
       body: JSON.stringify({ url: session.url }),
 
     };
+
+
 
   } catch (err) {
 
