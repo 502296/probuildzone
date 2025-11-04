@@ -1,74 +1,36 @@
 <script>
 
-  // هذا مثال للداتا اللي تبغى تحفظها
+  // هذا الداتا اللي كنت مرسله من Stripe أو من localStorage
 
-  const data = {
-
-    email: localStorage.getItem('pbz_email') || '',
-
-    name: localStorage.getItem('pbz_name') || '',
-
-    biz: localStorage.getItem('pbz_biz') || '',
-
-    phone: localStorage.getItem('pbz_phone') || '',
-
-    address: localStorage.getItem('pbz_address') || '',
-
-    license: localStorage.getItem('pbz_license') || '',
-
-    insurance: localStorage.getItem('pbz_insurance') || '',
-
-    notes: localStorage.getItem('pbz_notes') || '',
-
-  };
+  const payload = JSON.parse(localStorage.getItem('pbz_form_data') || '{}');
 
 
 
-  // نعرض "جاري الحفظ..." مثل اللي عندك
-
-  const msg = document.querySelector('#save-msg'); // حط id في الصفحة لو ما عندك
-
-  if (msg) msg.textContent = 'Saving your subscription to our records...';
-
-
-
-  fetch('/.netlify/functions/save-profile', {
+  fetch('/.netlify/functions/save-to-sheet', {
 
     method: 'POST',
 
     headers: { 'Content-Type': 'application/json' },
 
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
 
   })
 
-    .then(r => r.json())
+    .then(r => r.text())
 
-    .then(res => {
+    .then(text => {
 
-      console.log('save-profile response:', res);
+      console.log('sheet response:', text);
 
-      if (msg) {
+      // هنا تقدر تغيّر الرسالة لنجاح
 
-        if (res.ok) {
-
-          msg.textContent = 'Saved to Google Sheet ✅';
-
-        } else {
-
-          msg.textContent = 'Could not save to Sheet. Please contact support.';
-
-        }
-
-      }
+      // مثلا تخليها: "Saved!" بدل "Could not save..."
 
     })
 
     .catch(err => {
 
       console.error(err);
-
-      if (msg) msg.textContent = 'Could not save to Sheet. Please contact support.';
 
     });
 
