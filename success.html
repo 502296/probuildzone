@@ -24,49 +24,7 @@
 
 
 
-  <script>
-
-    // نتحقق إذا كانت بيانات المستخدم مخزنة مؤقتاً من صفحة التسجيل
-
-    const data = sessionStorage.getItem('probuildzone_form');
-
-
-
-    if (data) {
-
-      // نرسلها إلى الـfunction الخاصة في Netlify
-
-      fetch('/.netlify/functions/create-checkout-session', {
-
-        method: 'POST',
-
-        headers: { 'Content-Type': 'application/json' },
-
-        body: data
-
-      })
-
-      .then(res => res.json())
-
-      .then(result => {
-
-        console.log('✅ Saved to Sheet:', result);
-
-      })
-
-      .catch(err => {
-
-        console.error('❌ Error saving to Sheet:', err);
-
-      });
-
-    } else {
-
-      console.log('⚠️ No local data found to save.');
-
-    }
-
-  </script>
+  <!-- ما نرسل شي هنا، الحفظ صار في الفنكشن نفسها -->
 
 </body>
 
