@@ -4,7 +4,7 @@
 
 exports.handler = async (event) => {
 
-  // نقبل بس POST
+  // ما نقبل إلا POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -14,7 +14,7 @@ exports.handler = async (event) => {
 
 
 
-  // رابط الويب أب اللي حطّيته في نتلايفي
+  // رابط الويب آب من النتلايفي env
 
   const gsUrl = process.env.GS_WEBAPP_URL;
 
@@ -22,13 +22,11 @@ exports.handler = async (event) => {
 
   if (!gsUrl) {
 
-    console.error('GS_WEBAPP_URL is missing');
-
     return {
 
       statusCode: 500,
 
-      body: 'GS_WEBAPP_URL is missing in environment variables',
+      body: 'GS_WEBAPP_URL is missing in Netlify env',
 
     };
 
@@ -38,11 +36,7 @@ exports.handler = async (event) => {
 
   try {
 
-    const body = event.body || '{}';
-
-
-
-    // نبعث نفس الداتا للـ Google Apps Script
+    // نرسل نفس البودي اللي جا من الفرونت للـ Google Script
 
     const resp = await fetch(gsUrl, {
 
@@ -50,47 +44,35 @@ exports.handler = async (event) => {
 
       headers: { 'Content-Type': 'application/json' },
 
-      body,
+      body: event.body || '{}',
 
     });
 
 
 
-    if (!resp.ok) {
-
-      const text = await resp.text();
-
-      console.error('GS script error:', text);
-
-      return {
-
-        statusCode: 500,
-
-        body: 'Google Script returned error: ' + text,
-
-      };
-
-    }
+    const text = await resp.text(); // ناخذ الرد كنص عشان لو رجع HTML
 
 
+
+    // لو جوجل سكربت رجع 200 نرجعها للفرونت
 
     return {
 
       statusCode: 200,
 
-      body: 'OK',
+      body: text,
 
     };
 
   } catch (err) {
 
-    console.error('save-to-sheet err:', err);
+    console.error('GS proxy error:', err);
 
     return {
 
       statusCode: 500,
 
-      body: 'Failed to call Google Script: ' + err.message,
+      body: 'Failed to talk to Google Script: ' + err.message,
 
     };
 
