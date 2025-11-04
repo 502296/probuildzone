@@ -142,7 +142,7 @@ exports.handler = async (event) => {
 
         const sheets = google.sheets({ version: 'v4', auth });
 
-        const SHEET_ID = 'PUT_YOUR_SHEET_ID_HERE'; // ← غيّرها
+        const SHEET_ID = 'https://script.google.com/macros/s/AKfycbwriAYp5Mas7xpuyKvQgkWX8ZR0dzJeWZHblPvKhXDywmsGt7piyji8iNCzU1wjiR0P/exec'; // ← غيّرها
 
         const SHEET_NAME = 'Pros'; // ← اسم الشيت عندك
 
