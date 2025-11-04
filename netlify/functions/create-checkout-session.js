@@ -1,12 +1,12 @@
 const Stripe = require('stripe');
 
-const fetch = require('node-fetch'); // <<< الأهم هنا
+const { google } = require('googleapis'); // نحتاجها للـSheets
 
 
 
 exports.handler = async (event) => {
 
-  // السماح للـOPTIONS
+  // CORS
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -31,8 +31,6 @@ exports.handler = async (event) => {
   }
 
 
-
-  // نسمح بس للـPOST
 
   if (event.httpMethod !== 'POST') {
 
@@ -66,7 +64,7 @@ exports.handler = async (event) => {
 
 
 
-    // 👇 Stripe مثل ما هو
+    // 👇 Stripe نفس ما هو
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -100,75 +98,109 @@ exports.handler = async (event) => {
 
     });
 
-    // ☝️ هذا الجزء ما لمسناه
+    // ☝️ ما لمسناه
 
 
 
-    // ========= إرسال للـGoogle Sheet =========
+    // ============ Google Sheets ============
+
+
 
     try {
 
-      // رابط الويب آب الجديد اللي نسخته اليوم من سكربت جوجل
+      // 1) نقرأ الـJSON من المتغير
 
-      const gsUrl =
+      const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
 
-        process.env.GS_WEBAPP_URL ||
+      if (!serviceAccountJson) {
 
-        'https://script.google.com/macros/s/AKfycbxC8UJ2fxN9sQ11Xn0UrNeY7pNn6sSGU0e8e0n7kXAhsrdC2eCsUUwhNkX2x2jAHuYqs/exec';
+        console.error('GOOGLE_SERVICE_ACCOUNT env var missing');
 
+      } else {
 
-
-      if (gsUrl) {
-
-        const payload = {
-
-          name: name || '',
-
-          email: email || '',
-
-          phone: phone || '',
-
-          address: address || '',
-
-          license: license || '',
-
-          insurance: insurance || '',
-
-          notes: notes || '',
-
-          zip: zip || '',
-
-          notify_opt_in: notify_opt_in || '',
-
-          source_env: siteUrl,
-
-          stripe_session_id: session.id,
-
-        };
+        const creds = JSON.parse(serviceAccountJson);
 
 
 
-        const res = await fetch(gsUrl, {
+        // 2) نكوّن auth
 
-          method: 'POST',
+        const auth = new google.auth.JWT(
 
-          headers: { 'Content-Type': 'application/json' },
+          creds.client_email,
 
-          body: JSON.stringify(payload),
+          null,
+
+          creds.private_key,
+
+          ['https://www.googleapis.com/auth/spreadsheets']
+
+        );
+
+
+
+        // 3) نحدد الشيت
+
+        const sheets = google.sheets({ version: 'v4', auth });
+
+        const SHEET_ID = 'PUT_YOUR_SHEET_ID_HERE'; // ← غيّرها
+
+        const SHEET_NAME = 'Pros'; // ← اسم الشيت عندك
+
+
+
+        // 4) نجهّز الصف
+
+        const row = [
+
+          new Date().toISOString(),
+
+          name || '',
+
+          email || '',
+
+          phone || '',
+
+          address || '',
+
+          license || '',
+
+          insurance || '',
+
+          notes || '',
+
+          zip || '',
+
+          notify_opt_in || '',
+
+          siteUrl,
+
+          session.id,
+
+        ];
+
+
+
+        // 5) نرسل
+
+        await sheets.spreadsheets.values.append({
+
+          spreadsheetId: SHEET_ID,
+
+          range: `${SHEET_NAME}!A:Z`,
+
+          valueInputOption: 'USER_ENTERED',
+
+          requestBody: {
+
+            values: [row],
+
+          },
 
         });
 
 
 
-        const text = await res.text();
-
-        console.log('GSHEET RESPONSE STATUS:', res.status);
-
-        console.log('GSHEET RESPONSE BODY:', text);
-
-      } else {
-
-        console.error('GS_WEBAPP_URL is missing');
+        console.log('Sheet append success');
 
       }
 
@@ -176,9 +208,13 @@ exports.handler = async (event) => {
 
       console.error('Sheet error:', sheetErr);
 
+      // ما نرمي الخطأ عشان ما نخرب الرد على المتصفح
+
     }
 
-    // ========= نهاية الإرسال =========
+
+
+    // ============ نهاية Google Sheets ============
 
 
 
