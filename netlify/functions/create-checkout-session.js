@@ -8,7 +8,7 @@ const Stripe = require('stripe');
 
 exports.handler = async (event) => {
 
-  // CORS
+  // CORS للمتصفح
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -44,13 +44,15 @@ exports.handler = async (event) => {
 
   try {
 
+    // 1) env vars
+
     const secret  = process.env.STRIPE_SECRET_KEY;
 
     const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
 
     const siteUrl = process.env.SITE_URL;
 
-    const gsUrl  = "https://script.google.com/macros/s/AKfycbyrPVGLAESUPdUvKxc3YpS-77CiZoipZo91y_yaKkwiTuHp5eDHsfDlKF6qA1ZXUSI3/exec";  // 👈 هنا رابط الويب آب
+    const gsUrl   = process.env.GS_WEBAPP_URL; // ← هذا اللي حطّيناه في نتلايفاي
 
 
 
@@ -68,11 +70,9 @@ exports.handler = async (event) => {
 
 
 
-    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
+    // 2) بيانات جاية من الصفحة (لو حبيت تستخدمها)
 
-    const data = JSON.parse(event.body || '{}');
-
-
+    const bodyData = JSON.parse(event.body || '{}');
 
     const {
 
@@ -94,11 +94,15 @@ exports.handler = async (event) => {
 
       notify_opt_in,
 
-    } = data;
+    } = bodyData;
 
 
 
-    // 1) أنشئ جلسة Stripe
+    // 3) Stripe
+
+    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
+
+
 
     const session = await stripe.checkout.sessions.create({
 
@@ -146,37 +150,9 @@ exports.handler = async (event) => {
 
 
 
-    // 2) ابعث نفس الداتا للـ Google Web App (لو موجود)
+    // 4) إرسال البيانات إلى Google Apps Script (اللي سوّيناه قبل شوي)
 
     if (gsUrl) {
-
-      const payload = {
-
-        name,
-
-        email,
-
-        phone,
-
-        address,
-
-        license,
-
-        insurance,
-
-        notes,
-
-        zip,
-
-        notify_opt_in,
-
-        session_id: session.id,
-
-      };
-
-
-
-      // نتلايفاي على Node 18 فعنده fetch
 
       try {
 
@@ -186,21 +162,49 @@ exports.handler = async (event) => {
 
           headers: { 'Content-Type': 'application/json' },
 
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+
+            name,
+
+            email,
+
+            phone,
+
+            address,
+
+            license,
+
+            insurance,
+
+            notes,
+
+            zip,
+
+            notify_opt_in,
+
+            session_id: session.id,
+
+          }),
 
         });
 
       } catch (sheetErr) {
 
-        console.error('Error calling GS web app:', sheetErr);
+        // ما نخرب الدفع لو الشيت فشل
 
-        // ما نرجّع خطأ للمستخدم عشان ما نخرب الـ Stripe
+        console.error('Sheet error:', sheetErr);
 
       }
+
+    } else {
+
+      console.warn('GS_WEBAPP_URL is not set – skipping sheet save.');
 
     }
 
 
+
+    // 5) رجّع رابط سترايب للواجهة
 
     return {
 
@@ -217,8 +221,6 @@ exports.handler = async (event) => {
       body: JSON.stringify({ url: session.url }),
 
     };
-
-
 
   } catch (err) {
 
@@ -242,4 +244,4 @@ exports.handler = async (event) => {
 
   }
 
-};  
+};
