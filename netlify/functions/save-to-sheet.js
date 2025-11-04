@@ -4,6 +4,8 @@
 
 exports.handler = async (event) => {
 
+  // نسمح بس POST
+
   if (event.httpMethod !== 'POST') {
 
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -12,7 +14,7 @@ exports.handler = async (event) => {
 
 
 
-  const gsUrl = process.env.GS_WEBAPP_URL; // ← أنت حاطه صح في نتلايفي
+  const gsUrl = process.env.GS_WEBAPP_URL; // من env
 
   if (!gsUrl) {
 
@@ -24,11 +26,9 @@ exports.handler = async (event) => {
 
   try {
 
-    const payload = event.body || '{}';
+    const body = event.body || '{}';
 
 
-
-    // Netlify (Node 18) عنده fetch جاهز
 
     const res = await fetch(gsUrl, {
 
@@ -36,27 +36,21 @@ exports.handler = async (event) => {
 
       headers: { 'Content-Type': 'application/json' },
 
-      body: payload,
+      body
 
     });
 
 
 
-    const text = await res.text(); // عشان لو Google رجّع نص بس
+    const text = await res.text(); // نشوفه لو فيه خطأ
 
 
 
     if (!res.ok) {
 
-      console.error('GS error:', text);
+      console.error('Google Script error:', text);
 
-      return {
-
-        statusCode: 500,
-
-        body: 'Google Script returned non-200: ' + text,
-
-      };
+      return { statusCode: 500, body: text };
 
     }
 
@@ -66,21 +60,15 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      body: text, // أو `{"ok":true}`
+      body: text
 
     };
 
   } catch (err) {
 
-    console.error('save-to-sheet error:', err);
+    console.error('save-to-sheet failed:', err);
 
-    return {
-
-      statusCode: 500,
-
-      body: 'Failed to call Google Script: ' + err.message,
-
-    };
+    return { statusCode: 500, body: err.message };
 
   }
 
