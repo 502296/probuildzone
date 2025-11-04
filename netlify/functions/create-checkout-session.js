@@ -1,6 +1,10 @@
+// netlify/functions/create-checkout-session.js
+
+
+
 const Stripe = require('stripe');
 
-const { google } = require('googleapis'); // نحتاجها للـSheets
+const { google } = require('googleapis'); // 👈 هذا اللي يربط مع Google Sheets
 
 
 
@@ -64,13 +68,35 @@ exports.handler = async (event) => {
 
 
 
-    // 👇 Stripe نفس ما هو
+    // ================== STRIPE (مثل ما هو) ==================
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
     const data = JSON.parse(event.body || '{}');
 
-    const { name, email, phone, address, license, insurance, notes, zip, notify_opt_in } = data;
+
+
+    const {
+
+      name,
+
+      email,
+
+      phone,
+
+      address,
+
+      license,
+
+      insurance,
+
+      notes,
+
+      zip,
+
+      notify_opt_in,
+
+    } = data;
 
 
 
@@ -86,7 +112,27 @@ exports.handler = async (event) => {
 
         trial_period_days: 30,
 
-        metadata: { name, email, phone, address, license, insurance, notes, zip, notify_opt_in },
+        metadata: {
+
+          name,
+
+          email,
+
+          phone,
+
+          address,
+
+          license,
+
+          insurance,
+
+          notes,
+
+          zip,
+
+          notify_opt_in,
+
+        },
 
       },
 
@@ -98,17 +144,15 @@ exports.handler = async (event) => {
 
     });
 
-    // ☝️ ما لمسناه
+    // =========================================================
 
 
 
-    // ============ Google Sheets ============
+    // ============ GOOGLE SHEETS ============
 
 
 
     try {
-
-      // 1) نقرأ الـJSON من المتغير
 
       const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
 
@@ -121,8 +165,6 @@ exports.handler = async (event) => {
         const creds = JSON.parse(serviceAccountJson);
 
 
-
-        // 2) نكوّن auth
 
         const auth = new google.auth.JWT(
 
@@ -138,17 +180,17 @@ exports.handler = async (event) => {
 
 
 
-        // 3) نحدد الشيت
-
         const sheets = google.sheets({ version: 'v4', auth });
 
-        const SHEET_ID = 'https://script.google.com/macros/s/AKfycbwriAYp5Mas7xpuyKvQgkWX8ZR0dzJeWZHblPvKhXDywmsGt7piyji8iNCzU1wjiR0P/exec'; // ← غيّرها
-
-        const SHEET_NAME = 'Pros'; // ← اسم الشيت عندك
 
 
+        // 👇 هذا هو الشيت تبعك
 
-        // 4) نجهّز الصف
+        const SHEET_ID = '1NRblw2ZWin5juRvPHCSfCOuQ6oHtN-qopUQShY7OgDLQ';
+
+        const SHEET_NAME = 'Pros';
+
+
 
         const row = [
 
@@ -180,8 +222,6 @@ exports.handler = async (event) => {
 
 
 
-        // 5) نرسل
-
         await sheets.spreadsheets.values.append({
 
           spreadsheetId: SHEET_ID,
@@ -200,21 +240,21 @@ exports.handler = async (event) => {
 
 
 
-        console.log('Sheet append success');
+        console.log('✅ Sheet append success');
 
       }
 
     } catch (sheetErr) {
 
-      console.error('Sheet error:', sheetErr);
+      // لو في مشكلة ما نخليها تخرب على Stripe
 
-      // ما نرمي الخطأ عشان ما نخرب الرد على المتصفح
+      console.error('❌ Sheet error:', sheetErr);
 
     }
 
 
 
-    // ============ نهاية Google Sheets ============
+    // =========================================================
 
 
 
