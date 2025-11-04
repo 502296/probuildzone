@@ -1,26 +1,6 @@
 const Stripe = require('stripe');
 
-
-
-// نحاول نستخدم fetch المدمج أولاً (نتلايفاي Node 18 عنده fetch)
-
-// ولو ما كان موجود نرجع لـ node-fetch
-
-const ensureFetch = async (...args) => {
-
-  if (typeof fetch !== 'undefined') {
-
-    return fetch(...args);
-
-  } else {
-
-    const { default: nodeFetch } = await import('node-fetch');
-
-    return nodeFetch(...args);
-
-  }
-
-};
+const fetch = require('node-fetch'); // <<< الأهم هنا
 
 
 
@@ -86,7 +66,7 @@ exports.handler = async (event) => {
 
 
 
-    // 👇 Stripe مثل ما هو (ما لمسته)
+    // 👇 Stripe مثل ما هو
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -124,17 +104,17 @@ exports.handler = async (event) => {
 
 
 
-    // ========= إضافة حفظ Google Sheet =========
+    // ========= إرسال للـGoogle Sheet =========
 
     try {
 
-      // خذه من الـenv (الأفضل) ولو مو موجود استخدم الاحتياطي
+      // رابط الويب آب الجديد اللي نسخته اليوم من سكربت جوجل
 
       const gsUrl =
 
         process.env.GS_WEBAPP_URL ||
 
-        'https://script.google.com/macros/s/AKfycbw_8IzfwoM6cdLEV4VCzpAM6AN9zYLLBXcdTYXjoA_Adqkcg4mmrTU5ErURz8D-aisw/exec';
+        'https://script.google.com/macros/s/AKfycbxC8UJ2fxN9sQ11Xn0UrNeY7pNn6sSGU0e8e0n7kXAhsrdC2eCsUUwhNkX2x2jAHuYqs/exec';
 
 
 
@@ -168,7 +148,7 @@ exports.handler = async (event) => {
 
 
 
-        const res = await ensureFetch(gsUrl, {
+        const res = await fetch(gsUrl, {
 
           method: 'POST',
 
@@ -194,13 +174,11 @@ exports.handler = async (event) => {
 
     } catch (sheetErr) {
 
-      // ما نخلي الخطأ يوقف Stripe
-
       console.error('Sheet error:', sheetErr);
 
     }
 
-    // ========= نهاية إضافة حفظ Google Sheet =========
+    // ========= نهاية الإرسال =========
 
 
 
