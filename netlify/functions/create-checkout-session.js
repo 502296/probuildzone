@@ -1,12 +1,18 @@
 const Stripe = require('stripe');
 
-// إضافة fetch لأن بعض بيئات نتلايفاي ما فيها fetch جاهز
 
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)); // <-- added
+
+// بعض بيئات نتلايفاي ما يكون فيها fetch جاهز
+
+const fetch = (...args) =>
+
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 
 
 exports.handler = async (event) => {
+
+  // السماح للـOPTIONS
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -32,9 +38,11 @@ exports.handler = async (event) => {
 
 
 
+  // نسمح بس للـPOST
+
   if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, body: 'Method Not Allowed' }; 
+    return { statusCode: 405, body: 'Method Not Allowed' };
 
   }
 
@@ -52,11 +60,19 @@ exports.handler = async (event) => {
 
     if (!secret || !priceId || !siteUrl) {
 
-      return { statusCode: 500, body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)' };
+      return {
+
+        statusCode: 500,
+
+        body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)',
+
+      };
 
     }
 
 
+
+    // 👇 Stripe مثل ما هو
 
     const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
 
@@ -90,17 +106,27 @@ exports.handler = async (event) => {
 
     });
 
+    // ☝️ هذا الجزء ما لمسناه
 
 
-    // ===== هنا الإضافة فقط =====
 
-    try { // <-- added
+    // ========= إضافة حفظ Google Sheet =========
 
-      const gsUrl = process.env.GS_WEBAPP_URL; // <-- added
+    try {
 
-      if (gsUrl) { // <-- added
+      // لو موجود في نتلايفاي خذه، لو مش موجود استخدم الرابط اللي جربته ونجح
 
-        const payload = { // <-- added
+      const gsUrl =
+
+        process.env.GS_WEBAPP_URL ||
+
+        'https://script.google.com/macros/s/AKfycbw_8IzfwoM6cdLEV4VCzpAM6AN9zYLLBXcdTYXjoA_Adqkcg4mmrTU5ErURz8D-aisw/exec';
+
+
+
+      if (gsUrl) {
+
+        const payload = {
 
           name,
 
@@ -122,7 +148,9 @@ exports.handler = async (event) => {
 
         };
 
-        await fetch(gsUrl, { // <-- added
+
+
+        await fetch(gsUrl, {
 
           method: 'POST',
 
@@ -132,17 +160,21 @@ exports.handler = async (event) => {
 
         });
 
+      } else {
+
+        console.error('GS_WEBAPP_URL is missing');
+
       }
 
     } catch (sheetErr) {
 
-      console.error('Sheet error:', sheetErr); // <-- added
+      // ما نخلي الخطأ يوقف Stripe
 
-      // ما نرمي خطأ للفرونت عشان Stripe يظل شغال
+      console.error('Sheet error:', sheetErr);
 
     }
 
-    // ===== نهاية الإضافة =====
+    // ========= نهاية إضافة حفظ Google Sheet =========
 
 
 
@@ -150,7 +182,13 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      headers: {
+
+        'Access-Control-Allow-Origin': '*',
+
+        'Content-Type': 'application/json',
+
+      },
 
       body: JSON.stringify({ url: session.url }),
 
@@ -164,7 +202,13 @@ exports.handler = async (event) => {
 
       statusCode: 500,
 
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      headers: {
+
+        'Access-Control-Allow-Origin': '*',
+
+        'Content-Type': 'application/json',
+
+      },
 
       body: JSON.stringify({ error: err.message }),
 
