@@ -1,14 +1,54 @@
 // netlify/functions/create-checkout-session.js
 
-const Stripe = require('stripe');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+const { createClient } = require('@supabase/supabase-js');
+
+
+
+const corsHeaders = {
+
+  'Access-Control-Allow-Origin': '*',
+
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+  'Access-Control-Allow-Headers': 'Content-Type',
+
+};
 
 
 
 exports.handler = async (event) => {
 
+  // ✅ CORS preflight
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return {
+
+      statusCode: 200,
+
+      headers: corsHeaders,
+
+      body: 'OK',
+
+    };
+
+  }
+
+
+
   if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return {
+
+      statusCode: 405,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Method Not Allowed' }),
+
+    };
 
   }
 
@@ -16,27 +56,97 @@ exports.handler = async (event) => {
 
   try {
 
-    // ------------ env vars (تأكد إنها موجودة في Netlify) ------------
-
-    const secret = process.env.STRIPE_SECRET_KEY;
-
-    const priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_MONTHLY;
-
-    const siteUrl = process.env.SITE_URL;
-
-    const gsUrl = process.env.GS_WEBAPP_URL || "https://script.google.com/macros/s/AKfycbxK6Xnt_0ja0s9WFlijWNYinZ8RgD6j90uSgIX12yzn2R7Uc_EkhMMwCEQfDcN9iPEH/exec";
-
-    // -----------------------------------------------------------------
+    const body = JSON.parse(event.body || '{}');
 
 
 
-    if (!secret || !priceId || !siteUrl) {
+    const {
+
+      name,
+
+      email,
+
+      phone,
+
+      address,
+
+      license,
+
+      insurance,
+
+      notes,
+
+    } = body;
+
+
+
+    // ✅ إنشاء اتصال مع Supabase
+
+    const supabase = createClient(
+
+      process.env.SUPABASE_URL,
+
+      process.env.SUPABASE_SERVICE_ROLE
+
+    );
+
+
+
+    // ✅ حفظ بيانات الـ pro في قاعدة Supabase
+
+    const { data: inserted, error: insertError } = await supabase
+
+      .from('pros')
+
+      .insert([
+
+        {
+
+          full_name: name || null,
+
+          email: email || null,
+
+          phone: phone || null,
+
+          company_address: address || null,
+
+          license_no: license || null,
+
+          insurance_no: insurance || null,
+
+          notes: notes || null,
+
+          stripe_status: 'pending',
+
+        },
+
+      ])
+
+      .select()
+
+      .single();
+
+
+
+    if (insertError) {
+
+      console.error('Supabase insert error:', insertError);
 
       return {
 
         statusCode: 500,
 
-        body: 'Missing env vars (STRIPE_SECRET_KEY / STRIPE_PRICE_* / SITE_URL)',
+        headers: corsHeaders,
+
+        body: JSON.stringify({
+
+          ok: false,
+
+          error: 'Could not save pro to Supabase',
+
+          details: insertError.message,
+
+        }),
 
       };
 
@@ -44,155 +154,59 @@ exports.handler = async (event) => {
 
 
 
-    // -------------------- Stripe logic (لم يتغير) --------------------
-
-    // هذا هو الجزء الذي ينشئ الـCheckout Session في Stripe — لم نلمس هذا المنطق.
-
-    const stripe = new Stripe(secret, { apiVersion: '2024-06-20' });
-
-    const body = JSON.parse(event.body || '{}');
-
-
+    // ✅ إنشاء جلسة الدفع في Stripe
 
     const session = await stripe.checkout.sessions.create({
 
       mode: 'subscription',
 
-      payment_method_types: ['card'],
+      line_items: [
 
-      line_items: [{ price: priceId, quantity: 1 }],
+        {
 
-      allow_promotion_codes: true,
+          price: process.env.STRIPE_PRICE_YEARLY,
 
-      subscription_data: { trial_period_days: 30 }, // <-- كما هو
+          quantity: 1,
 
-      success_url: `${siteUrl}/success.html`,
+        },
 
-      cancel_url: `${siteUrl}/cancel.html`,
+      ],
 
-      customer_email: body.email,
+      success_url: `${process.env.SITE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+
+      cancel_url: `${process.env.SITE_URL}/cancel.html`,
+
+      customer_email: email,
+
+      subscription_data: {
+
+        trial_period_days: 30,
+
+      },
 
       metadata: {
 
-        name: body.name || '',
+        pro_id: inserted.id,
 
-        phone: body.phone || '',
+        name: name || '',
 
-        address: body.address || '',
+        phone: phone || '',
 
-        license: body.license || '',
-
-        insurance: body.insurance || '',
-
-        notes: body.notes || '',
+        address: address || '',
 
       },
 
     });
 
-    // ------------------ نهاية Stripe logic (آمن تمامًا) ------------------
 
 
-
-    // ---------- بعد الانتهاء من إنشاء الـsession نرسل نسخة للـGoogle Script ----------
-
-    // هذا الجزء إضافي ولا يغيّر أي شيء في Stripe، فقط يخزن البيانات في الـSheet.
-
-    let savedToSheet = true;
-
-
-
-    if (gsUrl) {
-
-      try {
-
-        const payload = {
-
-          name: body.name || '',
-
-          email: body.email || '',
-
-          phone: body.phone || '',
-
-          address: body.address || '',
-
-          license: body.license || '',
-
-          insurance: body.insurance || '',
-
-          notes: body.notes || '',
-
-          source_env: 'staging',
-
-          stripe_session_id: session.id,
-
-        };
-
-
-
-        const res = await fetch(gsUrl, {
-
-          method: 'POST',
-
-          headers: { 'Content-Type': 'application/json' },
-
-          body: JSON.stringify(payload),
-
-        });
-
-
-
-        const text = await res.text();
-
-        console.log('Google Script response =>', text);
-
-
-
-        let json = {};
-
-        try {
-
-          json = JSON.parse(text);
-
-        } catch {
-
-          savedToSheet = false;
-
-        }
-
-
-
-        if (!res.ok || json.ok === false) {
-
-          savedToSheet = false;
-
-        }
-
-
-
-      } catch (err) {
-
-        console.error('Error sending to Google Script:', err);
-
-        savedToSheet = false;
-
-      }
-
-    } else {
-
-      savedToSheet = false;
-
-    }
-
-    // -------------------------------------------------------------------------------
-
-
-
-    // الرد النهائي للفرونت (الصفحة) — Stripe كما كان، وإضافة علامة savedToSheet للاطلاع.
+    // ✅ رجوع الرابط للواجهة
 
     return {
 
       statusCode: 200,
+
+      headers: corsHeaders,
 
       body: JSON.stringify({
 
@@ -200,23 +214,27 @@ exports.handler = async (event) => {
 
         url: session.url,
 
-        savedToSheet,
-
       }),
 
     };
 
-
-
   } catch (err) {
 
-    console.error('Checkout session error:', err);
+    console.error('General error:', err);
 
     return {
 
       statusCode: 500,
 
-      body: JSON.stringify({ ok: false, error: err.message }),
+      headers: corsHeaders,
+
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: err.message || 'Unknown error',
+
+      }),
 
     };
 
