@@ -130,9 +130,13 @@
 
 
 
-  <script>
+  <script type="module">
 
-    // قراءة بيانات الفورم من التخزين (اختياري)
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+
+
+    // اقرأ الداتا اللي خزّناها قبل الدفع
 
     const payload = JSON.parse(localStorage.getItem('pbz_form_data') || '{}');
 
@@ -140,23 +144,81 @@
 
 
 
-    // بدل إرسالها إلى Google Sheets، نعرض رسالة نجاح
-
     const statusBox = document.getElementById('save-status');
 
-    if (Object.keys(payload).length > 0) {
 
-      statusBox.textContent = "Your information has been received successfully.";
 
-    } else {
+    // اتصال مباشر مع Supabase (مفتاح anon فقط للقراءة/الإضافة العامة)
 
-      statusBox.textContent = "Thank you! Your registration is complete.";
+    const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';       // 🔹 ضع رابط مشروعك
+
+    const SUPABASE_ANON = 'YOUR_PUBLIC_ANON_KEY';                  // 🔹 من صفحة API Keys (anon key)
+
+
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+
+
+    async function saveToSupabase() {
+
+      if (!payload.name || !payload.email) {
+
+        statusBox.textContent = 'No data to save (empty payload).';
+
+        return;
+
+      }
+
+
+
+      const { data, error } = await supabase
+
+        .from('pros')
+
+        .insert([{
+
+          full_name: payload.name,
+
+          email: payload.email,
+
+          phone: payload.phone,
+
+          company_address: payload.address,
+
+          license_no: payload.license,
+
+          insurance_no: payload.insurance,
+
+          notes: payload.notes,
+
+          stripe_status: 'active'
+
+        }]);
+
+
+
+      if (error) {
+
+        console.error('Supabase error:', error);
+
+        statusBox.textContent = 'Saved via Stripe, but could not sync to Supabase.';
+
+      } else {
+
+        console.log('Supabase sync success:', data);
+
+        statusBox.textContent = 'Your information has been saved successfully.';
+
+      }
 
     }
 
 
 
-    console.log('Skipped Google Sheet save (using Supabase now).');
+    // استدعاء الحفظ
+
+    saveToSupabase();
 
   </script>
 
