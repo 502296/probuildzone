@@ -1,78 +1,104 @@
 // netlify/functions/save-profile.js
 
-
-
-exports.handler = async (event) => {
-
-  // نستقبل فقط POST من الصفحة
-
-  if (event.httpMethod !== 'POST') {
-
-    return { statusCode: 405, body: 'Method Not Allowed' };
-
-  }
+import { createClient } from '@supabase/supabase-js';
 
 
 
-  const gsUrl = process.env.GS_WEBAPP_URL;
-
-  if (!gsUrl) {
-
-    console.error('GS_WEBAPP_URL is missing in Netlify env');
-
-    return { statusCode: 500, body: 'GS url missing' };
-
-  }
-
-
-
-  // الداتا اللي جايانا من success.html
-
-  const payload = JSON.parse(event.body || '{}');
-
-
+export const handler = async (event) => {
 
   try {
 
-    // نرسلها إلى Google Apps Script
+    if (event.httpMethod !== 'POST') {
 
-    const resp = await fetch(gsUrl, {
+      return { statusCode: 405, body: 'Method Not Allowed' };
 
-      method: 'POST',
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify(payload),
-
-    });
+    }
 
 
 
-    const text = await resp.text(); // ناخذ الرد كما هو
+    const data = JSON.parse(event.body || '{}');
 
 
 
-    // نرجع نفس الرد للصفحة
+    // تحقق من الحقول الأساسية
+
+    if (!data.email || !data.name) {
+
+      return { statusCode: 400, body: 'Missing required fields' };
+
+    }
+
+
+
+    // إنشاء عميل Supabase
+
+    const supabase = createClient(
+
+      process.env.SUPABASE_URL,
+
+      process.env.SUPABASE_SERVICE_ROLE
+
+    );
+
+
+
+    // إدخال البيانات في جدول pros
+
+    const { error } = await supabase.from('pros').insert([
+
+      {
+
+        full_name: data.name,
+
+        email: data.email,
+
+        phone: data.phone,
+
+        company_address: data.address,
+
+        license_no: data.license,
+
+        insurance_no: data.insurance,
+
+        notes: data.notes,
+
+        stripe_status: 'pending',
+
+        created_at: new Date(),
+
+      },
+
+    ]);
+
+
+
+    if (error) {
+
+      console.error('Supabase insert error:', error);
+
+      return {
+
+        statusCode: 500,
+
+        body: JSON.stringify({ ok: false, error: error.message }),
+
+      };
+
+    }
+
+
 
     return {
 
       statusCode: 200,
 
-      headers: {
-
-        'Content-Type': 'application/json',
-
-        'Access-Control-Allow-Origin': '*', // عشان لو فتحته من المتصفح
-
-      },
-
-      body: text,
+      body: JSON.stringify({ ok: true, message: 'Saved to Supabase' }),
 
     };
 
   } catch (err) {
 
-    console.error('Failed to call Google Script:', err);
+    console.error('save-profile failed:', err);
 
     return {
 
