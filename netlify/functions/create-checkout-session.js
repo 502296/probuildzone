@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
     const siteUrl  = process.env.SITE_URL;
 
-    const gsUrl    = process.env.GS_WEBAPP_URL || "https://script.google.com/macros/s/AKfycbwB7ge25yh6PIhTnc4YzqwJyOIt3frNh-zcOb5q0gs8VKKqjGHJnH2VvgcgvZ-dp6Yz/exec"; // 👈 رابط الويب آب تبع جوجل
+    const gsUrl    = process.env.GS_WEBAPP_URL || "https://script.google.com/macros/s/AKfycbwlS71A1Dlaf9Y4PSgSgH1DJV1MGjV2SrDRp3oXxMXHqE_J0Id-mS8ln_fNNgEjNiOq/exec"; // 👈 رابط الويب آب تبع جوجل
 
 
 
