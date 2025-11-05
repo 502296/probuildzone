@@ -14,17 +14,33 @@ exports.handler = async (event) => {
 
 
 
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+
+    console.error('Missing STRIPE_WEBHOOK_SECRET');
+
+    return { statusCode: 500, body: 'Webhook secret not configured' };
+
+  }
+
+
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
-    apiVersion: '2024-06-20'
+    apiVersion: '2024-06-20',
 
   });
 
 
 
-  const sig = event.headers['stripe-signature'];
+  // نتعامل مع الحرف الكبير/الصغير
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig =
+
+    event.headers['stripe-signature'] ||
+
+    event.headers['Stripe-Signature'];
 
 
 
@@ -32,7 +48,15 @@ exports.handler = async (event) => {
 
   try {
 
-    stripeEvent = stripe.webhooks.constructEvent(event.body, sig, webhookSecret);
+    stripeEvent = stripe.webhooks.constructEvent(
+
+      event.body,
+
+      sig,
+
+      webhookSecret
+
+    );
 
   } catch (err) {
 
@@ -52,11 +76,9 @@ exports.handler = async (event) => {
 
         const session = stripeEvent.data.object;
 
-        // example: session.customer_email, session.subscription, session.id
-
-        // هنا احفظ بيانات المشترك في Sheet/DB لاحقًا إن رغبت
-
         console.log('Checkout completed:', session.id);
+
+        // هنا لاحقًا نربطه مع Supabase لو حبيت
 
         break;
 
@@ -71,8 +93,6 @@ exports.handler = async (event) => {
         const subscription = stripeEvent.data.object;
 
         console.log('Subscription event:', stripeEvent.type, subscription.id);
-
-        // تحدّث حالة المشترك في قاعدة بياناتك إن وجدت
 
         break;
 
