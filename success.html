@@ -26,6 +26,8 @@
 
       --ok:#0a8f55;
 
+      --err:#b00020;
+
     }
 
     *{box-sizing:border-box}
@@ -100,8 +102,6 @@
 
       margin-top:16px;
 
-      color:var(--ok);
-
       font-weight:600;
 
     }
@@ -130,85 +130,75 @@
 
 
 
-  <script type="module">
+  <script>
 
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-
-
-    // اقرأ الداتا اللي خزّناها قبل الدفع
+    // نقرأ البيانات اللي خزّناها في الفورم قبل ما نروح Stripe
 
     const payload = JSON.parse(localStorage.getItem('pbz_form_data') || '{}');
-
-    console.log('ProBuildZone signup data:', payload);
-
-
 
     const statusBox = document.getElementById('save-status');
 
 
 
-    // اتصال مباشر مع Supabase (مفتاح anon فقط للقراءة/الإضافة العامة)
+    async function sendToNetlify() {
 
-    const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';       // 🔹 ضع رابط مشروعك
+      try {
 
-    const SUPABASE_ANON = 'YOUR_PUBLIC_ANON_KEY';                  // 🔹 من صفحة API Keys (anon key)
+        // لو ماكو بيانات، نطلع برسالة لطيفة
 
+        if (!payload || Object.keys(payload).length === 0) {
 
+          statusBox.textContent = 'Registration complete.';
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+          return;
 
-
-
-    async function saveToSupabase() {
-
-      if (!payload.name || !payload.email) {
-
-        statusBox.textContent = 'No data to save (empty payload).';
-
-        return;
-
-      }
+        }
 
 
 
-      const { data, error } = await supabase
+        const res = await fetch('/.netlify/functions/save-profile', {
 
-        .from('pros')
+          method: 'POST',
 
-        .insert([{
+          headers: { 'Content-Type': 'application/json' },
 
-          full_name: payload.name,
+          body: JSON.stringify(payload),
 
-          email: payload.email,
-
-          phone: payload.phone,
-
-          company_address: payload.address,
-
-          license_no: payload.license,
-
-          insurance_no: payload.insurance,
-
-          notes: payload.notes,
-
-          stripe_status: 'active'
-
-        }]);
+        });
 
 
 
-      if (error) {
+        const data = await res.json().catch(() => ({}));
 
-        console.error('Supabase error:', error);
 
-        statusBox.textContent = 'Saved via Stripe, but could not sync to Supabase.';
 
-      } else {
+        if (res.ok && data.ok) {
 
-        console.log('Supabase sync success:', data);
+          statusBox.style.color = 'var(--ok)';
 
-        statusBox.textContent = 'Your information has been saved successfully.';
+          statusBox.textContent = 'Your information has been saved.';
+
+          // ممكن تمسح التخزين بعدها
+
+          // localStorage.removeItem('pbz_form_data');
+
+        } else {
+
+          statusBox.style.color = 'var(--err)';
+
+          statusBox.textContent = 'Saved via Stripe, but could not save profile.';
+
+          console.log('save-profile response:', data);
+
+        }
+
+      } catch (err) {
+
+        statusBox.style.color = 'var(--err)';
+
+        statusBox.textContent = 'Saved via Stripe, but could not sync.';
+
+        console.error(err);
 
       }
 
@@ -216,9 +206,7 @@
 
 
 
-    // استدعاء الحفظ
-
-    saveToSupabase();
+    sendToNetlify();
 
   </script>
 
