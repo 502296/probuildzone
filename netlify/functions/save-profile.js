@@ -1,36 +1,82 @@
 // netlify/functions/save-profile.js
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 
 
-export const handler = async (event) => {
+const corsHeaders = {
+
+  'Access-Control-Allow-Origin': '*',
+
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+  'Access-Control-Allow-Headers': 'Content-Type',
+
+};
+
+
+
+exports.handler = async (event) => {
+
+  // preflight
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return {
+
+      statusCode: 200,
+
+      headers: corsHeaders,
+
+      body: 'OK',
+
+    };
+
+  }
+
+
+
+  if (event.httpMethod !== 'POST') {
+
+    return {
+
+      statusCode: 405,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+
+    };
+
+  }
+
+
 
   try {
-
-    if (event.httpMethod !== 'POST') {
-
-      return { statusCode: 405, body: 'Method Not Allowed' };
-
-    }
-
-
 
     const data = JSON.parse(event.body || '{}');
 
 
 
-    // تحقق من الحقول الأساسية
+    // تحقق بسيط
 
-    if (!data.email || !data.name) {
+    if (!data.email && !data.name) {
 
-      return { statusCode: 400, body: 'Missing required fields' };
+      return {
+
+        statusCode: 400,
+
+        headers: corsHeaders,
+
+        body: JSON.stringify({ ok: false, error: 'No data to save' }),
+
+      };
 
     }
 
 
 
-    // إنشاء عميل Supabase
+    // Supabase client (من المتغيرات اللي حطيناها في Netlify)
 
     const supabase = createClient(
 
@@ -42,29 +88,27 @@ export const handler = async (event) => {
 
 
 
-    // إدخال البيانات في جدول pros
-
     const { error } = await supabase.from('pros').insert([
 
       {
 
-        full_name: data.name,
+        full_name: data.name || null,
 
-        email: data.email,
+        email: data.email || null,
 
-        phone: data.phone,
+        phone: data.phone || null,
 
-        company_address: data.address,
+        company_address: data.address || null,
 
-        license_no: data.license,
+        license_no: data.license || null,
 
-        insurance_no: data.insurance,
+        insurance_no: data.insurance || null,
 
-        notes: data.notes,
+        notes: data.notes || null,
 
-        stripe_status: 'pending',
+        // بما إن المستخدم رجع من صفحة success نخليه active
 
-        created_at: new Date(),
+        stripe_status: 'active',
 
       },
 
@@ -80,6 +124,8 @@ export const handler = async (event) => {
 
         statusCode: 500,
 
+        headers: corsHeaders,
+
         body: JSON.stringify({ ok: false, error: error.message }),
 
       };
@@ -92,17 +138,21 @@ export const handler = async (event) => {
 
       statusCode: 200,
 
+      headers: corsHeaders,
+
       body: JSON.stringify({ ok: true, message: 'Saved to Supabase' }),
 
     };
 
   } catch (err) {
 
-    console.error('save-profile failed:', err);
+    console.error(err);
 
     return {
 
       statusCode: 500,
+
+      headers: corsHeaders,
 
       body: JSON.stringify({ ok: false, error: err.message }),
 
