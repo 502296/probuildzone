@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
     const siteUrl = process.env.SITE_URL;
 
-    const gsUrl = process.env.GS_WEBAPP_URL || "https://script.google.com/macros/s/AKfycbwlS71A1Dlaf9Y4PSgSgH1DJV1MGjV2SrDRp3oXxMXHqE_J0Id-mS8ln_fNNgEjNiOq/exec";
+    const gsUrl = process.env.GS_WEBAPP_URL || "https://script.google.com/macros/s/AKfycbzQ90OFgsod1WoHA_771Z8QhyoA1S70Pi3OMz0fmKFtexTpsU6CgQWn4Rb4YoW4aSlQ/exec";
 
     // -----------------------------------------------------------------
 
