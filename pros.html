@@ -18,9 +18,9 @@
 
     :root{
 
-      --pbz-blue:#0F2A43; --pbz-blue-2:#0b2033; --gold:#D4AF37; --gold-700:#b9962f;
+      --pbz-blue:#0F2A43; --gold:#D4AF37; --gold-700:#b9962f;
 
-      --muted:#6b7a8c; --bg:#f6f7fb; --card:#ffffff; --error:#b00020; --ok:#0a8f55;
+      --muted:#6b7a8c; --card:#ffffff;
 
     }
 
@@ -30,9 +30,9 @@
 
     .container{max-width:780px;margin:32px auto;padding:16px}
 
-    h1{font-size:26px;margin:0 0 16px}
-
     .card{background:var(--card);border:1px solid #e7e8ec;border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(15,42,67,.06)}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
     label{display:block;font-weight:600;margin:14px 0 6px}
 
@@ -40,13 +40,7 @@
 
     textarea{min-height:120px;resize:vertical}
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-    .row .full{grid-column:1 / -1}
-
-    .agree{display:flex;align-items:flex-start;gap:10px;margin-top:14px}
-
-    .agree input{width:20px;height:20px;margin-top:2px}
+    .agree{display:flex;gap:10px;margin-top:14px}
 
     .actions{display:flex;gap:10px;margin-top:18px}
 
@@ -68,8 +62,6 @@
 
     <h1>ProBuildZone — Start Free Trial</h1>
 
-
-
     <div class="card">
 
       <form id="prosForm" novalidate>
@@ -80,7 +72,7 @@
 
             <label for="name">Business / Owner name</label>
 
-            <input id="name" name="name" placeholder="John & Sons Builders" required>
+            <input id="name" name="name" required>
 
           </div>
 
@@ -88,13 +80,11 @@
 
             <label for="email">Email</label>
 
-            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+            <input id="email" name="email" type="email" required>
 
           </div>
 
         </div>
-
-
 
         <div class="row">
 
@@ -102,7 +92,7 @@
 
             <label for="phone">Phone</label>
 
-            <input id="phone" name="phone" placeholder="5022968111" required>
+            <input id="phone" name="phone" required>
 
           </div>
 
@@ -110,13 +100,11 @@
 
             <label for="address">Business address</label>
 
-            <input id="address" name="address" placeholder="266 Eldorado Ave">
+            <input id="address" name="address">
 
           </div>
 
         </div>
-
-
 
         <div class="row">
 
@@ -124,7 +112,7 @@
 
             <label for="license">Business license / #</label>
 
-            <input id="license" name="license" placeholder="KY-123456" required>
+            <input id="license" name="license" required>
 
           </div>
 
@@ -148,25 +136,21 @@
 
         </div>
 
-
-
         <div class="row">
 
-          <div class="full">
+          <div style="grid-column:1/-1">
 
             <label for="notes">Services & notes (optional)</label>
 
-            <textarea id="notes" name="notes" placeholder="Short description of services..."></textarea>
+            <textarea id="notes" name="notes"></textarea>
 
           </div>
 
         </div>
 
-
-
         <div class="agree">
 
-          <input id="agree" type="checkbox" required checked>
+          <input id="agree" type="checkbox" checked required>
 
           <label for="agree">By starting your free trial, you agree to our
 
@@ -176,17 +160,11 @@
 
         </div>
 
-
-
         <div id="alert" class="alert hidden"></div>
-
-
 
         <div class="actions">
 
           <button type="reset" class="btn">Reset</button>
-
-          <!-- مهم: button وليس submit -->
 
           <button id="startBtn" type="button" class="btn btn-gold">Start Free Trial</button>
 
@@ -202,17 +180,11 @@
 
   <script>
 
-    const $ = (s)=>document.querySelector(s);
+    const $ = s => document.querySelector(s);
 
     const alertBox = $('#alert');
 
     const startBtn = $('#startBtn');
-
-    const form = $('#prosForm');
-
-
-
-    // لو أنت على netlify.app نستخدم مسار نسبي، غير ذلك نستخدم دومين netlify مباشرة
 
     const NETLIFY_BASE = location.hostname.endsWith('netlify.app') ? '' : 'https://probuildzone.netlify.app';
 
@@ -226,15 +198,19 @@
 
     }
 
-    function clearError(){ alertBox.classList.add('hidden'); alertBox.textContent=''; }
+    function clearError(){
+
+      alertBox.textContent = '';
+
+      alertBox.classList.add('hidden');
+
+    }
 
 
 
     async function startTrial(){
 
       clearError();
-
-
 
       const payload = {
 
@@ -266,11 +242,19 @@
 
 
 
-      startBtn.disabled = true; startBtn.textContent = 'Creating session...';
+      // 👇 مهم: نخزّن البيانات عشان success.html تقدر تبعثها
+
+      localStorage.setItem('pbz_form_data', JSON.stringify(payload));
 
 
 
-      try{
+      startBtn.disabled = true;
+
+      startBtn.textContent = 'Creating session...';
+
+
+
+      try {
 
         const res = await fetch(`${NETLIFY_BASE}/.netlify/functions/create-checkout-session`, {
 
@@ -284,37 +268,27 @@
 
 
 
-        if(!res.ok){
-
-          const text = await res.text();
-
-          showError('Failed to fetch session: ' + text);
-
-          return;
-
-        }
-
-
-
         const data = await res.json();
 
-        if(data && data.url){
+        if (res.ok && data.url) {
 
-          window.location.href = data.url; // فتح Stripe Checkout
+          window.location.href = data.url;
 
         } else {
 
-          showError('No session URL returned.');
+          showError('Could not start checkout.');
 
         }
 
-      } catch(err){
+      } catch (err) {
 
-        showError('Error: ' + err.message);
+        showError(err.message);
 
-      } finally{
+      } finally {
 
-        startBtn.disabled = false; startBtn.textContent = 'Start Free Trial';
+        startBtn.disabled = false;
+
+        startBtn.textContent = 'Start Free Trial';
 
       }
 
@@ -322,9 +296,7 @@
 
 
 
-    startBtn.addEventListener('click', (e)=>{ e.preventDefault(); startTrial(); });
-
-    form.addEventListener('submit', (e)=> e.preventDefault()); // أمان إضافي
+    startBtn.addEventListener('click', e => { e.preventDefault(); startTrial(); });
 
   </script>
 
