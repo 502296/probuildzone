@@ -1,14 +1,20 @@
 // netlify/functions/save-profile.js
 
-const { createClient } = require("@supabase/supabase-js");
+const { createClient } = require('@supabase/supabase-js');
 
 
 
 exports.handler = async (event) => {
 
-  if (event.httpMethod !== "POST") {
+  if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+
+      statusCode: 405,
+
+      body: 'Method Not Allowed',
+
+    };
 
   }
 
@@ -16,41 +22,39 @@ exports.handler = async (event) => {
 
   try {
 
-    const data = JSON.parse(event.body);
+    const body = JSON.parse(event.body || '{}');
 
 
-
-    // إنشاء اتصال بـ Supabase
 
     const supabase = createClient(
 
       process.env.SUPABASE_URL,
 
-      process.env.SUPABASE_SERVICE_ROLE_KEY
+      process.env.SUPABASE_SERVICE_ROLE
 
     );
 
 
 
-    // إدخال البيانات في جدول pros
-
-    const { error } = await supabase.from("pros").insert([
+    const { error } = await supabase.from('pros').insert([
 
       {
 
-        email: data.email,
+        full_name: body.name || null,
 
-        phone: data.phone,
+        email: body.email || null,
 
-        company_address: data.address,
+        phone: body.phone || null,
 
-        license_no: data.license,
+        company_address: body.address || null,
 
-        insurance_no: data.insurance || null,
+        license_no: body.license || null,
 
-        notes: data.notes || "",
+        insurance_no: body.insurance || null,
 
-        stripe_status: "pending",
+        notes: body.notes || null,
+
+        stripe_status: 'pending',
 
       },
 
@@ -60,13 +64,13 @@ exports.handler = async (event) => {
 
     if (error) {
 
-      console.error("Supabase insert error:", error);
+      console.error('Supabase insert error:', error);
 
       return {
 
         statusCode: 500,
 
-        body: JSON.stringify({ message: "Error inserting data", error }),
+        body: JSON.stringify({ ok: false, error: error.message }),
 
       };
 
@@ -78,19 +82,19 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      body: JSON.stringify({ message: "Saved to Supabase successfully" }),
+      body: JSON.stringify({ ok: true }),
 
     };
 
   } catch (err) {
 
-    console.error("General error:", err);
+    console.error('save-profile error:', err);
 
     return {
 
-      statusCode: 400,
+      statusCode: 500,
 
-      body: JSON.stringify({ message: "Bad Request", error: err.message }),
+      body: JSON.stringify({ ok: false, error: err.message }),
 
     };
 
