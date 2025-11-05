@@ -1,61 +1,205 @@
-<script>
+<!doctype html>
 
-  const payload = JSON.parse(localStorage.getItem('pbz_form_data') || '{}');
+<html lang="en" dir="ltr">
+
+<head>
+
+  <meta charset="utf-8"/>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>ProBuildZone — Success</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    :root{
+
+      --pbz-blue:#0F2A43;
+
+      --gold:#D4AF37;
+
+      --gold-700:#b9962f;
+
+      --ok:#0a8f55;
+
+      --err:#b00020;
+
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+
+      margin:0;
+
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+
+      background:var(--pbz-blue);
+
+      color:#fff;
+
+      display:flex;
+
+      justify-content:center;
+
+      align-items:center;
+
+      height:100vh;
+
+      text-align:center;
+
+      padding:20px;
+
+    }
+
+    .card{
+
+      background:#fff;
+
+      color:#111;
+
+      border-radius:16px;
+
+      padding:32px 24px;
+
+      max-width:420px;
+
+      box-shadow:0 10px 40px rgba(0,0,0,.15);
+
+    }
+
+    h1{margin:0 0 12px;font-size:26px;color:var(--pbz-blue);}
+
+    p{margin:0 0 10px;font-size:15px;line-height:1.5;}
+
+    .btn{
+
+      display:inline-block;
+
+      margin-top:16px;
+
+      background:var(--gold);
+
+      color:#111;
+
+      font-weight:700;
+
+      text-decoration:none;
+
+      padding:12px 18px;
+
+      border-radius:12px;
+
+      border:1px solid var(--gold-700);
+
+    }
+
+    #save-status{margin-top:14px;font-weight:600;}
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h1>🎉 You’re in!</h1>
+
+    <p>Thanks for starting your 30-day free trial.</p>
+
+    <p>We’ve received your details and payment setup via Stripe.</p>
+
+    <p>If you need help, email <strong>contact@probuildzone.com</strong>.</p>
+
+    <div id="save-status">Saving your info...</div>
+
+    <a href="/" class="btn">Back to Home</a>
+
+  </div>
 
 
 
-  fetch('/.netlify/functions/save-profile', {
+  <script>
 
-    method: 'POST',
+    // نقرأ الداتا اللي خزّناها في pros.html
 
-    headers: { 'Content-Type': 'application/json' },
+    const payload = JSON.parse(localStorage.getItem('pbz_form_data') || '{}');
 
-    body: JSON.stringify(payload),
-
-  })
-
-    .then(async (res) => {
-
-      const text = await res.text();
-
-      console.log('Supabase response:', text);
+    const statusBox = document.getElementById('save-status');
 
 
 
-      if (res.ok) {
+    async function sendToNetlify() {
 
-        document.querySelector('.card').innerHTML = `
+      if (!payload || Object.keys(payload).length === 0) {
 
-          <h2>✅ Saved successfully!</h2>
+        statusBox.textContent = 'Registration complete.';
 
-          <p>Your profile info has been saved to our system.</p>
-
-          <a href="/" class="btn btn-gold">Back to Home</a>
-
-        `;
-
-      } else {
-
-        document.querySelector('.card').innerHTML += `
-
-          <p style="color:#f55;">⚠️ Could not save to Supabase. Please contact support.</p>
-
-        `;
+        return;
 
       }
 
-    })
 
-    .catch((err) => {
 
-      console.error('Save error:', err);
+      try {
 
-      document.querySelector('.card').innerHTML += `
+        const res = await fetch('/.netlify/functions/save-profile', {
 
-        <p style="color:#f55;">⚠️ Connection error while saving data.</p>
+          method: 'POST',
 
-      `;
+          headers: { 'Content-Type': 'application/json' },
 
-    });
+          body: JSON.stringify(payload),
 
-</script>
+        });
+
+
+
+        const data = await res.json().catch(() => ({}));
+
+
+
+        if (res.ok) {
+
+          statusBox.style.color = 'var(--ok)';
+
+          statusBox.textContent = 'Your information has been saved.';
+
+          // localStorage.removeItem('pbz_form_data');
+
+        } else {
+
+          statusBox.style.color = 'var(--err)';
+
+          statusBox.textContent = 'Saved via Stripe, but could not save profile.';
+
+          console.log('save-profile error:', data);
+
+        }
+
+      } catch (err) {
+
+        statusBox.style.color = 'var(--err)';
+
+        statusBox.textContent = 'Connection error while saving.';
+
+        console.error(err);
+
+      }
+
+    }
+
+
+
+    sendToNetlify();
+
+  </script>
+
+</body>
+
+</html>
