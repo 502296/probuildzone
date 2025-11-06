@@ -98,10 +98,6 @@
 
     }
 
-
-
-    /* agree section */
-
     .agree{
 
       margin-top:14px;
@@ -137,8 +133,6 @@
     }
 
     .agree a{color:#0b70ff;text-decoration:underline}
-
-
 
     .actions{
 
@@ -212,6 +206,12 @@
 
   </style>
 
+
+
+  <!-- Supabase للاتصال المباشر (بسبب إيقاف Netlify) -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 
 <body>
@@ -222,7 +222,9 @@
 
     <div class="card">
 
-      <form id="prosForm" novalidate>
+      <!-- عطيناه autocomplete="off" عشان ما يرجّع بياناتك -->
+
+      <form id="prosForm" novalidate autocomplete="off">
 
         <div class="grid">
 
@@ -230,7 +232,7 @@
 
             <label for="name">Business / Owner name</label>
 
-            <input id="name" name="name" placeholder="John &amp; Sons Builders" required>
+            <input id="name" name="name" placeholder="John &amp; Sons Builders" required autocomplete="off">
 
           </div>
 
@@ -238,7 +240,7 @@
 
             <label for="email">Email</label>
 
-            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="off">
 
           </div>
 
@@ -246,7 +248,7 @@
 
             <label for="phone">Phone</label>
 
-            <input id="phone" name="phone" placeholder="5022968111" required>
+            <input id="phone" name="phone" placeholder="5022968111" required autocomplete="off">
 
           </div>
 
@@ -254,7 +256,7 @@
 
             <label for="address">Business address</label>
 
-            <input id="address" name="address" placeholder="266 Eldorado Ave">
+            <input id="address" name="address" placeholder="266 Eldorado Ave" autocomplete="off">
 
           </div>
 
@@ -262,7 +264,7 @@
 
             <label for="license">Business license / #</label>
 
-            <input id="license" name="license" placeholder="KY-123456" required>
+            <input id="license" name="license" placeholder="KY-123456" required autocomplete="off">
 
           </div>
 
@@ -344,7 +346,7 @@
 
 
 
-    // نفس فكرتك: لو على netlify استخدم مسار نسبي
+    // لو على netlify استخدم مسار نسبي
 
     const BASE = location.hostname.endsWith('netlify.app')
 
@@ -369,6 +371,40 @@
       alertBox.style.display = 'none';
 
     }
+
+
+
+    // 👇 أول ما تفتح الصفحة نمسح التخزين المحلي عشان ما يطلع اسمك لصديقك
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      try {
+
+        localStorage.removeItem('pbz_form_data');
+
+      } catch(e){}
+
+      // نفرغ الحقول يدويًا تحسبًا للمتصفح
+
+      ['name','email','phone','address','license','notes'].forEach(id => {
+
+        const el = document.getElementById(id);
+
+        if (el) el.value = '';
+
+      });
+
+    });
+
+
+
+    // 👇 بيانات Supabase (بدّل القيمتين)
+
+    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
 
@@ -408,9 +444,13 @@
 
 
 
-      // نخزنها محليًا مثل ما كنت تعمل
+      // نخزنها محليًا (ولو ما احتجتها تقدر تشيلها بعدين)
 
-      localStorage.setItem('pbz_form_data', JSON.stringify(payload));
+      try {
+
+        localStorage.setItem('pbz_form_data', JSON.stringify(payload));
+
+      } catch(e){}
 
 
 
@@ -420,27 +460,39 @@
 
 
 
-      // 1) نحاول نحفظ في Supabase عبر الفنكشن الجديدة
+      // 1) نحفظ مباشرة في Supabase لأن Netlify موقوف
 
       try {
 
-        const saveRes = await fetch(`${BASE}/.netlify/functions/save-profile`, {
+        const { error } = await supabase
 
-          method: 'POST',
+          .from('pros_signups')
 
-          headers: { 'Content-Type': 'application/json' },
+          .insert([{
 
-          body: JSON.stringify(payload),
+            name: payload.name,
 
-        });
+            email: payload.email,
 
-        const saveData = await saveRes.json();
+            phone: payload.phone,
 
-        if (!saveRes.ok || !saveData.ok) {
+            address: payload.address,
 
-          console.warn('Supabase save failed:', saveData);
+            license: payload.license,
 
-          // ما نوقف Stripe هنا
+            insurance: payload.insurance || null,
+
+            notes: payload.notes || null,
+
+            stripe_customer_id: null,
+
+            stripe_subscription_id: null,
+
+          }]);
+
+        if (error) {
+
+          console.warn('Supabase insert error:', error.message);
 
         }
 
@@ -452,7 +504,7 @@
 
 
 
-      // 2) نكمل على Stripe كما هو بالضبط
+      // 2) Stripe مثل ما هو بالضبط
 
       try {
 
