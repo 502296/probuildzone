@@ -1,0 +1,347 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8"/>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>Post a Job – ProBuildZone</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    body {
+
+      font-family: 'Inter', sans-serif;
+
+      background: #0F2A43;
+
+      color: #fff;
+
+      margin: 0;
+
+      padding: 0;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      min-height: 100vh;
+
+    }
+
+    .card {
+
+      background: #fff;
+
+      color: #000;
+
+      border-radius: 16px;
+
+      padding: 24px;
+
+      max-width: 600px;
+
+      width: 90%;
+
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+    }
+
+    h1 { text-align:center; color:#0F2A43; }
+
+    label { font-weight:600; margin-top:10px; display:block; }
+
+    input, select, textarea {
+
+      width:100%; padding:10px; border-radius:8px;
+
+      border:1px solid #ccc; margin-top:6px; font-family:inherit;
+
+    }
+
+    textarea { min-height:80px; }
+
+    button {
+
+      background:#D4AF37; color:#000; border:none; padding:12px 20px;
+
+      border-radius:10px; font-weight:700; width:100%; margin-top:20px;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h1>Post a Job</h1>
+
+
+
+    <label for="hoCategory">Category</label>
+
+    <select id="hoCategory">
+
+      <option value="">— Select —</option>
+
+      <option value="Roofing">Roofing</option>
+
+      <option value="Decks & Porches">Decks & Porches</option>
+
+      <option value="Kitchens">Kitchens</option>
+
+      <option value="Flooring">Flooring</option>
+
+      <option value="Painting">Painting</option>
+
+      <option value="Electrical">Electrical</option>
+
+      <option value="Plumbing">Plumbing</option>
+
+      <option value="Landscaping">Landscaping</option>
+
+    </select>
+
+
+
+    <label for="hoPhotos">Photos (optional)</label>
+
+    <input id="hoPhotos" type="file" multiple>
+
+
+
+    <label for="hoTitle">Project title *</label>
+
+    <input id="hoTitle" placeholder="e.g. Replace roof shingles">
+
+
+
+    <label for="hoSummary">Short summary</label>
+
+    <input id="hoSummary" placeholder="One or two lines...">
+
+
+
+    <label for="hoCity">City</label>
+
+    <input id="hoCity">
+
+
+
+    <label for="hoState">State</label>
+
+    <input id="hoState">
+
+
+
+    <label for="hoBudgetFrom">Budget From ($)</label>
+
+    <input id="hoBudgetFrom" type="number">
+
+
+
+    <label for="hoBudgetTo">Budget To ($)</label>
+
+    <input id="hoBudgetTo" type="number">
+
+
+
+    <label for="hoContactName">Contact Name *</label>
+
+    <input id="hoContactName">
+
+
+
+    <label for="hoPhone">Phone *</label>
+
+    <input id="hoPhone">
+
+
+
+    <label for="hoEmail">Email *</label>
+
+    <input id="hoEmail" type="email">
+
+
+
+    <label for="hoFullAddress">Full Address</label>
+
+    <input id="hoFullAddress">
+
+
+
+    <label for="hoDescription">Description</label>
+
+    <textarea id="hoDescription"></textarea>
+
+
+
+    <button id="hoPostBtn" type="button">🚀 Post Job</button>
+
+  </div>
+
+
+
+  <!-- سكربت Supabase -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <script>
+
+    // 1. إعداد Supabase
+
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';  // ← غيّر هذا
+
+    const SUPABASE_KEY = 'YOUR-ANON-KEY';                    // ← غيّر هذا
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+
+    const btn = document.getElementById('hoPostBtn');
+
+
+
+    async function uploadFiles(files) {
+
+      const bucket = 'homeowner-uploads';
+
+      const paths = [];
+
+      for (const file of files) {
+
+        const fileName = `job-${Date.now()}-${file.name}`;
+
+        const { error } = await supabase.storage.from(bucket).upload(fileName, file);
+
+        if (!error) paths.push(fileName);
+
+      }
+
+      return paths;
+
+    }
+
+
+
+    async function handlePostJob() {
+
+      const category = hoCategory.value;
+
+      const title = hoTitle.value.trim();
+
+      const summary = hoSummary.value.trim();
+
+      const city = hoCity.value.trim();
+
+      const state = hoState.value.trim();
+
+      const budget_from = Number(hoBudgetFrom.value);
+
+      const budget_to = Number(hoBudgetTo.value);
+
+      const contact_name = hoContactName.value.trim();
+
+      const phone = hoPhone.value.trim();
+
+      const email = hoEmail.value.trim();
+
+      const full_address = hoFullAddress.value.trim();
+
+      const description = hoDescription.value.trim();
+
+      const files = hoPhotos.files;
+
+
+
+      if (!category || !title || !contact_name || !phone || !email) {
+
+        alert("Please fill all required fields.");
+
+        return;
+
+      }
+
+
+
+      btn.disabled = true;
+
+      btn.textContent = "Posting...";
+
+
+
+      let photoPaths = [];
+
+      if (files.length > 0) {
+
+        photoPaths = await uploadFiles(files);
+
+      }
+
+
+
+      const { data, error } = await supabase
+
+        .from('homeowner_jobs')
+
+        .insert([{
+
+          category, title, summary, city, state, budget_from, budget_to,
+
+          contact_name, phone, email, full_address, description
+
+        }])
+
+        .select();
+
+
+
+      if (error) {
+
+        alert("Error saving job: " + error.message);
+
+      } else {
+
+        const jobId = data[0].id;
+
+        if (photoPaths.length > 0) {
+
+          const photoRows = photoPaths.map(p => ({ job_id: jobId, path: p }));
+
+          await supabase.from('homeowner_job_photos').insert(photoRows);
+
+        }
+
+        alert("Job posted successfully!");
+
+      }
+
+
+
+      btn.disabled = false;
+
+      btn.textContent = "🚀 Post Job";
+
+    }
+
+
+
+    btn.addEventListener('click', handlePostJob);
+
+  </script>
+
+</body>
+
+</html>
