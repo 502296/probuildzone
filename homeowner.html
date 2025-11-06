@@ -4,11 +4,11 @@
 
 <head>
 
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Post a Job – ProBuildZone</title>
+  <title>Post a Job – Probuildzone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -16,65 +16,147 @@
 
   <style>
 
-    body {
+    body{
 
-      font-family: 'Inter', sans-serif;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 
-      background: #0F2A43;
+      background:#0F2A43;
 
-      color: #fff;
+      margin:0;
 
-      margin: 0;
+      min-height:100vh;
 
-      padding: 0;
+      display:flex;
 
-      display: flex;
+      justify-content:center;
 
-      justify-content: center;
+      align-items:flex-start;
 
-      align-items: center;
+      padding:30px 12px 50px;
 
-      min-height: 100vh;
-
-    }
-
-    .card {
-
-      background: #fff;
-
-      color: #000;
-
-      border-radius: 16px;
-
-      padding: 24px;
-
-      max-width: 600px;
-
-      width: 90%;
-
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      color:#fff;
 
     }
 
-    h1 { text-align:center; color:#0F2A43; }
+    .card{
 
-    label { font-weight:600; margin-top:10px; display:block; }
+      background:#fff;
 
-    input, select, textarea {
+      color:#000;
 
-      width:100%; padding:10px; border-radius:8px;
+      border-radius:18px;
 
-      border:1px solid #ccc; margin-top:6px; font-family:inherit;
+      max-width:720px;
+
+      width:100%;
+
+      padding:20px 18px 26px;
+
+      box-shadow:0 20px 55px rgba(0,0,0,.15);
 
     }
 
-    textarea { min-height:80px; }
+    h1{margin-top:0;margin-bottom:16px;font-size:22px}
 
-    button {
+    label{display:block;font-weight:600;margin-bottom:6px}
 
-      background:#D4AF37; color:#000; border:none; padding:12px 20px;
+    input,select,textarea{
 
-      border-radius:10px; font-weight:700; width:100%; margin-top:20px;
+      width:100%;
+
+      border:1px solid #d5d9de;
+
+      border-radius:10px;
+
+      padding:10px 11px;
+
+      font:inherit;
+
+      background:#fff;
+
+    }
+
+    textarea{min-height:110px;resize:vertical}
+
+    .row{
+
+      display:grid;
+
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+
+      gap:12px;
+
+    }
+
+    .mt{margin-top:14px}
+
+    .btn{
+
+      display:inline-block;
+
+      border:none;
+
+      background:#00A8FF;
+
+      color:#fff;
+
+      font-weight:600;
+
+      padding:12px 18px;
+
+      border-radius:14px;
+
+      cursor:pointer;
+
+      width:100%;
+
+      text-align:center;
+
+    }
+
+    .alert{
+
+      margin-top:12px;
+
+      background:#fdeeee;
+
+      border:1px solid #f4c3c3;
+
+      border-radius:10px;
+
+      padding:10px 12px;
+
+      color:#a52f2f;
+
+      display:none;
+
+      white-space:pre-wrap;
+
+    }
+
+    .success{
+
+      margin-top:12px;
+
+      background:#ecfdf3;
+
+      border:1px solid #c5f1d5;
+
+      border-radius:10px;
+
+      padding:10px 12px;
+
+      color:#167a3a;
+
+      display:none;
+
+      white-space:pre-wrap;
+
+    }
+
+    @media (max-width:520px){
+
+      .card{padding:16px 14px 24px}
 
     }
 
@@ -88,147 +170,303 @@
 
     <h1>Post a Job</h1>
 
+    <!-- نموذج homeowner -->
 
+    <div class="mt">
 
-    <label for="hoCategory">Category</label>
+      <label for="hoCategory">Category</label>
 
-    <select id="hoCategory">
+      <select id="hoCategory">
 
-      <option value="">— Select —</option>
+        <option value="Roofing">Roofing</option>
 
-      <option value="Roofing">Roofing</option>
+        <option value="Decks & Porches">Decks &amp; Porches</option>
 
-      <option value="Decks & Porches">Decks & Porches</option>
+        <option value="Kitchens">Kitchens</option>
 
-      <option value="Kitchens">Kitchens</option>
+        <option value="Bathrooms">Bathrooms</option>
 
-      <option value="Flooring">Flooring</option>
+        <option value="Flooring">Flooring</option>
 
-      <option value="Painting">Painting</option>
+        <option value="Painting">Painting</option>
 
-      <option value="Electrical">Electrical</option>
+        <option value="Masonry">Masonry</option>
 
-      <option value="Plumbing">Plumbing</option>
+        <option value="Electrical">Electrical</option>
 
-      <option value="Landscaping">Landscaping</option>
+        <option value="Plumbing">Plumbing</option>
 
-    </select>
+        <option value="Windows & Doors">Windows &amp; Doors</option>
 
+        <option value="Landscaping" selected>Landscaping</option>
 
+        <option value="Handyman">Handyman</option>
 
-    <label for="hoPhotos">Photos (optional)</label>
+      </select>
 
-    <input id="hoPhotos" type="file" multiple>
+    </div>
 
 
 
-    <label for="hoTitle">Project title *</label>
+    <div class="mt">
 
-    <input id="hoTitle" placeholder="e.g. Replace roof shingles">
+      <label for="hoPhotos">Photos / Files (optional)</label>
 
+      <input id="hoPhotos" type="file" multiple />
 
+      <small>You can upload one or more photos</small>
 
-    <label for="hoSummary">Short summary</label>
+    </div>
 
-    <input id="hoSummary" placeholder="One or two lines...">
 
 
+    <div class="mt">
 
-    <label for="hoCity">City</label>
+      <label for="hoTitle">Project title *</label>
 
-    <input id="hoCity">
+      <input id="hoTitle" placeholder="e.g., Replace leaking roof" required>
 
+    </div>
 
 
-    <label for="hoState">State</label>
 
-    <input id="hoState">
+    <div class="mt">
 
+      <label for="hoSummary">Short summary</label>
 
+      <input id="hoSummary" placeholder="One or two lines...">
 
-    <label for="hoBudgetFrom">Budget From ($)</label>
+    </div>
 
-    <input id="hoBudgetFrom" type="number">
 
 
+    <div class="row mt">
 
-    <label for="hoBudgetTo">Budget To ($)</label>
+      <div>
 
-    <input id="hoBudgetTo" type="number">
+        <label for="hoCity">City</label>
 
+        <input id="hoCity" placeholder="Enter your city">
 
+      </div>
 
-    <label for="hoContactName">Contact Name *</label>
+      <div>
 
-    <input id="hoContactName">
+        <label for="hoState">State</label>
 
+        <input id="hoState" placeholder="Enter your state">
 
+      </div>
 
-    <label for="hoPhone">Phone *</label>
+      <div>
 
-    <input id="hoPhone">
+        <label for="hoZip">ZIP code</label>
 
+        <input id="hoZip" placeholder="40202">
 
+      </div>
 
-    <label for="hoEmail">Email *</label>
+    </div>
 
-    <input id="hoEmail" type="email">
 
 
+    <div class="row mt">
 
-    <label for="hoFullAddress">Full Address</label>
+      <div>
 
-    <input id="hoFullAddress">
+        <label for="hoBudgetFrom">Budget From ($)</label>
 
+        <input id="hoBudgetFrom" type="number" min="0" placeholder="100">
 
+      </div>
 
-    <label for="hoDescription">Description</label>
+      <div>
 
-    <textarea id="hoDescription"></textarea>
+        <label for="hoBudgetTo">Budget To ($)</label>
 
+        <input id="hoBudgetTo" type="number" min="0" placeholder="300">
 
+      </div>
 
-    <button id="hoPostBtn" type="button">🚀 Post Job</button>
+    </div>
+
+
+
+    <div class="row mt">
+
+      <div>
+
+        <label for="hoContactName">Contact name *</label>
+
+        <input id="hoContactName" placeholder="Your name">
+
+      </div>
+
+      <div>
+
+        <label for="hoPhone">Phone *</label>
+
+        <input id="hoPhone" placeholder="Your phone number">
+
+      </div>
+
+    </div>
+
+
+
+    <div class="mt">
+
+      <label for="hoEmail">Email *</label>
+
+      <input id="hoEmail" type="email" placeholder="you@example.com">
+
+    </div>
+
+
+
+    <div class="mt">
+
+      <label for="hoFullAddress">Full address</label>
+
+      <input id="hoFullAddress" placeholder="Street, City, State">
+
+    </div>
+
+
+
+    <div class="mt">
+
+      <label for="hoDescription">Full description…</label>
+
+      <textarea id="hoDescription" placeholder="Describe the job in detail..."></textarea>
+
+    </div>
+
+
+
+    <div id="hoAlert" class="alert"></div>
+
+    <div id="hoSuccess" class="success"></div>
+
+
+
+    <div class="mt">
+
+      <button id="hoPostBtn" class="btn" type="button">🚀 Post Job</button>
+
+    </div>
 
   </div>
 
 
 
-  <!-- سكربت Supabase -->
+  <!-- Supabase CDN -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <script>
 
-    // 1. إعداد Supabase
+    // 🔐 غيّر هذول حسب مشروعك
 
-    const SUPABASE_URL = 'https://hczahffwghbddqabpbmu.supabase.co'; 
+    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';                  
+    const SUPABASE_KEY = 'YOUR-ANON-KEY';
+
+
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 
+    const alertBox = document.getElementById('hoAlert');
+
+    const successBox = document.getElementById('hoSuccess');
+
     const btn = document.getElementById('hoPostBtn');
 
 
 
+    function showError(msg) {
+
+      alertBox.textContent = msg;
+
+      alertBox.style.display = 'block';
+
+      successBox.style.display = 'none';
+
+    }
+
+    function showSuccess(msg) {
+
+      successBox.textContent = msg;
+
+      successBox.style.display = 'block';
+
+      alertBox.style.display = 'none';
+
+    }
+
+
+
+    // رفع جميع الملفات المختارة وإرجاع المسارات
+
     async function uploadFiles(files) {
 
-      const bucket = 'homeowner-uploads';
+      const bucket = 'homeowner_uploads';
 
       const paths = [];
 
+
+
       for (const file of files) {
 
-        const fileName = `job-${Date.now()}-${file.name}`;
+        const ext = file.name.split('.').pop();
 
-        const { error } = await supabase.storage.from(bucket).upload(fileName, file);
+        const fileName = `job-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-        if (!error) paths.push(fileName);
+
+
+        const { data, error } = await supabase
+
+          .storage
+
+          .from(bucket)
+
+          .upload(fileName, file);
+
+
+
+        if (error) {
+
+          console.warn('upload error', error.message);
+
+          // نكمل حتى لو فشل واحد
+
+        } else {
+
+          // نجيب الرابط العام
+
+          const { data: publicData } = supabase
+
+            .storage
+
+            .from(bucket)
+
+            .getPublicUrl(fileName);
+
+
+
+          if (publicData && publicData.publicUrl) {
+
+            paths.push(publicData.publicUrl);
+
+          }
+
+        }
 
       }
+
+
 
       return paths;
 
@@ -236,39 +474,53 @@
 
 
 
-    async function handlePostJob() {
+    btn.addEventListener('click', async () => {
 
-      const category = hoCategory.value;
+      alertBox.style.display = 'none';
 
-      const title = hoTitle.value.trim();
-
-      const summary = hoSummary.value.trim();
-
-      const city = hoCity.value.trim();
-
-      const state = hoState.value.trim();
-
-      const budget_from = Number(hoBudgetFrom.value);
-
-      const budget_to = Number(hoBudgetTo.value);
-
-      const contact_name = hoContactName.value.trim();
-
-      const phone = hoPhone.value.trim();
-
-      const email = hoEmail.value.trim();
-
-      const full_address = hoFullAddress.value.trim();
-
-      const description = hoDescription.value.trim();
-
-      const files = hoPhotos.files;
+      successBox.style.display = 'none';
 
 
 
-      if (!category || !title || !contact_name || !phone || !email) {
+      // جمع القيم
 
-        alert("Please fill all required fields.");
+      const payload = {
+
+        category: document.getElementById('hoCategory').value.trim(),
+
+        title: document.getElementById('hoTitle').value.trim(),
+
+        summary: document.getElementById('hoSummary').value.trim(),
+
+        city: document.getElementById('hoCity').value.trim(),
+
+        state: document.getElementById('hoState').value.trim(),
+
+        zip: document.getElementById('hoZip').value.trim(),
+
+        budget_from: document.getElementById('hoBudgetFrom').value.trim(),
+
+        budget_to: document.getElementById('hoBudgetTo').value.trim(),
+
+        contact_name: document.getElementById('hoContactName').value.trim(),
+
+        phone: document.getElementById('hoPhone').value.trim(),
+
+        email: document.getElementById('hoEmail').value.trim(),
+
+        full_address: document.getElementById('hoFullAddress').value.trim(),
+
+        description: document.getElementById('hoDescription').value.trim(),
+
+      };
+
+
+
+      // validation بسيط
+
+      if (!payload.title || !payload.contact_name || !payload.phone || !payload.email) {
+
+        showError('Please fill title, contact name, phone, and email.');
 
         return;
 
@@ -278,67 +530,103 @@
 
       btn.disabled = true;
 
-      btn.textContent = "Posting...";
+      btn.textContent = 'Posting...';
 
 
 
-      let photoPaths = [];
+      try {
 
-      if (files.length > 0) {
+        // 1) لو في صور ارفعها
 
-        photoPaths = await uploadFiles(files);
+        const filesInput = document.getElementById('hoPhotos');
 
-      }
+        let photos = [];
 
+        if (filesInput.files && filesInput.files.length > 0) {
 
-
-      const { data, error } = await supabase
-
-        .from('homeowner_jobs')
-
-        .insert([{
-
-          category, title, summary, city, state, budget_from, budget_to,
-
-          contact_name, phone, email, full_address, description
-
-        }])
-
-        .select();
-
-
-
-      if (error) {
-
-        alert("Error saving job: " + error.message);
-
-      } else {
-
-        const jobId = data[0].id;
-
-        if (photoPaths.length > 0) {
-
-          const photoRows = photoPaths.map(p => ({ job_id: jobId, path: p }));
-
-          await supabase.from('homeowner_job_photos').insert(photoRows);
+          photos = await uploadFiles(filesInput.files);
 
         }
 
-        alert("Job posted successfully!");
+
+
+        // 2) خزّن الطلب
+
+        const { data, error } = await supabase
+
+          .from('homeowner_jobs')
+
+          .insert([{
+
+            category: payload.category,
+
+            title: payload.title,
+
+            summary: payload.summary,
+
+            city: payload.city,
+
+            state: payload.state,
+
+            zip: payload.zip,
+
+            budget_from: payload.budget_from,
+
+            budget_to: payload.budget_to,
+
+            contact_name: payload.contact_name,
+
+            phone: payload.phone,
+
+            email: payload.email,
+
+            full_address: payload.full_address,
+
+            description: payload.description,
+
+            photo_urls: photos.length ? photos : null
+
+          }])
+
+          .select()
+
+          .single();
+
+
+
+        if (error) {
+
+          console.error(error);
+
+          showError('DB error: ' + error.message);
+
+        } else {
+
+          showSuccess('Job posted successfully!');
+
+          // ممكن تفرّغ الحقول هنا لو تبي
+
+          // document.getElementById('hoTitle').value = '';
+
+        }
+
+
+
+      } catch (err) {
+
+        console.error(err);
+
+        showError('Unexpected error: ' + err.message);
+
+      } finally {
+
+        btn.disabled = false;
+
+        btn.textContent = '🚀 Post Job';
 
       }
 
-
-
-      btn.disabled = false;
-
-      btn.textContent = "🚀 Post Job";
-
-    }
-
-
-
-    btn.addEventListener('click', handlePostJob);
+    });
 
   </script>
 
