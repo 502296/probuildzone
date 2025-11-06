@@ -2,39 +2,99 @@
 
 
 
-import { createClient } from '@supabase/supabase-js';
+const corsHeaders = {
+
+  'Access-Control-Allow-Origin': '*',
+
+  'Access-Control-Allow-Headers': 'Content-Type',
+
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+};
 
 
 
-export async function handler(event) {
-
-  const headers = {
-
-    'Access-Control-Allow-Origin': '*',
-
-    'Access-Control-Allow-Headers': 'Content-Type',
-
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-
-  };
-
-
-
-  // السماح بطلبات OPTIONS (CORS preflight)
+exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') {
 
-    return { statusCode: 200, headers, body: 'OK' };
+    return { statusCode: 200, headers: corsHeaders, body: 'OK' };
 
   }
 
 
 
-  // السماح فقط بطريقة POST
-
   if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return {
+
+      statusCode: 405,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+
+    };
+
+  }
+
+
+
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+
+  const SUPABASE_KEY =
+
+    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+
+
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+
+    return {
+
+      statusCode: 500,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: 'Missing Supabase env vars',
+
+      }),
+
+    };
+
+  }
+
+
+
+  // نحذف أي / زايد
+
+  const baseUrl = SUPABASE_URL.replace(/\/+$/, '');
+
+  const tableUrl = `${baseUrl}/rest/v1/pros_signups`;
+
+
+
+  let payload = {};
+
+  try {
+
+    payload = JSON.parse(event.body || '{}');
+
+  } catch (e) {
+
+    return {
+
+      statusCode: 400,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON' }),
+
+    };
 
   }
 
@@ -42,85 +102,65 @@ export async function handler(event) {
 
   try {
 
-    const data = JSON.parse(event.body || '{}');
+    const resp = await fetch(tableUrl, {
 
+      method: 'POST',
 
+      headers: {
 
-    // إنشاء عميل Supabase
+        'Content-Type': 'application/json',
 
-    const supabase = createClient(
+        apikey: SUPABASE_KEY,
 
-      process.env.SUPABASE_URL,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
 
-      process.env.SUPABASE_SERVICE_ROLE
-
-    );
-
-
-
-    // إدخال البيانات في جدول pros_signups
-
-    const { error } = await supabase.from('pros_signups').insert([
-
-      {
-
-        name: data.name,
-
-        email: data.email,
-
-        phone: data.phone,
-
-        address: data.address,
-
-        license: data.license,
-
-        insurance: data.insurance,
-
-        notes: data.notes,
+        Prefer: 'return=representation',
 
       },
 
-    ]);
+      body: JSON.stringify({
+
+        name: payload.name || null,
+
+        email: payload.email || null,
+
+        phone: payload.phone || null,
+
+        address: payload.address || null,
+
+        license: payload.license || null,
+
+        insurance: payload.insurance || null,
+
+        notes: payload.notes || null,
+
+      }),
+
+    });
 
 
 
-    if (error) {
-
-      console.error('Supabase insert error:', error);
-
-      return {
-
-        statusCode: 500,
-
-        headers,
-
-        body: JSON.stringify({ ok: false, error: error.message }),
-
-      };
-
-    }
+    const text = await resp.text();
 
 
 
     return {
 
-      statusCode: 200,
+      statusCode: resp.status,
 
-      headers,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
 
-      body: JSON.stringify({ ok: true, message: 'Data saved successfully' }),
+      body: text,
 
     };
 
   } catch (err) {
 
-    console.error('Handler error:', err);
-
     return {
 
       statusCode: 500,
 
-      headers,
+      headers: corsHeaders,
 
       body: JSON.stringify({ ok: false, error: err.message }),
 
@@ -128,4 +168,4 @@ export async function handler(event) {
 
   }
 
-}
+};
