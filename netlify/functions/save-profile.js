@@ -1,12 +1,10 @@
 // netlify/functions/save-profile.js
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 
 
-export const handler = async (event) => {
-
-  // نسمح فقط بالـ POST
+exports.handler = async (event) => {
 
   if (event.httpMethod !== 'POST') {
 
@@ -30,7 +28,7 @@ export const handler = async (event) => {
 
     const supabaseUrl = process.env.SUPABASE_URL;
 
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE; // service_role من supabase
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE;
 
 
 
@@ -68,8 +66,6 @@ export const handler = async (event) => {
 
       notes: body.notes || null,
 
-      // خليه فاضيين حالياً
-
       stripe_customer_id: body.stripe_customer_id || null,
 
       stripe_subscription_id: body.stripe_subscription_id || null,
@@ -77,8 +73,6 @@ export const handler = async (event) => {
     };
 
 
-
-    // إدخال في pros_signups (الجدول اللي ظاهر عندك)
 
     const { error } = await supabase.from('pros_signups').insert([row]);
 
