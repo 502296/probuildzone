@@ -6,13 +6,27 @@ const { createClient } = require('@supabase/supabase-js');
 
 exports.handler = async (event) => {
 
+  const headers = {
+
+    'Content-Type': 'application/json',
+
+    'Access-Control-Allow-Origin': '*',
+
+  };
+
+
+
+  // نسمح فقط بالـ POST
+
   if (event.httpMethod !== 'POST') {
 
     return {
 
       statusCode: 405,
 
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Method Not Allowed' }),
 
     };
 
@@ -26,6 +40,8 @@ exports.handler = async (event) => {
 
 
 
+    // نستخدم نفس الأسماء اللي عندك في الصورة 👇
+
     const supabaseUrl = process.env.SUPABASE_URL;
 
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE;
@@ -38,7 +54,15 @@ exports.handler = async (event) => {
 
         statusCode: 500,
 
-        body: JSON.stringify({ ok: false, error: 'Supabase env vars missing' }),
+        headers,
+
+        body: JSON.stringify({
+
+          ok: false,
+
+          error: 'Supabase env vars missing on Netlify',
+
+        }),
 
       };
 
@@ -46,9 +70,13 @@ exports.handler = async (event) => {
 
 
 
+    // نكوّن الكلاينت
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
 
+
+    // البيانات الجاية من الفورم
 
     const row = {
 
@@ -74,7 +102,13 @@ exports.handler = async (event) => {
 
 
 
-    const { error } = await supabase.from('pros_signups').insert([row]);
+    // ندخلها في جدولك بالضبط: pros_signups
+
+    const { error } = await supabase
+
+      .from('pros_signups')
+
+      .insert([row]);
 
 
 
@@ -86,7 +120,15 @@ exports.handler = async (event) => {
 
         statusCode: 500,
 
-        body: JSON.stringify({ ok: false, error: error.message }),
+        headers,
+
+        body: JSON.stringify({
+
+          ok: false,
+
+          error: error.message,
+
+        }),
 
       };
 
@@ -97,6 +139,8 @@ exports.handler = async (event) => {
     return {
 
       statusCode: 200,
+
+      headers,
 
       body: JSON.stringify({ ok: true }),
 
@@ -109,6 +153,8 @@ exports.handler = async (event) => {
     return {
 
       statusCode: 500,
+
+      headers,
 
       body: JSON.stringify({ ok: false, error: err.message }),
 
