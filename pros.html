@@ -224,7 +224,9 @@
 
             <label for="name">Business / Owner name</label>
 
-            <input id="name" name="pro_name" placeholder="John & Sons Builders" required autocomplete="off">
+            <!-- غيّرنا name عشان المتصفح ما يعمل autofill -->
+
+            <input id="name" name="pro_name" placeholder="John &amp; Sons Builders" required autocomplete="off">
 
           </div>
 
@@ -280,7 +282,7 @@
 
           <div style="grid-column:1/-1">
 
-            <label for="notes">Services & notes (optional)</label>
+            <label for="notes">Services &amp; notes (optional)</label>
 
             <textarea id="notes" name="pro_notes" placeholder="Short description of services..."></textarea>
 
@@ -328,6 +330,8 @@
 
 
 
+  <!-- Supabase CDN -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 
@@ -342,9 +346,17 @@
 
 
 
-    const BASE = location.hostname.endsWith('netlify.app') ? '' : 'https://probuildzone.netlify.app';
+    // نفس فكرتك: لو على netlify استخدم مسار نسبي
+
+    const BASE = location.hostname.endsWith('netlify.app')
+
+      ? ''
+
+      : 'https://probuildzone.netlify.app';
 
 
+
+    // حط قيمتك انت من Supabase
 
     const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
 
@@ -382,11 +394,11 @@
 
 
 
+    // نمسح الحقول أكثر من مرة عشان الأوتوفل العنيد
+
     function wipeFields() {
 
-      const ids = ['name','email','phone','address','license','notes'];
-
-      ids.forEach(id => {
+      ['name','email','phone','address','license','notes'].forEach(id => {
 
         const el = document.getElementById(id);
 
@@ -448,6 +460,8 @@
 
 
 
+      // نخزنها لو حبّيت تستخدمها بصفحة success
+
       try { localStorage.setItem('pbz_form_data', JSON.stringify(payload)); } catch(e){}
 
 
@@ -457,6 +471,8 @@
       btn.textContent = 'Creating checkout...';
 
 
+
+      // 1) نحفظ مباشرة في Supabase (بما أن Netlify واقف)
 
       if (supabase) {
 
@@ -488,7 +504,11 @@
 
             }]);
 
-          if (error) console.warn('Supabase insert error:', error.message);
+          if (error) {
+
+            console.warn('Supabase insert error:', error.message);
+
+          }
 
         } catch (err) {
 
@@ -500,7 +520,9 @@
 
 
 
-      // Stripe function (unchanged but hides user-facing errors)
+      // 2) Stripe عبر Netlify — لكن بدون إظهار الخطأ الآن
+
+      // (لأن حسابك متوقف ويرجع load failed)
 
       try {
 
@@ -520,9 +542,9 @@
 
           const t = await res.text();
 
-          console.warn('Stripe error:', t);
+          console.warn('Stripe error (hidden from user):', t);
 
-          // hide error from user until Netlify reactivated
+          // ما نعرض showError للمستخدم الآن
 
         } else {
 
@@ -542,9 +564,9 @@
 
       } catch (err){
 
-        console.warn('Network error calling Stripe:', err);
+        console.warn('Stripe network error (hidden from user):', err);
 
-        // hide error for now
+        // ما نعرض showError للمستخدم
 
       } finally {
 
