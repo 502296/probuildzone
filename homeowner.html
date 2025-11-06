@@ -1,299 +1,677 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!doctype html>
 
-<script>
+<html lang="en">
 
-  // 1) غيّر هذول على مشروعك
+<head>
 
-  const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+  <meta charset="utf-8" />
 
-  const SUPABASE_KEY = 'YOUR-ANON-KEY';
+  <title>Post a Job — ProBuildZone</title>
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  // 2) نجيب العناصر من الصفحة الموجودة فعلاً
+  <style>
 
-  const fileInput     = document.querySelector('input[type="file"]'); // اللي فوق
+    :root{
 
-  const titleInput    = document.querySelector('input[placeholder^="e.g.,"]');
+      --bg:#0F2A43;
 
-  const summaryInput  = document.querySelector('input[placeholder^="One or two"]');
+      --card:#111827;
 
-  const cityInput     = document.querySelector('input[placeholder="Enter your city"]');
+      --input:#1f2937;
 
-  const stateInput    = document.querySelector('input[placeholder="Enter your state"]');
+      --border:#374151;
 
-  const budgetFromInp = document.querySelector('input[placeholder="From ($)"]');
+      --accent:#36BFFA;
 
-  const budgetToInp   = document.querySelector('input[placeholder="To ($)"]');
+      --accent2:#d4af37;
 
-  const contactInput  = document.querySelector('input[placeholder="Your name"]');
+      --muted:#9ca3af;
 
-  const phoneInput    = document.querySelector('input[placeholder="Your phone number"]');
+    }
 
-  const emailInput    = document.querySelector('input[placeholder="Your email address"]');
+    *{box-sizing:border-box}
 
-  const addressInput  = document.querySelector('input[placeholder="Street, City, State"]');
+    body{
 
-  const descTextarea  = document.querySelector('textarea'); // عندك واحدة فقط
+      margin:0;
 
-  // زر الإرسال
+      min-height:100vh;
 
-  const postBtn       = document.querySelector('button, .btn, .post-btn, [type="button"]')
+      background:radial-gradient(circle at top, #133455 0%, #0F2A43 35%, #020617 100%);
 
-                           .closest('button') || document.querySelector('button');
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 
+      color:#fff;
 
+      display:flex;
 
-  // نضيف مكان للرسالة لو ما كان موجود
+      justify-content:center;
 
-  let msgBar = document.getElementById('ho-msg');
+      align-items:flex-start;
 
-  if (!msgBar) {
+      padding:32px 12px 60px;
 
-    msgBar = document.createElement('div');
+    }
 
-    msgBar.id = 'ho-msg';
+    .wrapper{
 
-    msgBar.style.marginTop = '14px';
+      width:100%;
 
-    msgBar.style.fontSize = '14px';
+      max-width:980px;
 
-    msgBar.style.fontWeight = '500';
+    }
 
-    msgBar.style.color = '#fff';
+    h1{
 
-    postBtn.parentNode.appendChild(msgBar);
+      margin-bottom:18px;
 
-  }
+      font-size:28px;
 
+      font-weight:700;
 
+    }
 
-  function showMsg(text, isError = false) {
+    .card{
 
-    msgBar.textContent = text;
+      background:rgba(2,6,23,.5);
 
-    msgBar.style.color = isError ? '#ffb4b4' : '#b4ffcb';
+      border:1px solid rgba(148,163,184,.15);
 
-  }
+      border-radius:18px;
 
+      padding:20px 18px 26px;
 
+      backdrop-filter: blur(4px);
 
-  // 3) رفع الصور إلى bucket اسمه homeowner_uploads
+    }
 
-  async function uploadFilesToSupabase(files) {
+    label{
 
-    const bucket = 'homeowner_uploads';
+      display:block;
 
-    const urls = [];
+      font-weight:500;
 
+      margin-bottom:6px;
 
+    }
 
-    for (const file of files) {
+    input, select, textarea{
 
-      const ext = file.name.split('.').pop();
+      width:100%;
 
-      const fileName = `job-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      background:var(--input);
 
+      border:1px solid rgba(148,163,184,.25);
 
+      border-radius:12px;
 
-      const { data, error } = await supabase
+      padding:10px 12px;
 
-        .storage
+      color:#fff;
 
-        .from(bucket)
+      font:inherit;
 
-        .upload(fileName, file);
+    }
 
+    input::placeholder, textarea::placeholder{
 
+      color:rgba(255,255,255,.28);
 
-      if (error) {
+    }
 
-        console.warn('upload error:', error.message);
+    textarea{
 
-        continue; // نكمّل على الباقي
+      min-height:120px;
 
-      }
+      resize:vertical;
 
+    }
 
+    .two{
 
-      const { data: publicData } = supabase
+      display:grid;
 
-        .storage
+      gap:12px;
 
-        .from(bucket)
+    }
 
-        .getPublicUrl(fileName);
+    @media (min-width:720px){
 
+      .two{grid-template-columns:repeat(2, minmax(0,1fr));}
 
+    }
 
-      if (publicData && publicData.publicUrl) {
+    .upload-box{
 
-        urls.push(publicData.publicUrl);
+      border:1px dashed rgba(148,163,184,.4);
 
-      }
+      border-radius:14px;
+
+      padding:12px 14px 14px;
+
+      margin-bottom:16px;
+
+      background:rgba(15,23,42,.25);
+
+    }
+
+    .upload-box small{
+
+      color:rgba(255,255,255,.35);
+
+      display:block;
+
+      margin-top:4px;
+
+    }
+
+    .btn{
+
+      display:inline-flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      gap:6px;
+
+      border:none;
+
+      background:#36BFFA;
+
+      color:#000;
+
+      font-weight:600;
+
+      border-radius:14px;
+
+      padding:11px 18px;
+
+      cursor:pointer;
+
+      font-size:15px;
+
+    }
+
+    .btn[disabled]{
+
+      opacity:.6;
+
+      cursor:not-allowed;
+
+    }
+
+    #ho-msg{
+
+      margin-top:14px;
+
+      font-weight:500;
+
+      text-align:center;
+
+    }
+
+    .note{
+
+      font-size:13px;
+
+      color:rgba(255,255,255,.5);
+
+      margin-bottom:14px;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+
+    <h1>Post a Job</h1>
+
+    <div class="card">
+
+      <!-- رفع الصور -->
+
+      <div class="upload-box">
+
+        <label for="hoPhotos">📸 Choose Photos/Files</label>
+
+        <input id="hoPhotos" type="file" multiple>
+
+        <small>You can select multiple photos or a PDF plan. Drag & drop is supported (optional).</small>
+
+      </div>
+
+
+
+      <!-- العنوان والملخص -->
+
+      <div>
+
+        <label for="hoTitle">Project title *</label>
+
+        <input id="hoTitle" placeholder="e.g., Replace leaking roof" required>
+
+      </div>
+
+      <div style="margin-top:12px">
+
+        <label for="hoSummary">Short summary</label>
+
+        <input id="hoSummary" placeholder="One or two lines...">
+
+      </div>
+
+
+
+      <!-- المدينة والولاية -->
+
+      <div class="two" style="margin-top:14px">
+
+        <div>
+
+          <label for="hoCity">City</label>
+
+          <input id="hoCity" placeholder="Enter your city">
+
+        </div>
+
+        <div>
+
+          <label for="hoState">State</label>
+
+          <input id="hoState" placeholder="Enter your state">
+
+        </div>
+
+      </div>
+
+
+
+      <!-- الميزانية -->
+
+      <div class="two" style="margin-top:14px">
+
+        <div>
+
+          <label for="hoBudgetFrom">Budget From ($)</label>
+
+          <input id="hoBudgetFrom" type="number" min="0" placeholder="From ($)">
+
+        </div>
+
+        <div>
+
+          <label for="hoBudgetTo">To ($)</label>
+
+          <input id="hoBudgetTo" type="number" min="0" placeholder="To ($)">
+
+        </div>
+
+      </div>
+
+
+
+      <!-- بيانات التواصل -->
+
+      <div class="two" style="margin-top:14px">
+
+        <div>
+
+          <label for="hoContactName">Contact name *</label>
+
+          <input id="hoContactName" placeholder="Your name" required>
+
+        </div>
+
+        <div>
+
+          <label for="hoPhone">Phone *</label>
+
+          <input id="hoPhone" placeholder="Your phone number" required>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="two" style="margin-top:14px">
+
+        <div>
+
+          <label for="hoEmail">Email *</label>
+
+          <input id="hoEmail" type="email" placeholder="Your email address" required>
+
+        </div>
+
+        <div>
+
+          <label for="hoFullAddress">Full address *</label>
+
+          <input id="hoFullAddress" placeholder="Street, City, State" required>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- الوصف -->
+
+      <div style="margin-top:14px">
+
+        <label for="hoDescription">Full description *</label>
+
+        <textarea id="hoDescription" placeholder="Describe the job in detail..."></textarea>
+
+      </div>
+
+
+
+      <p class="note">Only ZIP / title / photos will be shown to pros. Full contact details stay hidden until homeowner accepts an offer.</p>
+
+
+
+      <button id="hoPostBtn" class="btn" type="button">🚀 Post Job</button>
+
+      <div id="ho-msg"></div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Supabase CDN -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+
+
+  <script>
+
+    // 1) عدّل هذان السطران 👇
+
+    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+
+    const SUPABASE_KEY = 'YOUR-ANON-KEY';
+
+
+
+    // 2) إنشاء العميل
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+
+    // 3) مراجع العناصر
+
+    const fileInput    = document.getElementById('hoPhotos');
+
+    const titleInput   = document.getElementById('hoTitle');
+
+    const summaryInput = document.getElementById('hoSummary');
+
+    const cityInput    = document.getElementById('hoCity');
+
+    const stateInput   = document.getElementById('hoState');
+
+    const budgetFrom   = document.getElementById('hoBudgetFrom');
+
+    const budgetTo     = document.getElementById('hoBudgetTo');
+
+    const contactInput = document.getElementById('hoContactName');
+
+    const phoneInput   = document.getElementById('hoPhone');
+
+    const emailInput   = document.getElementById('hoEmail');
+
+    const addressInput = document.getElementById('hoFullAddress');
+
+    const descInput    = document.getElementById('hoDescription');
+
+    const postBtn      = document.getElementById('hoPostBtn');
+
+    const msgBar       = document.getElementById('ho-msg');
+
+
+
+    function showMsg(txt, isErr = false){
+
+      msgBar.textContent = txt;
+
+      msgBar.style.color = isErr ? '#ffb4b4' : '#baffc9';
 
     }
 
 
 
-    return urls;
+    // 4) رفع الملفات إلى bucket homeowner_uploads
 
-  }
+    async function uploadJobFiles(files){
 
+      const bucket = 'homeowner_uploads';
 
-
-  // 4) الحدث
-
-  postBtn.addEventListener('click', async () => {
-
-    showMsg('', false);
+      const urls = [];
 
 
 
-    // جمع البيانات
+      for (const file of files){
 
-    const payload = {
+        const ext = file.name.split('.').pop();
 
-      category: 'General',
-
-      title: titleInput?.value.trim() || '',
-
-      summary: summaryInput?.value.trim() || '',
-
-      city: cityInput?.value.trim() || '',
-
-      state: stateInput?.value.trim() || '',
-
-      zip: '', // ما عندك حقل ظاهر بالواجهة
-
-      budget_from: budgetFromInp?.value.trim() || '',
-
-      budget_to: budgetToInp?.value.trim() || '',
-
-      contact_name: contactInput?.value.trim() || '',
-
-      phone: phoneInput?.value.trim() || '',
-
-      email: emailInput?.value.trim() || '',
-
-      full_address: addressInput?.value.trim() || '',
-
-      description: descTextarea?.value.trim() || '',
-
-    };
+        const newName = `job-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
 
 
-    // تحقق بسيط مثل اللي كان عندك
+        const { data, error } = await supabase
 
-    if (!payload.title || !payload.contact_name || !payload.phone || !payload.email) {
+          .storage
 
-      showMsg('Please fill title, contact name, phone and email.', true);
+          .from(bucket)
 
-      return;
-
-    }
+          .upload(newName, file);
 
 
 
-    // تعطيل الزر
+        if (error){
 
-    const originalText = postBtn.textContent;
+          console.warn('upload error', error.message);
 
-    postBtn.disabled = true;
+          continue; // نكمل حتى لو فشل واحد
 
-    postBtn.textContent = 'Posting...';
+        }
 
 
 
-    try {
+        const { data: pub } = supabase
 
-      // أولاً: رفع الصور لو فيه
+          .storage
 
-      let photo_urls = [];
+          .from(bucket)
 
-      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          .getPublicUrl(newName);
 
-        photo_urls = await uploadFilesToSupabase(fileInput.files);
+
+
+        if (pub?.publicUrl){
+
+          urls.push(pub.publicUrl);
+
+        }
 
       }
 
 
 
-      // ثانياً: إدخال الصف في homeowner_jobs
+      return urls;
 
-      const { data, error } = await supabase
-
-        .from('homeowner_jobs')
-
-        .insert([{
-
-          category: payload.category,
-
-          title: payload.title,
-
-          summary: payload.summary,
-
-          city: payload.city,
-
-          state: payload.state,
-
-          zip: payload.zip,
-
-          budget_from: payload.budget_from,
-
-          budget_to: payload.budget_to,
-
-          contact_name: payload.contact_name,
-
-          phone: payload.phone,
-
-          email: payload.email,
-
-          full_address: payload.full_address,
-
-          description: payload.description,
-
-          photo_urls: photo_urls.length ? photo_urls : null
-
-        }])
-
-        .select()
-
-        .single();
+    }
 
 
 
-      if (error) {
+    // 5) حدث الإرسال
 
-        console.error(error);
+    postBtn.addEventListener('click', async () => {
 
-        showMsg('DB error: ' + error.message, true);
+      // تحقق من الحقول المهمة
 
-      } else {
+      if (!titleInput.value.trim() ||
 
-        showMsg('Job posted successfully!');
+          !contactInput.value.trim() ||
+
+          !phoneInput.value.trim() ||
+
+          !emailInput.value.trim() ||
+
+          !addressInput.value.trim() ||
+
+          !descInput.value.trim()){
+
+        showMsg('Please fill required fields (title, contact, phone, email, address, description).', true);
+
+        return;
 
       }
 
 
 
-    } catch (err) {
+      postBtn.disabled = true;
 
-      console.error(err);
+      const prevLabel = postBtn.textContent;
 
-      showMsg('Unexpected error: ' + err.message, true);
+      postBtn.textContent = 'Posting...';
 
-    } finally {
+      showMsg('');
 
-      postBtn.disabled = false;
 
-      postBtn.textContent = originalText;
 
-    }
+      try {
 
-  });
+        // رفع الصور (لو فيه)
 
-</script>
+        let photoUrls = [];
+
+        if (fileInput.files && fileInput.files.length){
+
+          photoUrls = await uploadJobFiles(fileInput.files);
+
+        }
+
+
+
+        // إدخال البيانات
+
+        const { data, error } = await supabase
+
+          .from('homeowner_jobs')
+
+          .insert([{
+
+            category: 'General',
+
+            title: titleInput.value.trim(),
+
+            summary: summaryInput.value.trim(),
+
+            city: cityInput.value.trim(),
+
+            state: stateInput.value.trim(),
+
+            zip: '',                // تقدر تضيف حقل ZIP بعدين
+
+            budget_from: budgetFrom.value.trim(),
+
+            budget_to: budgetTo.value.trim(),
+
+            contact_name: contactInput.value.trim(),
+
+            phone: phoneInput.value.trim(),
+
+            email: emailInput.value.trim(),
+
+            full_address: addressInput.value.trim(),
+
+            description: descInput.value.trim(),
+
+            photo_urls: photoUrls.length ? photoUrls : null
+
+          }])
+
+          .select()
+
+          .single();
+
+
+
+        if (error){
+
+          console.error(error);
+
+          showMsg('DB error: ' + error.message, true);
+
+        } else {
+
+          showMsg('Job posted successfully! ✅');
+
+          // تفريغ الحقول
+
+          titleInput.value = '';
+
+          summaryInput.value = '';
+
+          cityInput.value = '';
+
+          stateInput.value = '';
+
+          budgetFrom.value = '';
+
+          budgetTo.value = '';
+
+          contactInput.value = '';
+
+          phoneInput.value = '';
+
+          emailInput.value = '';
+
+          addressInput.value = '';
+
+          descInput.value = '';
+
+          if (fileInput.value) fileInput.value = '';
+
+        }
+
+
+
+      } catch (err){
+
+        console.error(err);
+
+        showMsg('Unexpected error: ' + err.message, true);
+
+      } finally {
+
+        postBtn.disabled = false;
+
+        postBtn.textContent = prevLabel;
+
+      }
+
+    });
+
+  </script>
+
+</body>
+
+</html>
