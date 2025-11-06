@@ -1,4 +1,4 @@
-// netlify/functions/save-pro.js
+// netlify/functions/save-profile.js
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -20,15 +20,7 @@ exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') {
 
-    return {
-
-      statusCode: 200,
-
-      headers: corsHeaders,
-
-      body: 'OK',
-
-    };
+    return { statusCode: 200, headers: corsHeaders, body: 'OK' };
 
   }
 
@@ -50,39 +42,47 @@ exports.handler = async (event) => {
 
 
 
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+
+  // جرّب السيرفس، لو مو مضبوط استخدم anon
+
+  const SUPABASE_KEY =
+
+    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+
+
+
+  console.log('SUPABASE_URL =', SUPABASE_URL);
+
+  console.log('SUPABASE_KEY length =', SUPABASE_KEY ? SUPABASE_KEY.length : 0);
+
+
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+
+    return {
+
+      statusCode: 500,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Supabase env vars missing' }),
+
+    };
+
+  }
+
+
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+
   try {
-
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-
-    const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
-
-
-
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
-
-      return {
-
-        statusCode: 500,
-
-        headers: corsHeaders,
-
-        body: JSON.stringify({ ok: false, error: 'Supabase env vars missing' }),
-
-      };
-
-    }
-
-
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE);
-
-
 
     const payload = JSON.parse(event.body || '{}');
 
 
-
-    // نتأكد ما يكون فاضي
 
     if (!payload.email) {
 
@@ -104,27 +104,31 @@ exports.handler = async (event) => {
 
       .from('pros_signups')
 
-      .insert([{
+      .insert([
 
-        name: payload.name || null,
+        {
 
-        email: payload.email || null,
+          name: payload.name || null,
 
-        phone: payload.phone || null,
+          email: payload.email || null,
 
-        address: payload.address || null,
+          phone: payload.phone || null,
 
-        license: payload.license || null,
+          address: payload.address || null,
 
-        insurance: payload.insurance || null,
+          license: payload.license || null,
 
-        notes: payload.notes || null,
+          insurance: payload.insurance || null,
 
-        stripe_customer_id: payload.stripe_customer_id || null,
+          notes: payload.notes || null,
 
-        stripe_subscription_id: payload.stripe_subscription_id || null,
+          stripe_customer_id: payload.stripe_customer_id || null,
 
-      }])
+          stripe_subscription_id: payload.stripe_subscription_id || null,
+
+        },
+
+      ])
 
       .select()
 
