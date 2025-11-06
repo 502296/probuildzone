@@ -16,7 +16,7 @@ const corsHeaders = {
 
 exports.handler = async (event) => {
 
-  // preflight
+  // للـ CORS
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -34,6 +34,8 @@ exports.handler = async (event) => {
 
 
 
+  // ما نقبل غير POST
+
   if (event.httpMethod !== 'POST') {
 
     return {
@@ -50,13 +52,15 @@ exports.handler = async (event) => {
 
 
 
-  const SUPABASE_URL = process.env.SUPABASE_URL;            // مثل: https://xxxx.supabase.co
+  const SUPABASE_URL = process.env.SUPABASE_URL; // مثال: https://xxxx.supabase.co
 
-  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+  const SUPABASE_KEY =
+
+    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
 
 
-  // نخليها ترجع لك الطول عشان تتأكد بنفسك
+  // لو مافي مفاتيح
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
 
@@ -70,11 +74,7 @@ exports.handler = async (event) => {
 
         ok: false,
 
-        error: 'Missing Supabase env vars',
-
-        url: SUPABASE_URL,
-
-        keyLength: SUPABASE_KEY ? SUPABASE_KEY.length : 0,
+        error: 'Supabase env vars missing',
 
       }),
 
@@ -84,13 +84,17 @@ exports.handler = async (event) => {
 
 
 
-  // نزيل أي / زيادة آخر الرابط
+  // نتأكد ماكو سلاش زايد
 
   const baseUrl = SUPABASE_URL.replace(/\/+$/, '');
+
+  // اسم الجدول لازم يكون موجود في Supabase
 
   const tableUrl = `${baseUrl}/rest/v1/pros_signups`;
 
 
+
+  // نقرأ البودي
 
   let payload = {};
 
@@ -114,8 +118,6 @@ exports.handler = async (event) => {
 
 
 
-  // لو ما فيه ايميل نوقف
-
   if (!payload.email) {
 
     return {
@@ -134,6 +136,8 @@ exports.handler = async (event) => {
 
   try {
 
+    // هنا الاتصال المباشر مع REST
+
     const resp = await fetch(tableUrl, {
 
       method: 'POST',
@@ -141,8 +145,6 @@ exports.handler = async (event) => {
       headers: {
 
         'Content-Type': 'application/json',
-
-        // هذان المطلوبان مع REST
 
         apikey: SUPABASE_KEY,
 
@@ -182,7 +184,7 @@ exports.handler = async (event) => {
 
 
 
-    // نرجعه كما هو حتى لو كان خطأ من Supabase
+    // نرجّع نفس اللي رجعه Supabase (عشان تشوف الخطأ لو فيه)
 
     return {
 
@@ -202,7 +204,7 @@ exports.handler = async (event) => {
 
   } catch (err) {
 
-    // لو كان فيه خطأ غريب زي اللي عندك
+    // لو صار خطأ جوّا الفنكشن نفسها
 
     return {
 
@@ -215,12 +217,6 @@ exports.handler = async (event) => {
         ok: false,
 
         error: err.message,
-
-        // هذا يساعدنا نعرف طول المفتاح اللي وصل للفنكشن
-
-        keyLength: SUPABASE_KEY.length,
-
-        urlUsed: tableUrl,
 
       }),
 
