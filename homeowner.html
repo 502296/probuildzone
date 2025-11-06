@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Post a Job – ProBuildZone</title>
+  <title>Post a Job — ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -16,297 +16,273 @@
 
   <style>
 
-    :root{
+    :root {
 
-      --bg:#0f1730;
+      --pbz: #0F2A43;
 
-      --card:#0f1d35;
+      --gold: #D4AF37;
 
-      --accent:#0ba5ff;
+      --muted: #64748b;
 
-      --input:#0b1324;
-
-      --border:#1f2b44;
+      --bg: #f3f5f7;
 
     }
 
-    *{box-sizing:border-box}
+    * { box-sizing: border-box; }
 
-    body{
+    body {
 
-      margin:0;
+      margin: 0;
 
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background: var(--bg);
 
-      background:linear-gradient(160deg,#0b1021,#0f1730 60%,#0f1730);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
 
-      color:#fff;
+      color: #0f172a;
 
-      min-height:100vh;
+      min-height: 100vh;
 
-      display:flex;
+      display: flex;
 
-      justify-content:center;
+      align-items: center;
 
-      align-items:flex-start;
+      justify-content: center;
 
-      padding:28px 12px 48px;
-
-    }
-
-    .wrapper{
-
-      width:100%;
-
-      max-width:720px;
-
-      background:rgba(10,16,30,.3);
-
-      border:1px solid rgba(255,255,255,.04);
-
-      border-radius:18px;
-
-      backdrop-filter:blur(14px);
-
-      box-shadow:0 20px 50px rgba(0,0,0,.25);
-
-      overflow:hidden;
+      padding: 26px 14px 40px;
 
     }
 
-    .head{
+    .card {
 
-      padding:16px 18px 10px;
+      width: min(920px, 100%);
 
-      border-bottom:1px solid rgba(255,255,255,.03);
+      background: #fff;
 
-      display:flex;
+      border: 1px solid #e2e8f0;
 
-      justify-content:space-between;
+      border-radius: 18px;
 
-      align-items:center;
+      box-shadow: 0 16px 35px rgba(15, 42, 67, 0.04);
 
-      gap:10px;
-
-    }
-
-    h1{
-
-      font-size:20px;
-
-      margin:0;
+      padding: 20px 20px 24px;
 
     }
 
-    .btn-small{
+    h1 {
 
-      background:rgba(255,255,255,.04);
+      margin: 0 0 8px;
 
-      border:1px solid rgba(255,255,255,.08);
+      font-size: 24px;
 
-      border-radius:10px;
-
-      color:#fff;
-
-      padding:6px 12px;
-
-      cursor:pointer;
+      color: var(--pbz);
 
     }
 
-    form{
+    .subtitle {
 
-      padding:16px 18px 22px;
+      color: var(--muted);
 
-    }
+      margin-bottom: 18px;
 
-    label{
-
-      display:block;
-
-      font-weight:500;
-
-      margin-bottom:6px;
+      font-size: 14px;
 
     }
 
-    input,select,textarea{
+    label {
 
-      width:100%;
+      display: block;
 
-      background:rgba(0,0,0,.25);
+      font-weight: 500;
 
-      border:1px solid rgba(255,255,255,.03);
-
-      border-radius:10px;
-
-      padding:10px 12px;
-
-      color:#fff;
-
-      font:inherit;
-
-      outline:none;
+      margin-bottom: 6px;
 
     }
 
-    input:focus,select:focus,textarea:focus{
+    input, select, textarea {
 
-      border-color:rgba(11,165,255,.6);
+      width: 100%;
 
-      background:rgba(11,165,255,.06);
+      border: 1px solid #d0d7e2;
 
-    }
+      border-radius: 10px;
 
-    textarea{min-height:110px;resize:vertical}
+      padding: 10px 11px;
 
-    .grid{
+      font: inherit;
 
-      display:grid;
-
-      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-
-      gap:12px 14px;
+      background: #fff;
 
     }
 
-    .full{grid-column:1/-1}
+    input:focus, select:focus, textarea:focus {
 
-    .upload-box{
+      outline: none;
 
-      border:1px dashed rgba(255,255,255,.15);
+      border-color: #0b70ff;
 
-      background:rgba(0,0,0,.12);
-
-      border-radius:12px;
-
-      padding:12px 12px 6px;
-
-      margin-bottom:14px;
+      box-shadow: 0 0 0 3px rgba(11, 112, 255, 0.09);
 
     }
 
-    .upload-box small{opacity:.6}
+    textarea { min-height: 95px; resize: vertical; }
 
-    .actions{
 
-      margin-top:18px;
 
-      display:flex;
+    .grid {
 
-      justify-content:flex-start;
+      display: grid;
 
-      gap:10px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 
-      align-items:center;
+      gap: 14px 16px;
 
     }
 
-    .btn-main{
 
-      background:var(--accent);
 
-      border:none;
+    .full { grid-column: 1 / -1; }
 
-      color:#fff;
 
-      font-weight:600;
 
-      border-radius:15px;
+    .upload-box {
 
-      padding:11px 26px;
+      border: 1px dashed #cbd5e1;
 
-      cursor:pointer;
+      border-radius: 10px;
 
-      display:inline-flex;
+      padding: 12px 14px;
 
-      gap:6px;
-
-      align-items:center;
+      background: #f8fafc;
 
     }
 
-    #hoError{
+    .upload-box small { color: #94a3b8; }
 
-      margin-top:12px;
 
-      background:rgba(255,69,58,.12);
 
-      border:1px solid rgba(255,69,58,.35);
+    .actions {
 
-      border-radius:10px;
+      margin-top: 20px;
 
-      padding:10px 12px;
+      display: flex;
 
-      color:#ffd6d2;
+      gap: 12px;
 
-      display:none;
-
-      white-space:pre-wrap;
+      flex-wrap: wrap;
 
     }
 
-    #hoSuccess{
+    button {
 
-      margin-top:12px;
+      border: none;
 
-      background:rgba(35,195,81,.12);
+      cursor: pointer;
 
-      border:1px solid rgba(35,195,81,.3);
-
-      border-radius:10px;
-
-      padding:10px 12px;
-
-      color:#dcffe5;
-
-      display:none;
+      font-weight: 600;
 
     }
 
-    @media (max-width:540px){
+    .btn-main {
 
-      .head{flex-wrap:wrap}
+      background: var(--gold);
 
-      .actions{flex-direction:column;align-items:flex-start}
+      color: #000;
 
-      .btn-main{width:100%;justify-content:center}
+      padding: 11px 18px;
+
+      border-radius: 10px;
+
+    }
+
+    .btn-sec {
+
+      background: #e2e8f0;
+
+      color: #0f172a;
+
+      padding: 11px 18px;
+
+      border-radius: 10px;
+
+    }
+
+    .alert {
+
+      margin-top: 14px;
+
+      background: #fee2e2;
+
+      border: 1px solid #fecaca;
+
+      border-radius: 10px;
+
+      padding: 8px 12px;
+
+      color: #b91c1c;
+
+      display: none;
+
+      white-space: pre-wrap;
+
+    }
+
+    .success {
+
+      margin-top: 14px;
+
+      background: #ecfdf3;
+
+      border: 1px solid #bbf7d0;
+
+      border-radius: 10px;
+
+      padding: 8px 12px;
+
+      color: #166534;
+
+      display: none;
+
+    }
+
+    @media (max-width: 600px) {
+
+      body { padding: 18px 10px 30px; }
+
+      .card { padding: 16px 14px 20px; }
+
+      .actions { flex-direction: column; }
+
+      .btn-main, .btn-sec { width: 100%; text-align: center; }
 
     }
 
   </style>
 
+  <!-- Supabase CDN -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 </head>
 
 <body>
 
+  <div class="card">
 
+    <h1>Post a Job</h1>
 
-  <div class="wrapper">
-
-    <div class="head">
-
-      <button class="btn-small" type="button" onclick="history.back()">← Back</button>
-
-      <h1>Post a Job</h1>
-
-      <button class="btn-small" type="button" onclick="location.href='/'">Close</button>
-
-    </div>
+    <p class="subtitle">Fill in your project details so contractors can review it.</p>
 
 
 
-    <form id="hoForm">
+    <form id="hoForm" novalidate>
 
-      <!-- رفع الصور -->
+      <div class="upload-box full" style="margin-bottom:14px;">
 
-      <div class="upload-box">
+        <label for="hoPhotos">Project photos / files (optional)</label>
 
-        <label for="hoPhotos">📁 Choose Photos/Files</label>
+        <input id="hoPhotos" type="file" multiple />
 
-        <input id="hoPhotos" type="file" multiple>
-
-        <small>You can select multiple photos or a PDF (optional)</small>
+        <small>You can add photos or a PDF plan. Max size per file = 50MB.</small>
 
       </div>
 
@@ -316,11 +292,49 @@
 
         <div class="full">
 
-          <label for="hoTitle">Project title *</label>
+          <label for="hoCategory">Category</label>
 
-          <input id="hoTitle" placeholder="e.g., Replace leaking roof" required>
+          <select id="hoCategory">
+
+            <option value="Roofing">Roofing</option>
+
+            <option value="Decks & Porches">Decks &amp; Porches</option>
+
+            <option value="Kitchens">Kitchens</option>
+
+            <option value="Bathrooms">Bathrooms</option>
+
+            <option value="Flooring">Flooring</option>
+
+            <option value="Painting">Painting</option>
+
+            <option value="Masonry">Masonry</option>
+
+            <option value="Electrical">Electrical</option>
+
+            <option value="Plumbing">Plumbing</option>
+
+            <option value="Windows & Doors">Windows &amp; Doors</option>
+
+            <option value="Landscaping">Landscaping</option>
+
+            <option value="Handyman">Handyman</option>
+
+          </select>
 
         </div>
+
+
+
+        <div class="full">
+
+          <label for="hoTitle">Project title *</label>
+
+          <input id="hoTitle" placeholder="Replace leaking roof" required>
+
+        </div>
+
+
 
         <div class="full">
 
@@ -330,27 +344,31 @@
 
         </div>
 
+
+
         <div>
 
-          <label for="hoCity">City *</label>
+          <label for="hoCity">City</label>
 
-          <input id="hoCity" placeholder="Enter your city" required>
+          <input id="hoCity" placeholder="Enter your city">
 
         </div>
 
         <div>
 
-          <label for="hoState">State *</label>
+          <label for="hoState">State</label>
 
-          <input id="hoState" placeholder="Enter your state" required>
+          <input id="hoState" placeholder="Enter your state">
 
         </div>
+
+
 
         <div>
 
           <label for="hoBudgetFrom">Budget From ($)</label>
 
-          <input id="hoBudgetFrom" type="number" min="0" step="1" placeholder="From">
+          <input id="hoBudgetFrom" type="number" min="0" placeholder="e.g. 500">
 
         </div>
 
@@ -358,9 +376,11 @@
 
           <label for="hoBudgetTo">Budget To ($)</label>
 
-          <input id="hoBudgetTo" type="number" min="0" step="1" placeholder="To">
+          <input id="hoBudgetTo" type="number" min="0" placeholder="e.g. 1500">
 
         </div>
+
+
 
         <div>
 
@@ -406,13 +426,15 @@
 
 
 
-      <div id="hoError"></div>
+      <div id="hoAlert" class="alert"></div>
 
-      <div id="hoSuccess"></div>
+      <div id="hoSuccess" class="success">Job posted successfully!</div>
 
 
 
       <div class="actions">
+
+        <button type="reset" class="btn-sec">Reset</button>
 
         <button id="hoPostBtn" type="button" class="btn-main">🚀 Post Job</button>
 
@@ -424,137 +446,127 @@
 
 
 
-  <!-- supabase js -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
-
   <script>
 
-    // ✏️ غيّر هذول السطرين من مشروعك
+    // 1) عدّل هذول بالقيم الصحيحة من مشروعك
 
     const SUPABASE_URL = 'https://hczahffwghbddqabpbmu.supabase.co';
 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
+    const SUPABASE_KEY = 'PUT_YOUR_ANON_PUBLIC_KEY_HERE';
 
 
+
+    // 2) إنشاء عميل Supabase
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 
-    const form = document.getElementById('hoForm');
+    const alertBox = document.getElementById('hoAlert');
+
+    const successBox = document.getElementById('hoSuccess');
 
     const btn = document.getElementById('hoPostBtn');
 
-    const errBox = document.getElementById('hoError');
-
-    const okBox = document.getElementById('hoSuccess');
 
 
+    function showError(msg) {
 
-    function showErr(msg){
+      alertBox.textContent = msg;
 
-      errBox.textContent = 'Error: ' + msg;
+      alertBox.style.display = 'block';
 
-      errBox.style.display = 'block';
-
-      okBox.style.display = 'none';
+      successBox.style.display = 'none';
 
     }
 
-    function showOk(msg){
+    function showSuccess(msg) {
 
-      okBox.textContent = msg;
+      successBox.textContent = msg;
 
-      okBox.style.display = 'block';
+      successBox.style.display = 'block';
 
-      errBox.style.display = 'none';
+      alertBox.style.display = 'none';
+
+    }
+
+    function clearMsg() {
+
+      alertBox.style.display = 'none';
+
+      successBox.style.display = 'none';
 
     }
 
 
 
-    async function uploadFiles(files, jobId){
+    // رفع مجموعة ملفات
 
-      const paths = [];
+    async function uploadFiles(files) {
 
-      for (const file of files){
+      const bucket = 'homeowner_uploads';
 
-        const fileName = `${jobId}/${Date.now()}-${file.name}`;
+      const uploaded = [];
+
+
+
+      for (const file of files) {
+
+        const fileName = `job-${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name}`;
 
         const { data, error } = await supabase
 
           .storage
 
-          .from('homeowner_uploads')
+          .from(bucket)
 
           .upload(fileName, file);
 
-        if (error){
+
+
+        if (error) {
 
           console.warn('upload error', error.message);
 
-          continue;
+          // نكمّل حتى لو وحدة فشلت
+
+        } else {
+
+          uploaded.push(fileName);
 
         }
 
-        paths.push(fileName);
-
-        // اختياري: خزّنها بجدول ثاني
-
-        await supabase.from('homeowner_job_photos').insert({
-
-          job_id: jobId,
-
-          path: fileName
-
-        });
-
       }
 
-      return paths;
+      return uploaded;
 
     }
 
 
 
-    async function postJob(){
+    async function postJob() {
 
-      errBox.style.display = 'none';
-
-      okBox.style.display = 'none';
+      clearMsg();
 
 
 
       const title = document.getElementById('hoTitle').value.trim();
 
-      const summary = document.getElementById('hoSummary').value.trim();
-
-      const city = document.getElementById('hoCity').value.trim();
-
-      const state = document.getElementById('hoState').value.trim();
-
-      const budget_from = document.getElementById('hoBudgetFrom').value.trim();
-
-      const budget_to = document.getElementById('hoBudgetTo').value.trim();
-
-      const contact_name = document.getElementById('hoContactName').value.trim();
+      const contact = document.getElementById('hoContactName').value.trim();
 
       const phone = document.getElementById('hoPhone').value.trim();
 
       const email = document.getElementById('hoEmail').value.trim();
 
-      const full_address = document.getElementById('hoFullAddress').value.trim();
+      const addr = document.getElementById('hoFullAddress').value.trim();
 
-      const description = document.getElementById('hoDescription').value.trim();
-
-      const files = document.getElementById('hoPhotos').files;
+      const desc = document.getElementById('hoDescription').value.trim();
 
 
 
-      if (!title || !city || !state || !contact_name || !phone || !email || !full_address || !description){
+      if (!title || !contact || !phone || !email || !addr || !desc) {
 
-        showErr('Please fill all required fields.');
+        showError('Please fill all required fields (*)');
 
         return;
 
@@ -568,77 +580,81 @@
 
 
 
-      // 1) أضف الصف في homeowner_jobs
+      // 1) ارفع الصور أول
+
+      const fileInput = document.getElementById('hoPhotos');
+
+      const uploadedPaths = fileInput.files.length
+
+        ? await uploadFiles(fileInput.files)
+
+        : [];
+
+
+
+      // 2) خزّن الطلب
 
       const { data, error } = await supabase
 
         .from('homeowner_jobs')
 
-        .insert({
+        .insert([
 
-          category: null,        // انت بعدين تحطها من اختيار الأيقونة
+          {
 
-          title,
+            homeowner_id: null,
 
-          summary,
+            category: document.getElementById('hoCategory').value,
 
-          city,
+            title: title,
 
-          state,
+            summary: document.getElementById('hoSummary').value.trim(),
 
-          budget_from: budget_from ? Number(budget_from) : null,
+            city: document.getElementById('hoCity').value.trim(),
 
-          budget_to: budget_to ? Number(budget_to) : null,
+            state: document.getElementById('hoState').value.trim(),
 
-          contact_name,
+            budget_from: document.getElementById('hoBudgetFrom').value || null,
 
-          phone,
+            budget_to: document.getElementById('hoBudgetTo').value || null,
 
-          email,
+            contact_name: contact,
 
-          full_address,
+            phone: phone,
 
-          description
+            email: email,
 
-        })
+            full_address: addr,
 
-        .select('id')
+            description: desc,
+
+            photo_paths: uploadedPaths  // لازم يكون العمود موجود أو تحذفه
+
+          }
+
+        ])
+
+        .select()
 
         .single();
 
 
 
-      if (error){
+      if (error) {
 
-        showErr(error.message);
+        console.error(error);
 
-        btn.disabled = false;
+        showError('Error: ' + error.message);
 
-        btn.textContent = '🚀 Post Job';
+      } else {
 
-        return;
+        showSuccess('Job posted successfully!');
 
-      }
-
-
-
-      const jobId = data.id;
-
-
-
-      // 2) ارفع الملفات (لو فيه)
-
-      if (files && files.length > 0){
-
-        await uploadFiles(files, jobId);
+        document.getElementById('hoForm').reset();
 
       }
 
 
-
-      showOk('Job posted successfully!');
-
-      form.reset();
 
       btn.disabled = false;
 
