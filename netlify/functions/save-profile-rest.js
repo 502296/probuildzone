@@ -2,23 +2,23 @@
 
 
 
-const corsHeaders = {
+export async function handler(event) {
 
-  'Access-Control-Allow-Origin': '*',
+  const headers = {
 
-  'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': '*',
 
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
 
-};
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+  };
 
 
-
-exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') {
 
-    return { statusCode: 200, headers: corsHeaders, body: 'OK' };
+    return { statusCode: 200, headers, body: 'OK' };
 
   }
 
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
 
       statusCode: 405,
 
-      headers: corsHeaders,
+      headers,
 
       body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
 
@@ -42,9 +42,7 @@ exports.handler = async (event) => {
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
 
-  const SUPABASE_KEY =
-
-    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE;
 
 
 
@@ -54,13 +52,13 @@ exports.handler = async (event) => {
 
       statusCode: 500,
 
-      headers: corsHeaders,
+      headers,
 
       body: JSON.stringify({
 
         ok: false,
 
-        error: 'Supabase env vars missing',
+        error: 'Missing Supabase environment variables',
 
       }),
 
@@ -70,17 +68,11 @@ exports.handler = async (event) => {
 
 
 
-  const baseUrl = SUPABASE_URL.replace(/\/+$/, '');
-
-  const tableUrl = `${baseUrl}/rest/v1/pros_signups`;
-
-
-
-  let payload = {};
+  let payload;
 
   try {
 
-    payload = JSON.parse(event.body || '{}');
+    payload = JSON.parse(event.body);
 
   } catch (e) {
 
@@ -88,7 +80,7 @@ exports.handler = async (event) => {
 
       statusCode: 400,
 
-      headers: corsHeaders,
+      headers,
 
       body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }),
 
@@ -98,25 +90,9 @@ exports.handler = async (event) => {
 
 
 
-  if (!payload.email) {
-
-    return {
-
-      statusCode: 400,
-
-      headers: corsHeaders,
-
-      body: JSON.stringify({ ok: false, error: 'email is required' }),
-
-    };
-
-  }
-
-
-
   try {
 
-    const resp = await fetch(tableUrl, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/pros_signups`, {
 
       method: 'POST',
 
@@ -132,45 +108,23 @@ exports.handler = async (event) => {
 
       },
 
-      body: JSON.stringify({
-
-        name: payload.name || null,
-
-        email: payload.email || null,
-
-        phone: payload.phone || null,
-
-        address: payload.address || null,
-
-        license: payload.license || null,
-
-        insurance: payload.insurance || null,
-
-        notes: payload.notes || null,
-
-      }),
+      body: JSON.stringify(payload),
 
     });
 
 
 
-    const text = await resp.text();
+    const data = await response.text();
 
 
 
     return {
 
-      statusCode: resp.status,
+      statusCode: response.status,
 
-      headers: {
+      headers,
 
-        ...corsHeaders,
-
-        'Content-Type': 'application/json',
-
-      },
-
-      body: text,
+      body: data,
 
     };
 
@@ -180,18 +134,12 @@ exports.handler = async (event) => {
 
       statusCode: 500,
 
-      headers: corsHeaders,
+      headers,
 
-      body: JSON.stringify({
-
-        ok: false,
-
-        error: err.message,
-
-      }),
+      body: JSON.stringify({ ok: false, error: err.message }),
 
     };
 
   }
 
-};
+}
