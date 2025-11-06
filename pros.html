@@ -98,6 +98,8 @@
 
     }
 
+
+
     .agree{
 
       margin-top:14px;
@@ -133,6 +135,8 @@
     }
 
     .agree a{color:#0b70ff;text-decoration:underline}
+
+
 
     .actions{
 
@@ -206,12 +210,6 @@
 
   </style>
 
-
-
-  <!-- Supabase للاتصال المباشر (بسبب إيقاف Netlify) -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 
 <body>
@@ -222,8 +220,6 @@
 
     <div class="card">
 
-      <!-- عطيناه autocomplete="off" عشان ما يرجّع بياناتك -->
-
       <form id="prosForm" novalidate autocomplete="off">
 
         <div class="grid">
@@ -232,7 +228,9 @@
 
             <label for="name">Business / Owner name</label>
 
-            <input id="name" name="name" placeholder="John &amp; Sons Builders" required autocomplete="off">
+            <!-- kept id=name but changed name to pro_name to prevent browser autofill -->
+
+            <input id="name" name="pro_name" placeholder="John &amp; Sons Builders" required autocomplete="off">
 
           </div>
 
@@ -240,7 +238,7 @@
 
             <label for="email">Email</label>
 
-            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="off">
+            <input id="email" name="pro_email" type="email" placeholder="you@example.com" required autocomplete="off">
 
           </div>
 
@@ -248,7 +246,7 @@
 
             <label for="phone">Phone</label>
 
-            <input id="phone" name="phone" placeholder="5022968111" required autocomplete="off">
+            <input id="phone" name="pro_phone" placeholder="5022968111" required autocomplete="off">
 
           </div>
 
@@ -256,7 +254,7 @@
 
             <label for="address">Business address</label>
 
-            <input id="address" name="address" placeholder="266 Eldorado Ave" autocomplete="off">
+            <input id="address" name="pro_address" placeholder="266 Eldorado Ave" autocomplete="off">
 
           </div>
 
@@ -264,7 +262,7 @@
 
             <label for="license">Business license / #</label>
 
-            <input id="license" name="license" placeholder="KY-123456" required autocomplete="off">
+            <input id="license" name="pro_license" placeholder="KY-123456" required autocomplete="off">
 
           </div>
 
@@ -272,7 +270,7 @@
 
             <label for="insurance">Insurance (optional)</label>
 
-            <select id="insurance" name="insurance">
+            <select id="insurance" name="pro_insurance" autocomplete="off">
 
               <option value="">— Select —</option>
 
@@ -290,7 +288,7 @@
 
             <label for="notes">Services &amp; notes (optional)</label>
 
-            <textarea id="notes" name="notes" placeholder="Short description of services..."></textarea>
+            <textarea id="notes" name="pro_notes" placeholder="Short description of services..."></textarea>
 
           </div>
 
@@ -336,6 +334,12 @@
 
 
 
+  <!-- Supabase client (CDN). Keep or change the version as you like -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+
+
   <script>
 
     const form = document.getElementById('prosForm');
@@ -346,13 +350,39 @@
 
 
 
-    // لو على netlify استخدم مسار نسبي
+    // If site is running on Netlify subdomain, use relative (Netlify functions path).
 
-    const BASE = location.hostname.endsWith('netlify.app')
+    // If you test locally or elsewhere, adjust BASE to your deployed URL.
 
-      ? ''
+    const BASE = location.hostname.endsWith('netlify.app') ? '' : 'https://probuildzone.netlify.app';
 
-      : 'https://probuildzone.netlify.app';
+
+
+    // --- SUPABASE CONFIG: replace these with your real values ---
+
+    // Go to your Supabase project > Settings > API to get the project ref and anon key
+
+    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co'; // <-- replace
+
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY'; // <-- replace
+
+    // ----------------------------------------------------------------
+
+    // If you don't want direct Supabase from client, leave keys empty and the code will
+
+    // still try the Netlify function. But direct insert is helpful when Netlify is paused.
+
+    let supabase = null;
+
+    try {
+
+      if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      }
+
+    } catch(e){ console.warn('Supabase init error', e); }
 
 
 
@@ -374,19 +404,13 @@
 
 
 
-    // 👇 أول ما تفتح الصفحة نمسح التخزين المحلي عشان ما يطلع اسمك لصديقك
+    // wipe fields helper — used to remove autofill data that browsers insert
 
-    window.addEventListener('DOMContentLoaded', () => {
+    function wipeFields() {
 
-      try {
+      const ids = ['name','email','phone','address','license','notes'];
 
-        localStorage.removeItem('pbz_form_data');
-
-      } catch(e){}
-
-      // نفرغ الحقول يدويًا تحسبًا للمتصفح
-
-      ['name','email','phone','address','license','notes'].forEach(id => {
+      ids.forEach(id => {
 
         const el = document.getElementById(id);
 
@@ -394,17 +418,25 @@
 
       });
 
+    }
+
+
+
+    // remove local stored form (safety on load)
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+      try { localStorage.removeItem('pbz_form_data'); } catch(e) {}
+
+      wipeFields();
+
+      // some browsers fill inputs slightly later -> remove again
+
+      setTimeout(wipeFields, 300);
+
+      setTimeout(wipeFields, 1000);
+
     });
-
-
-
-    // 👇 بيانات Supabase (بدّل القيمتين)
-
-    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-
-    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
-
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
 
@@ -444,13 +476,9 @@
 
 
 
-      // نخزنها محليًا (ولو ما احتجتها تقدر تشيلها بعدين)
+      // store locally (optional)
 
-      try {
-
-        localStorage.setItem('pbz_form_data', JSON.stringify(payload));
-
-      } catch(e){}
+      try { localStorage.setItem('pbz_form_data', JSON.stringify(payload)); } catch(e){}
 
 
 
@@ -460,51 +488,61 @@
 
 
 
-      // 1) نحفظ مباشرة في Supabase لأن Netlify موقوف
+      // 1) Try to save directly to Supabase first (useful if Netlify functions are paused).
 
-      try {
+      if (supabase) {
 
-        const { error } = await supabase
+        try {
 
-          .from('pros_signups')
+          const { error } = await supabase
 
-          .insert([{
+            .from('pros_signups')
 
-            name: payload.name,
+            .insert([{
 
-            email: payload.email,
+              name: payload.name,
 
-            phone: payload.phone,
+              email: payload.email,
 
-            address: payload.address,
+              phone: payload.phone,
 
-            license: payload.license,
+              address: payload.address,
 
-            insurance: payload.insurance || null,
+              license: payload.license,
 
-            notes: payload.notes || null,
+              insurance: payload.insurance || null,
 
-            stripe_customer_id: null,
+              notes: payload.notes || null,
 
-            stripe_subscription_id: null,
+              stripe_customer_id: null,
 
-          }]);
+              stripe_subscription_id: null,
 
-        if (error) {
+            }]);
 
-          console.warn('Supabase insert error:', error.message);
+          if (error) {
+
+            console.warn('Supabase insert error:', error.message);
+
+            // don't block user — continue to Stripe
+
+          }
+
+        } catch (err) {
+
+          console.warn('Supabase request error:', err);
 
         }
 
-      } catch (err) {
+      } else {
 
-        console.warn('Supabase request error:', err);
+        console.info('Supabase client not configured; skipping direct insert.');
 
       }
 
 
 
-      // 2) Stripe مثل ما هو بالضبط
+      // 2) Proceed to Stripe (call Netlify function as before)
 
       try {
 
