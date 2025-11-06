@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export const handler = async (event) => {
 
-  // السماح فقط بالـ POST
+  // نسمح فقط بالـ POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -24,17 +24,13 @@ export const handler = async (event) => {
 
   try {
 
-    // 1) قراءة البيانات القادمة من الفورم كـ JSON
-
-    const data = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
 
 
-
-    // 2) ربط Supabase من خلال متغيرات البيئة في Netlify
 
     const supabaseUrl = process.env.SUPABASE_URL;
 
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE; // حط السيرفس رول هنا
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE; // service_role من supabase
 
 
 
@@ -44,7 +40,7 @@ export const handler = async (event) => {
 
         statusCode: 500,
 
-        body: JSON.stringify({ error: 'Supabase env vars missing' }),
+        body: JSON.stringify({ ok: false, error: 'Supabase env vars missing' }),
 
       };
 
@@ -56,39 +52,35 @@ export const handler = async (event) => {
 
 
 
-    // 3) تجهيز الصف اللي راح ينحفظ
+    const row = {
 
-    const payload = {
+      name: body.name || null,
 
-      name: data.name || null,
+      email: body.email || null,
 
-      email: data.email || null,
+      phone: body.phone || null,
 
-      phone: data.phone || null,
+      address: body.address || null,
 
-      address: data.address || null,
+      license: body.license || null,
 
-      license: data.license || null,
+      insurance: body.insurance || null,
 
-      insurance: data.insurance || null,
+      notes: body.notes || null,
 
-      notes: data.notes || null,
+      // خليه فاضيين حالياً
 
-      stripe_customer_id: data.stripe_customer_id || null,
+      stripe_customer_id: body.stripe_customer_id || null,
 
-      stripe_subscription_id: data.stripe_subscription_id || null,
+      stripe_subscription_id: body.stripe_subscription_id || null,
 
     };
 
 
 
-    // 4) الإدخال في الجدول
+    // إدخال في pros_signups (الجدول اللي ظاهر عندك)
 
-    const { error } = await supabase
-
-      .from('pros_signups')
-
-      .insert([payload]);
+    const { error } = await supabase.from('pros_signups').insert([row]);
 
 
 
@@ -108,13 +100,11 @@ export const handler = async (event) => {
 
 
 
-    // 5) رجّع رد ناجح
-
     return {
 
       statusCode: 200,
 
-      body: JSON.stringify({ ok: true, message: 'Pro saved' }),
+      body: JSON.stringify({ ok: true }),
 
     };
 
