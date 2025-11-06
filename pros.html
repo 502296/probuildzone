@@ -98,7 +98,9 @@
 
     }
 
-    /* checkbox section */
+
+
+    /* agree section */
 
     .agree{
 
@@ -106,9 +108,7 @@
 
       display:flex;
 
-      flex-direction:column;            /* الكلام تحت المربع */
-
-      gap:6px;
+      gap:10px;
 
       align-items:flex-start;
 
@@ -119,6 +119,10 @@
       width:20px;
 
       height:20px;
+
+      margin-top:2px;
+
+      flex:0 0 auto;
 
     }
 
@@ -133,6 +137,8 @@
     }
 
     .agree a{color:#0b70ff;text-decoration:underline}
+
+
 
     .actions{
 
@@ -199,6 +205,8 @@
       .actions{flex-direction:column}
 
       .btn-main,.btn-secondary{width:100%;text-align:center}
+
+      .agree{flex-direction:row;align-items:flex-start}
 
     }
 
@@ -336,9 +344,7 @@
 
 
 
-    // 👇 نفس شغلك القديم: لو الموقع على netlify.app نستخدم مسار نسبي
-
-    // لو على الدومين تبعك (.com) نوجّه الطلب لموقع netlify.app اللي عليه الفنكشنات
+    // نفس فكرتك: لو على netlify استخدم مسار نسبي
 
     const BASE = location.hostname.endsWith('netlify.app')
 
@@ -402,7 +408,7 @@
 
 
 
-      // نخزنها عشان success.html يرسلها لـ Netlify/Supabase
+      // نخزنها محليًا مثل ما كنت تعمل
 
       localStorage.setItem('pbz_form_data', JSON.stringify(payload));
 
@@ -413,6 +419,40 @@
       btn.textContent = 'Creating checkout...';
 
 
+
+      // 1) نحاول نحفظ في Supabase عبر الفنكشن الجديدة
+
+      try {
+
+        const saveRes = await fetch(`${BASE}/.netlify/functions/save-profile`, {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify(payload),
+
+        });
+
+        const saveData = await saveRes.json();
+
+        if (!saveRes.ok || !saveData.ok) {
+
+          console.warn('Supabase save failed:', saveData);
+
+          // ما نوقف Stripe هنا
+
+        }
+
+      } catch (err) {
+
+        console.warn('Supabase request error:', err);
+
+      }
+
+
+
+      // 2) نكمل على Stripe كما هو بالضبط
 
       try {
 
