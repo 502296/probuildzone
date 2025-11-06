@@ -98,8 +98,6 @@
 
     }
 
-
-
     .agree{
 
       margin-top:14px;
@@ -135,8 +133,6 @@
     }
 
     .agree a{color:#0b70ff;text-decoration:underline}
-
-
 
     .actions{
 
@@ -228,9 +224,7 @@
 
             <label for="name">Business / Owner name</label>
 
-            <!-- kept id=name but changed name to pro_name to prevent browser autofill -->
-
-            <input id="name" name="pro_name" placeholder="John &amp; Sons Builders" required autocomplete="off">
+            <input id="name" name="pro_name" placeholder="John & Sons Builders" required autocomplete="off">
 
           </div>
 
@@ -286,7 +280,7 @@
 
           <div style="grid-column:1/-1">
 
-            <label for="notes">Services &amp; notes (optional)</label>
+            <label for="notes">Services & notes (optional)</label>
 
             <textarea id="notes" name="pro_notes" placeholder="Short description of services..."></textarea>
 
@@ -334,8 +328,6 @@
 
 
 
-  <!-- Supabase client (CDN). Keep or change the version as you like -->
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 
@@ -350,27 +342,13 @@
 
 
 
-    // If site is running on Netlify subdomain, use relative (Netlify functions path).
-
-    // If you test locally or elsewhere, adjust BASE to your deployed URL.
-
     const BASE = location.hostname.endsWith('netlify.app') ? '' : 'https://probuildzone.netlify.app';
 
 
 
-    // --- SUPABASE CONFIG: replace these with your real values ---
+    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
 
-    // Go to your Supabase project > Settings > API to get the project ref and anon key
-
-    const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co'; // <-- replace
-
-    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY'; // <-- replace
-
-    // ----------------------------------------------------------------
-
-    // If you don't want direct Supabase from client, leave keys empty and the code will
-
-    // still try the Netlify function. But direct insert is helpful when Netlify is paused.
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
 
     let supabase = null;
 
@@ -404,8 +382,6 @@
 
 
 
-    // wipe fields helper — used to remove autofill data that browsers insert
-
     function wipeFields() {
 
       const ids = ['name','email','phone','address','license','notes'];
@@ -422,15 +398,11 @@
 
 
 
-    // remove local stored form (safety on load)
-
     window.addEventListener('DOMContentLoaded', () => {
 
       try { localStorage.removeItem('pbz_form_data'); } catch(e) {}
 
       wipeFields();
-
-      // some browsers fill inputs slightly later -> remove again
 
       setTimeout(wipeFields, 300);
 
@@ -476,8 +448,6 @@
 
 
 
-      // store locally (optional)
-
       try { localStorage.setItem('pbz_form_data', JSON.stringify(payload)); } catch(e){}
 
 
@@ -487,8 +457,6 @@
       btn.textContent = 'Creating checkout...';
 
 
-
-      // 1) Try to save directly to Supabase first (useful if Netlify functions are paused).
 
       if (supabase) {
 
@@ -520,13 +488,7 @@
 
             }]);
 
-          if (error) {
-
-            console.warn('Supabase insert error:', error.message);
-
-            // don't block user — continue to Stripe
-
-          }
+          if (error) console.warn('Supabase insert error:', error.message);
 
         } catch (err) {
 
@@ -534,15 +496,11 @@
 
         }
 
-      } else {
-
-        console.info('Supabase client not configured; skipping direct insert.');
-
       }
 
 
 
-      // 2) Proceed to Stripe (call Netlify function as before)
+      // Stripe function (unchanged but hides user-facing errors)
 
       try {
 
@@ -562,7 +520,9 @@
 
           const t = await res.text();
 
-          showError('Stripe error: ' + t);
+          console.warn('Stripe error:', t);
+
+          // hide error from user until Netlify reactivated
 
         } else {
 
@@ -582,7 +542,9 @@
 
       } catch (err){
 
-        showError('Network error: ' + err.message);
+        console.warn('Network error calling Stripe:', err);
+
+        // hide error for now
 
       } finally {
 
