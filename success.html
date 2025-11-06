@@ -1,107 +1,83 @@
-<!doctype html>
+<script>
 
-<html lang="en">
+  // نفترض إنك خزنت بيانات الفورم قبل ما تروح لسترايب
 
-<head>
+  // مثلاً في pros.html عملت:
 
-  <meta charset="utf-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>Success — ProBuildZone</title>
-
-  <style>
-
-    body{margin:0;background:#0f4368;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-
-    .card{background:#0f2a43;border-radius:16px;padding:26px 26px 20px;max-width:460px;width:100%;box-shadow:0 10px 35px rgba(0,0,0,.15)}
-
-    h1{font-size:26px;margin-bottom:6px}
-
-    p{margin:6px 0 10px;line-height:1.5}
-
-    .btn{background:#f1a21d;color:#000;padding:10px 14px;border-radius:10px;display:inline-block;margin-top:16px;text-decoration:none;font-weight:600}
-
-    .small{margin-top:10px;font-size:13px;opacity:.8}
-
-    #saveMsg{margin-top:8px;font-size:13px}
-
-  </style>
-
-</head>
-
-<body>
-
-  <div class="card">
-
-    <h1>🎉 You’re in!</h1>
-
-    <p>Thanks for starting your 30-day free trial. We've received your details and payment setup via Stripe.</p>
-
-    <p>If you need help, email <a href="mailto:contact@probuildzone.com" style="color:#fff;font-weight:600">contact@probuildzone.com</a>.</p>
-
-    <p id="saveMsg" class="small">Saving your profile...</p>
-
-    <a class="btn" href="/">Back to Home</a>
-
-  </div>
+  // localStorage.setItem('pbz-pro', JSON.stringify(formData));
 
 
 
-  <script>
+  async function savePro() {
 
-    (async () => {
+    const saved = localStorage.getItem('pbz-pro');
 
-      const BASE = location.origin;
+    if (!saved) return;
 
-      const stored = localStorage.getItem('pbz_form_data');
 
-      if (!stored){
 
-        document.getElementById('saveMsg').textContent = 'Could not find form data (localStorage empty).';
+    const proData = JSON.parse(saved);
 
-        return;
 
-      }
 
-      try {
+    // لو رجع لك السترايب ids في الـsuccess URL تقدر تضيفهم هنا
 
-        const res = await fetch(`${BASE}/.netlify/functions/save-profile`, {
+    const urlParams = new URLSearchParams(window.location.search);
 
-          method: 'POST',
+    const sc = urlParams.get('customer');
 
-          headers: { 'Content-Type': 'application/json' },
+    const sub = urlParams.get('subscription');
 
-          body: stored
 
-        });
 
-        if (res.ok){
+    const res = await fetch('/.netlify/functions/save-pro', {
 
-          document.getElementById('saveMsg').textContent = 'Profile saved to database.';
+      method: 'POST',
 
-          // لو تحب تفرّغ التخزين:
+      headers: { 'Content-Type': 'application/json' },
 
-          // localStorage.removeItem('pbz_form_data');
+      body: JSON.stringify({
 
-        } else {
+        ...proData,
 
-          const t = await res.text();
+        stripe_customer_id: sc,
 
-          document.getElementById('saveMsg').textContent = 'Could not save to database: ' + t;
+        stripe_subscription_id: sub,
 
-        }
+      }),
 
-      } catch (err){
+    });
 
-        document.getElementById('saveMsg').textContent = 'Error: ' + err.message;
 
-      }
 
-    })();
+    const json = await res.json();
 
-  </script>
+    const statusEl = document.getElementById('save-status');
 
-</body>
 
-</html>
+
+    if (json.ok) {
+
+      statusEl.textContent = 'Your profile was saved successfully.';
+
+      statusEl.style.color = '#58d68d';
+
+      // ممكن تحب تحذفها من التخزين
+
+      localStorage.removeItem('pbz-pro');
+
+    } else {
+
+      statusEl.textContent = 'We received your payment, but could not save your profile. Please email contact@probuildzone.com';
+
+      statusEl.style.color = '#e74c3c';
+
+    }
+
+  }
+
+
+
+  savePro();
+
+</script>
