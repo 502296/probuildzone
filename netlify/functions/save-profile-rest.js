@@ -2,6 +2,10 @@
 
 
 
+import { createClient } from '@supabase/supabase-js';
+
+
+
 export async function handler(event) {
 
   const headers = {
@@ -16,6 +20,8 @@ export async function handler(event) {
 
 
 
+  // السماح بطلبات OPTIONS (CORS preflight)
+
   if (event.httpMethod === 'OPTIONS') {
 
     return { statusCode: 200, headers, body: 'OK' };
@@ -24,67 +30,11 @@ export async function handler(event) {
 
 
 
+  // السماح فقط بطريقة POST
+
   if (event.httpMethod !== 'POST') {
 
-    return {
-
-      statusCode: 405,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
-
-    };
-
-  }
-
-
-
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-
-  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE;
-
-
-
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-
-    return {
-
-      statusCode: 500,
-
-      headers,
-
-      body: JSON.stringify({
-
-        ok: false,
-
-        error: 'Missing Supabase environment variables',
-
-      }),
-
-    };
-
-  }
-
-
-
-  let payload;
-
-  try {
-
-    payload = JSON.parse(event.body);
-
-  } catch (e) {
-
-    return {
-
-      statusCode: 400,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }),
-
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   }
 
@@ -92,43 +42,79 @@ export async function handler(event) {
 
   try {
 
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/pros_signups`, {
+    const data = JSON.parse(event.body || '{}');
 
-      method: 'POST',
 
-      headers: {
 
-        'Content-Type': 'application/json',
+    // إنشاء عميل Supabase
 
-        apikey: SUPABASE_KEY,
+    const supabase = createClient(
 
-        Authorization: `Bearer ${SUPABASE_KEY}`,
+      process.env.SUPABASE_URL,
 
-        Prefer: 'return=representation',
+      process.env.SUPABASE_SERVICE_ROLE
+
+    );
+
+
+
+    // إدخال البيانات في جدول pros_signups
+
+    const { error } = await supabase.from('pros_signups').insert([
+
+      {
+
+        name: data.name,
+
+        email: data.email,
+
+        phone: data.phone,
+
+        address: data.address,
+
+        license: data.license,
+
+        insurance: data.insurance,
+
+        notes: data.notes,
 
       },
 
-      body: JSON.stringify(payload),
-
-    });
+    ]);
 
 
 
-    const data = await response.text();
+    if (error) {
+
+      console.error('Supabase insert error:', error);
+
+      return {
+
+        statusCode: 500,
+
+        headers,
+
+        body: JSON.stringify({ ok: false, error: error.message }),
+
+      };
+
+    }
 
 
 
     return {
 
-      statusCode: response.status,
+      statusCode: 200,
 
       headers,
 
-      body: data,
+      body: JSON.stringify({ ok: true, message: 'Data saved successfully' }),
 
     };
 
   } catch (err) {
+
+    console.error('Handler error:', err);
 
     return {
 
