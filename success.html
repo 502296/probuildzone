@@ -4,9 +4,9 @@
 
 <head>
 
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
 
   <title>You're in — ProBuildZone</title>
 
@@ -90,9 +90,21 @@
 
     <a class="btn" href="/">Back to Home</a>
 
-    <small>Signup data is stored in ProBuildZone database (Supabase).</small>
+    <small>Data saved to ProBuildZone database.</small>
 
   </div>
+
+
+
+  <!-- مهم: لا نحاول الحفظ في Google Sheets مرة ثانية -->
+
+  <script>
+
+    // لو كان عندك سكربت قديم يحاول يرسل للـ Sheet كان هنا.
+
+    // حذفناه حتى لا تظهر جملة "Could not save to Sheet".
+
+  </script>
 
 </body>
 
