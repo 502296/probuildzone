@@ -1,7 +1,5 @@
 // netlify/functions/save-profile.js
 
-const { createClient } = require('@supabase/supabase-js');
-
 
 
 const corsHeaders = {
@@ -18,9 +16,19 @@ const corsHeaders = {
 
 exports.handler = async (event) => {
 
+  // preflight
+
   if (event.httpMethod === 'OPTIONS') {
 
-    return { statusCode: 200, headers: corsHeaders, body: 'OK' };
+    return {
+
+      statusCode: 200,
+
+      headers: corsHeaders,
+
+      body: 'OK',
+
+    };
 
   }
 
@@ -42,21 +50,13 @@ exports.handler = async (event) => {
 
 
 
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_URL = process.env.SUPABASE_URL;            // مثل: https://xxxx.supabase.co
 
-  // جرّب السيرفس، لو مو مضبوط استخدم anon
-
-  const SUPABASE_KEY =
-
-    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+  const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
 
 
-  console.log('SUPABASE_URL =', SUPABASE_URL);
-
-  console.log('SUPABASE_KEY length =', SUPABASE_KEY ? SUPABASE_KEY.length : 0);
-
-
+  // نخليها ترجع لك الطول عشان تتأكد بنفسك
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
 
@@ -66,7 +66,17 @@ exports.handler = async (event) => {
 
       headers: corsHeaders,
 
-      body: JSON.stringify({ ok: false, error: 'Supabase env vars missing' }),
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: 'Missing Supabase env vars',
+
+        url: SUPABASE_URL,
+
+        keyLength: SUPABASE_KEY ? SUPABASE_KEY.length : 0,
+
+      }),
 
     };
 
@@ -74,95 +84,125 @@ exports.handler = async (event) => {
 
 
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  // نزيل أي / زيادة آخر الرابط
+
+  const baseUrl = SUPABASE_URL.replace(/\/+$/, '');
+
+  const tableUrl = `${baseUrl}/rest/v1/pros_signups`;
+
+
+
+  let payload = {};
+
+  try {
+
+    payload = JSON.parse(event.body || '{}');
+
+  } catch (e) {
+
+    return {
+
+      statusCode: 400,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }),
+
+    };
+
+  }
+
+
+
+  // لو ما فيه ايميل نوقف
+
+  if (!payload.email) {
+
+    return {
+
+      statusCode: 400,
+
+      headers: corsHeaders,
+
+      body: JSON.stringify({ ok: false, error: 'email is required' }),
+
+    };
+
+  }
 
 
 
   try {
 
-    const payload = JSON.parse(event.body || '{}');
+    const resp = await fetch(tableUrl, {
+
+      method: 'POST',
+
+      headers: {
+
+        'Content-Type': 'application/json',
+
+        // هذان المطلوبان مع REST
+
+        apikey: SUPABASE_KEY,
+
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+
+        Prefer: 'return=representation',
+
+      },
+
+      body: JSON.stringify({
+
+        name: payload.name || null,
+
+        email: payload.email || null,
+
+        phone: payload.phone || null,
+
+        address: payload.address || null,
+
+        license: payload.license || null,
+
+        insurance: payload.insurance || null,
+
+        notes: payload.notes || null,
+
+        stripe_customer_id: payload.stripe_customer_id || null,
+
+        stripe_subscription_id: payload.stripe_subscription_id || null,
+
+      }),
+
+    });
 
 
 
-    if (!payload.email) {
-
-      return {
-
-        statusCode: 400,
-
-        headers: corsHeaders,
-
-        body: JSON.stringify({ ok: false, error: 'Missing email in payload' }),
-
-      };
-
-    }
+    const text = await resp.text();
 
 
 
-    const { data, error } = await supabase
-
-      .from('pros_signups')
-
-      .insert([
-
-        {
-
-          name: payload.name || null,
-
-          email: payload.email || null,
-
-          phone: payload.phone || null,
-
-          address: payload.address || null,
-
-          license: payload.license || null,
-
-          insurance: payload.insurance || null,
-
-          notes: payload.notes || null,
-
-          stripe_customer_id: payload.stripe_customer_id || null,
-
-          stripe_subscription_id: payload.stripe_subscription_id || null,
-
-        },
-
-      ])
-
-      .select()
-
-      .single();
-
-
-
-    if (error) {
-
-      return {
-
-        statusCode: 500,
-
-        headers: corsHeaders,
-
-        body: JSON.stringify({ ok: false, error: error.message }),
-
-      };
-
-    }
-
-
+    // نرجعه كما هو حتى لو كان خطأ من Supabase
 
     return {
 
-      statusCode: 200,
+      statusCode: resp.status,
 
-      headers: corsHeaders,
+      headers: {
 
-      body: JSON.stringify({ ok: true, data }),
+        ...corsHeaders,
+
+        'Content-Type': 'application/json',
+
+      },
+
+      body: text,
 
     };
 
   } catch (err) {
+
+    // لو كان فيه خطأ غريب زي اللي عندك
 
     return {
 
@@ -170,7 +210,19 @@ exports.handler = async (event) => {
 
       headers: corsHeaders,
 
-      body: JSON.stringify({ ok: false, error: err.message }),
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: err.message,
+
+        // هذا يساعدنا نعرف طول المفتاح اللي وصل للفنكشن
+
+        keyLength: SUPABASE_KEY.length,
+
+        urlUsed: tableUrl,
+
+      }),
 
     };
 
