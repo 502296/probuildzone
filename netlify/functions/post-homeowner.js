@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
 
 
-  // نقرأ المتغيرات من البيئة جوّا الهاندلر (عشان لو تغيّرت تنقرا من جديد)
+  // نقرأ المتغيرات من البيئة
 
   const supabaseUrl = process.env.SUPABASE_URL;
 
@@ -52,7 +52,7 @@ exports.handler = async (event) => {
 
 
 
-  // قراءة بيانات الفورم
+  // نقرأ جسم الطلب
 
   let payload;
 
@@ -78,7 +78,7 @@ exports.handler = async (event) => {
 
 
 
-  // إدخال في الجدول
+  // ✅ غيّر اسم الجدول لو غير هذا
 
   const { error } = await supabase.from('homeowner_jobs').insert([
 
