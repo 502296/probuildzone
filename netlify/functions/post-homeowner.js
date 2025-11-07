@@ -2,6 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 
 
 
+// ✅ تأكد من وضع متغيرات البيئة الصحيحة في Netlify
+
 const supabaseUrl = process.env.SUPABASE_URL;
 
 const supabaseKey =
@@ -11,6 +13,8 @@ const supabaseKey =
 
 
 export async function handler(event) {
+
+  // 🧩 السماح فقط بـ POST
 
   if (event.httpMethod !== "POST") {
 
@@ -26,6 +30,8 @@ export async function handler(event) {
 
 
 
+  // ⚠️ تأكد من وجود مفاتيح Supabase
+
   if (!supabaseUrl || !supabaseKey) {
 
     return {
@@ -40,6 +46,8 @@ export async function handler(event) {
 
 
 
+  // 🧠 قراءة بيانات JSON القادمة من الموقع
+
   let body;
 
   try {
@@ -48,15 +56,25 @@ export async function handler(event) {
 
   } catch (e) {
 
-    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
+    return {
+
+      statusCode: 400,
+
+      body: JSON.stringify({ error: "Invalid JSON format" }),
+
+    };
 
   }
 
 
 
+  // ✅ تهيئة الاتصال بـ Supabase
+
   const supabase = createClient(supabaseUrl, supabaseKey);
 
 
+
+  // 📦 إدخال البيانات إلى جدول homeowner_jobs
 
   const { error, data } = await supabase
 
@@ -90,9 +108,19 @@ export async function handler(event) {
 
         description: body.description || null,
 
-        zip: body.zip || null,
 
-        homeowner_id: body.homeowner_id || null,
+
+        // ✅ إصلاح المشكلة هنا
+
+        zip: body.zip && body.zip !== "" ? body.zip : null,
+
+        homeowner_id:
+
+          body.homeowner_id && body.homeowner_id !== ""
+
+            ? body.homeowner_id
+
+            : null,
 
       },
 
@@ -102,7 +130,11 @@ export async function handler(event) {
 
 
 
+  // 🚨 معالجة الأخطاء إن وجدت
+
   if (error) {
+
+    console.error("Supabase error:", error.message);
 
     return {
 
@@ -115,6 +147,8 @@ export async function handler(event) {
   }
 
 
+
+  // 🎉 نجاح العملية
 
   return {
 
