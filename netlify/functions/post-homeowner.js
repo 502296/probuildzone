@@ -1,24 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+const supabaseKey =
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
 
 
 export async function handler(event) {
 
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
 
     return {
 
       statusCode: 405,
 
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
+      body: JSON.stringify({ error: "Method not allowed" }),
 
     };
 
@@ -26,76 +26,102 @@ export async function handler(event) {
 
 
 
-  try {
-
-    const body = JSON.parse(event.body || '{}');
-
-    const { full_name, phone, address, title, description, category } = body;
-
-
-
-    if (!full_name || !phone) {
-
-      return {
-
-        statusCode: 400,
-
-        body: JSON.stringify({ error: 'Missing required fields: full_name or phone' }),
-
-      };
-
-    }
-
-
-
-    // ✅ إدخال البيانات في جدول homeowner_jobs
-
-    const { data, error } = await supabase
-
-      .from('homeowner_jobs')
-
-      .insert([{ full_name, phone, address, title, description, category }])
-
-      .select();
-
-
-
-    if (error) {
-
-      console.error('Supabase error:', error.message);
-
-      return {
-
-        statusCode: 500,
-
-        body: JSON.stringify({ ok: false, error: error.message }),
-
-      };
-
-    }
-
-
-
-    return {
-
-      statusCode: 200,
-
-      body: JSON.stringify({ ok: true, data }),
-
-    };
-
-  } catch (err) {
-
-    console.error('Server error:', err.message);
+  if (!supabaseUrl || !supabaseKey) {
 
     return {
 
       statusCode: 500,
 
-      body: JSON.stringify({ ok: false, error: err.message }),
+      body: JSON.stringify({ error: "Missing Supabase environment variables" }),
 
     };
 
   }
+
+
+
+  let body;
+
+  try {
+
+    body = JSON.parse(event.body || "{}");
+
+  } catch (e) {
+
+    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
+
+  }
+
+
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+
+
+  const { error, data } = await supabase
+
+    .from("homeowner_jobs")
+
+    .insert([
+
+      {
+
+        category: body.category || null,
+
+        title: body.title || null,
+
+        summary: body.summary || null,
+
+        city: body.city || null,
+
+        state: body.state || null,
+
+        budget_from: body.budget_from || null,
+
+        budget_to: body.budget_to || null,
+
+        full_name: body.full_name || null,
+
+        phone: body.phone || null,
+
+        email: body.email || null,
+
+        address: body.address || null,
+
+        description: body.description || null,
+
+        zip: body.zip || null,
+
+        homeowner_id: body.homeowner_id || null,
+
+      },
+
+    ])
+
+    .select();
+
+
+
+  if (error) {
+
+    return {
+
+      statusCode: 500,
+
+      body: JSON.stringify({ ok: false, error: error.message }),
+
+    };
+
+  }
+
+
+
+  return {
+
+    statusCode: 200,
+
+    body: JSON.stringify({ ok: true, data }),
+
+  };
 
 }
