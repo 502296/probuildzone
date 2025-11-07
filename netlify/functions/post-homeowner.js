@@ -1,22 +1,16 @@
-// netlify/functions/post-homeowner.js
-
-
-
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
-const supabaseKey =
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
-  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-exports.handler = async (event) => {
-
-  // نسمح بس بالـ POST
+export async function handler(event) {
 
   if (event.httpMethod !== 'POST') {
 
@@ -24,200 +18,84 @@ exports.handler = async (event) => {
 
       statusCode: 405,
 
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
 
     };
 
   }
 
 
-
-  if (!supabaseUrl || !supabaseKey) {
-
-    return {
-
-      statusCode: 500,
-
-      body: JSON.stringify({
-
-        error: 'Supabase env vars are missing (URL or KEY)',
-
-      }),
-
-    };
-
-  }
-
-
-
-  // نقرأ جسم الطلب
-
-  let payload = {};
 
   try {
 
-    payload = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
 
-  } catch (e) {
+    const { full_name, phone, address, title, description, category } = body;
+
+
+
+    if (!full_name || !phone) {
+
+      return {
+
+        statusCode: 400,
+
+        body: JSON.stringify({ error: 'Missing required fields: full_name or phone' }),
+
+      };
+
+    }
+
+
+
+    // ✅ إدخال البيانات في جدول homeowner_jobs
+
+    const { data, error } = await supabase
+
+      .from('homeowner_jobs')
+
+      .insert([{ full_name, phone, address, title, description, category }])
+
+      .select();
+
+
+
+    if (error) {
+
+      console.error('Supabase error:', error.message);
+
+      return {
+
+        statusCode: 500,
+
+        body: JSON.stringify({ ok: false, error: error.message }),
+
+      };
+
+    }
+
+
 
     return {
 
-      statusCode: 400,
+      statusCode: 200,
 
-      body: JSON.stringify({ error: 'Invalid JSON body' }),
+      body: JSON.stringify({ ok: true, data }),
 
     };
 
-  }
+  } catch (err) {
 
-
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-
-
-  // 1) نحاول نلقى homeowner بنفس رقم الهاتف
-
-  let homeownerId = null;
-
-
-
-  if (payload.phone) {
-
-    const { data: existing, error: findErr } = await supabase
-
-      .from('homeowners')
-
-      .select('id')
-
-      .eq('phone', payload.phone)
-
-      .maybeSingle();
-
-
-
-    if (findErr) {
-
-      console.error('Find homeowner error:', findErr);
-
-      return {
-
-        statusCode: 500,
-
-        body: JSON.stringify({ error: findErr.message }),
-
-      };
-
-    }
-
-
-
-    if (existing && existing.id) {
-
-      homeownerId = existing.id;
-
-    }
-
-  }
-
-
-
-  // 2) لو ما لقيناه ننشئ واحد جديد ونرجع الـ id
-
-  if (!homeownerId) {
-
-    const { data: inserted, error: insertErr } = await supabase
-
-      .from('homeowners')
-
-      .insert([
-
-        {
-
-          full_name: payload.full_name || null,
-
-          phone: payload.phone || null,
-
-          address: payload.address || null,
-
-          email: payload.email || null,
-
-        },
-
-      ])
-
-      .select('id')
-
-      .single();
-
-
-
-    if (insertErr) {
-
-      console.error('Insert homeowner error:', insertErr);
-
-      return {
-
-        statusCode: 500,
-
-        body: JSON.stringify({ error: insertErr.message }),
-
-      };
-
-    }
-
-
-
-    homeownerId = inserted.id;
-
-  }
-
-
-
-  // 3) الحين ندخل الجوب في homeowner_jobs مربوط بنفس الـ UUID
-
-  const { error: jobErr } = await supabase.from('homeowner_jobs').insert([
-
-    {
-
-      homeowner_id: homeownerId,
-
-      category: payload.category || null,
-
-      title: payload.title || payload.job_title || null,
-
-      description: payload.description || null,
-
-      address: payload.address || null,
-
-    },
-
-  ]);
-
-
-
-  if (jobErr) {
-
-    console.error('Insert job error:', jobErr);
+    console.error('Server error:', err.message);
 
     return {
 
       statusCode: 500,
 
-      body: JSON.stringify({ error: jobErr.message }),
+      body: JSON.stringify({ ok: false, error: err.message }),
 
     };
 
   }
 
-
-
-  return {
-
-    statusCode: 200,
-
-    body: JSON.stringify({ ok: true }),
-
-  };
-
-};
+}
