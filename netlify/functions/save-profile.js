@@ -16,8 +16,6 @@ exports.handler = async (event) => {
 
 
 
-  // نسمح فقط بالـ POST
-
   if (event.httpMethod !== 'POST') {
 
     return {
@@ -40,11 +38,11 @@ exports.handler = async (event) => {
 
 
 
-    // نستخدم نفس الأسماء اللي عندك في الصورة 👇
-
     const supabaseUrl = process.env.SUPABASE_URL;
 
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE;
+    const supabaseKey =
+
+      process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
 
 
@@ -70,15 +68,81 @@ exports.handler = async (event) => {
 
 
 
-    // نكوّن الكلاينت
-
     const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-    // البيانات الجاية من الفورم
+    // 👇 هنا نحدد: هل هذي بيانات homeowner أو pro؟
 
-    const row = {
+    const formType = body.form_type || body.type || 'pro';
+
+
+
+    if (formType === 'homeowner') {
+
+      // نحفظ في جدول homeowners
+
+      const row = {
+
+        full_name: body.full_name || body.name || null,
+
+        phone: body.phone || null,
+
+        address: body.address || body.full_address || null,
+
+        title: body.title || null,
+
+        description: body.description || body.full_description || null,
+
+        created_at: new Date().toISOString(),
+
+      };
+
+
+
+      const { error } = await supabase
+
+        .from('homeowner_jobs')
+
+        .insert([row]);
+
+
+
+      if (error) {
+
+        console.error('Supabase insert error (homeowner):', error);
+
+        return {
+
+          statusCode: 500,
+
+          headers,
+
+          body: JSON.stringify({ ok: false, error: error.message }),
+
+        };
+
+      }
+
+
+
+      return {
+
+        statusCode: 200,
+
+        headers,
+
+        body: JSON.stringify({ ok: true, target: 'homeowner' }),
+
+      };
+
+    }
+
+
+
+    // 👇 الجزء القديم للـ pros يبقى كما هو
+
+    const proRow = {
 
       name: body.name || null,
 
@@ -102,19 +166,13 @@ exports.handler = async (event) => {
 
 
 
-    // ندخلها في جدولك بالضبط: pros_signups
-
-    const { error } = await supabase
-
-      .from('pros_signups')
-
-      .insert([row]);
+    const { error } = await supabase.from('pros_signups').insert([proRow]);
 
 
 
     if (error) {
 
-      console.error('Supabase insert error:', error);
+      console.error('Supabase insert error (pro):', error);
 
       return {
 
@@ -122,13 +180,7 @@ exports.handler = async (event) => {
 
         headers,
 
-        body: JSON.stringify({
-
-          ok: false,
-
-          error: error.message,
-
-        }),
+        body: JSON.stringify({ ok: false, error: error.message }),
 
       };
 
@@ -142,7 +194,7 @@ exports.handler = async (event) => {
 
       headers,
 
-      body: JSON.stringify({ ok: true }),
+      body: JSON.stringify({ ok: true, target: 'pro' }),
 
     };
 
