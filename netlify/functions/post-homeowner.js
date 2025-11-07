@@ -1,20 +1,12 @@
 // netlify/functions/post-homeowner.js
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 
 
-const supabaseUrl = process.env.SUPABASE_URL;
+exports.handler = async (event) => {
 
-const supabaseKey =
-
-  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
-
-
-
-export async function handler(event) {
-
-  // بس POST
+  // نسمح فقط بالـ POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -30,9 +22,19 @@ export async function handler(event) {
 
 
 
-  // تأكدنا من المتغيرات
+  // نقرأ المتغيرات من البيئة جوّا الهاندلر (عشان لو تغيّرت تنقرا من جديد)
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+
+  const supabaseKey =
+
+    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+
+
 
   if (!supabaseUrl || !supabaseKey) {
+
+    console.log('Missing env vars', { supabaseUrl, hasKey: !!supabaseKey });
 
     return {
 
@@ -50,7 +52,7 @@ export async function handler(event) {
 
 
 
-  // البيانات جاية من الفورم
+  // قراءة بيانات الفورم
 
   let payload;
 
@@ -76,7 +78,7 @@ export async function handler(event) {
 
 
 
-  // عدل اسم الجدول حسب اللي عملته في Supabase
+  // إدخال في الجدول
 
   const { error } = await supabase.from('homeowner_jobs').insert([
 
@@ -102,7 +104,7 @@ export async function handler(event) {
 
   if (error) {
 
-    // هذا اللي كان يطلعلك “Invalid API key”
+    console.log('Supabase insert error:', error);
 
     return {
 
@@ -124,4 +126,4 @@ export async function handler(event) {
 
   };
 
-}
+};
