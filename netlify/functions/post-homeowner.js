@@ -1,6 +1,8 @@
 // netlify/functions/post-homeowner.js
 
-import { createClient } from '@supabase/supabase-js';
+
+
+const { createClient } = require('@supabase/supabase-js');
 
 
 
@@ -12,7 +14,7 @@ const supabaseKey =
 
 
 
-export async function handler(event) {
+exports.handler = async (event) => {
 
   // نسمح بس بالـ POST
 
@@ -29,8 +31,6 @@ export async function handler(event) {
   }
 
 
-
-  // تأكدنا من المتغيرات
 
   if (!supabaseUrl || !supabaseKey) {
 
@@ -50,15 +50,15 @@ export async function handler(event) {
 
 
 
-  // نقرأ البيانات من الفورم
+  // نقرأ جسم الطلب
 
-  let payload;
+  let payload = {};
 
   try {
 
-    payload = JSON.parse(event.body);
+    payload = JSON.parse(event.body || '{}');
 
-  } catch (err) {
+  } catch (e) {
 
     return {
 
@@ -76,9 +76,11 @@ export async function handler(event) {
 
 
 
-  // 1) نحاول نلاقي الـ homeowner حسب الهاتف (تقدر تغيّرها للإيميل لو حاب)
+  // 1) نحاول نلقى homeowner بنفس رقم الهاتف
 
   let homeownerId = null;
+
+
 
   if (payload.phone) {
 
@@ -112,8 +114,6 @@ export async function handler(event) {
 
     if (existing && existing.id) {
 
-      // لقيناه ✅
-
       homeownerId = existing.id;
 
     }
@@ -122,7 +122,7 @@ export async function handler(event) {
 
 
 
-  // 2) لو ما لقيناه، نسويه الآن ونجيب الـ UUID
+  // 2) لو ما لقيناه ننشئ واحد جديد ونرجع الـ id
 
   if (!homeownerId) {
 
@@ -174,13 +174,13 @@ export async function handler(event) {
 
 
 
-  // 3) الآن نسجل الجوب في جدول homeowner_jobs ونربطه بـ homeowner_id
+  // 3) الحين ندخل الجوب في homeowner_jobs مربوط بنفس الـ UUID
 
   const { error: jobErr } = await supabase.from('homeowner_jobs').insert([
 
     {
 
-      homeowner_id: homeownerId, // 👈 هنا صار UUID حقيقي، مو null
+      homeowner_id: homeownerId,
 
       category: payload.category || null,
 
@@ -220,4 +220,4 @@ export async function handler(event) {
 
   };
 
-}
+};
