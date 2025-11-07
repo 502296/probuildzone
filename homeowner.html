@@ -8,31 +8,13 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>ProBuildZone – Homeowner</title>
+  <title>ProBuildZone – Post a Job</title>
 
   <style>
 
-    :root {
-
-      --bg: #f5f6fa;
-
-      --card: #ffffff;
-
-      --primary: #0F2A43;
-
-      --primary-dark: #0b1f33;
-
-      --danger: #c0392b;
-
-      --success: #27ae60;
-
-      --radius: 12px;
-
-    }
-
     body {
 
-      background: var(--bg);
+      background: #0f2a43;
 
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
@@ -42,11 +24,21 @@
 
       justify-content: center;
 
+      color: white;
+
     }
 
     .container {
 
-      width: min(520px, 100%);
+      width: min(600px, 100%);
+
+      background: #132d49;
+
+      padding: 25px 30px;
+
+      border-radius: 12px;
+
+      box-shadow: 0 0 12px rgba(0,0,0,0.25);
 
     }
 
@@ -54,7 +46,7 @@
 
       text-align: center;
 
-      color: var(--primary);
+      color: #D4AF37;
 
       margin-bottom: 10px;
 
@@ -64,23 +56,11 @@
 
       text-align: center;
 
-      color: #666;
+      color: #ccc;
 
       margin-bottom: 25px;
 
       font-size: 0.95rem;
-
-    }
-
-    form {
-
-      background: var(--card);
-
-      padding: 22px 25px 26px;
-
-      border-radius: var(--radius);
-
-      box-shadow: 0 0 12px rgba(0,0,0,0.06);
 
     }
 
@@ -92,9 +72,11 @@
 
       font-weight: 600;
 
+      color: #f1f1f1;
+
     }
 
-    input, textarea, select {
+    input, textarea {
 
       width: 100%;
 
@@ -108,19 +90,9 @@
 
       font-size: 0.93rem;
 
-      transition: border 0.15s ease;
+      background: #f8f8f8;
 
-      background: #fff;
-
-    }
-
-    input:focus, textarea:focus, select:focus {
-
-      outline: none;
-
-      border: 1px solid rgba(15, 42, 67, 0.65);
-
-      box-shadow: 0 0 0 2px rgba(15,42,67,0.08);
+      color: #111;
 
     }
 
@@ -138,9 +110,9 @@
 
       margin-top: 22px;
 
-      background: var(--primary);
+      background: #D4AF37;
 
-      color: white;
+      color: #0f2a43;
 
       border: none;
 
@@ -150,107 +122,33 @@
 
       font-size: 1rem;
 
+      font-weight: 600;
+
       cursor: pointer;
-
-      display: inline-flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      gap: 8px;
 
       transition: background 0.15s ease;
 
     }
 
-    button[disabled] {
+    button:hover { background: #b9962f; }
 
-      background: #95a5a6;
+    .msg { margin-top: 15px; padding: 10px 12px; border-radius: 6px; display: none; font-size: 0.9rem; }
 
-      cursor: not-allowed;
+    .msg.success { background: rgba(39,174,96,0.15); color: #2ecc71; }
 
-    }
-
-    button:hover:not([disabled]) {
-
-      background: var(--primary-dark);
-
-    }
-
-    .msg {
-
-      margin-top: 15px;
-
-      padding: 10px 12px;
-
-      border-radius: 6px;
-
-      display: none;
-
-      font-size: 0.9rem;
-
-    }
-
-    .msg.success {
-
-      background: rgba(39, 174, 96, 0.12);
-
-      color: var(--success);
-
-    }
-
-    .msg.error {
-
-      background: rgba(192, 57, 43, 0.11);
-
-      color: var(--danger);
-
-      white-space: pre-wrap;
-
-    }
-
-    .small {
-
-      font-size: 0.77rem;
-
-      color: #888;
-
-      margin-top: 3px;
-
-    }
-
-    .spinner {
-
-      width: 16px;
-
-      height: 16px;
-
-      border: 2px solid rgba(255,255,255,0.4);
-
-      border-top-color: #fff;
-
-      border-radius: 50%;
-
-      animation: spin 0.7s linear infinite;
-
-    }
-
-    @keyframes spin {
-
-      to { transform: rotate(360deg); }
-
-    }
+    .msg.error { background: rgba(192,57,43,0.15); color: #e74c3c; }
 
   </style>
 
 </head>
 
+
+
 <body>
 
   <div class="container">
 
-    <h1>Post your project</h1>
+    <h1>Post a Job</h1>
 
     <p class="sub">Tell us what you need and we’ll match you with local pros.</p>
 
@@ -258,71 +156,83 @@
 
     <form id="homeownerForm">
 
-      <label for="full_name">Full name *</label>
+      <label>Category</label>
 
-      <input id="full_name" name="full_name" required />
-
-
-
-      <label for="phone">Phone *</label>
-
-      <input id="phone" name="phone" required />
+      <input id="category" name="category" placeholder="e.g. Roofing, Plumbing..." />
 
 
 
-      <label for="address">Full address *</label>
+      <label>Project title *</label>
 
-      <input id="address" name="address" required />
-
-
-
-      <label for="title">Project title *</label>
-
-      <input id="title" name="title" placeholder="Fix leaking sink, kitchen remodel..." required />
+      <input id="title" name="title" placeholder="Replace leaking roof..." required />
 
 
 
-      <label for="description">Full description *</label>
+      <label>Short summary</label>
 
-      <textarea id="description" name="description" placeholder="Describe the issue, when you want it done, photos link, etc." required></textarea>
-
-
-
-      <label for="category">Category (optional)</label>
-
-      <select id="category" name="category">
-
-        <option value="">-- Select --</option>
-
-        <option>Plumbing</option>
-
-        <option>Electrical</option>
-
-        <option>Landscaping</option>
-
-        <option>Painting</option>
-
-        <option>Porch</option>
-
-        <option>Roofing</option>
-
-      </select>
+      <input id="summary" name="summary" placeholder="One or two lines..." />
 
 
 
-      <p class="small">* required</p>
+      <label>City</label>
+
+      <input id="city" name="city" placeholder="Enter your city" />
 
 
 
-      <button type="submit" id="submitBtn">
+      <label>State</label>
 
-        <span id="btnText">Submit</span>
-
-      </button>
+      <input id="state" name="state" placeholder="Enter your state" />
 
 
 
-      <div id="successMsg" class="msg success">✅ Your request was sent!</div>
+      <label>Estimated budget (optional)</label>
+
+      <div style="display:flex; gap:10px;">
+
+        <input id="budget_from" name="budget_from" placeholder="From ($)" />
+
+        <input id="budget_to" name="budget_to" placeholder="To ($)" />
+
+      </div>
+
+
+
+      <label>Contact name *</label>
+
+      <input id="full_name" name="full_name" placeholder="Your name" required />
+
+
+
+      <label>Phone *</label>
+
+      <input id="phone" name="phone" placeholder="Your phone number" required />
+
+
+
+      <label>Email *</label>
+
+      <input id="email" name="email" type="email" placeholder="Your email address" required />
+
+
+
+      <label>Full address *</label>
+
+      <input id="address" name="address" placeholder="Street, City, State" required />
+
+
+
+      <label>Full description *</label>
+
+      <textarea id="description" name="description" placeholder="Describe the job in detail..." required></textarea>
+
+
+
+      <button type="submit">🚀 Post Job</button>
+
+
+
+      <div id="successMsg" class="msg success">✅ Your job has been posted successfully.</div>
 
       <div id="errorMsg" class="msg error">❌ Something went wrong.</div>
 
@@ -336,37 +246,9 @@
 
     const form = document.getElementById('homeownerForm');
 
-    const submitBtn = document.getElementById('submitBtn');
-
     const successMsg = document.getElementById('successMsg');
 
     const errorMsg = document.getElementById('errorMsg');
-
-
-
-    function setLoading(isLoading) {
-
-      if (isLoading) {
-
-        submitBtn.setAttribute('disabled', 'true');
-
-        submitBtn.innerHTML = '';
-
-        const sp = document.createElement('div');
-
-        sp.className = 'spinner';
-
-        submitBtn.appendChild(sp);
-
-      } else {
-
-        submitBtn.removeAttribute('disabled');
-
-        submitBtn.innerHTML = '<span id="btnText">Submit</span>';
-
-      }
-
-    }
 
 
 
@@ -380,39 +262,37 @@
 
 
 
-      const payload = {
+      const data = {
+
+        category: document.getElementById('category').value.trim(),
+
+        title: document.getElementById('title').value.trim(),
+
+        summary: document.getElementById('summary').value.trim(),
+
+        city: document.getElementById('city').value.trim(),
+
+        state: document.getElementById('state').value.trim(),
+
+        budget_from: document.getElementById('budget_from').value.trim(),
+
+        budget_to: document.getElementById('budget_to').value.trim(),
 
         full_name: document.getElementById('full_name').value.trim(),
 
         phone: document.getElementById('phone').value.trim(),
 
-        address: document.getElementById('address').value.trim(),
+        email: document.getElementById('email').value.trim(),
 
-        title: document.getElementById('title').value.trim(),
+        address: document.getElementById('address').value.trim(),
 
         description: document.getElementById('description').value.trim(),
 
-        category: document.getElementById('category').value.trim(),
+        zip: null,
+
+        homeowner_id: null,
 
       };
-
-
-
-      // validation بسيط
-
-      if (!payload.full_name || !payload.phone || !payload.address || !payload.title || !payload.description) {
-
-        errorMsg.textContent = '❌ Please fill all required fields.';
-
-        errorMsg.style.display = 'block';
-
-        return;
-
-      }
-
-
-
-      setLoading(true);
 
 
 
@@ -424,17 +304,15 @@
 
           headers: { 'Content-Type': 'application/json' },
 
-          body: JSON.stringify(payload),
+          body: JSON.stringify(data),
 
         });
 
 
 
-        const data = await res.json();
+        const result = await res.json();
 
-
-
-        if (res.ok && data.ok) {
+        if (res.ok && result.ok) {
 
           successMsg.style.display = 'block';
 
@@ -442,7 +320,7 @@
 
         } else {
 
-          errorMsg.textContent = '❌ ' + (data.error || 'Server error');
+          errorMsg.textContent = '❌ ' + (result.error || 'Server error');
 
           errorMsg.style.display = 'block';
 
@@ -453,10 +331,6 @@
         errorMsg.textContent = '❌ Network error: ' + err.message;
 
         errorMsg.style.display = 'block';
-
-      } finally {
-
-        setLoading(false);
 
       }
 
