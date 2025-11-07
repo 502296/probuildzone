@@ -38,11 +38,11 @@ exports.handler = async (event) => {
 
 
 
-    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL || "https://hczahffwghbddqabpbmu.supabase.co";
 
     const supabaseKey =
 
-      process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+      process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU;
 
 
 
