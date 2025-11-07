@@ -1,12 +1,20 @@
 // netlify/functions/post-homeowner.js
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 
 
-exports.handler = async (event) => {
+const supabaseUrl = process.env.SUPABASE_URL;
 
-  // نسمح فقط بالـ POST
+const supabaseKey =
+
+  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+
+
+
+export async function handler(event) {
+
+  // نسمح بس بالـ POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -22,19 +30,9 @@ exports.handler = async (event) => {
 
 
 
-  // نقرأ المتغيرات من البيئة
-
-  const supabaseUrl = process.env.SUPABASE_URL;
-
-  const supabaseKey =
-
-    process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
-
-
+  // تأكدنا من المتغيرات
 
   if (!supabaseUrl || !supabaseKey) {
-
-    console.log('Missing env vars', { supabaseUrl, hasKey: !!supabaseKey });
 
     return {
 
@@ -52,7 +50,7 @@ exports.handler = async (event) => {
 
 
 
-  // نقرأ جسم الطلب
+  // نقرأ البيانات من الفورم
 
   let payload;
 
@@ -78,23 +76,119 @@ exports.handler = async (event) => {
 
 
 
-  // ✅ غيّر اسم الجدول لو غير هذا
+  // 1) نحاول نلاقي الـ homeowner حسب الهاتف (تقدر تغيّرها للإيميل لو حاب)
 
-  const { error } = await supabase.from('homeowner_jobs').insert([
+  let homeownerId = null;
+
+  if (payload.phone) {
+
+    const { data: existing, error: findErr } = await supabase
+
+      .from('homeowners')
+
+      .select('id')
+
+      .eq('phone', payload.phone)
+
+      .maybeSingle();
+
+
+
+    if (findErr) {
+
+      console.error('Find homeowner error:', findErr);
+
+      return {
+
+        statusCode: 500,
+
+        body: JSON.stringify({ error: findErr.message }),
+
+      };
+
+    }
+
+
+
+    if (existing && existing.id) {
+
+      // لقيناه ✅
+
+      homeownerId = existing.id;
+
+    }
+
+  }
+
+
+
+  // 2) لو ما لقيناه، نسويه الآن ونجيب الـ UUID
+
+  if (!homeownerId) {
+
+    const { data: inserted, error: insertErr } = await supabase
+
+      .from('homeowners')
+
+      .insert([
+
+        {
+
+          full_name: payload.full_name || null,
+
+          phone: payload.phone || null,
+
+          address: payload.address || null,
+
+          email: payload.email || null,
+
+        },
+
+      ])
+
+      .select('id')
+
+      .single();
+
+
+
+    if (insertErr) {
+
+      console.error('Insert homeowner error:', insertErr);
+
+      return {
+
+        statusCode: 500,
+
+        body: JSON.stringify({ error: insertErr.message }),
+
+      };
+
+    }
+
+
+
+    homeownerId = inserted.id;
+
+  }
+
+
+
+  // 3) الآن نسجل الجوب في جدول homeowner_jobs ونربطه بـ homeowner_id
+
+  const { error: jobErr } = await supabase.from('homeowner_jobs').insert([
 
     {
 
-      full_name: payload.full_name,
+      homeowner_id: homeownerId, // 👈 هنا صار UUID حقيقي، مو null
 
-      phone: payload.phone,
+      category: payload.category || null,
 
-      address: payload.address,
+      title: payload.title || payload.job_title || null,
 
-      title: payload.title,
+      description: payload.description || null,
 
-      description: payload.description,
-
-      created_at: new Date().toISOString(),
+      address: payload.address || null,
 
     },
 
@@ -102,15 +196,15 @@ exports.handler = async (event) => {
 
 
 
-  if (error) {
+  if (jobErr) {
 
-    console.log('Supabase insert error:', error);
+    console.error('Insert job error:', jobErr);
 
     return {
 
-      statusCode: 400,
+      statusCode: 500,
 
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: jobErr.message }),
 
     };
 
@@ -126,4 +220,4 @@ exports.handler = async (event) => {
 
   };
 
-};
+}
