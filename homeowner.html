@@ -459,6 +459,57 @@
     });
 
   </script>
+  <script>
+
+  function submitHomeownerForm(event) {
+
+    event.preventDefault();
+
+
+
+    fetch('/.netlify/functions/save-profile', {
+
+      method: 'POST',
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({
+
+        full_name: document.getElementById('full_name').value,
+
+        phone: document.getElementById('phone').value,
+
+        address: document.getElementById('address').value,
+
+        title: document.getElementById('job_title').value,
+
+        description: document.getElementById('description').value,
+
+      }),
+
+    })
+
+      .then((res) => res.json())
+
+      .then((data) => {
+
+        if (data.ok) {
+
+          alert('✅ Homeowner added successfully!');
+
+        } else {
+
+          alert('⚠️ Error: ' + data.error);
+
+        }
+
+      })
+
+      .catch((err) => alert('Error: ' + err));
+
+  }
+
+</script>
 
 </body>
 
