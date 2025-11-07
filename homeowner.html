@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 
@@ -94,7 +94,7 @@
 
     }
 
-    input, textarea {
+    input, textarea, select {
 
       width: 100%;
 
@@ -110,9 +110,11 @@
 
       transition: border 0.15s ease;
 
+      background: #fff;
+
     }
 
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
 
       outline: none;
 
@@ -284,6 +286,30 @@
 
       <textarea id="description" name="description" placeholder="Describe the issue, when you want it done, photos link, etc." required></textarea>
 
+
+
+      <label for="category">Category (optional)</label>
+
+      <select id="category" name="category">
+
+        <option value="">-- Select --</option>
+
+        <option>Plumbing</option>
+
+        <option>Electrical</option>
+
+        <option>Landscaping</option>
+
+        <option>Painting</option>
+
+        <option>Porch</option>
+
+        <option>Roofing</option>
+
+      </select>
+
+
+
       <p class="small">* required</p>
 
 
@@ -312,8 +338,6 @@
 
     const submitBtn = document.getElementById('submitBtn');
 
-    const btnText = document.getElementById('btnText');
-
     const successMsg = document.getElementById('successMsg');
 
     const errorMsg = document.getElementById('errorMsg');
@@ -326,7 +350,7 @@
 
         submitBtn.setAttribute('disabled', 'true');
 
-        btnText.innerHTML = '';
+        submitBtn.innerHTML = '';
 
         const sp = document.createElement('div');
 
@@ -356,21 +380,27 @@
 
 
 
-      // basic validation
+      const payload = {
 
-      const full_name = document.getElementById('full_name').value.trim();
+        full_name: document.getElementById('full_name').value.trim(),
 
-      const phone = document.getElementById('phone').value.trim();
+        phone: document.getElementById('phone').value.trim(),
 
-      const address = document.getElementById('address').value.trim();
+        address: document.getElementById('address').value.trim(),
 
-      const title = document.getElementById('title').value.trim();
+        title: document.getElementById('title').value.trim(),
 
-      const description = document.getElementById('description').value.trim();
+        description: document.getElementById('description').value.trim(),
+
+        category: document.getElementById('category').value.trim(),
+
+      };
 
 
 
-      if (!full_name || !phone || !address || !title || !description) {
+      // validation بسيط
+
+      if (!payload.full_name || !payload.phone || !payload.address || !payload.title || !payload.description) {
 
         errorMsg.textContent = '❌ Please fill all required fields.';
 
@@ -388,51 +418,25 @@
 
       try {
 
-        const res = await fetch('/.netlify/functions/save-profile', {
+        const res = await fetch('/.netlify/functions/post-homeowner', {
 
           method: 'POST',
 
           headers: { 'Content-Type': 'application/json' },
 
-          body: JSON.stringify({
-
-            form_type: 'homeowner',      // 👈 مهم جداً
-
-            full_name,
-
-            phone,
-
-            address,
-
-            title,
-
-            description,
-
-          }),
+          body: JSON.stringify(payload),
 
         });
 
 
 
-        let data = {};
-
-        try {
-
-          data = await res.json();
-
-        } catch (_) {
-
-          // ignore if body is empty
-
-        }
+        const data = await res.json();
 
 
 
-        if (res.ok && (data.ok === true || !data.error)) {
+        if (res.ok && data.ok) {
 
           successMsg.style.display = 'block';
-
-          errorMsg.style.display = 'none';
 
           form.reset();
 
@@ -459,57 +463,6 @@
     });
 
   </script>
-  <script>
-
-  function submitHomeownerForm(event) {
-
-    event.preventDefault();
-
-
-
-    fetch('/.netlify/functions/save-profile', {
-
-      method: 'POST',
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({
-
-        full_name: document.getElementById('full_name').value,
-
-        phone: document.getElementById('phone').value,
-
-        address: document.getElementById('address').value,
-
-        title: document.getElementById('job_title').value,
-
-        description: document.getElementById('description').value,
-
-      }),
-
-    })
-
-      .then((res) => res.json())
-
-      .then((data) => {
-
-        if (data.ok) {
-
-          alert('✅ Homeowner added successfully!');
-
-        } else {
-
-          alert('⚠️ Error: ' + data.error);
-
-        }
-
-      })
-
-      .catch((err) => alert('Error: ' + err));
-
-  }
-
-</script>
 
 </body>
 
