@@ -190,38 +190,75 @@
 
 
 
-      <label>Contact name *</label>
+     <label>Contact name *</label>
 
-      <input id="full_name" name="full_name" placeholder="Your name" required />
-
-
-
-      <label>Phone *</label>
-
-      <input id="phone" name="phone" placeholder="Your phone number" required />
+<input id="full_name" name="full_name" placeholder="Your name" required />
 
 
 
-      <label>Email *</label>
+<label>Phone *</label>
 
-      <input id="email" name="email" type="email" placeholder="Your email address" required />
+<input
+
+  id="phone"
+
+  name="phone"
+
+  placeholder="Your phone number"
+
+  pattern="[0-9]{10}"
+
+  inputmode="numeric"
+
+  title="Please enter a 10-digit phone number"
+
+  required
+
+/>
 
 
 
-      <label>Full address *</label>
+<label>Email *</label>
 
-      <input id="address" name="address" placeholder="Street, City, State" required />
+<input
+
+  id="email"
+
+  name="email"
+
+  type="email"
+
+  placeholder="Your email address"
+
+  required
+
+/>
 
 
 
-      <label>Full description *</label>
+<label>Full address *</label>
 
-      <textarea id="description" name="description" placeholder="Describe the job in detail..." required></textarea>
+<input id="address" name="address" placeholder="Street, City, State" required />
 
 
 
-      <button type="submit">🚀 Post Job</button>
+<label>Full description *</label>
 
+<textarea
+
+  id="description"
+
+  name="description"
+
+  placeholder="Describe the job in detail..."
+
+  required
+
+></textarea>
+
+
+
+<button type="submit">🚀 Post Job</button>
 
 
       <div id="successMsg" class="msg success">✅ Your job has been posted successfully.</div>
