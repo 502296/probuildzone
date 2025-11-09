@@ -336,5 +336,82 @@
       }
     });
   </script>
+<script>
+
+  const form = document.getElementById('homeownerForm');
+
+
+
+  form.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+
+
+    const payload = {
+
+      full_name: form.full_name.value,
+
+      phone: form.phone.value,
+
+      email: form.email.value,
+
+      address: form.address.value,
+
+      description: form.description.value,
+
+    };
+
+
+
+    // 👇 هذا هو رابط الفنكشن اللي عندك في الصورة
+
+    const endpoint = "https://hczahffwghbddaqbpbmu.supabase.co/functions/v1/smart-endpoint";
+
+
+
+    const res = await fetch(endpoint, {
+
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+
+      body: JSON.stringify(payload),
+
+    });
+
+
+
+    const data = await res.json();
+
+
+
+    if (!res.ok) {
+
+      // نعرض نفس الخط اللي عندك تحت الزر
+
+      const errBox = document.querySelector('.error-box') || document.createElement('p');
+
+      errBox.className = 'error-box';
+
+      errBox.style.color = '#f88';
+
+      errBox.textContent = "Error: " + (data.error || "Something went wrong");
+
+      form.appendChild(errBox);
+
+      return;
+
+    }
+
+
+
+    alert("Job posted ✅");
+
+    form.reset();
+
+  });
+
+</script>
 </body>
 </html>
