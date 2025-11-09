@@ -1,123 +1,333 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+<!DOCTYPE html><html lang="en"><head>
 
-:root{--build-sky:#0EA5E9;--zone-gold:#F9A825;--white:#fff;--dark:#0b1220;--text:#0f172a;--logo-size:36px;}
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 
-*{margin:0;padding:0;box-sizing:border-box}
+<title>ProBuildZone — Get Home Projects Done</title>
 
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:#fff;}
+<meta name="description" content="Post your project with photos. Local contractors send offers. You choose the best match — fair prices, local pros.">
 
-header{width:100%;position:absolute;top:0;left:0;z-index:10;padding:18px 40px}
+<link rel="stylesheet" href="/style.css"/>
 
-nav{display:flex;justify-content:space-between;align-items:center}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-.brand-logo{font-weight:900;font-size:var(--logo-size);display:flex;gap:.15em}
+</head>
 
-.brand-logo .pro{color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.55)}
+<body>
 
-.brand-logo .build{color:var(--build-sky);text-shadow:0 2px 6px rgba(0,0,0,.25)}
+<header>
 
-.brand-logo .zone{background:linear-gradient(135deg,#ffe29a,#f7b733 35%,#f59e0b 60%,#d97706 85%);-webkit-background-clip:text;color:transparent;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+<nav>
 
-nav ul{display:flex;gap:20px;list-style:none}
+<div class="brand-logo"><span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span></div>
 
-nav a{color:#fff;text-decoration:none;font-weight:700}
+<ul>
 
-.pro-btn{background:var(--zone-gold);color:#111!important;padding:8px 16px;border-radius:8px}
+<li><a href="#about" class="nav-link" id="openAbout">Services</a></li>
 
-.hero{min-height:100vh;background:url('images/hero-bg.jpg') center/cover no-repeat;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:0 20px}
+<li><a href="/pros.html" class="pro-btn">For Pros</a></li>
 
-.hero::before{content:"";position:absolute;inset:0;background:transparent;pointer-events:none;}
+</ul>
 
-.overlay{position:relative;z-index:1;max-width:980px}
+</nav>
 
-.hero h1{font-size:clamp(32px,5.2vw,56px);margin-bottom:14px;line-height:1.1;text-shadow:0 3px 16px rgba(0,0,0,.55)}
+</header>
 
-.hero p{font-size:clamp(15px,1.5vw,18px);margin-bottom:22px;color:#eef2ff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+<section class="hero" id="home">
 
-.buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+<div class="overlay">
 
-.btn{padding:12px 18px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+<h1>Get Home Projects Done — Fair Prices, Local Pros.</h1>
 
-.primary{background:var(--build-sky);color:#fff}
+<p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-.btn:hover{filter:brightness(1.1)}
+<div class="buttons">
 
-.job-id{display:flex;justify-content:center;gap:10px;margin-top:8px}
+<button class="btn primary" id="postJobTop">Post a Job (Free)</button>
 
-.job-id input{padding:10px;border-radius:10px;border:none;width:240px;background:rgba(255,255,255,.12);color:#fff}
+</div>
 
-.job-id button{padding:10px 14px;border:none;background:var(--build-sky);color:#fff;border-radius:10px;font-weight:800}
+<div class="job-id">
 
-.links-row{padding:28px 16px;text-align:center}
+<input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., PBZ-99999)"><button id="goQuick">Go</button>
 
-.links-row a{color:#0b3c7d;font-weight:700;text-decoration:none;margin:0 10px}
+</div>
 
-/* modal light */
+</div>
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:stretch;justify-content:center;z-index:9999}
+</section>
 
-.sheet{background:#fff;border:1px solid rgba(15,23,42,.08);width:min(880px,100%);height:100dvh;overflow:auto;color:#0f172a;padding:18px 18px 160px;}
+<section id="links" class="links-row">
 
-.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fff;position:sticky;top:0;z-index:2;border-bottom:1px solid rgba(15,23,42,.08)}
+<a href="#about" class="nav-link" id="openAbout2">Services</a><span>•</span>
 
-.job-form{background:#f8fafc;padding:18px;border-radius:12px;max-width:720px;margin:0 auto}
+<a href="/privacy.html">Privacy</a><span>•</span>
 
-.job-form h2{margin:0 0 6px}
+<a href="/terms.html">Terms</a>
 
-.job-form label{display:block;font-weight:600;margin-top:14px;margin-bottom:6px;font-size:.9rem}
+</section>
 
-.job-form input,.job-form textarea{width:100%;background:#fff;border:1px solid #cbd5e1;color:#0f172a;border-radius:8px;padding:10px 14px;font-size:.9rem;outline:none}
+<div class="about-modal" id="aboutModal" style="display:none">
 
-.job-form input:focus,.job-form textarea:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+<div class="about-dialog">
 
-.job-form .note{font-size:.8rem;color:#64748b;margin-bottom:8px}
+<div class="about-head">
 
-.job-form .hint{display:block;font-size:.75rem;color:#64748b;margin-top:6px}
+<h3>About our platform</h3>
 
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+<button class="btn xsm ghost" id="aboutClose">Close</button>
 
-@media(max-width:820px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
+</div>
 
-.cat-card{display:flex;align-items:center;gap:10px;justify-content:flex-start;background:#fff;border:1px solid rgba(15,23,42,.08);color:#0f172a;border-radius:12px;padding:14px;cursor:pointer;font-weight:700}
+<div class="about-body">
 
-.cat-card:hover{border-color:#0EA5E9;box-shadow:0 0 0 3px rgba(14,165,233,.08)}
+<p><strong>ProBuildZone</strong> is a matching platform that connects homeowners with local, vetted pros. We are <em>not</em> a contractor, and we don’t perform any manual work or handle payments between parties.</p>
 
-.selected-cat{display:inline-flex;gap:8px;align-items:center;margin-bottom:10px;background:#e2e8f0;border:1px solid #cbd5e1;color:#0f172a;border-radius:999px;padding:6px 12px;font-size:.9rem}
+<ul>
 
-.upload-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px dashed #94a3b8;border-radius:12px;padding:12px 14px;margin:8px 0 6px}
+<li>We introduce homeowners to qualified builders/pros.</li>
 
-.upload-wrap.hover{background:#e2e8f0;border-color:#0EA5E9}
+<li>Privacy-first — project photos, address, and contact info stay private until the owner approves sharing.</li>
 
-.upload-wrap input[type=file]{display:none}
+<li>You negotiate scope, timing, and price directly with the pro.</li>
 
-.btn.outline{background:transparent;border:1px dashed #94a3b8;color:#0f172a}
+<li>No platform fees; we never interfere with any offer or payment.</li>
 
-.file-hint{font-size:.75rem;color:#64748b;margin-top:6px;margin-bottom:12px;text-align:left;line-height:1.4}
+</ul>
 
-.card{background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:10px;padding:10px;margin:10px 0}
+</div>
 
-.file-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px}
+</div>
 
-.file-item .thumb{width:40px;height:40px;border-radius:8px;background:#e2e8f0;display:grid;place-items:center;overflow:hidden}
+</div>
 
-.file-item .thumb img{width:100%;height:100%;object-fit:cover}
+<div class="modal" id="modal" style="display:none">
 
-.file-item .meta{display:flex;flex-direction:column;gap:2px;font-size:.78rem;color:#0f172a}
+<div class="sheet">
 
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+<div class="sheet-head">
 
-@media(max-width:620px){.row2{grid-template-columns:1fr}}
+<button class="btn xsm ghost back" id="backBtn">← Back</button>
 
-.about-modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);z-index:9999}
+<h3 id="sheetTitle">Post a Job</h3>
 
-.about-dialog{width:min(820px,94%);background:#fff;border:1px solid #e5e9f2;border-radius:14px;overflow:hidden}
+<button class="btn xsm ghost" id="closeDoor">Close</button>
 
-.about-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#0b1220;color:#E9ECF5;border-bottom:1px solid rgba(255,255,255,.12)}
+</div>
 
-.about-body{padding:18px}
+<section class="job-form" id="step1">
 
-.about-body ul{margin-left:18px;line-height:1.8}
+<h2>Choose a category</h2>
 
-@media(max-width:780px){header{padding:14px 16px}:root{--logo-size:26px}}
+<p class="note">Pick what best fits your project. You can change later.</p>
 
-@media(max-width:520px){:root{--logo-size:22px}.pro-btn{font-size:13px;padding:6px 10px}}
+<div class="cat-grid">
+
+<button class="cat-card" data-cat="Roofing">🏠 <span>Roofing</span></button>
+
+<button class="cat-card" data-cat="Decks & Porches">🪚 <span>Decks & Porches</span></button>
+
+<button class="cat-card" data-cat="Kitchens">🍳 <span>Kitchens</span></button>
+
+<button class="cat-card" data-cat="Bathrooms">🛁 <span>Bathrooms</span></button>
+
+<button class="cat-card" data-cat="Flooring">🪵 <span>Flooring</span></button>
+
+<button class="cat-card" data-cat="Painting">🎨 <span>Painting</span></button>
+
+<button class="cat-card" data-cat="Masonry">🧱 <span>Masonry</span></button>
+
+<button class="cat-card" data-cat="Electrical">⚡ <span>Electrical</span></button>
+
+<button class="cat-card" data-cat="Plumbing">🚰 <span>Plumbing</span></button>
+
+<button class="cat-card" data-cat="Windows & Doors">🪟 <span>Windows & Doors</span></button>
+
+<button class="cat-card" data-cat="Landscaping">🌿 <span>Landscaping</span></button>
+
+<button class="cat-card" data-cat="Handyman">🧰 <span>Handyman</span></button>
+
+</div>
+
+</section>
+
+<section class="job-form" id="step2" style="display:none">
+
+<div class="selected-cat" id="selectedCat">Category: <b>-</b></div>
+
+<div class="upload-wrap" id="dropZone">
+
+<input type="file" id="fileInput" multiple accept="image/*,application/pdf"/>
+
+<button type="button" class="btn outline" id="pickBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos/Files</button>
+
+<span class="hint">You can select multiple photos or a PDF plan. Drag & drop is supported.</span>
+
+</div>
+
+<div class="file-hint">Adding photos helps pros understand your project better (optional)</div>
+
+<div class="card" id="fileList"></div>
+
+<input type="hidden" id="categoryHidden" value="General"/>
+
+<label for="title">Project title *</label>
+
+<input id="title" type="text" placeholder="e.g., Replace leaking roof" required>
+
+<label for="summary">Short summary</label>
+
+<input id="summary" type="text" placeholder="One or two lines...">
+
+<div class="row2">
+
+<div>
+
+<label for="city">City</label>
+
+<input id="city" type="text" placeholder="Enter your city">
+
+</div>
+
+<div>
+
+<label for="state">State</label>
+
+<input id="state" type="text" placeholder="Enter your state">
+
+</div>
+
+</div>
+
+<div class="row2">
+
+<div>
+
+<label for="contactName">Contact name *</label>
+
+<input id="contactName" type="text" placeholder="Your name" required>
+
+</div>
+
+<div>
+
+<label for="phone">Phone *</label>
+
+<input id="phone" type="tel" placeholder="Your phone number" required>
+
+</div>
+
+</div>
+
+<label for="email">Email *</label>
+
+<input id="email" type="email" placeholder="Your email address" required>
+
+<label for="address">Full address *</label>
+
+<input id="address" type="text" placeholder="Street, City, State" required>
+
+<label for="longDesc">Full description *</label>
+
+<textarea id="longDesc" placeholder="Describe the job in detail..." rows="4" required></textarea>
+
+<div class="center" style="margin-top:10px">
+
+<button id="sendBtn" class="btn primary">🚀 Post Job</button>
+
+<span id="sendMsg" class="hint"></span>
+
+</div>
+
+</section>
+
+</div>
+
+</div>
+
+<script>
+
+const aboutModal=document.getElementById('aboutModal');const openAbout=(e)=>{if(e)e.preventDefault();aboutModal.style.display='grid';document.documentElement.style.overflow='hidden';};const closeAbout=()=>{aboutModal.style.display='none';document.documentElement.style.overflow='';};document.getElementById('openAbout')?.addEventListener('click',openAbout);document.getElementById('openAbout2')?.addEventListener('click',openAbout);document.getElementById('aboutClose')?.addEventListener('click',closeAbout);aboutModal?.addEventListener('click',(ev)=>{if(ev.target===aboutModal)closeAbout();});
+
+const modal=document.getElementById('modal');const step1=document.getElementById('step1');const step2=document.getElementById('step2');const sheet=document.querySelector('.sheet');const selectedCatEl=document.getElementById('selectedCat').querySelector('b');const hiddenCat=document.getElementById('categoryHidden');
+
+function openDoor(){modal.style.display='flex';document.documentElement.style.overflow='hidden';goStep(1);}
+
+function closeDoor(){modal.style.display='none';document.documentElement.style.overflow='';}
+
+function goStep(n){if(n===1){step1.style.display='block';step2.style.display='none';document.getElementById('sheetTitle').textContent='Post a Job';}if(n===2){step1.style.display='none';step2.style.display='block';document.getElementById('sheetTitle').textContent='Post a Job';sheet.scrollTop=0;}}
+
+document.getElementById('postJobTop').addEventListener('click',()=>{openDoor();});
+
+document.getElementById('closeDoor').addEventListener('click',closeDoor);
+
+document.getElementById('backBtn').addEventListener('click',()=>{if(step1.style.display==='block')closeDoor();else goStep(1);});
+
+document.querySelectorAll('.cat-card').forEach(btn=>{btn.addEventListener('click',()=>{const val=btn.dataset.cat;hiddenCat.value=val;selectedCatEl.textContent=val;goStep(2);});});
+
+document.getElementById('goQuick').addEventListener('click',()=>{const id=document.getElementById('jobIdQuick').value.trim();if(id){location.href=`/offers.html?id=${encodeURIComponent(id)}`;}});
+
+const fileInput=document.getElementById('fileInput');const pickBtn=document.getElementById('pickBtn');const fileList=document.getElementById('fileList');const dropZone=document.getElementById('dropZone');
+
+if(pickBtn)pickBtn.onclick=()=>fileInput.click();
+
+const humanSize=(b)=>b<1024?(b+' B'):b<1048576?((b/1024).toFixed(1)+' KB'):((b/1048576).toFixed(1)+' MB');
+
+const renderList=(files)=>{fileList.innerHTML='';if(!files.length){fileList.innerHTML='<span class="hint">No files selected yet.</span>';return;}[...files].forEach(f=>{const isImg=/^image\//.test(f.type);const item=document.createElement('div');item.className='file-item';item.innerHTML=`<div class="thumb">${isImg?`<img src="${URL.createObjectURL(f)}" alt="">`:`<i class="fa-regular fa-file-lines"></i>`}</div><div class="meta"><b>${f.name}</b><span>${f.type||'file'} • ${humanSize(f.size)}</span></div>`;fileList.appendChild(item);});};
+
+fileInput?.addEventListener('change',()=>renderList(fileInput.files));
+
+['dragenter','dragover','dragleave','drop'].forEach(e=>dropZone?.addEventListener(e,ev=>{ev.preventDefault();ev.stopPropagation();},false));
+
+['dragenter','dragover'].forEach(e=>dropZone?.addEventListener(e,()=>dropZone.classList.add('hover'),false));
+
+['dragleave','drop'].forEach(e=>dropZone?.addEventListener(e,()=>dropZone.classList.remove('hover'),false));
+
+dropZone?.addEventListener('drop',ev=>{const dt=ev.dataTransfer;if(dt?.files){fileInput.files=dt.files;renderList(fileInput.files);}});
+
+const bufToBase64=(buf)=>{let bin='';new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b));return btoa(bin);};
+
+const filesToBase64=async(list)=>{const arr=[];for(const f of [...(list||[])]){if(f.size>10*1024*1024)throw new Error(`File too large: ${f.name}`);const buf=await f.arrayBuffer();arr.push(bufToBase64(buf));}return arr;};
+
+document.getElementById('sendBtn').addEventListener('click',async()=>{const m=document.getElementById('sendMsg');try{const payload={
+
+category:hiddenCat.value||'General',
+
+project_title:document.getElementById('title').value.trim(),
+
+short_summary:document.getElementById('summary').value.trim(),
+
+city:document.getElementById('city').value.trim(),
+
+state:document.getElementById('state').value.trim(),
+
+contact_name:document.getElementById('contactName').value.trim(),
+
+phone:document.getElementById('phone').value.trim(),
+
+email:document.getElementById('email').value.trim(),
+
+full_address:document.getElementById('address').value.trim(),
+
+full_description:document.getElementById('longDesc').value.trim(),
+
+photosBase64:await filesToBase64(fileInput.files)
+
+};
+
+if(!payload.project_title||!payload.contact_name||!payload.phone||!payload.email||!payload.full_address||!payload.full_description){m.textContent='Please fill all required fields.';return;}
+
+m.textContent='Sending...';
+
+const res=await fetch('/.netlify/functions/post-homeowner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+
+const j=await res.json();
+
+if(!res.ok||!j.ok)throw new Error(j.error||'Failed');
+
+m.textContent='Posted ✔';setTimeout(()=>{m.textContent='';closeDoor();},1100);
+
+}catch(e){m.textContent='Error: '+(e.message||'failed');}});
+
+</script>
+
+</body></html>
