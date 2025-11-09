@@ -64,36 +64,6 @@ export const handler = async (event) => {
 
 
 
-    const {
-
-      category,
-
-      project_title,
-
-      short_summary,
-
-      city,
-
-      state,
-
-      budget_from,
-
-      budget_to,
-
-      contact_name,
-
-      phone,
-
-      email,
-
-      full_address,
-
-      full_description,
-
-    } = body;
-
-
-
     const { data, error } = await supabase
 
       .from('homeowner_jobs')
@@ -102,29 +72,25 @@ export const handler = async (event) => {
 
         {
 
-          category,
+          category: body.category,
 
-          project_title,
+          project_title: body.project_title,
 
-          short_summary,
+          short_summary: body.short_summary,
 
-          city,
+          city: body.city,
 
-          state,
+          state: body.state,
 
-          budget_from,
+          contact_name: body.contact_name,
 
-          budget_to,
+          phone: body.phone,
 
-          contact_name,
+          email: body.email,
 
-          phone,
+          full_address: body.full_address,
 
-          email,
-
-          full_address,
-
-          full_description,
+          full_description: body.full_description,
 
           approved: false,
 
