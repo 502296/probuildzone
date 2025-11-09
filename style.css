@@ -54,7 +54,9 @@ nav a{color:#fff;text-decoration:none;font-weight:700}
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:stretch;justify-content:center;z-index:9999}
 
-.sheet{background:#f3f4f6;border:1px solid rgba(15,23,42,.04);width:min(880px,100%);height:100dvh;overflow:auto;color:#0f172a;padding:18px 18px 160px;}
+@keyframes fadeModal{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.sheet{background:#f3f4f6;border:1px solid rgba(15,23,42,.04);width:min(880px,100%);height:100dvh;overflow:auto;color:#0f172a;padding:18px 18px 160px;animation:fadeModal .4s ease;}
 
 .sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f3f4f6;position:sticky;top:0;z-index:2;border-bottom:1px solid rgba(15,23,42,.06)}
 
