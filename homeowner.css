@@ -1,0 +1,217 @@
+body {
+
+  background: #0f172a; /* أفتح من البنفسجي الغامق */
+
+  margin: 0;
+
+  padding: 1rem;
+
+}
+
+
+
+.job-wrapper {
+
+  max-width: 720px;
+
+  margin: 0 auto;
+
+  background: #1e2840;
+
+  border: 1px solid rgba(255,255,255,0.03);
+
+  border-radius: 14px;
+
+  padding: 1.5rem 1.5rem 2rem;
+
+  color: #fff;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  box-shadow: 0 18px 40px rgba(0,0,0,.15);
+
+}
+
+
+
+.back-btn {
+
+  background: transparent;
+
+  border: 0;
+
+  color: #fff;
+
+  margin-bottom: .5rem;
+
+  cursor: pointer;
+
+  font-size: .9rem;
+
+}
+
+
+
+.job-title {
+
+  margin: 0;
+
+  font-size: 1.35rem;
+
+  font-weight: 700;
+
+}
+
+
+
+.job-sub {
+
+  margin-top: .25rem;
+
+  margin-bottom: 1rem;
+
+  color: rgba(255,255,255,.7);
+
+  font-size: .9rem;
+
+}
+
+
+
+.chip-row {
+
+  margin-bottom: 1rem;
+
+}
+
+.chip {
+
+  background: rgba(68,150,255,.15);
+
+  border: 1px solid rgba(68,150,255,.4);
+
+  padding: .35rem .8rem;
+
+  border-radius: 999px;
+
+  font-size: .75rem;
+
+}
+
+
+
+.upload-box {
+
+  background: rgba(0,0,0,.12);
+
+  border: 1px dashed rgba(255,255,255,.25);
+
+  border-radius: 12px;
+
+  padding: .75rem 1rem;
+
+  margin-bottom: 1rem;
+
+}
+
+
+
+.job-form label {
+
+  display: block;
+
+  font-size: .78rem;
+
+  margin-bottom: .7rem;
+
+}
+
+.job-form input,
+
+.job-form textarea,
+
+.job-form select {
+
+  width: 100%;
+
+  background: rgba(0,0,0,.25);
+
+  border: 1px solid rgba(255,255,255,.07);
+
+  border-radius: 8px;
+
+  padding: .6rem .5rem;
+
+  color: #fff;
+
+  margin-top: .35rem;
+
+  font-size: .85rem;
+
+}
+
+.job-form input:focus,
+
+.job-form textarea:focus {
+
+  outline: 1px solid rgba(113,199,255,.6);
+
+  background: rgba(0,0,0,.35);
+
+}
+
+
+
+.row {
+
+  display: flex;
+
+  gap: .75rem;
+
+}
+
+.half {
+
+  flex: 1;
+
+}
+
+
+
+.post-btn {
+
+  width: 140px;
+
+  margin-top: .4rem;
+
+  background: #22a6f0;
+
+  border: none;
+
+  border-radius: 999px;
+
+  padding: .55rem 1rem;
+
+  color: #001326;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+}
+
+.post-btn:hover {
+
+  background: #46b4f2;
+
+}
+
+
+
+.status {
+
+  margin-top: .85rem;
+
+  font-size: .8rem;
+
+}
