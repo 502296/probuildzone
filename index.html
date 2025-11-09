@@ -1,165 +1,305 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+<!DOCTYPE html>
 
+<html lang="en">
 
+<head>
 
-:root {
+  <meta charset="UTF-8" />
 
-  --sky:#0EA5E9;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  --gold:#F9A825;
+  <title>ProBuildZone – Post a Job</title>
 
-  --white:#fff;
 
-  --text:#0f172a;
 
-  --bg:#f3f4f6;
+  <!-- Main Styles -->
 
-}
+  <link rel="stylesheet" href="/style.css?v=7" />
 
+  <link rel="stylesheet" href="/homeowner.css" />
 
 
-*{margin:0;padding:0;box-sizing:border-box}
 
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#fff;color:var(--text)}
+  <!-- Force gray background override -->
 
+  <style>
 
+    #modal .sheet { background: #f3f4f6 !important; }
 
-header{position:absolute;top:0;left:0;width:100%;padding:18px 40px;z-index:10}
+    #modal .job-form { background: #f9fafb !important; border: 1px solid #e2e8f0 !important; }
 
-nav{display:flex;justify-content:space-between;align-items:center}
+    body { background: #f3f4f6 !important; }
 
-.brand-logo{font-size:34px;font-weight:900;display:flex;gap:.15em}
+  </style>
 
-.brand-logo .pro{color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.55)}
+</head>
 
-.brand-logo .build{color:var(--sky);text-shadow:0 2px 6px rgba(0,0,0,.25)}
 
-.brand-logo .zone{background:linear-gradient(135deg,#ffe29a,#f7b733 35%,#f59e0b 60%,#d97706 85%);
 
-  -webkit-background-clip:text;color:transparent;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+<body>
 
-nav ul{display:flex;gap:20px;list-style:none}
+  <header>
 
-nav a{color:#fff;text-decoration:none;font-weight:700}
+    <nav>
 
-.pro-btn{background:var(--gold);color:#111!important;padding:8px 16px;border-radius:8px}
+      <div class="brand-logo">
 
+        <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
 
+      </div>
 
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;
+      <ul>
 
-  background:url('images/hero-bg.jpg') center/cover no-repeat;color:#fff;padding:0 20px}
+        <li><a href="/">Home</a></li>
 
-.hero::before{content:"";position:absolute;inset:0;background:transparent}
+        <li><a href="/pros.html">For Pros</a></li>
 
-.overlay{position:relative;z-index:1;max-width:980px}
+        <li><a href="/homeowner.html">For Homeowners</a></li>
 
-.hero h1{font-size:clamp(32px,5vw,56px);margin-bottom:14px;line-height:1.1;text-shadow:0 3px 16px rgba(0,0,0,.55)}
+      </ul>
 
-.hero p{font-size:clamp(15px,1.5vw,18px);margin-bottom:22px;color:#eef2ff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+      <a href="/pros.html" class="pro-btn">Join as Pro</a>
 
-.buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    </nav>
 
-.btn{padding:12px 18px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+  </header>
 
-.primary{background:var(--sky);color:#fff}
 
-.btn:hover{filter:brightness(1.1)}
 
-.job-id{display:flex;justify-content:center;gap:10px;margin-top:8px}
+  <!-- HERO SECTION -->
 
-.job-id input{padding:10px;border-radius:10px;border:none;width:240px;background:rgba(255,255,255,.12);color:#fff}
+  <section class="hero">
 
-.job-id button{padding:10px 14px;border:none;background:var(--sky);color:#fff;border-radius:10px;font-weight:800}
+    <div class="overlay">
 
+      <h1>Find Local Pros You Can Trust</h1>
 
+      <p>From roofing to remodeling — post your project and connect with trusted professionals.</p>
 
-.links-row{padding:28px 16px;text-align:center}
+      <div class="buttons">
 
-.links-row a{color:#0b3c7d;font-weight:700;text-decoration:none;margin:0 10px}
+        <button class="btn primary" id="openModal">Post a Job</button>
 
+        <a href="/pros.html" class="btn">For Professionals</a>
 
+      </div>
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:stretch;justify-content:center;z-index:9999}
+    </div>
 
-.sheet{width:min(880px,100%);height:100dvh;background:var(--bg);color:#0f172a;overflow:auto;
+  </section>
 
-  border:1px solid #e5e7eb;padding:18px 18px 160px;border-radius:0;animation:fadeIn .4s ease}
 
-.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fff;
 
-  position:sticky;top:0;z-index:2;border-bottom:1px solid #e5e7eb}
+  <!-- MODAL -->
 
-.btn.xsm{padding:8px 12px;border-radius:8px}
+  <div id="modal" class="modal">
 
-.btn.ghost{background:transparent;border:1px solid #cbd5e1;color:#334155}
+    <div class="sheet">
 
+      <div class="sheet-head">
 
+        <button class="btn xsm ghost" id="closeModal">← Back</button>
 
-.job-form{background:#f9fafb;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:720px;margin:0 auto;color:#0f172a}
+        <h2>Post a Job</h2>
 
-.job-form h2{margin:0 0 6px}
+        <button class="btn xsm ghost" id="closeModalTop">Close</button>
 
-.job-form label{display:block;font-weight:600;margin-top:16px;margin-bottom:6px;font-size:0.95rem}
+      </div>
 
-.job-form input,.job-form textarea{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:8px;
 
-  padding:10px 14px;font-size:.95rem;color:#111;outline:none}
 
-.job-form input:focus,.job-form textarea:focus{border-color:var(--sky);box-shadow:0 0 8px rgba(14,165,233,.3)}
+      <!-- STEP 1: CATEGORY -->
 
-.job-form .note{font-size:.85rem;color:#64748b;margin-bottom:8px}
+      <div id="step1" class="job-form">
 
-.job-form .hint{display:block;font-size:.8rem;color:#94a3b8;margin-top:6px}
+        <h2>Choose a category</h2>
 
+        <p>Pick what best fits your project. You can change later.</p>
 
 
-.upload-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#f8fafc;
 
-  border:1px dashed #93c5fd;border-radius:12px;padding:12px 14px;margin:8px 0 6px;transition:.2s ease}
+        <div class="cat-grid">
 
-.upload-wrap.hover{background:#f1f5f9;border-color:#60a5fa}
+          <div class="cat-card">🏠 <span>Roofing</span></div>
 
-.upload-wrap input[type=file]{display:none}
+          <div class="cat-card">🪵 <span>Decks & Porches</span></div>
 
-.btn.outline{background:transparent;border:1px dashed #93c5fd;color:#0369a1}
+          <div class="cat-card">🔍 <span>Kitchens</span></div>
 
-.file-hint{font-size:.85rem;color:#64748b;margin-top:6px;margin-bottom:12px;line-height:1.4;text-align:left}
+          <div class="cat-card">🛁 <span>Bathrooms</span></div>
 
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin:10px 0}
+          <div class="cat-card">🪵 <span>Flooring</span></div>
 
-.file-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px}
+          <div class="cat-card">🎨 <span>Painting</span></div>
 
-.file-item .thumb{width:40px;height:40px;border-radius:8px;background:#f3f4f6;display:grid;place-items:center;overflow:hidden}
+          <div class="cat-card">🧱 <span>Masonry</span></div>
 
-.file-item .thumb img{width:100%;height:100%;object-fit:cover}
+          <div class="cat-card">⚡ <span>Electrical</span></div>
 
-.file-item .meta{display:flex;flex-direction:column;gap:2px;font-size:.85rem;color:#334155}
+          <div class="cat-card">🚰 <span>Plumbing</span></div>
 
+          <div class="cat-card">🪟 <span>Windows & Doors</span></div>
 
+          <div class="cat-card">🌿 <span>Landscaping</span></div>
 
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+          <div class="cat-card">🧰 <span>Handyman</span></div>
 
-@media(max-width:620px){.row2{grid-template-columns:1fr}}
+        </div>
 
+      </div>
 
 
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
 
-@media(max-width:820px){.cat-grid{grid-template-columns:repeat(2,1fr)}}
+      <!-- STEP 2: JOB DETAILS -->
 
-.cat-card{display:flex;align-items:center;gap:10px;justify-content:flex-start;background:#fff;
+      <div id="step2" class="job-form" style="display:none;">
 
-  border:1px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;font-weight:800;transition:.2s}
+        <div class="selected-cat">🏠 <span id="selectedCategory">Roofing</span></div>
 
-.cat-card:hover{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(14,165,233,.15)}
 
-.cat-card span{font-weight:800}
 
-.selected-cat{display:inline-flex;gap:8px;align-items:center;margin-bottom:10px;background:#e2e8f0;
+        <label>Upload Photos / Files</label>
 
-  color:#111;border-radius:999px;padding:6px 12px;font-size:.9rem}
+        <div class="upload-wrap">
 
+          <input type="file" id="fileInput" multiple />
 
+          <label for="fileInput" class="btn outline">Choose Photos/Files</label>
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        </div>
+
+        <p class="file-hint">Adding photos helps pros understand your project better (optional).</p>
+
+
+
+        <label>Project title *</label>
+
+        <input type="text" placeholder="e.g., Replace leaking roof" id="projectTitle" />
+
+
+
+        <label>Short summary</label>
+
+        <input type="text" placeholder="One or two lines..." id="projectSummary" />
+
+
+
+        <div class="row2">
+
+          <div>
+
+            <label>City</label>
+
+            <input type="text" id="city" placeholder="Enter your city" />
+
+          </div>
+
+          <div>
+
+            <label>State</label>
+
+            <input type="text" id="state" placeholder="Enter your state" />
+
+          </div>
+
+        </div>
+
+
+
+        <label>Contact name *</label>
+
+        <input type="text" id="contactName" placeholder="Your name" />
+
+
+
+        <label>Additional notes</label>
+
+        <textarea rows="3" id="notes" placeholder="Add any details or timing preferences..."></textarea>
+
+
+
+        <div style="margin-top:18px;text-align:right;">
+
+          <button class="btn primary" id="submitJob">Submit Job</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- SIMPLE SCRIPT -->
+
+  <script>
+
+    const modal = document.getElementById('modal');
+
+    const openModal = document.getElementById('openModal');
+
+    const closeModal = document.getElementById('closeModal');
+
+    const closeModalTop = document.getElementById('closeModalTop');
+
+    const step1 = document.getElementById('step1');
+
+    const step2 = document.getElementById('step2');
+
+    const categoryCards = document.querySelectorAll('.cat-card');
+
+    const selectedCategory = document.getElementById('selectedCategory');
+
+
+
+    openModal?.addEventListener('click', () => {
+
+      modal.style.display = 'flex';
+
+      document.body.style.overflow = 'hidden';
+
+    });
+
+
+
+    [closeModal, closeModalTop].forEach(btn => {
+
+      btn?.addEventListener('click', () => {
+
+        modal.style.display = 'none';
+
+        document.body.style.overflow = 'auto';
+
+        step2.style.display = 'none';
+
+        step1.style.display = 'block';
+
+      });
+
+    });
+
+
+
+    categoryCards.forEach(card => {
+
+      card.addEventListener('click', () => {
+
+        const category = card.textContent.trim();
+
+        selectedCategory.textContent = category;
+
+        step1.style.display = 'none';
+
+        step2.style.display = 'block';
+
+      });
+
+    });
+
+  </script>
+
+</body>
+
+</html>
