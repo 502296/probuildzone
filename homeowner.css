@@ -1,6 +1,6 @@
 body {
 
-  background: #0f172a;
+  background: #e9eef8;
 
   margin: 0;
 
@@ -16,15 +16,15 @@ body {
 
   margin: 1.5rem auto;
 
-  background: #1f2a48; /* أفتح من القديم */
+  background: #ffffff;
 
   border-radius: 14px;
 
   padding: 1.5rem;
 
-  color: #fff;
+  color: #0f172a;
 
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.15);
 
 }
 
@@ -50,7 +50,7 @@ body {
 
   border: none;
 
-  color: #fff;
+  color: #475569;
 
   cursor: pointer;
 
@@ -62,15 +62,17 @@ body {
 
   display: inline-block;
 
-  background: rgba(68, 150, 255, 0.15);
+  background: #eff6ff;
 
-  border: 1px solid rgba(68, 150, 255, 0.4);
+  border: 1px solid #bfdbfe;
 
   padding: 0.25rem 0.65rem;
 
   border-radius: 999px;
 
   font-size: 0.75rem;
+
+  color: #1e3a8a;
 
   margin-bottom: 1rem;
 
@@ -84,7 +86,11 @@ body {
 
   margin-bottom: 0.7rem;
 
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+
+  font-weight: 500;
+
+  color: #1e293b;
 
 }
 
@@ -96,17 +102,17 @@ body {
 
   width: 100%;
 
-  background: rgba(255, 255, 255, 0.035);
+  background: #f8fafc;
 
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #cbd5e1;
 
   border-radius: 8px;
 
-  padding: 0.55rem 0.5rem;
+  padding: 0.6rem 0.5rem;
 
   margin-top: 0.35rem;
 
-  color: #fff;
+  color: #0f172a;
 
 }
 
@@ -120,6 +126,8 @@ body {
 
 }
 
+
+
 .half {
 
   flex: 1;
@@ -132,18 +140,28 @@ body {
 
   margin-top: 0.5rem;
 
-  background: #25a6f0;
+  background: #2563eb;
 
   border: none;
 
-  border-radius: 999px;
+  border-radius: 8px;
 
-  padding: 0.55rem 1rem;
+  padding: 0.65rem 1.2rem;
 
-  color: #001326;
+  color: #fff;
 
   font-weight: 600;
 
   cursor: pointer;
+
+}
+
+
+
+#homeowner-status {
+
+  margin-top: 0.5rem;
+
+  font-size: 0.85rem;
 
 }
