@@ -4,17 +4,19 @@ import { createClient } from '@supabase/supabase-js';
 
 
 
-const supabaseUrl = process.env.SUPABASE_URL;
+const supabase = createClient(
 
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+  process.env.SUPABASE_URL,
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+  process.env.SUPABASE_ANON_KEY
+
+);
 
 
 
 export const handler = async (event) => {
 
-  // CORS preflight
+  // CORS
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -92,8 +94,6 @@ export const handler = async (event) => {
 
 
 
-    // إدخال في جدول homeowner_jobs
-
     const { data, error } = await supabase
 
       .from('homeowner_jobs')
@@ -126,6 +126,8 @@ export const handler = async (event) => {
 
           full_description,
 
+          approved: false,
+
         },
 
       ])
@@ -138,7 +140,7 @@ export const handler = async (event) => {
 
     if (error) {
 
-      console.error('Supabase insert error:', error);
+      console.error(error);
 
       return {
 
@@ -166,7 +168,7 @@ export const handler = async (event) => {
 
   } catch (err) {
 
-    console.error('General error:', err);
+    console.error(err);
 
     return {
 
