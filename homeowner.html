@@ -1,269 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ProBuildZone – Post a Job</title>
-  <style>
-    body {
-      background: #0f2a43;
 
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  <meta charset="UTF-8">
 
-      padding: 30px 15px 50px;
+  <title>Post a Job – ProBuildZone</title>
 
-      display: flex;
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-      justify-content: center;
-
-      color: white;
-
-    }
-
-    .container {
-
-      width: min(600px, 100%);
-
-      background: #132d49;
-
-      padding: 25px 30px;
-
-      border-radius: 12px;
-
-      box-shadow: 0 0 12px rgba(0,0,0,0.25);
-
-    }
-
-    h1 {
-
-      text-align: center;
-
-      color: #D4AF37;
-
-      margin-bottom: 10px;
-
-    }
-
-    p.sub {
-
-      text-align: center;
-
-      color: #ccc;
-
-      margin-bottom: 25px;
-
-      font-size: 0.95rem;
-
-    }
-
-    label {
-
-      display: block;
-
-      margin-top: 14px;
-
-      font-weight: 600;
-
-      color: #f1f1f1;
-
-    }
-
-    input, textarea {
-
-      width: 100%;
-
-      margin-top: 6px;
-
-      padding: 10px 11px;
-
-      border-radius: 6px;
-
-      border: 1px solid #dcdde1;
-
-      font-size: 0.93rem;
-
-      background: #f8f8f8;
-
-      color: #111;
-
-    }
-
-    textarea {
-
-      min-height: 90px;
-
-      resize: vertical;
-
-    }
-
-    button {
-
-      width: 100%;
-
-      margin-top: 22px;
-
-      background: #D4AF37;
-
-      color: #0f2a43;
-
-      border: none;
-
-      border-radius: 6px;
-
-      padding: 12px 0;
-
-      font-size: 1rem;
-
-      font-weight: 600;
-
-      cursor: pointer;
-
-      transition: background 0.15s ease;
-
-    }
-
-    button:hover { background: #b9962f; }
-
-    .msg { margin-top: 15px; padding: 10px 12px; border-radius: 6px; display: none; font-size: 0.9rem; }
-
-    .msg.success { background: rgba(39,174,96,0.15); color: #2ecc71; }
-
-    .msg.error { background: rgba(192,57,43,0.15); color: #e74c3c; }
-
-  </style>
+  <link rel="stylesheet" href="/css/homeowner.css">
 
 </head>
 
-
-
 <body>
 
-  <div class="container">
-
-    <h1>Post a Job</h1>
-
-    <p class="sub">Tell us what you need and we’ll match you with local pros.</p>
 
 
+  <div class="job-wrapper">
 
-    <form id="homeownerForm">
+    <button class="back-btn" onclick="history.back()">← Back</button>
 
-      <label>Category</label>
+    <h2 class="job-title">Post a Job</h2>
 
-      <input id="category" name="category" placeholder="e.g. Roofing, Plumbing..." />
+    <p class="job-sub">Add your project details so local pros can contact you.</p>
 
 
 
-      <label>Project title *</label>
+    <!-- لو كنت مختار الكاتيجوري من صفحة قبل -->
 
-      <input id="title" name="title" placeholder="Replace leaking roof..." required />
+    <div class="chip-row">
 
+      <span class="chip" id="categoryLabel">Category: Roofing</span>
 
-
-      <label>Short summary</label>
-
-      <input id="summary" name="summary" placeholder="One or two lines..." />
+    </div>
 
 
 
-      <label>City</label>
+    <!-- صندوق رفع الصور (حالياً شكلي) -->
 
-      <input id="city" name="city" placeholder="Enter your city" />
+    <div class="upload-box">
+
+      <strong>📁 Choose Photos/Files</strong>
+
+      <p>You can select multiple photos or a PDF plan. Drag & drop is supported. (optional)</p>
+
+    </div>
 
 
 
-      <label>State</label>
+    <form id="homeowner-form" class="job-form">
 
-      <input id="state" name="state" placeholder="Enter your state" />
+      <label>
+
+        Project title *
+
+        <input type="text" name="project_title" id="project_title" placeholder="e.g., Replace leaking roof" required>
+
+      </label>
 
 
 
-      <label>Estimated budget (optional)</label>
+      <label>
 
-      <div style="display:flex; gap:10px;">
+        Short summary
 
-        <input id="budget_from" name="budget_from" placeholder="From ($)" />
+        <input type="text" name="short_summary" id="short_summary" placeholder="One or two lines...">
 
-        <input id="budget_to" name="budget_to" placeholder="To ($)" />
+      </label>
+
+
+
+      <div class="row">
+
+        <label class="half">
+
+          City
+
+          <input type="text" name="city" id="city" placeholder="Enter your city">
+
+        </label>
+
+        <label class="half">
+
+          State
+
+          <input type="text" name="state" id="state" placeholder="Enter your state">
+
+        </label>
 
       </div>
 
 
 
-     <label>Contact name *</label>
+      <div class="row">
 
-<input id="full_name" name="full_name" placeholder="Your name" required />
+        <label class="half">
 
+          Estimated budget (From $)
 
+          <input type="text" name="budget_from" id="budget_from" placeholder="From ($)">
 
-<label>Phone *</label>
+        </label>
 
-<input
+        <label class="half">
 
-  id="phone"
+          To ($)
 
-  name="phone"
+          <input type="text" name="budget_to" id="budget_to" placeholder="To ($)">
 
-  placeholder="Your phone number"
+        </label>
 
-  pattern="[0-9]{10}"
-
-  inputmode="numeric"
-
-  title="Please enter a 10-digit phone number"
-
-  required
-
-/>
+      </div>
 
 
 
-<label>Email *</label>
+      <div class="row">
 
-<input
+        <label class="half">
 
-  id="email"
+          Contact name *
 
-  name="email"
+          <input type="text" name="contact_name" id="contact_name" placeholder="Your name" required>
 
-  type="email"
+        </label>
 
-  placeholder="Your email address"
+        <label class="half">
 
-  required
+          Phone *
 
-/>
+          <input type="tel" name="phone" id="phone" placeholder="Your phone number" required>
 
+        </label>
 
-
-<label>Full address *</label>
-
-<input id="address" name="address" placeholder="Street, City, State" required />
+      </div>
 
 
 
-<label>Full description *</label>
+      <label>
 
-<textarea
+        Email *
 
-  id="description"
+        <input type="email" name="email" id="email" placeholder="Your email address" required>
 
-  name="description"
-
-  placeholder="Describe the job in detail..."
-
-  required
-
-></textarea>
+      </label>
 
 
 
-<button type="submit">🚀 Post Job</button>
+      <label>
+
+        Full address *
+
+        <input type="text" name="full_address" id="full_address" placeholder="Street, City, State" required>
+
+      </label>
 
 
-      <div id="successMsg" class="msg success">✅ Your job has been posted successfully.</div>
 
-      <div id="errorMsg" class="msg error">❌ Something went wrong.</div>
+      <label>
+
+        Full description *
+
+        <textarea name="full_description" id="full_description" rows="4" placeholder="Describe the job in detail..." required></textarea>
+
+      </label>
+
+
+
+      <button type="submit" class="post-btn" id="postJobBtn">🚀 Post Job</button>
+
+      <p id="homeowner-status" class="status"></p>
 
     </form>
 
@@ -271,147 +178,8 @@
 
 
 
-  <script>
+  <script src="/js/homeowner.js"></script>
 
-    const form = document.getElementById('homeownerForm');
-
-    const successMsg = document.getElementById('successMsg');
-
-    const errorMsg = document.getElementById('errorMsg');
-
-
-
-    form.addEventListener('submit', async (e) => {
-
-      e.preventDefault();
-
-      successMsg.style.display = 'none';
-
-      errorMsg.style.display = 'none';
-
-
-
-      const data = {
-
-        category: document.getElementById('category').value.trim(),
-
-        title: document.getElementById('title').value.trim(),
-
-        summary: document.getElementById('summary').value.trim(),
-
-        city: document.getElementById('city').value.trim(),
-
-        state: document.getElementById('state').value.trim(),
-
-        budget_from: document.getElementById('budget_from').value.trim(),
-
-        budget_to: document.getElementById('budget_to').value.trim(),
-
-        full_name: document.getElementById('full_name').value.trim(),
-
-        phone: document.getElementById('phone').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        address: document.getElementById('address').value.trim(),
-        description: document.getElementById('description').value.trim(),
-        zip: null,
-        homeowner_id: null,
-      };
-      try {
-        const res = await fetch('/.netlify/functions/post-homeowner', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-        if (res.ok && result.ok) {
-          successMsg.style.display = 'block';
-          form.reset();
-        } else {
-          errorMsg.textContent = '❌ ' + (result.error || 'Server error');
-          errorMsg.style.display = 'block';
-        }
-      } catch (err) {
-        errorMsg.textContent = '❌ Network error: ' + err.message;
-        errorMsg.style.display = 'block';
-      }
-    });
-  </script>
-<script>
-
-  const form = document.getElementById('homeownerForm');
-
-
-
-  form.addEventListener('submit', async (e) => {
-
-    e.preventDefault();
-
-
-
-    const payload = {
-
-      full_name: form.full_name.value,
-
-      phone: form.phone.value,
-
-      email: form.email.value,
-
-      address: form.address.value,
-
-      description: form.description.value,
-
-    };
-
-
-
-    // 👇 هذا هو رابط الفنكشن اللي عندك في الصورة
-
-    const endpoint = "https://hczahffwghbddaqbpbmu.supabase.co/functions/v1/smart-endpoint";
-
-
-
-    const res = await fetch(endpoint, {
-
-      method: "POST",
-
-      headers: { "Content-Type": "application/json" },
-
-      body: JSON.stringify(payload),
-
-    });
-
-
-
-    const data = await res.json();
-
-
-
-    if (!res.ok) {
-
-      // نعرض نفس الخط اللي عندك تحت الزر
-
-      const errBox = document.querySelector('.error-box') || document.createElement('p');
-
-      errBox.className = 'error-box';
-
-      errBox.style.color = '#f88';
-
-      errBox.textContent = "Error: " + (data.error || "Something went wrong");
-
-      form.appendChild(errBox);
-
-      return;
-
-    }
-
-
-
-    alert("Job posted ✅");
-
-    form.reset();
-
-  });
-
-</script>
 </body>
+
 </html>
