@@ -1,4 +1,4 @@
-// netlify/functions/save-homeowner-job.js
+// netlify/functions/post-homeowner.js
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -91,6 +91,8 @@ export const handler = async (event) => {
     } = body;
 
 
+
+    // إدخال في جدول homeowner_jobs
 
     const { data, error } = await supabase
 
