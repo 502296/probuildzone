@@ -12,29 +12,25 @@
 
 
 
-  <!-- Main Styles -->
+  <!-- main styles -->
 
-  <link rel="stylesheet" href="/style.css?v=7" />
+  <link rel="stylesheet" href="/style.css?v=8" />
 
   <link rel="stylesheet" href="/homeowner.css" />
 
 
 
-  <!-- Force gray background override -->
+  <!-- force gray for modal -->
 
   <style>
 
-    #modal .sheet { background: #f3f4f6 !important; }
+    #modal .sheet { background:#f3f4f6 !important; }
 
-    #modal .job-form { background: #f9fafb !important; border: 1px solid #e2e8f0 !important; }
-
-    body { background: #f3f4f6 !important; }
+    #modal .job-form { background:#f9fafb !important; border:1px solid #e2e8f0 !important; }
 
   </style>
 
 </head>
-
-
 
 <body>
 
@@ -66,21 +62,17 @@
 
 
 
-  <!-- HERO SECTION -->
-
   <section class="hero">
 
     <div class="overlay">
 
-      <h1>Find Local Pros You Can Trust</h1>
+      <h1>Get Home Projects Done</h1>
 
-      <p>From roofing to remodeling — post your project and connect with trusted professionals.</p>
+      <p>Post your project, local pros respond, you pick the best.</p>
 
       <div class="buttons">
 
         <button class="btn primary" id="openModal">Post a Job</button>
-
-        <a href="/pros.html" class="btn">For Professionals</a>
 
       </div>
 
@@ -90,9 +82,7 @@
 
 
 
-  <!-- MODAL -->
-
-  <div id="modal" class="modal">
+  <div id="modal" class="modal" style="display:none;">
 
     <div class="sheet">
 
@@ -108,7 +98,7 @@
 
 
 
-      <!-- STEP 1: CATEGORY -->
+      <!-- step 1 -->
 
       <div id="step1" class="job-form">
 
@@ -116,33 +106,31 @@
 
         <p>Pick what best fits your project. You can change later.</p>
 
-
-
         <div class="cat-grid">
 
-          <div class="cat-card">🏠 <span>Roofing</span></div>
+          <button class="cat-card">🏠 <span>Roofing</span></button>
 
-          <div class="cat-card">🪵 <span>Decks & Porches</span></div>
+          <button class="cat-card">🪵 <span>Decks & Porches</span></button>
 
-          <div class="cat-card">🔍 <span>Kitchens</span></div>
+          <button class="cat-card">🔍 <span>Kitchens</span></button>
 
-          <div class="cat-card">🛁 <span>Bathrooms</span></div>
+          <button class="cat-card">🛁 <span>Bathrooms</span></button>
 
-          <div class="cat-card">🪵 <span>Flooring</span></div>
+          <button class="cat-card">🪵 <span>Flooring</span></button>
 
-          <div class="cat-card">🎨 <span>Painting</span></div>
+          <button class="cat-card">🎨 <span>Painting</span></button>
 
-          <div class="cat-card">🧱 <span>Masonry</span></div>
+          <button class="cat-card">🧱 <span>Masonry</span></button>
 
-          <div class="cat-card">⚡ <span>Electrical</span></div>
+          <button class="cat-card">⚡ <span>Electrical</span></button>
 
-          <div class="cat-card">🚰 <span>Plumbing</span></div>
+          <button class="cat-card">🚰 <span>Plumbing</span></button>
 
-          <div class="cat-card">🪟 <span>Windows & Doors</span></div>
+          <button class="cat-card">🪟 <span>Windows & Doors</span></button>
 
-          <div class="cat-card">🌿 <span>Landscaping</span></div>
+          <button class="cat-card">🌿 <span>Landscaping</span></button>
 
-          <div class="cat-card">🧰 <span>Handyman</span></div>
+          <button class="cat-card">🧰 <span>Handyman</span></button>
 
         </div>
 
@@ -150,37 +138,37 @@
 
 
 
-      <!-- STEP 2: JOB DETAILS -->
+      <!-- step 2 -->
 
       <div id="step2" class="job-form" style="display:none;">
 
-        <div class="selected-cat">🏠 <span id="selectedCategory">Roofing</span></div>
+        <div class="selected-cat">Category: <b id="selectedCategory">Roofing</b></div>
 
 
 
-        <label>Upload Photos / Files</label>
+        <label>Upload photos/files</label>
 
         <div class="upload-wrap">
 
           <input type="file" id="fileInput" multiple />
 
-          <label for="fileInput" class="btn outline">Choose Photos/Files</label>
+          <button class="btn outline" onclick="document.getElementById('fileInput').click()">Choose Photos/Files</button>
 
         </div>
 
-        <p class="file-hint">Adding photos helps pros understand your project better (optional).</p>
+        <p class="file-hint">Optional, but helpful.</p>
 
 
 
-        <label>Project title *</label>
+        <label for="title">Project title *</label>
 
-        <input type="text" placeholder="e.g., Replace leaking roof" id="projectTitle" />
+        <input id="title" type="text" placeholder="e.g., Replace leaking roof" />
 
 
 
-        <label>Short summary</label>
+        <label for="summary">Short summary</label>
 
-        <input type="text" placeholder="One or two lines..." id="projectSummary" />
+        <input id="summary" type="text" placeholder="One or two lines..." />
 
 
 
@@ -188,17 +176,17 @@
 
           <div>
 
-            <label>City</label>
+            <label for="city">City</label>
 
-            <input type="text" id="city" placeholder="Enter your city" />
+            <input id="city" type="text" placeholder="Enter your city" />
 
           </div>
 
           <div>
 
-            <label>State</label>
+            <label for="state">State</label>
 
-            <input type="text" id="state" placeholder="Enter your state" />
+            <input id="state" type="text" placeholder="Enter your state" />
 
           </div>
 
@@ -206,21 +194,21 @@
 
 
 
-        <label>Contact name *</label>
+        <label for="contactName">Contact name *</label>
 
-        <input type="text" id="contactName" placeholder="Your name" />
-
-
-
-        <label>Additional notes</label>
-
-        <textarea rows="3" id="notes" placeholder="Add any details or timing preferences..."></textarea>
+        <input id="contactName" type="text" placeholder="Your name" />
 
 
 
-        <div style="margin-top:18px;text-align:right;">
+        <label for="desc">Full description *</label>
 
-          <button class="btn primary" id="submitJob">Submit Job</button>
+        <textarea id="desc" rows="4" placeholder="Describe the job..."></textarea>
+
+
+
+        <div style="margin-top:14px;text-align:right;">
+
+          <button class="btn primary" id="submitJob">🚀 Post Job</button>
 
         </div>
 
@@ -231,8 +219,6 @@
   </div>
 
 
-
-  <!-- SIMPLE SCRIPT -->
 
   <script>
 
@@ -248,7 +234,7 @@
 
     const step2 = document.getElementById('step2');
 
-    const categoryCards = document.querySelectorAll('.cat-card');
+    const catCards = document.querySelectorAll('.cat-card');
 
     const selectedCategory = document.getElementById('selectedCategory');
 
@@ -270,7 +256,7 @@
 
         modal.style.display = 'none';
 
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
 
         step2.style.display = 'none';
 
@@ -282,13 +268,11 @@
 
 
 
-    categoryCards.forEach(card => {
+    catCards.forEach(btn => {
 
-      card.addEventListener('click', () => {
+      btn.addEventListener('click', () => {
 
-        const category = card.textContent.trim();
-
-        selectedCategory.textContent = category;
+        selectedCategory.textContent = btn.innerText.trim();
 
         step1.style.display = 'none';
 
