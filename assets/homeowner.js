@@ -6,39 +6,23 @@ const form = document.getElementById('homeowner-form');
 
 const statusEl = document.getElementById('homeowner-status');
 
-const btn = document.getElementById('postJobBtn');
-
-
-
-// لو الصفحة القديمة كانت تربط الزر بفاكشن ثانية وتطلع الرسالة هذي
-
-// نحن بنوقف أي handler قديم
-
-if (btn) {
-
-  btn.onclick = null;
-
-}
-
 
 
 if (form) {
 
   form.addEventListener('submit', async (e) => {
 
-    e.preventDefault(); // أهم سطر: لا تستخدم الفحص القديم
+    e.preventDefault();
 
     if (statusEl) statusEl.textContent = 'Sending...';
 
 
 
-    // نجمع البيانات
-
     const data = Object.fromEntries(new FormData(form).entries());
 
 
 
-    // نضيف الكاتيجوري لو موجود
+    // خذ الكاتيجوري من الأعلى
 
     const catLabel = document.getElementById('categoryLabel');
 
@@ -70,7 +54,7 @@ if (form) {
 
       if (json.ok) {
 
-        statusEl.textContent = '✅ Job posted successfully.';
+        statusEl.textContent = '✅ Job posted. Waiting for approval.';
 
         form.reset();
 
