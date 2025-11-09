@@ -2,184 +2,148 @@
 
 <html lang="en">
 
-<head>
+  <head>
 
-  <meta charset="UTF-8">
+    <meta charset="UTF-8" />
 
-  <title>Post a Job – ProBuildZone</title>
+    <title>Post a Job</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="/css/homeowner.css">
+    <link rel="stylesheet" href="/homeowner.css" />
 
-</head>
+  </head>
 
-<body>
+  <body>
+
+    <div class="post-job-modal">
+
+      <div class="header">
+
+        <button class="back" onclick="history.back()">← Back</button>
+
+        <h2>Post a Job</h2>
+
+        <button class="close" onclick="history.back()">Close</button>
+
+      </div>
 
 
-
-  <div class="job-wrapper">
-
-    <button class="back-btn" onclick="history.back()">← Back</button>
-
-    <h2 class="job-title">Post a Job</h2>
-
-    <p class="job-sub">Add your project details so local pros can contact you.</p>
-
-
-
-    <!-- لو كنت مختار الكاتيجوري من صفحة قبل -->
-
-    <div class="chip-row">
 
       <span class="chip" id="categoryLabel">Category: Roofing</span>
 
-    </div>
 
 
+      <form id="homeowner-form">
 
-    <!-- صندوق رفع الصور (حالياً شكلي) -->
+        <label>
 
-    <div class="upload-box">
+          Project title *
 
-      <strong>📁 Choose Photos/Files</strong>
-
-      <p>You can select multiple photos or a PDF plan. Drag & drop is supported. (optional)</p>
-
-    </div>
-
-
-
-    <form id="homeowner-form" class="job-form">
-
-      <label>
-
-        Project title *
-
-        <input type="text" name="project_title" id="project_title" placeholder="e.g., Replace leaking roof" required>
-
-      </label>
-
-
-
-      <label>
-
-        Short summary
-
-        <input type="text" name="short_summary" id="short_summary" placeholder="One or two lines...">
-
-      </label>
-
-
-
-      <div class="row">
-
-        <label class="half">
-
-          City
-
-          <input type="text" name="city" id="city" placeholder="Enter your city">
+          <input type="text" name="project_title" required />
 
         </label>
 
-        <label class="half">
-
-          State
-
-          <input type="text" name="state" id="state" placeholder="Enter your state">
-
-        </label>
-
-      </div>
 
 
+        <label>
 
-      <div class="row">
+          Short summary
 
-        <label class="half">
-
-          Estimated budget (From $)
-
-          <input type="text" name="budget_from" id="budget_from" placeholder="From ($)">
+          <input type="text" name="short_summary" />
 
         </label>
 
-        <label class="half">
-
-          To ($)
-
-          <input type="text" name="budget_to" id="budget_to" placeholder="To ($)">
-
-        </label>
-
-      </div>
 
 
+        <div class="row">
 
-      <div class="row">
+          <label class="half">
 
-        <label class="half">
+            City
+
+            <input type="text" name="city" />
+
+          </label>
+
+          <label class="half">
+
+            State
+
+            <input type="text" name="state" />
+
+          </label>
+
+        </div>
+
+
+
+        <!-- حذفنا budget مثل ما طلبت -->
+
+        <label>
 
           Contact name *
 
-          <input type="text" name="contact_name" id="contact_name" placeholder="Your name" required>
+          <input type="text" name="contact_name" required />
 
         </label>
 
-        <label class="half">
 
-          Phone *
 
-          <input type="tel" name="phone" id="phone" placeholder="Your phone number" required>
+        <div class="row">
+
+          <label class="half">
+
+            Phone *
+
+            <input type="tel" name="phone" required />
+
+          </label>
+
+          <label class="half">
+
+            Email *
+
+            <input type="email" name="email" required />
+
+          </label>
+
+        </div>
+
+
+
+        <label>
+
+          Full address *
+
+          <input type="text" name="full_address" required />
 
         </label>
 
-      </div>
+
+
+        <label>
+
+          Full description *
+
+          <textarea name="full_description" rows="4" required></textarea>
+
+        </label>
 
 
 
-      <label>
+        <button id="postJobBtn" type="submit">🚀 Post Job</button>
 
-        Email *
+        <p id="homeowner-status"></p>
 
-        <input type="email" name="email" id="email" placeholder="Your email address" required>
+      </form>
 
-      </label>
-
-
-
-      <label>
-
-        Full address *
-
-        <input type="text" name="full_address" id="full_address" placeholder="Street, City, State" required>
-
-      </label>
+    </div>
 
 
 
-      <label>
+    <script src="/assets/homeowner.js?v=1"></script>
 
-        Full description *
-
-        <textarea name="full_description" id="full_description" rows="4" placeholder="Describe the job in detail..." required></textarea>
-
-      </label>
-
-
-
-      <button type="submit" class="post-btn" id="postJobBtn">🚀 Post Job</button>
-
-      <p id="homeowner-status" class="status"></p>
-
-    </form>
-
-  </div>
-
-
-
-  <script src="/js/homeowner.js"></script>
-
-</body>
+  </body>
 
 </html>
