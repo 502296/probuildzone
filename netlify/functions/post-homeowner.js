@@ -1,161 +1,181 @@
-import { createClient } from "@supabase/supabase-js";
+// netlify/functions/save-homeowner-job.js
+
+import { createClient } from '@supabase/supabase-js';
 
 
-
-// ✅ تأكد من وضع متغيرات البيئة الصحيحة في Netlify
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
-const supabaseKey =
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-export async function handler(event) {
+export const handler = async (event) => {
 
-  // 🧩 السماح فقط بـ POST
+  // CORS preflight
 
-  if (event.httpMethod !== "POST") {
+  if (event.httpMethod === 'OPTIONS') {
+
+    return {
+
+      statusCode: 200,
+
+      headers: {
+
+        'Access-Control-Allow-Origin': '*',
+
+        'Access-Control-Allow-Headers': 'Content-Type',
+
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+
+      },
+
+      body: '',
+
+    };
+
+  }
+
+
+
+  if (event.httpMethod !== 'POST') {
 
     return {
 
       statusCode: 405,
 
-      body: JSON.stringify({ error: "Method not allowed" }),
+      headers: { 'Access-Control-Allow-Origin': '*' },
+
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
 
     };
 
   }
 
 
-
-  // ⚠️ تأكد من وجود مفاتيح Supabase
-
-  if (!supabaseUrl || !supabaseKey) {
-
-    return {
-
-      statusCode: 500,
-
-      body: JSON.stringify({ error: "Missing Supabase environment variables" }),
-
-    };
-
-  }
-
-
-
-  // 🧠 قراءة بيانات JSON القادمة من الموقع
-
-  let body;
 
   try {
 
-    body = JSON.parse(event.body || "{}");
+    const body = JSON.parse(event.body || '{}');
 
-  } catch (e) {
+
+
+    const {
+
+      category,
+
+      project_title,
+
+      short_summary,
+
+      city,
+
+      state,
+
+      budget_from,
+
+      budget_to,
+
+      contact_name,
+
+      phone,
+
+      email,
+
+      full_address,
+
+      full_description,
+
+    } = body;
+
+
+
+    const { data, error } = await supabase
+
+      .from('homeowner_jobs')
+
+      .insert([
+
+        {
+
+          category,
+
+          project_title,
+
+          short_summary,
+
+          city,
+
+          state,
+
+          budget_from,
+
+          budget_to,
+
+          contact_name,
+
+          phone,
+
+          email,
+
+          full_address,
+
+          full_description,
+
+        },
+
+      ])
+
+      .select()
+
+      .single();
+
+
+
+    if (error) {
+
+      console.error('Supabase insert error:', error);
+
+      return {
+
+        statusCode: 500,
+
+        headers: { 'Access-Control-Allow-Origin': '*' },
+
+        body: JSON.stringify({ ok: false, error: error.message }),
+
+      };
+
+    }
+
+
 
     return {
 
-      statusCode: 400,
+      statusCode: 200,
 
-      body: JSON.stringify({ error: "Invalid JSON format" }),
+      headers: { 'Access-Control-Allow-Origin': '*' },
+
+      body: JSON.stringify({ ok: true, data }),
 
     };
 
-  }
+  } catch (err) {
 
-
-
-  // ✅ تهيئة الاتصال بـ Supabase
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-
-
-  // 📦 إدخال البيانات إلى جدول homeowner_jobs
-
-  const { error, data } = await supabase
-
-    .from("homeowner_jobs")
-
-    .insert([
-
-      {
-
-        category: body.category || null,
-
-        title: body.title || null,
-
-        summary: body.summary || null,
-
-        city: body.city || null,
-
-        state: body.state || null,
-
-        budget_from: body.budget_from || null,
-
-        budget_to: body.budget_to || null,
-
-        full_name: body.full_name || null,
-
-        phone: body.phone || null,
-
-        email: body.email || null,
-
-        address: body.address || null,
-
-        description: body.description || null,
-
-
-
-        // ✅ إصلاح المشكلة هنا
-
-        zip: body.zip && body.zip !== "" ? body.zip : null,
-
-        homeowner_id:
-
-          body.homeowner_id && body.homeowner_id !== ""
-
-            ? body.homeowner_id
-
-            : null,
-
-      },
-
-    ])
-
-    .select();
-
-
-
-  // 🚨 معالجة الأخطاء إن وجدت
-
-  if (error) {
-
-    console.error("Supabase error:", error.message);
+    console.error('General error:', err);
 
     return {
 
       statusCode: 500,
 
-      body: JSON.stringify({ ok: false, error: error.message }),
+      headers: { 'Access-Control-Allow-Origin': '*' },
+
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON' }),
 
     };
 
   }
 
-
-
-  // 🎉 نجاح العملية
-
-  return {
-
-    statusCode: 200,
-
-    body: JSON.stringify({ ok: true, data }),
-
-  };
-
-}
+};
