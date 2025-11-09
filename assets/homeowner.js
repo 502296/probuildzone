@@ -1,7 +1,5 @@
 // assets/homeowner.js
 
-
-
 const form = document.getElementById('homeowner-form');
 
 const statusEl = document.getElementById('homeowner-status');
@@ -22,7 +20,7 @@ if (form) {
 
 
 
-    // خذ الكاتيجوري من الأعلى
+    // category from label
 
     const catLabel = document.getElementById('categoryLabel');
 
