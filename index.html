@@ -796,30 +796,125 @@
 
         // لو كلشي تمام
 
-        m.textContent = "✅ Job saved successfully!";
+      <script>
 
-        m.className = "hint ok";
+// ====== SEND BUTTON (نسخة لا تستدعي /api/jobs/create) ======
 
-        setTimeout(() => {
+document.getElementById("sendBtn").addEventListener("click", async () => {
 
-          m.textContent = "";
+  const m = document.getElementById("sendMsg");
 
-          closeDoor();
+  try {
 
-        }, 1200);
+    const payload = {
 
-      } catch (e) {
+      category: document.getElementById("categoryHidden").value || "General",
 
-        m.textContent = "Error: " + (e.message || "failed");
+      project_title: document.getElementById("title").value.trim(),
 
-        m.className = "hint err";
+      short_summary: document.getElementById("summary").value.trim(),
 
-      }
+      city: document.getElementById("city").value.trim(),
+
+      state: document.getElementById("state").value.trim(),
+
+      contact_name: document.getElementById("contactName").value.trim(),
+
+      phone: document.getElementById("phone").value.trim(),
+
+      email: document.getElementById("email").value.trim(),
+
+      full_address: document.getElementById("address").value.trim(),
+
+      full_description: document.getElementById("longDesc").value.trim()
+
+    };
+
+
+
+    if (
+
+      !payload.project_title ||
+
+      !payload.contact_name ||
+
+      !payload.phone ||
+
+      !payload.email ||
+
+      !payload.full_address ||
+
+      !payload.full_description
+
+    ) {
+
+      m.textContent = "Please fill all required fields.";
+
+      m.className = "hint err";
+
+      return;
+
+    }
+
+
+
+    m.textContent = "Saving to database…";
+
+    m.className = "hint";
+
+
+
+    // 👇 هنا الإرسال الوحيد إلى Function الجديدة
+
+    const res = await fetch("/.netlify/functions/save-homeowner-job", {
+
+      method: "POST",
+
+      headers: { "Content-Type": "application/json" },
+
+      body: JSON.stringify(payload)
 
     });
 
-  </script>
 
+
+    const data = await res.json();
+
+
+
+    if (data.ok) {
+
+      m.textContent = "✅ Job posted!";
+
+      m.className = "hint ok";
+
+      setTimeout(() => {
+
+        m.textContent = "";
+
+        if (typeof closeDoor === "function") closeDoor();
+
+      }, 1200);
+
+    } else {
+
+      m.textContent = "❌ Error: " + (data.error || "failed to save");
+
+      m.className = "hint err";
+
+    }
+
+  } catch (e) {
+
+    m.textContent = "❌ Error: " + (e.message || "network error");
+
+    m.className = "hint err";
+
+  }
+
+});
+
+</script>
 </body>
 
 </html>
