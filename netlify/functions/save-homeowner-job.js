@@ -6,21 +6,27 @@ const { createClient } = require('@supabase/supabase-js');
 
 
 
-// نقرأ المتغيرات من بيئة نتلايفي
+const SUPABASE_URL = process.env.SUPABASE_URL;
 
-const supabaseUrl = process.env.SUPABASE_URL;
-
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY; // أو service role لو تبغى
 
 
 
-// نجهّز العميل (لو مافي مفاتيح بنرجع خطأ واضح)
+// helper: نتأكد الـ URL شكله صح
 
-let supabase = null;
+function isValidUrl(str) {
 
-if (supabaseUrl && supabaseKey) {
+  try {
 
-  supabase = createClient(supabaseUrl, supabaseKey);
+    new URL(str);
+
+    return true;
+
+  } catch {
+
+    return false;
+
+  }
 
 }
 
@@ -28,7 +34,7 @@ if (supabaseUrl && supabaseKey) {
 
 exports.handler = async (event) => {
 
-  // نقبل POST فقط
+  // ما نقبل GET
 
   if (event.httpMethod !== 'POST') {
 
@@ -44,9 +50,9 @@ exports.handler = async (event) => {
 
 
 
-  // لو ما في مفاتيح
+  // لو واحد من المتغيرات ناقص
 
-  if (!supabase) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
 
     return {
 
@@ -56,7 +62,7 @@ exports.handler = async (event) => {
 
         ok: false,
 
-        error: 'Supabase credentials are missing in Netlify environment'
+        error: 'Supabase env missing: please set SUPABASE_URL and SUPABASE_ANON_KEY in Netlify'
 
       })
 
@@ -66,13 +72,39 @@ exports.handler = async (event) => {
 
 
 
+  // لو الـ URL مو شكل URL
+
+  if (!isValidUrl(SUPABASE_URL)) {
+
+    return {
+
+      statusCode: 500,
+
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: 'SUPABASE_URL is not a valid URL. Go to Supabase → Settings → API → copy Project URL (https://xxxx.supabase.co) and paste it in Netlify.'
+
+      })
+
+    };
+
+  }
+
+
+
+  // الآن نقدر ننشئ العميل
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+
   try {
 
     const body = JSON.parse(event.body || '{}');
 
 
-
-    // نبني السطر اللي بندخله
 
     const row = {
 
@@ -100,29 +132,13 @@ exports.handler = async (event) => {
 
 
 
-    // ننظف الفارغ
-
-    const cleanRow = {};
-
-    for (const [k, v] of Object.entries(row)) {
-
-      if (v !== null && v !== '') {
-
-        cleanRow[k] = v;
-
-      }
-
-    }
-
-
-
-    // ندخل الجدول الجديد اللي سوّيناه
+    // ندخل في الجدول اللي صنعته (غير الاسم لو تبي)
 
     const { data, error } = await supabase
 
-      .from('homeowner_leads') // ← تأكد اسمه كذا في Supabase
+      .from('homeowner_leads')
 
-      .insert([cleanRow])
+      .insert([row])
 
       .select();
 
@@ -130,19 +146,11 @@ exports.handler = async (event) => {
 
     if (error) {
 
-      console.error('Supabase insert error:', error);
-
       return {
 
         statusCode: 400,
 
-        body: JSON.stringify({
-
-          ok: false,
-
-          error: error.message
-
-        })
+        body: JSON.stringify({ ok: false, error: error.message })
 
       };
 
@@ -154,33 +162,17 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      body: JSON.stringify({
-
-        ok: true,
-
-        message: 'Job saved to homeowner_leads ✅',
-
-        lead: data && data[0] ? data[0] : null
-
-      })
+      body: JSON.stringify({ ok: true, job: data?.[0] || null })
 
     };
 
   } catch (err) {
 
-    console.error('Function runtime error:', err);
-
     return {
 
       statusCode: 400,
 
-      body: JSON.stringify({
-
-        ok: false,
-
-        error: err.message || 'Invalid request body'
-
-      })
+      body: JSON.stringify({ ok: false, error: err.message })
 
     };
 
