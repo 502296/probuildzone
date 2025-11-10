@@ -1,16 +1,15 @@
-
 [build]
 
-publish = "."
+  publish = "."
 
-functions = "netlify/netlify/functions"
+  functions = "netlify/functions"
 
 
 
 [functions]
 
-directory = "netlify/netlify/functions"
+  directory = "netlify/functions"
 
-node_bundler = "esbuild"
+  node_bundler = "esbuild"
 
-external_node_modules = ["stripe", "@supabase/supabase-js"]
+  external_node_modules = ["stripe", "@supabase/supabase-js"]
