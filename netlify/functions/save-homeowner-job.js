@@ -1,82 +1,44 @@
-// netlify/functions/save-homeowner-job.js
-
-import { createClient } from '@supabase/supabase-js';
-
-
-
-// لازم تكون موجودة في Netlify env
-
-const supabase = createClient(
-
-  process.env.SUPABASE_URL,
-
-  process.env.SUPABASE_ANON_KEY
-
-);
-
-
-
-export const handler = async (event) => {
-
-  // نسمح بـ POST فقط
-
-  if (event.httpMethod !== 'POST') {
-
-    return {
-
-      statusCode: 405,
-
-      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
-
-    };
-
-  }
-
-
+exports.handler = async (event) => {
 
   try {
 
-    const body = JSON.parse(event.body || '{}');
+    // تأكد أن الطلب من نوع POST
+
+    if (event.httpMethod !== "POST") {
+
+      return {
+
+        statusCode: 405,
+
+        body: JSON.stringify({ ok: false, error: "Method not allowed" })
+
+      };
+
+    }
 
 
 
-    // نجمع الحقول اللي تيجي من الفورم
+    // نحاول قراءة البودي
 
-    const row = {
-
-      category: body.category || 'General',
-
-      project_title: body.project_title || body.title || null,
-
-      short_summary: body.short_summary || body.summary || null,
-
-      city: body.city || null,
-
-      state: body.state || null,
-
-      contact_name: body.contact_name || null,
-
-      phone: body.phone || null,
-
-      email: body.email || null,
-
-      full_address: body.full_address || body.address || null,
-
-      full_description: body.full_description || body.description_long || null
-
-    };
+    const data = JSON.parse(event.body || "{}");
 
 
 
-    // نشيل الفارغ منها
+    // تحقق سريع من البيانات المطلوبة
 
-    const cleanRow = {};
+    const required = ["project_title", "contact_name", "phone", "email", "full_address", "full_description"];
 
-    for (const [key, value] of Object.entries(row)) {
+    for (const field of required) {
 
-      if (value !== null && value !== '') {
+      if (!data[field]) {
 
-        cleanRow[key] = value;
+        return {
+
+          statusCode: 400,
+
+          body: JSON.stringify({ ok: false, error: `Missing field: ${field}` })
+
+        };
 
       }
 
@@ -84,39 +46,15 @@ export const handler = async (event) => {
 
 
 
-    // 👇 نكتب في الجدول النظيف الجديد
+    // هنا لاحقًا نضيف حفظ في Supabase أو أي قاعدة بيانات
 
-    const { data, error } = await supabase
+    // حالياً نطبع فقط
 
-      .from('homeowner_leads')
-
-      .insert([cleanRow])
-
-      .select();
+    console.log("📩 Received homeowner job:", data);
 
 
 
-    if (error) {
-
-      console.error('Supabase insert error:', error);
-
-      return {
-
-        statusCode: 400,
-
-        body: JSON.stringify({
-
-          ok: false,
-
-          error: error.message
-
-        })
-
-      };
-
-    }
-
-
+    // استجابة ناجحة
 
     return {
 
@@ -126,9 +64,9 @@ export const handler = async (event) => {
 
         ok: true,
 
-        message: 'Job saved to homeowner_leads ✅',
+        message: "Job saved successfully",
 
-        lead: data?.[0] || null
+        received: data
 
       })
 
@@ -136,13 +74,19 @@ export const handler = async (event) => {
 
   } catch (err) {
 
-    console.error('Function error:', err);
+    console.error("❌ Error in save-homeowner-job:", err);
 
     return {
 
-      statusCode: 400,
+      statusCode: 500,
 
-      body: JSON.stringify({ ok: false, error: err.message })
+      body: JSON.stringify({
+
+        ok: false,
+
+        error: err.message || "Internal Server Error"
+
+      })
 
     };
 
