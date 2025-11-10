@@ -8,33 +8,25 @@ const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY; // أو service role لو تبغى
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
 
 
-// helper: نتأكد الـ URL شكله صح
+// helper: نتأكد أن الـ URL على شكل https://xxxxx.supabase.co
 
-function isValidUrl(str) {
+function looksLikeSupabaseUrl(url) {
 
-  try {
+  if (!url) return false;
 
-    new URL(str);
+  // لازم يبدأ بـ https:// و ينتهي بـ .supabase.co
 
-    return true;
-
-  } catch {
-
-    return false;
-
-  }
+  return url.startsWith('https://') && url.includes('.supabase.co');
 
 }
 
 
 
 exports.handler = async (event) => {
-
-  // ما نقبل GET
 
   if (event.httpMethod !== 'POST') {
 
@@ -50,7 +42,7 @@ exports.handler = async (event) => {
 
 
 
-  // لو واحد من المتغيرات ناقص
+  // لو واحد منهم ناقص
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
 
@@ -62,7 +54,7 @@ exports.handler = async (event) => {
 
         ok: false,
 
-        error: 'Supabase env missing: please set SUPABASE_URL and SUPABASE_ANON_KEY in Netlify'
+        error: 'SUPABASE_URL or SUPABASE_ANON_KEY is missing from Netlify env.'
 
       })
 
@@ -72,9 +64,9 @@ exports.handler = async (event) => {
 
 
 
-  // لو الـ URL مو شكل URL
+  // لو الـ URL مو على شكل supabase.co
 
-  if (!isValidUrl(SUPABASE_URL)) {
+  if (!looksLikeSupabaseUrl(SUPABASE_URL)) {
 
     return {
 
@@ -84,7 +76,7 @@ exports.handler = async (event) => {
 
         ok: false,
 
-        error: 'SUPABASE_URL is not a valid URL. Go to Supabase → Settings → API → copy Project URL (https://xxxx.supabase.co) and paste it in Netlify.'
+        error: `SUPABASE_URL doesn't look right. Current value = "${SUPABASE_URL}". Go to Supabase → Settings → API → copy "Project URL" (it looks like https://xxxx.supabase.co) and paste it into Netlify as SUPABASE_URL.`
 
       })
 
@@ -102,41 +94,39 @@ exports.handler = async (event) => {
 
   try {
 
-    const body = JSON.parse(event.body || '{}');
+    const payload = JSON.parse(event.body || '{}');
 
 
 
     const row = {
 
-      category: body.category || 'General',
+      category: payload.category || 'General',
 
-      project_title: body.project_title || body.title || null,
+      project_title: payload.project_title || payload.title || null,
 
-      short_summary: body.short_summary || body.summary || null,
+      short_summary: payload.short_summary || payload.summary || null,
 
-      city: body.city || null,
+      city: payload.city || null,
 
-      state: body.state || null,
+      state: payload.state || null,
 
-      contact_name: body.contact_name || null,
+      contact_name: payload.contact_name || null,
 
-      phone: body.phone || null,
+      phone: payload.phone || null,
 
-      email: body.email || null,
+      email: payload.email || null,
 
-      full_address: body.full_address || body.address || null,
+      full_address: payload.full_address || payload.address || null,
 
-      full_description: body.full_description || body.description_long || null
+      full_description: payload.full_description || payload.description_long || null,
 
     };
 
 
 
-    // ندخل في الجدول اللي صنعته (غير الاسم لو تبي)
-
     const { data, error } = await supabase
 
-      .from('homeowner_leads')
+      .from('homeowner_leads') // غيّرها لو جدولك اسمه شيء ثاني
 
       .insert([row])
 
@@ -162,7 +152,7 @@ exports.handler = async (event) => {
 
       statusCode: 200,
 
-      body: JSON.stringify({ ok: true, job: data?.[0] || null })
+      body: JSON.stringify({ ok: true, data: data?.[0] || null })
 
     };
 
