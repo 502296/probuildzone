@@ -8,25 +8,565 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>ProBuildZone – Post a Job</title>
+  <title>ProBuildZone – Get Home Projects Done</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 
-
-  <!-- main styles -->
-
-  <link rel="stylesheet" href="/style.css?v=8" />
-
-  <link rel="stylesheet" href="/homeowner.css" />
-
-
-
-  <!-- force gray for modal -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
 
-    #modal .sheet { background:#f3f4f6 !important; }
+    :root{
 
-    #modal .job-form { background:#f9fafb !important; border:1px solid #e2e8f0 !important; }
+      --pbz-blue:#0F2A43;
+
+      --gold:#D4AF37;
+
+    }
+
+    *{
+
+      box-sizing: border-box;
+
+      margin:0;
+
+      padding:0;
+
+    }
+
+    body{
+
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      background:#f6f7fb;
+
+      color:#222;
+
+      min-height:100vh;
+
+    }
+
+
+
+    /* ====== ANIMATIONS ====== */
+
+    @keyframes fadeInUp {
+
+      from { opacity:0; transform: translateY(18px); }
+
+      to { opacity:1; transform: translateY(0); }
+
+    }
+
+    @keyframes fadeIn {
+
+      from { opacity:0; }
+
+      to { opacity:1; }
+
+    }
+
+
+
+    /* ========== TOP BAR ========== */
+
+    .topbar {
+
+      width: 100%;
+
+      background: #0da6b4;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 1rem;
+
+      padding: 0.6rem 1.25rem;
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 1000;
+
+    }
+
+    .brand {
+
+      font-size: 1.3rem;
+
+      font-weight: 700;
+
+      display: flex;
+
+      gap: 0.25rem;
+
+      align-items: center;
+
+    }
+
+    .brand-pro { color: #fff; }
+
+    .brand-build { color: #000; }
+
+    .brand-zone { color: #d4af37; }
+
+
+
+    .right-actions{
+
+      display:flex;
+
+      gap:0.7rem;
+
+      align-items:center;
+
+    }
+
+
+
+    .menu-toggle {
+
+      background: rgba(0,0,0,0.15);
+
+      border: 1px solid rgba(255,255,255,0.5);
+
+      color: #fff;
+
+      padding: 0.4rem 0.75rem;
+
+      border-radius: 6px;
+
+      font-size: 0.9rem;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .join-pro-btn{
+
+      background:#fff;
+
+      color:#0f2a43;
+
+      border:none;
+
+      padding:0.4rem 0.85rem;
+
+      border-radius:6px;
+
+      font-weight:600;
+
+      cursor:pointer;
+
+      text-decoration:none;
+
+      white-space:nowrap;
+
+    }
+
+
+
+    .menu {
+
+      position: absolute;
+
+      top: 100%;
+
+      right: 1.25rem;
+
+      background: #ffffff;
+
+      border-radius: 8px;
+
+      box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+
+      display: none;
+
+      flex-direction: column;
+
+      min-width: 190px;
+
+      overflow: hidden;
+
+    }
+
+    .menu a {
+
+      display: block;
+
+      padding: 0.55rem 0.85rem;
+
+      color: #0f2a43;
+
+      text-decoration: none;
+
+      font-weight: 500;
+
+      border-bottom: 1px solid #f0f0f0;
+
+    }
+
+    .menu a:last-child { border-bottom: none; }
+
+    .menu a:hover { background: #f4f8fb; }
+
+
+
+    .topbar.open .menu { display:flex; }
+
+
+
+    /* desktop */
+
+    @media (min-width: 900px) {
+
+      .menu-toggle { display: none; }
+
+      .menu {
+
+        position: static;
+
+        display: flex !important;
+
+        background: transparent;
+
+        box-shadow: none;
+
+        flex-direction: row;
+
+        gap: 0.5rem;
+
+        min-width: auto;
+
+      }
+
+      .menu a {
+
+        border: none;
+
+        color: #fff;
+
+        background: transparent;
+
+      }
+
+      .menu a:hover {
+
+        background: rgba(255,255,255,0.12);
+
+        border-radius: 4px;
+
+      }
+
+      .right-actions{
+
+      gap:1rem;
+
+      }
+
+    }
+
+
+
+    /* ========== HERO ========== */
+
+    .hero {
+
+      position: relative;
+
+      min-height: 380px;
+
+      background: url('https://images.unsplash.com/photo-1570129476767-47cbb58fc0c6?auto=format&fit=crop&w=1400&q=60') center/cover no-repeat;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      text-align:center;
+
+      padding:4.5rem 1.25rem 3.25rem;
+
+    }
+
+    .hero::after{
+
+      content:"";
+
+      position:absolute;
+
+      inset:0;
+
+      background:linear-gradient(135deg, rgba(0,0,0,0.45), rgba(0,0,0,0));
+
+    }
+
+    .hero-content{
+
+      position:relative;
+
+      z-index:2;
+
+      max-width: 680px;
+
+      color:#fff;
+
+      animation: fadeInUp 0.65s ease-out both;
+
+    }
+
+    .hero-title{
+
+      font-size:3rem;
+
+      font-weight:700;
+
+      line-height:1.05;
+
+      margin-bottom:0.75rem;
+
+      text-shadow:0 8px 25px rgba(0,0,0,0.3);
+
+    }
+
+    .hero-sub{
+
+      font-size:1rem;
+
+      opacity:0.9;
+
+      margin-bottom:1.3rem;
+
+    }
+
+    .hero-actions{
+
+      display:flex;
+
+      gap:0.8rem;
+
+      justify-content:center;
+
+      flex-wrap:wrap;
+
+    }
+
+    .primary-btn{
+
+      background:#11a0ff;
+
+      border:none;
+
+      color:#fff;
+
+      padding:0.6rem 1.2rem;
+
+      border-radius:6px;
+
+      font-weight:600;
+
+      cursor:pointer;
+
+      text-decoration:none;
+
+    }
+
+    .secondary-btn{
+
+      background:rgba(255,255,255,0.07);
+
+      border:1px solid rgba(255,255,255,0.35);
+
+      color:#fff;
+
+      padding:0.6rem 1.1rem;
+
+      border-radius:6px;
+
+      font-weight:500;
+
+      cursor:pointer;
+
+      text-decoration:none;
+
+    }
+
+
+
+    /* ========== SEARCH BLOCK ========== */
+
+    .project-search {
+
+      max-width: 720px;
+
+      margin: -1.2rem auto 1.8rem;
+
+      background: rgba(255,255,255,0.97);
+
+      padding: 1rem 1.25rem 1.15rem;
+
+      border-radius: 10px;
+
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+
+      text-align: center;
+
+      position:relative;
+
+      z-index:5;
+
+      animation: fadeIn 0.5s ease-out 0.35s both;
+
+    }
+
+    .project-search h2 {
+
+      margin-bottom: 0.75rem;
+
+      font-size: 1.05rem;
+
+      color: #0f2a43;
+
+    }
+
+    .search-form {
+
+      display: flex;
+
+      gap: 0.6rem;
+
+    }
+
+    .search-form input {
+
+      flex: 1;
+
+      padding: 0.6rem 0.7rem;
+
+      border: 1px solid #d5d8dd;
+
+      border-radius: 6px;
+
+      font-size: 0.9rem;
+
+    }
+
+    .search-form button {
+
+      padding: 0.6rem 1.1rem;
+
+      border: none;
+
+      background: #0f2a43;
+
+      color: #fff;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      font-weight: 600;
+
+    }
+
+
+
+    /* ========== SECTIONS ========== */
+
+    section {
+
+      padding: 2.5rem 1.25rem;
+
+      max-width: 1100px;
+
+      margin: 0 auto;
+
+    }
+
+    h3.section-title{
+
+      font-size:1.4rem;
+
+      margin-bottom:1rem;
+
+      color:#0f2a43;
+
+    }
+
+    p.section-text{
+
+      max-width:700px;
+
+      line-height:1.6;
+
+      color:#4d5560;
+
+    }
+
+
+
+    footer{
+
+      padding:1.8rem 1.25rem;
+
+      text-align:center;
+
+      color:#6b7a8c;
+
+    }
+
+
+
+    /* ====== MOBILE TWEAKS ====== */
+
+    @media (max-width: 580px) {
+
+      .hero {
+
+        padding-top:4.8rem;
+
+        padding-bottom:3.1rem;
+
+      }
+
+      .hero-title{
+
+        font-size:2.35rem;
+
+      }
+
+      .right-actions .join-pro-btn{
+
+        display:none; /* نتركه فوق بس للكبيرة */
+
+      }
+
+      .search-form {
+
+        flex-direction: column;
+
+      }
+
+      .search-form button {
+
+        width: 100%;
+
+      }
+
+      .project-search {
+
+        margin-inline: 0.6rem;
+
+      }
+
+    }
 
   </style>
 
@@ -34,251 +574,177 @@
 
 <body>
 
-  <header>
 
-    <nav>
 
-      <div class="brand-logo">
+  <!-- TOP BAR -->
 
-        <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
+  <header class="topbar">
 
-      </div>
+    <div class="brand">
 
-      <ul>
+      <span class="brand-pro">Pro</span>
 
-        <li><a href="/">Home</a></li>
+      <span class="brand-build">Build</span>
 
-        <li><a href="/pros.html">For Pros</a></li>
+      <span class="brand-zone">Zone</span>
 
-        <li><a href="/homeowner.html">For Homeowners</a></li>
+    </div>
 
-      </ul>
 
-      <a href="/pros.html" class="pro-btn">Join as Pro</a>
+
+    <nav class="menu" aria-label="Main navigation">
+
+      <a href="#home">Home</a>
+
+      <a href="#for-pros">For Pros</a>
+
+      <a href="#for-homeowners">For Homeowners</a>
+
+      <a href="#services">Services</a>
+
+      <a href="#privacy">Privacy</a>
+
+      <a href="#terms">Terms</a>
 
     </nav>
+
+
+
+    <div class="right-actions">
+
+      <a class="join-pro-btn" href="#for-pros">Join as Pro</a>
+
+      <button class="menu-toggle" aria-label="Open menu">Menu ▾</button>
+
+    </div>
 
   </header>
 
 
 
-  <section class="hero">
+  <!-- HERO -->
 
-    <div class="overlay">
+  <main id="home">
 
-      <h1>Get Home Projects Done</h1>
+    <section class="hero">
 
-      <p>Post your project, local pros respond, you pick the best.</p>
+      <div class="hero-content">
 
-      <div class="buttons">
+        <h1 class="hero-title">Get Home Projects Done</h1>
 
-        <button class="btn primary" id="openModal">Post a Job</button>
+        <p class="hero-sub">Post your project, local pros respond, you pick the best.</p>
 
-      </div>
+        <div class="hero-actions">
 
-    </div>
+          <a href="#for-homeowners" class="primary-btn">Post a Job</a>
 
-  </section>
-
-
-
-  <div id="modal" class="modal" style="display:none;">
-
-    <div class="sheet">
-
-      <div class="sheet-head">
-
-        <button class="btn xsm ghost" id="closeModal">← Back</button>
-
-        <h2>Post a Job</h2>
-
-        <button class="btn xsm ghost" id="closeModalTop">Close</button>
-
-      </div>
-
-
-
-      <!-- step 1 -->
-
-      <div id="step1" class="job-form">
-
-        <h2>Choose a category</h2>
-
-        <p>Pick what best fits your project. You can change later.</p>
-
-        <div class="cat-grid">
-
-          <button class="cat-card">🏠 <span>Roofing</span></button>
-
-          <button class="cat-card">🪵 <span>Decks & Porches</span></button>
-
-          <button class="cat-card">🔍 <span>Kitchens</span></button>
-
-          <button class="cat-card">🛁 <span>Bathrooms</span></button>
-
-          <button class="cat-card">🪵 <span>Flooring</span></button>
-
-          <button class="cat-card">🎨 <span>Painting</span></button>
-
-          <button class="cat-card">🧱 <span>Masonry</span></button>
-
-          <button class="cat-card">⚡ <span>Electrical</span></button>
-
-          <button class="cat-card">🚰 <span>Plumbing</span></button>
-
-          <button class="cat-card">🪟 <span>Windows & Doors</span></button>
-
-          <button class="cat-card">🌿 <span>Landscaping</span></button>
-
-          <button class="cat-card">🧰 <span>Handyman</span></button>
+          <a href="#for-pros" class="secondary-btn">Join as Pro</a>
 
         </div>
 
       </div>
 
-
-
-      <!-- step 2 -->
-
-      <div id="step2" class="job-form" style="display:none;">
-
-        <div class="selected-cat">Category: <b id="selectedCategory">Roofing</b></div>
+    </section>
 
 
 
-        <label>Upload photos/files</label>
+    <!-- SEARCH -->
 
-        <div class="upload-wrap">
+    <section id="project-search" class="project-search">
 
-          <input type="file" id="fileInput" multiple />
+      <h2>Search homeowner projects</h2>
 
-          <button class="btn outline" onclick="document.getElementById('fileInput').click()">Choose Photos/Files</button>
+      <form class="search-form" onsubmit="event.preventDefault(); alert('search… later we hook Supabase');">
 
-        </div>
+        <input type="text" name="q" placeholder="Search for: roofing, painting, fencing..." required>
 
-        <p class="file-hint">Optional, but helpful.</p>
+        <button type="submit">Search</button>
 
+      </form>
 
-
-        <label for="title">Project title *</label>
-
-        <input id="title" type="text" placeholder="e.g., Replace leaking roof" />
+    </section>
 
 
 
-        <label for="summary">Short summary</label>
+    <!-- SECTIONS -->
 
-        <input id="summary" type="text" placeholder="One or two lines..." />
+    <section id="for-homeowners">
 
+      <h3 class="section-title">For Homeowners</h3>
 
+      <p class="section-text">Post what you need: remodels, fencing, painting, roofing. Pros in your area will send offers.</p>
 
-        <div class="row2">
-
-          <div>
-
-            <label for="city">City</label>
-
-            <input id="city" type="text" placeholder="Enter your city" />
-
-          </div>
-
-          <div>
-
-            <label for="state">State</label>
-
-            <input id="state" type="text" placeholder="Enter your state" />
-
-          </div>
-
-        </div>
+    </section>
 
 
 
-        <label for="contactName">Contact name *</label>
+    <section id="for-pros">
 
-        <input id="contactName" type="text" placeholder="Your name" />
+      <h3 class="section-title">For Pros</h3>
 
+      <p class="section-text">Subscribe, view local jobs, get shortlisted, and win more work.</p>
 
-
-        <label for="desc">Full description *</label>
-
-        <textarea id="desc" rows="4" placeholder="Describe the job..."></textarea>
+    </section>
 
 
 
-        <div style="margin-top:14px;text-align:right;">
+    <section id="services">
 
-          <button class="btn primary" id="submitJob">🚀 Post Job</button>
+      <h3 class="section-title">Services</h3>
 
-        </div>
+      <p class="section-text">List of services your platform supports here.</p>
 
-      </div>
+    </section>
 
-    </div>
 
-  </div>
+
+    <section id="privacy">
+
+      <h3 class="section-title">Privacy</h3>
+
+      <p class="section-text">Your privacy policy content goes here.</p>
+
+    </section>
+
+
+
+    <section id="terms">
+
+      <h3 class="section-title">Terms</h3>
+
+      <p class="section-text">Your terms of use go here.</p>
+
+    </section>
+
+  </main>
+
+
+
+  <footer>
+
+    © <span id="y"></span> ProBuildZone. All rights reserved.
+
+  </footer>
 
 
 
   <script>
 
-    const modal = document.getElementById('modal');
+    // year
 
-    const openModal = document.getElementById('openModal');
-
-    const closeModal = document.getElementById('closeModal');
-
-    const closeModalTop = document.getElementById('closeModalTop');
-
-    const step1 = document.getElementById('step1');
-
-    const step2 = document.getElementById('step2');
-
-    const catCards = document.querySelectorAll('.cat-card');
-
-    const selectedCategory = document.getElementById('selectedCategory');
+    document.getElementById('y').textContent = new Date().getFullYear();
 
 
 
-    openModal?.addEventListener('click', () => {
+    // menu toggle
 
-      modal.style.display = 'flex';
+    const topbar = document.querySelector('.topbar');
 
-      document.body.style.overflow = 'hidden';
+    const btn = document.querySelector('.menu-toggle');
 
-    });
+    btn.addEventListener('click', () => {
 
-
-
-    [closeModal, closeModalTop].forEach(btn => {
-
-      btn?.addEventListener('click', () => {
-
-        modal.style.display = 'none';
-
-        document.body.style.overflow = '';
-
-        step2.style.display = 'none';
-
-        step1.style.display = 'block';
-
-      });
-
-    });
-
-
-
-    catCards.forEach(btn => {
-
-      btn.addEventListener('click', () => {
-
-        selectedCategory.textContent = btn.innerText.trim();
-
-        step1.style.display = 'none';
-
-        step2.style.display = 'block';
-
-      });
+      topbar.classList.toggle('open');
 
     });
 
