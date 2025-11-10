@@ -1,151 +1,103 @@
-// netlify/functions/post-homeowner.js
+<script>
 
-import { createClient } from '@supabase/supabase-js';
+document.addEventListener("DOMContentLoaded", () => {
 
-
-
-const supabase = createClient(
-
-  process.env.SUPABASE_URL,
-
-  process.env.SUPABASE_ANON_KEY
-
-);
+  const form = document.querySelector("form");
 
 
 
-export const handler = async (event) => {
+  form.addEventListener("submit", async (e) => {
 
-  // CORS
-
-  if (event.httpMethod === 'OPTIONS') {
-
-    return {
-
-      statusCode: 200,
-
-      headers: {
-
-        'Access-Control-Allow-Origin': '*',
-
-        'Access-Control-Allow-Headers': 'Content-Type',
-
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-
-      },
-
-      body: '',
-
-    };
-
-  }
+    e.preventDefault();
 
 
 
-  if (event.httpMethod !== 'POST') {
+    // 🔹 نجمع البيانات من الحقول
 
-    return {
+    const formData = {
 
-      statusCode: 405,
+      category: form.category?.value || "General",
 
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      project_title: form.project_title?.value,
 
-      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+      short_summary: form.short_summary?.value,
+
+      city: form.city?.value,
+
+      state: form.state?.value,
+
+      contact_name: form.contact_name?.value,
+
+      phone: form.phone?.value,
+
+      email: form.email?.value,
+
+      full_address: form.full_address?.value,
+
+      full_description: form.full_description?.value,
 
     };
 
-  }
+
+
+    // 🔹 نرسل الطلب إلى Netlify function
+
+    try {
+
+      const response = await fetch("https://probuildzone.netlify.app/.netlify/functions/save-homeowner-job", {
+
+        method: "POST",
+
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify(formData),
+
+      });
 
 
 
-  try {
+      // نقرأ الردّ كـ نصّ أولاً ثم نحاول نحوله إلى JSON
 
-    const body = JSON.parse(event.body || '{}');
+      const text = await response.text();
 
-
-
-    const { data, error } = await supabase
-
-      .from('homeowner_jobs')
-
-      .insert([
-
-        {
-
-          category: body.category,
-
-          project_title: body.project_title,
-
-          short_summary: body.short_summary,
-
-          city: body.city,
-
-          state: body.state,
-
-          contact_name: body.contact_name,
-
-          phone: body.phone,
-
-          email: body.email,
-
-          full_address: body.full_address,
-
-          full_description: body.full_description,
-
-          approved: false,
-
-        },
-
-      ])
-
-      .select()
-
-      .single();
+      console.log("🔍 Raw response:", text);
 
 
 
-    if (error) {
+      try {
 
-      console.error(error);
+        const data = JSON.parse(text);
 
-      return {
 
-        statusCode: 500,
 
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        if (data.ok) {
 
-        body: JSON.stringify({ ok: false, error: error.message }),
+          alert("✅ Job saved successfully!");
 
-      };
+          form.reset();
+
+        } else {
+
+          alert("❌ Error: " + data.error);
+
+        }
+
+      } catch {
+
+        alert("⚠️ Unexpected response from server:\n" + text);
+
+      }
+
+    } catch (err) {
+
+      console.error("Fetch error:", err);
+
+      alert("⚠️ Network error, please try again.");
 
     }
 
+  });
 
+});
 
-    return {
-
-      statusCode: 200,
-
-      headers: { 'Access-Control-Allow-Origin': '*' },
-
-      body: JSON.stringify({ ok: true, data }),
-
-    };
-
-  } catch (err) {
-
-    console.error(err);
-
-    return {
-
-      statusCode: 500,
-
-      headers: { 'Access-Control-Allow-Origin': '*' },
-
-      body: JSON.stringify({ ok: false, error: 'Invalid JSON' }),
-
-    };
-
-  }
-
-};
+</script>
