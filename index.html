@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -16,6 +15,66 @@
   <link rel="stylesheet" href="style.css"/>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- overrides البسيطة -->
+
+  <style>
+
+    /* نخلي Build أسود */
+
+    .brand-logo .build {
+
+      color: #000 !important;
+
+    }
+
+    /* زر الهيرو نخليه أجمل */
+
+    .hero .buttons .btn.primary,
+
+    .hero .btn.primary {
+
+      background: #10a5ff;
+
+      border: none;
+
+      color: #fff;
+
+      padding: 0.65rem 1.7rem;
+
+      border-radius: 999px;
+
+      font-weight: 600;
+
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+
+    }
+
+    .hero .btn.primary:hover {
+
+      transform: translateY(-1px);
+
+      box-shadow: 0 16px 35px rgba(0,0,0,0.28);
+
+    }
+
+    /* خانة Job ID تحت الزر نخليها مرتبة */
+
+    .job-id input {
+
+      border-radius: 6px 0 0 6px;
+
+    }
+
+    .job-id button {
+
+      border-radius: 0 6px 6px 0;
+
+    }
+
+  </style>
 
 </head>
 
@@ -66,6 +125,8 @@
 
 
       <div class="buttons">
+
+        <!-- نفس الـ id حتى ما نخرب الجافاسكربت -->
 
         <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
 
@@ -199,17 +260,13 @@
 
 
 
-      <!-- STEP 2: Full form (with upload on top) -->
+      <!-- STEP 2: Full form -->
 
       <section class="job-form" id="step2" style="display:none">
-
-        <!-- selected category badge -->
 
         <div class="selected-cat" id="selectedCat">Category: <b>-</b></div>
 
 
-
-        <!-- Upload -->
 
         <div class="upload-wrap" id="dropZone">
 
@@ -230,8 +287,6 @@
         <div class="card" id="fileList"></div>
 
 
-
-        <!-- hidden field to send category -->
 
         <input type="hidden" id="categoryHidden" value="General" />
 
@@ -401,15 +456,11 @@
 
     document.getElementById('backBtn').addEventListener('click', ()=>{
 
-      // if already at step1, close; else go back to step1
-
       if(step1.style.display==='block') closeDoor(); else goStep(1);
 
     });
 
 
-
-    // Category cards → set value & go to step 2
 
     document.querySelectorAll('.cat-card').forEach(btn=>{
 
@@ -429,8 +480,6 @@
 
 
 
-    // Job ID lookup
-
     document.getElementById('goQuick').addEventListener('click', ()=>{
 
       const id = document.getElementById('jobIdQuick').value.trim();
@@ -440,8 +489,6 @@
     });
 
 
-
-    // Upload preview
 
     const fileInput = document.getElementById('fileInput');
 
@@ -497,15 +544,11 @@
 
 
 
-    // Base64 helper
-
     const bufToBase64 = (buf)=>{ let bin=''; new Uint8Array(buf).forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); };
 
     const filesToBase64 = async(list)=>{ const arr=[]; for(const f of [...list||[]]){ if(f.size>10*1024*1024) throw new Error(`File too large: ${f.name}`); const buf=await f.arrayBuffer(); arr.push(bufToBase64(buf)); } return arr; };
 
 
-
-    // Submit Job
 
     document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
@@ -540,8 +583,6 @@
           description_long: document.getElementById('longDesc').value.trim(),
 
           photosBase64: await filesToBase64(fileInput.files),
-
-          // TODO: default_notify_email = "contact@probuildzone.com"
 
         };
 
@@ -594,9 +635,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
