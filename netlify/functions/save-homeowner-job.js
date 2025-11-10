@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 
 
 
+// ✅ الاتصال بـ Supabase باستخدام مفاتيح البيئة من Netlify
+
 const supabase = createClient(
 
   process.env.SUPABASE_URL,
@@ -16,7 +18,7 @@ const supabase = createClient(
 
 export const handler = async (event) => {
 
-  // نقبل POST فقط
+  // نسمح فقط بـ POST
 
   if (event.httpMethod !== 'POST') {
 
@@ -38,7 +40,7 @@ export const handler = async (event) => {
 
 
 
-    // هنا نحدد الحقول يدويًا عشان ما يروح شي غريب للجدول
+    // ✅ الحقول المطلوبة من الصفحة (بدون قيم فاضية أو إضافية)
 
     const row = {
 
@@ -66,15 +68,15 @@ export const handler = async (event) => {
 
 
 
-    // نحذف المفاتيح اللي قيمتها null عشان ما نزعّل بوستجريس
+    // ⚙️ تنظيف الحقول — نحذف الفارغة/null قبل الإرسال
 
     const cleanRow = {};
 
-    for (const [k, v] of Object.entries(row)) {
+    for (const [key, value] of Object.entries(row)) {
 
-      if (v !== null && v !== '') {
+      if (value !== null && value !== '') {
 
-        cleanRow[k] = v;
+        cleanRow[key] = value;
 
       }
 
@@ -82,11 +84,11 @@ export const handler = async (event) => {
 
 
 
-    // لو جدولك اسمه غير هذا غيّر السطر تحت:
+    // ✅ إدخال البيانات في الجدول الصحيح homeowner_jobs
 
     const { data, error } = await supabase
 
-      .from('homeowners_jobs')
+      .from('homeowner_jobs') // ← جدولك الحالي
 
       .insert([cleanRow])
 
@@ -96,7 +98,7 @@ export const handler = async (event) => {
 
     if (error) {
 
-      console.error('Supabase error:', error);
+      console.error('Supabase insert error:', error);
 
       return {
 
@@ -108,7 +110,7 @@ export const handler = async (event) => {
 
           error: error.message,
 
-          hint: 'Check table name/columns in Supabase'
+          details: error
 
         })
 
@@ -118,6 +120,8 @@ export const handler = async (event) => {
 
 
 
+    // ✅ نجاح الإدخال
+
     return {
 
       statusCode: 200,
@@ -126,7 +130,7 @@ export const handler = async (event) => {
 
         ok: true,
 
-        message: 'Job saved to Supabase',
+        message: 'Job saved successfully to homeowner_jobs ✅',
 
         job: data?.[0] || null
 
@@ -136,7 +140,7 @@ export const handler = async (event) => {
 
   } catch (err) {
 
-    console.error('Function parse error:', err);
+    console.error('Function error:', err);
 
     return {
 
