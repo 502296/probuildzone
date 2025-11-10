@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 
 
-// تأكد إن هذول موجودين في Netlify env
+// لازم تكون موجودة في Netlify env
 
 const supabase = createClient(
 
@@ -18,7 +18,7 @@ const supabase = createClient(
 
 export const handler = async (event) => {
 
-  // نسمح فقط بـ POST
+  // نسمح بـ POST فقط
 
   if (event.httpMethod !== 'POST') {
 
@@ -40,9 +40,11 @@ export const handler = async (event) => {
 
 
 
-    // نجمع الحقول اللي تجي من الفورم
+    // نجمع الحقول اللي تيجي من الفورم
 
     const row = {
+
+      category: body.category || 'General',
 
       project_title: body.project_title || body.title || null,
 
@@ -60,15 +62,13 @@ export const handler = async (event) => {
 
       full_address: body.full_address || body.address || null,
 
-      full_description: body.full_description || body.description_long || null,
-
-      category: body.category || 'General'
+      full_description: body.full_description || body.description_long || null
 
     };
 
 
 
-    // نرمي الحقول الفارغة
+    // نشيل الفارغ منها
 
     const cleanRow = {};
 
@@ -84,11 +84,11 @@ export const handler = async (event) => {
 
 
 
-    // 👇 هنا التعديل المهم: نكتب في homeowners_jobs (بالـ s)
+    // 👇 نكتب في الجدول النظيف الجديد
 
     const { data, error } = await supabase
 
-      .from('homeowners_jobs')
+      .from('homeowner_leads')
 
       .insert([cleanRow])
 
@@ -108,9 +108,7 @@ export const handler = async (event) => {
 
           ok: false,
 
-          error: error.message,
-
-          details: error
+          error: error.message
 
         })
 
@@ -128,9 +126,9 @@ export const handler = async (event) => {
 
         ok: true,
 
-        message: 'Job saved to homeowners_jobs ✅',
+        message: 'Job saved to homeowner_leads ✅',
 
-        job: data?.[0] || null
+        lead: data?.[0] || null
 
       })
 
