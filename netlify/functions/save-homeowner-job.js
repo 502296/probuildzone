@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 
 
-// ✅ الاتصال بـ Supabase باستخدام مفاتيح البيئة من Netlify
+// تأكد إن هذول موجودين في Netlify env
 
 const supabase = createClient(
 
@@ -40,7 +40,7 @@ export const handler = async (event) => {
 
 
 
-    // ✅ الحقول المطلوبة من الصفحة (بدون قيم فاضية أو إضافية)
+    // نجمع الحقول اللي تجي من الفورم
 
     const row = {
 
@@ -68,7 +68,7 @@ export const handler = async (event) => {
 
 
 
-    // ⚙️ تنظيف الحقول — نحذف الفارغة/null قبل الإرسال
+    // نرمي الحقول الفارغة
 
     const cleanRow = {};
 
@@ -84,11 +84,11 @@ export const handler = async (event) => {
 
 
 
-    // ✅ إدخال البيانات في الجدول الصحيح homeowner_jobs
+    // 👇 هنا التعديل المهم: نكتب في homeowners_jobs (بالـ s)
 
     const { data, error } = await supabase
 
-      .from('homeowner_jobs') // ← جدولك الحالي
+      .from('homeowners_jobs')
 
       .insert([cleanRow])
 
@@ -120,8 +120,6 @@ export const handler = async (event) => {
 
 
 
-    // ✅ نجاح الإدخال
-
     return {
 
       statusCode: 200,
@@ -130,7 +128,7 @@ export const handler = async (event) => {
 
         ok: true,
 
-        message: 'Job saved successfully to homeowner_jobs ✅',
+        message: 'Job saved to homeowners_jobs ✅',
 
         job: data?.[0] || null
 
