@@ -8,53 +8,67 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>ProBuildZone — Post a Job</title>
+  <title>ProBuildZone — Homeowner</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
 
-    :root{
+    :root { --brand:#0f2a43; --bg:#f6f7fb; --card:#fff; --ok:#0a7f4f; --err:#b00020; }
 
-      --bg:#f6f7fb; --ink:#0f2a43; --card:#fff; --muted:#6b7a8c; --ok:#157347; --err:#b00020; --btn:#0f2a43; --btnH:#143756;
+    * { box-sizing: border-box; }
+
+    body {
+
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+
+      background: var(--bg); color: var(--brand); margin: 0; padding: 40px;
 
     }
 
-    *{box-sizing:border-box}
+    h1 { text-align: center; margin: 0 0 20px; }
 
-    body{font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:32px}
+    .card {
 
-    h1{margin:0 0 8px;text-align:center}
+      max-width: 560px; margin: 24px auto; background: var(--card);
 
-    p.lead{margin:0 0 24px;text-align:center;color:var(--muted)}
+      padding: 24px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.08);
 
-    form{max-width:560px;margin:0 auto;background:var(--card);padding:24px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    }
 
-    label{display:block;font-weight:600;margin:10px 0 6px}
+    label { display:block; font-weight:600; font-size:.92rem; margin:12px 0 6px; }
 
-    input,textarea{width:100%;padding:12px 14px;border:1px solid #d9dde4;border-radius:8px;font-size:16px;outline:none}
+    input, textarea, select {
 
-    input:focus,textarea:focus{border-color:#9bb7d7;box-shadow:0 0 0 3px rgba(58,121,207,.15)}
+      width:100%; padding:12px; border:1px solid #d7dde6; border-radius:8px; font-size:1rem; background:#fff;
 
-    textarea{resize:vertical;min-height:110px}
+    }
 
-    .row{display:flex;gap:12px}
+    textarea { resize: vertical; min-height: 120px; }
 
-    .row > div{flex:1}
+    .row { display:flex; gap:12px; }
 
-    button{width:100%;margin-top:12px;padding:14px 16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-weight:700;font-size:16px;cursor:pointer;transition:.18s}
+    .row > div { flex:1; }
 
-    button:hover{background:var(--btnH)}
+    button {
 
-    button[disabled]{opacity:.65;cursor:not-allowed}
+      width:100%; margin-top:16px; padding:14px 16px; border:0; border-radius:10px;
 
-    #msg{margin-top:12px;text-align:center;font-weight:600}
+      background:#0b7ef4; color:#fff; font-weight:700; cursor:pointer; transition:.2s;
 
-    #msg.ok{color:var(--ok)}
+    }
 
-    #msg.err{color:var(--err)}
+    button:hover { filter:brightness(.95); }
 
-    .hint{font-size:12px;color:var(--muted);margin-top:4px}
+    button[disabled] { opacity:.6; cursor:not-allowed; }
+
+    .msg { margin-top:12px; text-align:center; }
+
+    .msg.ok   { color: var(--ok); font-weight:600; }
+
+    .msg.err  { color: var(--err); font-weight:600; }
+
+    small.muted { color:#6b7a8c; display:block; margin-top:4px; }
 
   </style>
 
@@ -64,81 +78,97 @@
 
   <h1>🏡 Post Your Project</h1>
 
-  <p class="lead">Tell us about your home project. Local pros will send offers.</p>
+
+
+  <div class="card">
+
+    <form id="job-form" novalidate>
+
+      <label for="title">Project title (optional)</label>
+
+      <input id="title" type="text" placeholder="e.g., Repair porch roof">
 
 
 
-  <form id="job-form" novalidate>
+      <label for="summary">Short summary (optional)</label>
 
-    <label for="title">Project title *</label>
-
-    <input id="title" type="text" placeholder="e.g., Build a new porch roof" required>
+      <input id="summary" type="text" placeholder="One-line summary">
 
 
 
-    <label for="summary">Short summary</label>
+      <div class="row">
 
-    <input id="summary" type="text" placeholder="One line about the project (optional)">
+        <div>
 
+          <label for="city">City (optional)</label>
 
+          <input id="city" type="text" placeholder="City">
 
-    <div class="row">
+        </div>
 
-      <div>
+        <div>
 
-        <label for="name">Full name *</label>
+          <label for="state">State (optional)</label>
 
-        <input id="name" type="text" placeholder="Your full name" required>
+          <input id="state" type="text" placeholder="KY">
 
-      </div>
-
-      <div>
-
-        <label for="phone">Phone</label>
-
-        <input id="phone" type="tel" placeholder="(optional)">
-
-      </div>
-
-    </div>
-
-
-
-    <div class="row">
-
-      <div>
-
-        <label for="email">Email *</label>
-
-        <input id="email" type="email" placeholder="you@email.com" required>
+        </div>
 
       </div>
 
-      <div>
 
-        <label for="address">Full address *</label>
 
-        <input id="address" type="text" placeholder="Street, City, State" required>
+      <label for="name">Full name *</label>
+
+      <input id="name" type="text" required placeholder="Your full name">
+
+
+
+      <div class="row">
+
+        <div>
+
+          <label for="email">Email *</label>
+
+          <input id="email" type="email" required placeholder="name@example.com">
+
+        </div>
+
+        <div>
+
+          <label for="phone">Phone *</label>
+
+          <input id="phone" type="tel" required placeholder="(555) 555-5555">
+
+        </div>
 
       </div>
 
-    </div>
+
+
+      <label for="address">Full address *</label>
+
+      <input id="address" type="text" required placeholder="Street, City, State, ZIP">
 
 
 
-    <label for="description">Full description *</label>
+      <label for="description">Full description *</label>
 
-    <textarea id="description" placeholder="Describe the work you need" required></textarea>
-
-    <div class="hint">Fields marked * are required.</div>
+      <textarea id="description" required placeholder="Describe your project, measurements, timeline, etc."></textarea>
 
 
 
-    <button id="submitBtn" type="submit">🚀 Post Job</button>
+      <small class="muted">Fields marked * are required.</small>
 
-    <div id="msg" role="status" aria-live="polite"></div>
 
-  </form>
+
+      <button id="postBtn" type="submit">🚀 Post Job</button>
+
+      <div id="status" class="msg" aria-live="polite"></div>
+
+    </form>
+
+  </div>
 
 
 
@@ -146,19 +176,19 @@
 
     const form = document.getElementById('job-form');
 
-    const btn  = document.getElementById('submitBtn');
+    const btn  = document.getElementById('postBtn');
 
-    const msg  = document.getElementById('msg');
+    const statusEl = document.getElementById('status');
 
 
 
-    const setMsg = (text, cls='') => {
+    function setStatus(text, type) {
 
-      msg.className = ''; if (cls) msg.classList.add(cls);
+      statusEl.textContent = text || '';
 
-      msg.textContent = text;
+      statusEl.className = 'msg ' + (type || '');
 
-    };
+    }
 
 
 
@@ -166,15 +196,11 @@
 
       e.preventDefault();
 
-      setMsg('');
-
-      btn.disabled = true;
-
-      const original = btn.textContent;
-
-      btn.textContent = 'Saving to database…';
+      setStatus('', '');
 
 
+
+      // جمع البيانات
 
       const payload = {
 
@@ -182,11 +208,15 @@
 
         summary:     document.getElementById('summary').value.trim() || null,
 
+        city:        document.getElementById('city').value.trim() || null,
+
+        state:       document.getElementById('state').value.trim() || null,
+
         name:        document.getElementById('name').value.trim(),
 
         email:       document.getElementById('email').value.trim(),
 
-        phone:       document.getElementById('phone').value.trim() || null,
+        phone:       document.getElementById('phone').value.trim(), // مطلوب
 
         address:     document.getElementById('address').value.trim(),
 
@@ -196,23 +226,27 @@
 
 
 
-      // basic required validation on the client
+      // تحقق بسيط قبل الإرسال
 
-      if (!payload.name || !payload.email || !payload.address || !payload.description) {
+      if (!payload.name || !payload.email || !payload.phone || !payload.address || !payload.description) {
 
-        setMsg('Please fill all required fields.', 'err');
-
-        btn.textContent = original; btn.disabled = false;
-
-        return;
+        return setStatus('Please fill all required fields.', 'err');
 
       }
 
 
 
+      btn.disabled = true;
+
+      btn.textContent = 'Saving to database…';
+
+      setStatus('', '');
+
+
+
       try {
 
-        const res = await fetch('/.netlify/functions/post-job', {
+        const res = await fetch('/.netlify/functions/save-homeowner-job', {
 
           method: 'POST',
 
@@ -224,23 +258,29 @@
 
 
 
-        // Force JSON; if HTML arrives (like a 404 page), throw readable error
-
-        const text = await res.text();
+        const text = await res.text(); // نقرأ كنص أولاً لمنع HTML المفاجئ
 
         let data;
 
         try { data = JSON.parse(text); }
 
-        catch { throw new Error(`Non-JSON response (${res.status}). First bytes: ${text.slice(0,80)}…`); }
+        catch {
+
+          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`);
+
+        }
 
 
 
-        if (!res.ok) throw new Error(data.error || 'Failed to post job');
+        if (!res.ok || !data.ok) {
+
+          throw new Error(data.error || `Failed with ${res.status}`);
+
+        }
 
 
 
-        setMsg('✅ Job posted successfully!', 'ok');
+        setStatus(`✅ Job posted successfully! Your Job ID: ${data.job_id}`, 'ok');
 
         form.reset();
 
@@ -248,13 +288,13 @@
 
         console.error(err);
 
-        setMsg(`Error: ${err.message}`, 'err');
+        setStatus(`Error: ${err.message}`, 'err');
 
       } finally {
 
-        btn.textContent = original;
-
         btn.disabled = false;
+
+        btn.textContent = '🚀 Post Job';
 
       }
 
