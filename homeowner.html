@@ -4,109 +4,33 @@
 
 <head>
 
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <title>ProBuildZone — Homeowner</title>
 
-
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-
 
   <style>
 
-    :root{
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f7fb;color:#0f2a43;padding:40px}
 
-      --blue:#0f2a43;
+    h1{ text-align:center }
 
-      --blue-700:#143756;
+    form{ max-width:560px;margin:32px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 20px rgba(15,42,67,.08)}
 
-      --bg:#f6f7fb;
+    label{font-weight:600;margin-top:6px;display:block}
 
-      --card:#ffffff;
+    input,textarea{width:100%;padding:12px 14px;margin:8px 0 16px;border:1px solid #d8dde6;border-radius:8px;font-size:16px}
 
-      --ok:#0a8a5b;
+    button{width:100%;background:#0f2a43;color:#fff;font-weight:700;padding:12px 16px;border:0;border-radius:10px;cursor:pointer;transition:.2s}
 
-      --err:#b00020;
+    button:hover{background:#143756}
 
-    }
+    #post-error{color:#b00020;text-align:center;margin-top:10px;font-weight:600}
 
-    *{box-sizing:border-box}
-
-    body{
-
-      font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-
-      background:var(--bg);
-
-      color:var(--blue);
-
-      padding:40px 16px;
-
-    }
-
-    h1{ text-align:center; margin:0 0 18px }
-
-    p.sub{ text-align:center; margin:0 0 26px; color:#516171 }
-
-
-
-    form{
-
-      max-width:560px; margin:0 auto; background:var(--card);
-
-      padding:24px; border-radius:12px; box-shadow:0 8px 30px rgba(10,20,40,.06);
-
-    }
-
-    label{ display:block; font-weight:600; margin:12px 0 6px }
-
-    input, textarea{
-
-      width:100%; padding:12px 14px; border:1px solid #d7dbe3; border-radius:10px;
-
-      font-size:1rem; background:#fff; outline:none; transition:border-color .15s ease;
-
-    }
-
-    input:focus, textarea:focus{ border-color:#9fb7cc }
-
-    textarea{ resize:vertical; min-height:110px }
-
-
-
-    button{
-
-      width:100%; margin-top:14px; background:var(--blue); color:#fff;
-
-      font-weight:700; padding:13px 16px; border:0; border-radius:10px; cursor:pointer;
-
-      transition:transform .06s ease, background .15s ease; letter-spacing:.2px;
-
-    }
-
-    button:hover{ background:var(--blue-700) }
-
-    button:disabled{ opacity:.65; cursor:not-allowed }
-
-
-
-    .msg{
-
-      text-align:center; margin-top:12px; font-weight:600;
-
-    }
-
-    .msg.ok{ color:var(--ok) }
-
-    .msg.err{ color:var(--err) }
-
-
-
-    .hint{ font-size:.85rem; color:#6b7a8c; margin-top:6px }
+    .hint{color:#6b7a8c;font-size:.9rem;margin-top:-10px;margin-bottom:10px}
 
   </style>
 
@@ -116,51 +40,45 @@
 
   <h1>🏡 Post Your Project</h1>
 
-  <p class="sub">Tell us about your project and local pros will send offers.</p>
-
 
 
   <form id="job-form" novalidate>
 
-    <label for="name">Full Name *</label>
+    <label for="name">Full name *</label>
 
     <input id="name" type="text" placeholder="e.g., Ali Kathem" required />
 
 
 
-    <label for="email">Email Address *</label>
+    <label for="email">Email *</label>
 
-    <input id="email" type="email" placeholder="name@example.com" required />
-
-
-
-    <label for="phone">Phone Number (optional)</label>
-
-    <input id="phone" type="tel" inputmode="tel" placeholder="e.g., 502-555-0137" />
+    <input id="email" type="email" placeholder="name@email.com" required />
 
 
 
-    <label for="address">Project Address *</label>
+    <label for="phone">Phone (optional)</label>
 
-    <input id="address" type="text" placeholder="Street, City, State" required />
-
-
-
-    <label for="description">Project Description *</label>
-
-    <textarea id="description" placeholder="Describe the work (materials, size, timeline)…" required></textarea>
+    <input id="phone" type="text" placeholder="(555) 555-5555" />
 
 
 
-    <button id="submitBtn" type="submit">🚀 Post Job</button>
+    <label for="address">Full address *</label>
+
+    <input id="address" type="text" placeholder="123 Main St, Louisville, KY" required />
 
 
 
-    <div id="post-ok" class="msg ok" style="display:none;"></div>
+    <label for="description">Project description *</label>
 
-    <div id="post-error" class="msg err" style="display:none;"></div>
+    <textarea id="description" rows="5" placeholder="Describe your project…" required></textarea>
 
-    <div class="hint">By posting, you agree to be contacted by ProBuildZone and matched pros.</div>
+
+
+    <button type="submit">🚀 Post Job</button>
+
+    <p class="hint" id="status-hint"></p>
+
+    <p id="post-error"></p>
 
   </form>
 
@@ -168,131 +86,87 @@
 
   <script>
 
-  const form = document.getElementById('job-form');
+    const FN_URL = 'https://probuildzone.netlify.app/.netlify/functions/post-job'; // Netlify domain
 
-  const btn  = document.getElementById('submitBtn');
 
-  const okEl = document.getElementById('post-ok');
 
-  const errEl= document.getElementById('post-error');
+    document.getElementById('job-form').addEventListener('submit', async (e) => {
 
+      e.preventDefault();
 
+      const status = document.getElementById('status-hint');
 
-  form.addEventListener('submit', async (e) => {
+      const errorBox = document.getElementById('post-error');
 
-    e.preventDefault();
+      status.textContent = 'Saving to database…';
 
+      errorBox.textContent = '';
 
 
-    // basic front-end validation
 
-    const name = document.getElementById('name').value.trim();
+      const payload = {
 
-    const email= document.getElementById('email').value.trim();
+        name: document.getElementById('name').value.trim(),
 
-    const phone= document.getElementById('phone')?.value?.trim() || null;
+        email: document.getElementById('email').value.trim(),
 
-    const address = document.getElementById('address').value.trim();
+        phone: document.getElementById('phone')?.value?.trim() || null,
 
-    const description = document.getElementById('description').value.trim();
+        address: document.getElementById('address').value.trim(),
 
+        description: document.getElementById('description').value.trim(),
 
+      };
 
-    if (!name || !email || !address || !description) {
 
-      showError('Please fill in all required fields.');
 
-      return;
+      try {
 
-    }
+        const res = await fetch(FN_URL, {
 
+          method: 'POST',
 
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 
-    const payload = { name, email, phone, address, description };
+          body: JSON.stringify(payload),
 
+          mode: 'cors'
 
+        });
 
-    try {
 
-      okEl.style.display = 'none';
 
-      errEl.style.display = 'none';
+        const text = await res.text();
 
-      btn.disabled = true; btn.textContent = 'Posting…';
+        let data;
 
+        try { data = JSON.parse(text); }
 
+        catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
-      // ✅ Netlify Function endpoint
 
-      const res = await fetch('/.netlify/functions/post-job', {
 
-        method: 'POST',
+        if (!res.ok) throw new Error(data.error || 'Failed to post job');
 
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 
-        body: JSON.stringify(payload),
 
-      });
+        alert('✅ Job posted successfully!');
 
+        e.target.reset();
 
+        status.textContent = 'Saved ✔';
 
-      const text = await res.text();
+      } catch (err) {
 
-      let data;
+        console.error(err);
 
-      try { data = JSON.parse(text); }
+        status.textContent = '';
 
-      catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
+        errorBox.textContent = `Error: ${err.message}`;
 
+      }
 
-
-      if (!res.ok) throw new Error(data.error || 'Failed to post job');
-
-
-
-      // try to show returned job id if provided by the function
-
-      const jid = data.jobId || data.id || data.reference || null;
-
-      showOk(`✅ Job posted successfully${jid ? ` — ID: ${jid}` : '!'}`);
-
-      form.reset();
-
-    } catch (err) {
-
-      showError(err.message);
-
-      console.error(err);
-
-    } finally {
-
-      btn.disabled = false; btn.textContent = '🚀 Post Job';
-
-    }
-
-  });
-
-
-
-  function showOk(msg){
-
-    okEl.textContent = msg;
-
-    okEl.style.display = 'block';
-
-    errEl.style.display = 'none';
-
-  }
-
-  function showError(msg){
-
-    errEl.textContent = `Error: ${msg}`;
-
-    errEl.style.display = 'block';
-
-    okEl.style.display = 'none';
-
-  }
+    });
 
   </script>
 
