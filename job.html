@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <title>ProBuildZone — Job Details</title>
+  <title>Job Details — ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -16,105 +16,77 @@
 
   <style>
 
-    :root {
+    :root{
 
       --ink:#0F2A43;
 
+      --ink-2:#0b2033;
+
       --muted:#6b7a8c;
 
-      --ok:#0a7f3f;
+      --ok:#0a7d2a;
 
-      --warn:#b00020;
+      --err:#b00020;
 
-      --bg:#f5f7fb;
+      --bg:#f6f7fb;
 
-      --card:#fff;
+      --card:#ffffff;
 
-      --shadow: 0 10px 24px rgba(15,42,67,.06);
+      --border:#e7ecf3;
 
-      --radius: 16px;
+      --blue:#0f62fe;
+
+      --blue-700:#0c4ed6;
+
+      --radius:16px;
 
     }
 
     *{box-sizing:border-box}
 
-    body{
+    html,body{margin:0;padding:0;background:var(--bg);font-family:Inter,system-ui,Arial,sans-serif;color:var(--ink)}
 
-      margin:0;
+    .wrap{max-width:980px;margin:28px auto;padding:0 16px}
 
-      background:var(--bg);
+    .card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:22px 20px;box-shadow:0 10px 24px rgba(15,42,67,0.06)}
 
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    h1{margin:0 0 18px;font-size:40px;letter-spacing:-0.5px}
 
-      color:var(--ink);
+    .grid{display:grid;grid-template-columns:1fr 2fr;gap:8px 16px}
 
-    }
+    .k{color:var(--muted);font-weight:600}
 
-    .wrap{max-width:900px;margin:40px auto;padding:0 16px}
+    .v a{color:#0a58ca;text-decoration:none}
 
-    .card{
+    .btns{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
 
-      background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);
+    .btn{appearance:none;border:none;cursor:pointer;padding:12px 18px;border-radius:12px;font-weight:700}
 
-      padding:24px 22px;
+    .btn.primary{background:var(--blue);color:#fff}
 
-    }
+    .btn.primary:active{transform:translateY(1px)}
 
-    h1{margin:0 0 16px;font-size:36px;letter-spacing:.2px}
+    .btn.primary:hover{background:var(--blue-700)}
 
-    .row{display:flex;gap:10px;line-height:1.7;flex-wrap:wrap}
+    .btn.white{background:#fff;border:1px solid var(--border);color:var(--ink)}
 
-    .label{font-weight:700;min-width:110px}
-
-    hr{border:none;border-top:1px solid #e7ecf3;margin:18px 0}
-
-    .error{
-
-      background:#ffeef0;border:1px solid #ffd3d8;color:#9a1e2a;border-radius:12px;padding:14px 16px;margin:0 0 18px
-
-    }
+    h2{margin:26px 0 12px}
 
     .muted{color:var(--muted)}
 
-    .offers h2{margin:10px 0 14px}
+    .error{color:var(--err)}
 
-    .offer{
+    .offer-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:12px}
 
-      border:1px solid #e7ecf3;border-radius:14px;padding:14px 16px;margin:10px 0;background:#fbfdff
+    .badge{font-size:12px;padding:2px 8px;border-radius:10px;background:#eef4ff;margin-left:6px}
 
-    }
+    @media (max-width:640px){
 
-    .offer .head{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+      h1{font-size:34px}
 
-    .pill{padding:2px 10px;border-radius:999px;border:1px solid #e0e6ef;font-size:13px}
-
-    .amount{font-weight:800}
-
-    .toolrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-
-    .btn{
-
-      display:inline-block;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;
-
-      background:#0d5bd7;color:#fff;font-weight:700;text-decoration:none
+      .grid{grid-template-columns:1fr}
 
     }
-
-    .btn.secondary{background:#eef3fd;color:#0d5bd7}
-
-    .center{display:flex;align-items:center;justify-content:center}
-
-    .spinner{
-
-      width:20px;height:20px;border-radius:50%;border:3px solid #dfe7f6;border-top-color:#0d5bd7;animation:s 1s linear infinite
-
-    }
-
-    @keyframes s{to{transform:rotate(360deg)}}
-
-    .idpill{font-weight:800;letter-spacing:.6px}
-
-    .small{font-size:13px}
 
   </style>
 
@@ -124,61 +96,51 @@
 
   <div class="wrap">
 
-    <div id="alert"></div>
-
-
-
-    <div class="card" id="jobCard" style="display:none">
+    <div class="card">
 
       <h1>Job Details</h1>
 
 
 
-      <div class="row"><div class="label">Job ID:</div><div id="jobPublicId" class="idpill"></div></div>
-
-      <div class="row"><div class="label">Title:</div><div id="jobTitle"></div></div>
-
-      <div class="row"><div class="label">Name:</div><div id="jobName"></div></div>
-
-      <div class="row"><div class="label">Email:</div><div id="jobEmail"></div></div>
-
-      <div class="row"><div class="label">Phone:</div><div id="jobPhone"></div></div>
-
-      <div class="row"><div class="label">Address:</div><div id="jobAddress"></div></div>
-
-      <div class="row"><div class="label">Description:</div><div id="jobSummary"></div></div>
+      <div id="jobError" class="error" style="margin-bottom:8px"></div>
 
 
 
-      <hr/>
+      <div id="jobBox" class="grid" style="display:none">
 
+        <div class="k">Job ID:</div>      <div class="v" id="v_id"></div>
 
+        <div class="k">Title:</div>       <div class="v" id="v_title"></div>
 
-      <div class="toolrow">
+        <div class="k">Name:</div>        <div class="v" id="v_name"></div>
 
-        <a id="offerBtn" class="btn" href="#">Submit Offer</a>
+        <div class="k">Email:</div>       <div class="v" id="v_email"></div>
 
-        <a class="btn secondary" href="/">Back to Home</a>
+        <div class="k">Phone:</div>       <div class="v" id="v_phone"></div>
+
+        <div class="k">Address:</div>     <div class="v" id="v_address"></div>
+
+        <div class="k">Description:</div> <div class="v" id="v_summary"></div>
 
       </div>
 
 
 
-      <div class="offers">
+      <div class="btns">
 
-        <h2>Offers</h2>
+        <a id="offerLink" class="btn primary" href="#">Submit Offer</a>
 
-        <div id="offersList" class="muted">Loading offers...</div>
+        <a class="btn white" href="/index.html">Back to Home</a>
 
       </div>
 
-    </div>
 
 
+      <h2>Offers</h2>
 
-    <div id="loading" class="card center" style="min-height:150px">
+      <div id="offersBox" class="muted">Loading...</div>
 
-      <div class="spinner" aria-label="Loading"></div>
+      <p id="offersError" class="error"></p>
 
     </div>
 
@@ -186,109 +148,79 @@
 
 
 
-  <!-- Supabase JS (ESM) -->
+  <script>
 
-  <script type="module">
-
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-
-
-    // === Supabase Config ===
-
-    const SUPABASE_URL = 'https://hczahffwghbddqabpbmu.supabase.co';
-
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-
-
-    // === Helpers ===
+  (async () => {
 
     const params = new URLSearchParams(location.search);
 
-    const PUBLIC_ID = (params.get('id') || '').trim();
-
-    const jobCard = document.getElementById('jobCard');
-
-    const offersDiv = document.getElementById('offersList');
-
-    const loading = document.getElementById('loading');
-
-    const alertBox = document.getElementById('alert');
+    const publicId = params.get('id');
 
 
 
-    function showError(message){
+    const jobBox = document.getElementById('jobBox');
 
-      alertBox.innerHTML = `<div class="error">${message}</div>`;
-
-    }
+    const jobError = document.getElementById('jobError');
 
 
 
-    function fmtAmount(v){
+    const v_id = document.getElementById('v_id');
 
-      if (v === null || v === undefined || v === '') return '—';
+    const v_title = document.getElementById('v_title');
 
-      const n = Number(v);
+    const v_name = document.getElementById('v_name');
 
-      if (Number.isNaN(n)) return '—';
+    const v_email = document.getElementById('v_email');
 
-      return `$${n.toLocaleString()}`;
+    const v_phone = document.getElementById('v_phone');
 
-    }
+    const v_address = document.getElementById('v_address');
+
+    const v_summary = document.getElementById('v_summary');
 
 
 
-    // === Load job + offers ===
+    const offerLink = document.getElementById('offerLink');
 
-    if (!PUBLIC_ID){
+    const offersBox = document.getElementById('offersBox');
 
-      loading.style.display = 'none';
+    const offersError = document.getElementById('offersError');
 
-      showError(`Error: missing id in URL.`);
 
-    } else {
 
-      document.getElementById('jobPublicId').textContent = PUBLIC_ID;
+    if (!publicId) {
 
-      loadJob(PUBLIC_ID);
+      jobError.textContent = "Job not found.";
+
+      offersBox.textContent = "Couldn't load offers.";
+
+      return;
 
     }
 
 
 
-    async function loadJob(pubId){
+    // رابط صفحة تقديم العرض
 
-      const { data: job, error } = await supabase
-
-        .from('homeowner_jobs')
-
-        .select('id, public_id, title, full_name, email, phone, address, summary')
-
-        .eq('public_id', pubId)
-
-        .maybeSingle();
+    offerLink.href = `/pro-offer.html?id=${encodeURIComponent(publicId)}`;
 
 
 
-      if (error){
+    try {
 
-        loading.style.display = 'none';
+      // 1) جلب تفاصيل الجوب
 
-        showError('Database error while loading job.');
+      const jobRes = await fetch(`/api/get-job?id=${encodeURIComponent(publicId)}`);
 
-        return;
+      const jobJson = await jobRes.json();
 
-      }
 
-      if (!job){
 
-        loading.style.display = 'none';
+      if (!jobRes.ok || !jobJson.job) {
 
-        showError('Job not found.');
+        jobError.textContent = jobJson.error || "Job not found.";
+
+        offersBox.textContent = "No offers yet.";
 
         return;
 
@@ -296,57 +228,39 @@
 
 
 
-      document.getElementById('jobTitle').textContent   = job.title ?? '';
+      const j = jobJson.job;
 
-      document.getElementById('jobName').textContent    = job.full_name ?? '';
+      jobBox.style.display = "";
 
-      document.getElementById('jobEmail').innerHTML     = job.email ? `<a href="mailto:${job.email}">${job.email}</a>` : '';
+      v_id.textContent = j.public_id || publicId;
 
-      document.getElementById('jobPhone').innerHTML     = job.phone ? `<a href="tel:${job.phone}">${job.phone}</a>` : '';
+      v_title.textContent = j.title || "—";
 
-      document.getElementById('jobAddress').textContent = job.address ?? '';
+      v_name.textContent = j.name || "—";
 
-      document.getElementById('jobSummary').textContent = job.summary ?? '';
+      v_email.innerHTML = j.email ? `<a href="mailto:${j.email}">${j.email}</a>` : "—";
 
+      v_phone.innerHTML = j.phone ? `<a href="tel:${j.phone}">${j.phone}</a>` : "—";
 
+      v_address.textContent = j.address || "—";
 
-      document.getElementById('offerBtn').href = `/pro-offer.html?id=${encodeURIComponent(pubId)}`;
-
-
-
-      // === Load offers ===
-
-      const { data: offers, error: offersErr } = await supabase
-
-        .from('job_offers')
-
-        .select('pro_name, amount, phone, message, created_at, status')
-
-        .eq('job_id', job.id)
-
-        .order('created_at', { ascending:false });
+      v_summary.textContent = j.summary || "—";
 
 
 
-      loading.style.display = 'none';
+      // 2) جلب العروض
 
-      jobCard.style.display = 'block';
+      const offRes = await fetch(`/api/get-offers?id=${encodeURIComponent(publicId)}`);
+
+      const offJson = await offRes.json();
 
 
 
-      if (offersErr){
+      if (!offRes.ok) {
 
-        offersDiv.innerHTML = `<span class="muted">Couldn’t load offers.</span>`;
+        offersError.textContent = offJson.error || "Couldn't load offers.";
 
-        console.error(offersErr);
-
-        return;
-
-      }
-
-      if (!offers || offers.length === 0){
-
-        offersDiv.innerHTML = `<span class="muted">No offers yet.</span>`;
+        offersBox.textContent = "";
 
         return;
 
@@ -354,29 +268,119 @@
 
 
 
-      offersDiv.innerHTML = offers.map(o => `
+      offersBox.innerHTML = "";
 
-        <div class="offer">
+      if (!offJson.offers || offJson.offers.length === 0) {
 
-          <div class="head">
+        offersBox.innerHTML = `<p class="muted" style="margin:0">No offers yet.</p>`;
 
-            <div style="font-weight:800">${o.pro_name ?? '—'}</div>
+        return;
 
-            <div class="pill amount">${fmtAmount(o.amount)}</div>
+      }
 
-            ${o.status ? `<div class="pill">${o.status}</div>` : ''}
+
+
+      offJson.offers.forEach(o => {
+
+        const amount = (o.amount != null) ? `$${Number(o.amount).toLocaleString()}` : "$—";
+
+        const phone = o.phone ? ` • ${o.phone}` : "";
+
+        const statusBadge = `<span class="badge">${o.status}</span>`;
+
+
+
+        const div = document.createElement('div');
+
+        div.className = 'offer-card';
+
+        div.innerHTML = `
+
+          <div style="font-weight:700;margin-bottom:4px">
+
+            ${o.business_name} — ${amount} ${statusBadge}
 
           </div>
 
-          <div class="small" style="margin:6px 0 2px">${o.message ?? ''}</div>
+          <div style="color:#334155;white-space:pre-wrap">${o.message || ""}</div>
 
-          <div class="muted small">${new Date(o.created_at).toLocaleString()}</div>
+          <div style="color:#6b7a8c;margin-top:6px">${new Date(o.created_at).toLocaleString()}${phone}</div>
 
-        </div>
+          <div style="margin-top:10px">
 
-      `).join('');
+            <button data-id="${o.id}" class="accept-btn btn primary" style="padding:8px 12px">Accept</button>
+
+          </div>
+
+        `;
+
+        offersBox.appendChild(div);
+
+      });
+
+
+
+      // 3) حدث زر القبول
+
+      offersBox.addEventListener('click', async (e) => {
+
+        const btn = e.target.closest('.accept-btn');
+
+        if (!btn) return;
+
+        btn.disabled = true;
+
+        try {
+
+          const offerId = btn.getAttribute('data-id');
+
+          const res = await fetch('/api/accept-offer', {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json' },
+
+            body: JSON.stringify({ offer_id: offerId })
+
+          });
+
+          if (res.ok) {
+
+            location.reload();
+
+          } else {
+
+            const err = await res.text();
+
+            alert('Failed to accept offer: ' + err);
+
+            btn.disabled = false;
+
+          }
+
+        } catch (err) {
+
+          alert('Failed to accept offer.');
+
+          btn.disabled = false;
+
+        }
+
+      });
+
+
+
+    } catch (err) {
+
+      console.error(err);
+
+      jobError.textContent = "Job not found.";
+
+      offersError.textContent = "Couldn't load offers.";
 
     }
+
+  })();
 
   </script>
 
