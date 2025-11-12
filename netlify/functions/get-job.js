@@ -1,101 +1,135 @@
 // netlify/functions/get-job.js
 
-const HEADERS = {
-
-  'Content-Type': 'application/json',
-
-  'Access-Control-Allow-Origin': '*',
-
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
-
-};
+const { createClient } = require('@supabase/supabase-js');
 
 
 
 exports.handler = async (event) => {
 
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: HEADERS, body: '' };
+  try {
 
+    const publicId = (event.queryStringParameters && event.queryStringParameters.id) || '';
 
+    if (!publicId) {
 
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-
-  const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
-
-  if (!SUPABASE_URL || !SERVICE_ROLE) {
-
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Server not configured' }) };
-
-  }
-
-
-
-  // يقبل ?id=UUID أو ?code=PBZ-12345
-
-  const params = new URLSearchParams(event.queryStringParameters || {});
-
-  let uuid = params.get('id');
-
-  const code = params.get('code');
-
-
-
-  if (!uuid && code) {
-
-    // استرجاع عبر الكود: نبحث بآخر 5 من الUUID
-
-    const suffix = (code || '').toUpperCase().replace('PBZ-','').trim();
-
-    if (!/^[A-Z0-9]{5}$/.test(suffix)) {
-
-      return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid code' }) };
+      return resp(400, { error: 'Missing id' });
 
     }
 
-    // فلترة REST: نستخدم ilike على id النصي (بدون شرط دقيق)، أبسط حل:
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs?id=ilike.*${suffix}`, {
 
-      headers: { 'apikey': SERVICE_ROLE, 'Authorization': `Bearer ${SERVICE_ROLE}` }
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+
+
+
+    // 1) نجيب السجل حسب public_id (مو الـ UUID)
+
+    const { data: job, error: jobErr } = await supabase
+
+      .from('homeowner_jobs')
+
+      .select('id, public_id, title, summary, city, state, homeowner_id, created_at, address')
+
+      .eq('public_id', publicId)
+
+      .maybeSingle();
+
+
+
+    if (jobErr) throw jobErr;
+
+    if (!job) return resp(404, { error: 'Job not found' });
+
+
+
+    // 2) معلومات صاحب الطلب
+
+    const { data: owner, error: ownerErr } = await supabase
+
+      .from('homeowners')
+
+      .select('name, email, phone, address')
+
+      .eq('id', job.homeowner_id)
+
+      .maybeSingle();
+
+    if (ownerErr) throw ownerErr;
+
+
+
+    // 3) العروض المرتبطة (حسب UUID الداخلي job.id)
+
+    const { data: offers, error: offersErr } = await supabase
+
+      .from('job_offers')
+
+      .select('id, amount, message, pro_name, phone, status, created_at')
+
+      .eq('job_id', job.id)
+
+      .order('created_at', { ascending: false });
+
+    if (offersErr) throw offersErr;
+
+
+
+    return resp(200, {
+
+      job: {
+
+        public_id: job.public_id,
+
+        title: job.title,
+
+        summary: job.summary,
+
+        address: owner?.address || job.address || null,
+
+        name: owner?.name || null,
+
+        email: owner?.email || null,
+
+        phone: owner?.phone || null,
+
+        created_at: job.created_at,
+
+      },
+
+      offers: offers || [],
 
     });
 
-    const rows = await res.json();
+  } catch (e) {
 
-    const row = (rows || []).find(r => r.id && r.id.replace(/-/g,'').toUpperCase().endsWith(suffix));
+    console.error(e);
 
-    if (!row) return { statusCode: 404, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Not found' }) };
-
-    return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok:true, job: row }) };
+    return resp(500, { error: e.message || 'Server error' });
 
   }
-
-
-
-  if (!uuid) {
-
-    return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing id or code' }) };
-
-  }
-
-
-
-  // استرجاع مباشر عبر uuid
-
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs?id=eq.${uuid}`, {
-
-    headers: { 'apikey': SERVICE_ROLE, 'Authorization': `Bearer ${SERVICE_ROLE}` }
-
-  });
-
-  const data = await res.json();
-
-  if (!Array.isArray(data) || !data[0]) {
-
-    return { statusCode: 404, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Not found' }) };
-
-  }
-
-  return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok:true, job: data[0] }) };
 
 };
+
+
+
+function resp(statusCode, body) {
+
+  return {
+
+    statusCode,
+
+    headers: {
+
+      'Content-Type': 'application/json',
+
+      'Access-Control-Allow-Origin': '*',
+
+      'Cache-Control': 'no-store',
+
+    },
+
+    body: JSON.stringify(body),
+
+  };
+
+}
