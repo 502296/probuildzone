@@ -2,49 +2,73 @@
 
 (async () => {
 
-  // 1) اقرأ id من الرابط
+  const box = document.getElementById('offersBox') || document.body;
 
   const params = new URLSearchParams(location.search);
 
-  let raw = (params.get('id') || '').trim();
+  let raw = (params.get('id') || '').trim(); // نقبل id=PBZ-xxxxx أو id=UUID
 
 
 
-  const box = document.getElementById('offersBox') || document.body;
+  if (!raw) { box.innerHTML = `<div class="err">Missing id. Use ?id=PBZ-12345 or paste full UUID.</div>`; return; }
 
 
 
-  // 2) دوال مساعدة
+  const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.co';
+
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
+
+
 
   const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
 
-  const toPublicId = s => {
-
-    // لو دخل 99999 نحولها PBZ-99999
-
-    if (!s) return null;
-
-    const u = s.toUpperCase();
-
-    if (isUUID(u)) return null;         // هذا UUID، ليس public_id
-
-    const digits = u.replace(/^PBZ-/, '');
-
-    if (/^\d{5}$/.test(digits)) return `PBZ-${digits}`;
-
-    // لو أعطى PBZ-xxxxx جاهزة نعيدها كما هي
-
-    if (/^PBZ-\d{5}$/.test(u)) return u;
-
-    return null;
-
-  };
+  const toSuffix = code => code.toUpperCase().replace(/^PBZ-/, '').replace(/[^A-Z0-9]/g,'').slice(-5);
 
 
 
-  if (!raw) {
+  let job = null;
 
-    box.innerHTML = `<div class="err">Error: missing id in URL. Try <code>?id=PBZ-12345</code> or paste the Job ID you received.</div>`;
+
+
+  try {
+
+    if (isUUID(raw)) {
+
+      // بحث مباشر بالـ UUID
+
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*&id=eq.${encodeURIComponent(raw)}`, {
+
+        headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+
+      });
+
+      const rows = await r.json();
+
+      job = rows[0] || null;
+
+    } else {
+
+      // بحث بالكود PBZ-xxxxx عبر مطابقة آخر 5 أحرف من uuid (بدون عمود public_id)
+
+      const suffix = toSuffix(raw);
+
+      if (!/^[A-Z0-9]{5}$/.test(suffix)) throw new Error('Invalid Job ID format.');
+
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*`, {
+
+        headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+
+      });
+
+      const rows = await r.json();
+
+      job = (rows || []).find(x => x.id && x.id.replace(/-/g,'').toUpperCase().endsWith(suffix)) || null;
+
+    }
+
+  } catch (e) {
+
+    box.innerHTML = `<div class="err">Error fetching job: ${e.message}</div>`;
 
     return;
 
@@ -52,119 +76,53 @@
 
 
 
-  // 3) حضّر الاستعلام
-
-  let url;
-
-  const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.co';        // مثل https://xxxx.supabase.co
-
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';   // المفتاح العام (مسموح وضعه في العميل للقراءة)
+  if (!job) { box.innerHTML = `<div class="err">No job found for this ID.</div>`; return; }
 
 
 
-  if (isUUID(raw)) {
+  // عرض تفاصيل الطلب
 
-    // ابحث بالـUUID الحقيقي
+  box.innerHTML = `
 
-    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*&id=eq.${encodeURIComponent(raw)}`;
+    <div class="card">
 
-  } else {
+      <h2>Job Details</h2>
 
-    // ابحث بالـ public_id (نقبل 99999 أو PBZ-99999)
+      <p><b>Title:</b> ${job.project_title ?? '-'}</p>
 
-    const pid = toPublicId(raw);
+      <p><b>Name:</b> ${job.contact_name ?? job.name ?? '-'}</p>
 
-    if (!pid) {
+      <p><b>Email:</b> ${job.email ?? '-'}</p>
 
-      box.innerHTML = `<div class="err">Error: invalid Job ID format. Use something like <b>PBZ-12345</b> or paste the full UUID.</div>`;
+      <p><b>Phone:</b> ${job.phone ?? '-'}</p>
 
-      return;
+      <p><b>Address:</b> ${job.full_address ?? job.address ?? '-'}</p>
 
-    }
+      <p><b>Description:</b><br>${(job.full_description ?? job.description ?? '').replace(/\n/g,'<br>')}</p>
 
-    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*&public_id=eq.${encodeURIComponent(pid)}`;
+      <hr/>
 
-  }
+      <h3>Offers</h3>
+
+      <div id="offersList">Loading offers…</div>
+
+    </div>
+
+  `;
 
 
+
+  // (اختياري) جلب العروض إن جهّزنا جدول pro_offers
 
   try {
 
-    const res = await fetch(url, {
-
-      headers: {
-
-        apikey: SUPABASE_ANON,
-
-        Authorization: `Bearer ${SUPABASE_ANON}`
-
-      }
-
-    });
-
-    const rows = await res.json();
-
-
-
-    if (!Array.isArray(rows) || rows.length === 0) {
-
-      box.innerHTML = `<div class="err">No job found for this ID.</div>`;
-
-      return;
-
-    }
-
-
-
-    const job = rows[0];
-
-
-
-    // اعرض ملخّص الطلب (بساطة الآن)
-
-    box.innerHTML = `
-
-      <div class="card">
-
-        <h2>Job Details</h2>
-
-        <p><b>Title:</b> ${job.project_title ?? '-'}</p>
-
-        <p><b>Name:</b> ${job.contact_name ?? job.name ?? '-'}</p>
-
-        <p><b>Email:</b> ${job.email ?? '-'}</p>
-
-        <p><b>Phone:</b> ${job.phone ?? '-'}</p>
-
-        <p><b>Address:</b> ${job.full_address ?? job.address ?? '-'}</p>
-
-        <p><b>Description:</b><br>${(job.full_description ?? job.description ?? '').replace(/\n/g,'<br>')}</p>
-
-        <hr/>
-
-        <h3>Offers</h3>
-
-        <div id="offersList">Loading offers…</div>
-
-      </div>
-
-    `;
-
-
-
-    // (اختياري) اجلب العروض من جدول pro_offers لو أنشأناه
-
-    const offersUrl = `${SUPABASE_URL}/rest/v1/pro_offers?select=pro_name,amount,message,created_at&job_id=eq.${job.id}`;
-
-    const ores = await fetch(offersUrl, {
+    const ores = await fetch(`${SUPABASE_URL}/rest/v1/pro_offers?select=pro_name,amount,message,created_at&job_id=eq.${job.id}`, {
 
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
 
     });
 
     const offers = await ores.json();
-
-
 
     const list = document.getElementById('offersList');
 
@@ -190,11 +148,9 @@
 
     }
 
+  } catch {
 
-
-  } catch (e) {
-
-    box.innerHTML = `<div class="err">Error: ${e.message}</div>`;
+    document.getElementById('offersList').textContent = 'No offers yet.';
 
   }
 
