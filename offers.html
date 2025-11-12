@@ -1,36 +1,84 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
 
 <head>
 
-  <meta charset="utf-8"/>
+  <meta charset="utf-8">
 
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>ProBuildZone — Job Offers</title>
+  <title>Offers — ProBuildZone</title>
 
-  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
 
-    .wrap{max-width:900px;margin:40px auto;padding:0 16px}
+    :root{
 
-    .search{display:flex;gap:8px;margin-bottom:16px}
+      --bg:#f6f7fb; --ink:#0f2a43; --card:#fff; --muted:#6b7a8c; --ok:#0a7f4f; --err:#b00020; --brand:#0b7ef4;
 
-    .search input{flex:1;padding:12px;border:1px solid #d7dde6;border-radius:8px}
+    }
 
-    .search button{padding:12px 16px;border:0;border-radius:8px;background:#0b7ef4;color:#fff;font-weight:700}
+    *{box-sizing:border-box}
 
-    .card{background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:20px;margin-top:16px}
+    body{margin:0; font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--ink)}
 
-    .muted{color:#6b7a8c}
+    header{padding:16px 20px; display:flex; align-items:center; justify-content:space-between; background:#ffffffc0; backdrop-filter:saturate(1.2) blur(6px); position:sticky; top:0; z-index:2}
 
-    .offers{margin-top:16px;display:grid;gap:12px}
+    .brand{font-weight:800; letter-spacing:.2px}
 
-    .offer{border:1px solid #e7ecf3;border-radius:10px;padding:14px}
+    .container{max-width:980px; margin:24px auto; padding:0 16px}
 
-    .pill{display:inline-block;background:#eef5ff;border:1px solid #d3e6ff;border-radius:999px;padding:4px 10px;font-size:.85rem;margin-left:8px}
+    .hero{
+
+      position:relative; height: 220px; border-radius:16px; overflow:hidden; margin-bottom:16px;
+
+      background:url('hero.jpg'), linear-gradient(#ccc,#ddd);
+
+      background-size:cover; background-position:center;
+
+      filter: brightness(1.05) contrast(1.02); /* زيادة سطوع بسيطة */
+
+    }
+
+    .card{background:var(--card); border-radius:14px; box-shadow:0 10px 28px rgba(0,0,0,.08); padding:18px}
+
+    h1{font-size:1.6rem; margin:0 0 10px}
+
+    .row{display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px}
+
+    .grid{display:grid; gap:12px}
+
+    .muted{color:var(--muted)}
+
+    .pill{display:inline-block; background:#eef3ff; color:#1b4bd7; padding:4px 10px; border-radius:999px; font-weight:600; font-size:.85rem}
+
+    .offers{margin-top:16px}
+
+    table{width:100%; border-collapse:collapse}
+
+    th,td{padding:12px 10px; text-align:left; border-bottom:1px solid #e8edf4; vertical-align:top}
+
+    th{font-size:.9rem; color:#334c66}
+
+    .empty{padding:14px; background:#fff8e6; border:1px dashed #ffe1a3; border-radius:10px; color:#6a5600}
+
+    .error{color:var(--err); font-weight:600}
+
+    .ok{color:var(--ok); font-weight:600}
+
+    .idbox{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+    .idbox input{flex:1; padding:10px 12px; border:1px solid #d7dde6; border-radius:8px}
+
+    .idbox button{background:var(--brand); color:#fff; font-weight:700; border:0; padding:10px 14px; border-radius:10px; cursor:pointer}
+
+    .skeleton{background:linear-gradient(90deg,#f1f4f9 25%,#e9edf3 37%,#f1f4f9 63%); background-size:400% 100%; animation:sh 1.3s infinite}
+
+    @keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+    .hl{font-weight:700}
 
   </style>
 
@@ -38,27 +86,97 @@
 
 <body>
 
-  <div class="wrap">
+  <header>
 
-    <h1>🔎 View Job & Offers</h1>
+    <div class="brand">ProBuildZone</div>
+
+    <a href="/" style="text-decoration:none;color:var(--brand);font-weight:700">Home</a>
+
+  </header>
 
 
 
-    <div class="search">
+  <div class="container">
 
-      <input id="jobId" placeholder="Enter Job ID (e.g., PBZ-12345)" />
+    <div class="hero"></div>
 
-      <button id="goBtn">Load</button>
+
+
+    <div class="card" id="searchCard" style="display:none">
+
+      <h1>Find your Job</h1>
+
+      <p class="muted">Paste your Job ID to see offers.</p>
+
+      <div class="idbox">
+
+        <input id="jobIdInput" placeholder="PBZ-xxxx or UUID">
+
+        <button id="jobIdGo">Open</button>
+
+      </div>
 
     </div>
 
 
 
-    <div id="msg" class="muted"></div>
+    <div class="grid" id="jobWrap" style="display:none">
 
-    <div id="job" class="card" style="display:none"></div>
+      <div class="card">
 
-    <div id="offers" class="offers"></div>
+        <h1>Project details <span class="pill" id="jobIdPill"></span></h1>
+
+        <div class="row">
+
+          <div>
+
+            <div><span class="muted">Title</span><div id="jobTitle" class="hl"></div></div>
+
+            <div style="margin-top:10px"><span class="muted">Summary</span><div id="jobSummary"></div></div>
+
+            <div style="margin-top:10px"><span class="muted">City / State</span><div id="jobCityState"></div></div>
+
+          </div>
+
+          <div>
+
+            <div><span class="muted">Contact</span><div id="jobContact"></div></div>
+
+            <div style="margin-top:10px"><span class="muted">Address</span><div id="jobAddress"></div></div>
+
+          </div>
+
+        </div>
+
+        <div style="margin-top:12px">
+
+          <span class="muted">Description</span>
+
+          <div id="jobDesc" style="white-space:pre-wrap"></div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <h1>Offers</h1>
+
+        <div id="offersBox" class="offers">
+
+          <div class="empty">No offers yet. Keep this page open — it refreshes automatically every 10s.</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div id="msg" class="card" style="display:none"></div>
 
   </div>
 
@@ -66,87 +184,89 @@
 
   <script>
 
-    const qs = new URLSearchParams(location.search);
+    const $ = (s)=>document.querySelector(s);
 
-    const jobIdInput = document.getElementById('jobId');
+    const msg = $("#msg");
 
-    const goBtn = document.getElementById('goBtn');
+    const jobWrap = $("#jobWrap");
 
-    const msg = document.getElementById('msg');
+    const searchCard = $("#searchCard");
 
-    const jobBox = document.getElementById('job');
+    const offersBox = $("#offersBox");
 
-    const offersBox = document.getElementById('offers');
+    const jobIdPill = $("#jobIdPill");
 
 
 
-    async function load(id){
+    function setMsg(html, type){ msg.style.display='block'; msg.innerHTML = `<div class="${type||''}">${html}</div>`; }
 
-      msg.textContent = 'Loading…'; jobBox.style.display='none'; offersBox.innerHTML='';
+    function clearMsg(){ msg.style.display='none'; msg.innerHTML=''; }
+
+
+
+    // Parse id from URL
+
+    const params = new URLSearchParams(location.search);
+
+    let JOB_ID = (params.get('id')||'').trim();
+
+
+
+    if(!JOB_ID){
+
+      searchCard.style.display='block';
+
+      $("#jobIdGo").onclick = ()=> {
+
+        const v = $("#jobIdInput").value.trim();
+
+        if(v) location.href = `offers.html?id=${encodeURIComponent(v)}`;
+
+      };
+
+    } else {
+
+      loadAll();
+
+      // polling offers every 10s
+
+      setInterval(()=> loadOffers(JOB_ID, false), 10000);
+
+    }
+
+
+
+    async function loadAll(){
+
+      clearMsg();
+
+      jobWrap.style.display='none';
+
+      setMsg('Loading job…','');
+
+
 
       try{
 
-        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(id)}`);
+        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(JOB_ID)}`);
 
         const text = await res.text();
 
-        let data; try{ data = JSON.parse(text); }catch{ throw new Error(`Non-JSON (${res.status})`); }
+        let data; try{ data = JSON.parse(text); } catch{ throw new Error(`Non-JSON (${res.status}) ${text.slice(0,120)}…`); }
 
-        if(!res.ok || !data.ok) throw new Error(data.error || `Failed ${res.status}`);
+        if(!res.ok || !data.ok) throw new Error(data.error||`Failed (${res.status})`);
 
+        renderJob(data.job);
 
+        renderOffers(data.offers||[]);
 
-        const j = data.job;
+        jobWrap.style.display='grid';
 
-        jobBox.innerHTML = `
+        clearMsg();
 
-          <h2>${j.project_title || '(Untitled Project)'} <span class="pill">${j.category || 'General'}</span></h2>
+      }catch(err){
 
-          <p class="muted">${j.short_summary || ''}</p>
-
-          <p><b>Contact:</b> ${j.contact_name} — ${j.phone} — ${j.email}</p>
-
-          <p><b>Address:</b> ${j.full_address}</p>
-
-          <p style="white-space:pre-wrap">${j.full_description}</p>
-
-          <p class="muted">Job ID: ${j.job_id}</p>
-
-        `;
-
-        jobBox.style.display='block';
-
-
-
-        // عروض (لاحقاً نستبدلها ببيانات حقيقية من جدول offers)
-
-        offersBox.innerHTML = '';
-
-        if(!data.offers || !data.offers.length){
-
-          offersBox.innerHTML = `<div class="muted">No offers yet. Pros will start sending offers soon.</div>`;
-
-        }else{
-
-          data.offers.forEach(o=>{
-
-            const el = document.createElement('div');
-
-            el.className='offer';
-
-            el.innerHTML = `<b>${o.pro_name}</b> — $${o.amount}<br><span class="muted">${o.message||''}</span>`;
-
-            offersBox.appendChild(el);
-
-          });
-
-        }
-
-        msg.textContent='';
-
-      }catch(e){
-
-        msg.textContent = 'Error: '+e.message;
+        setMsg(`<div class="error">Error: ${err.message}</div>`,'');
 
       }
 
@@ -154,13 +274,87 @@
 
 
 
-    goBtn.onclick = ()=> jobIdInput.value.trim() && load(jobIdInput.value.trim());
+    function renderJob(job){
+
+      JOB_ID = job.id;
+
+      jobIdPill.textContent = job.id;
+
+      $("#jobTitle").textContent = job.title || '—';
+
+      $("#jobSummary").textContent = job.summary || '—';
+
+      $("#jobCityState").textContent = [job.city, job.state].filter(Boolean).join(', ') || '—';
+
+      $("#jobContact").textContent = `${job.name || '—'} · ${job.email || '—'} · ${job.phone || '—'}`;
+
+      $("#jobAddress").textContent = job.address || '—';
+
+      $("#jobDesc").textContent = job.description || '—';
+
+    }
 
 
 
-    // لو جاي بالرابط ?id=
+    async function loadOffers(id, showLoading=true){
 
-    if(qs.get('id')){ jobIdInput.value = qs.get('id'); load(qs.get('id')); }
+      try{
+
+        if(showLoading) offersBox.innerHTML = `<div class="skeleton" style="height:48px;border-radius:10px"></div>`;
+
+        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(id)}`);
+
+        const data = await res.json();
+
+        if(!res.ok || !data.ok) throw new Error(data.error || `Failed ${res.status}`);
+
+        renderOffers(data.offers||[]);
+
+      }catch(err){
+
+        offersBox.innerHTML = `<div class="error">Error loading offers: ${err.message}</div>`;
+
+      }
+
+    }
+
+
+
+    function renderOffers(offers){
+
+      if(!offers.length){
+
+        offersBox.innerHTML = `<div class="empty">No offers yet. Share your Job ID with local pros or wait for invitations.</div>`;
+
+        return;
+
+      }
+
+      const rows = offers.map(o => `
+
+        <tr>
+
+          <td><div class="hl">${o.pro_name || 'Pro'}</div><div class="muted" style="font-size:.9rem">${new Date(o.created_at).toLocaleString()}</div></td>
+
+          <td style="white-space:pre-wrap">${o.message || '—'}</td>
+
+          <td style="font-weight:800">$${(o.amount ?? 0).toLocaleString()}</td>
+
+        </tr>
+
+      `).join('');
+
+      offersBox.innerHTML = `
+
+        <table>
+
+          <thead><tr><th>Pro</th><th>Message</th><th>Offer</th></tr></thead>
+
+          <tbody>${rows}</tbody>
+
+        </table>`;
+
+    }
 
   </script>
 
