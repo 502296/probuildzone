@@ -16,6 +16,22 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+
+
+  <!-- تفتيح بسيط للواجهة بدون تغيير التصميم -->
+
+  <style>
+
+    .hero .overlay{
+
+      /* كانت داكنة أكثر – خففنا العتمة قليلاً */
+
+      background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.35));
+
+    }
+
+  </style>
+
 </head>
 
 <body>
@@ -328,7 +344,7 @@
 
       if (!e.target.closest(".menu-wrap")) {
 
-        if (menuPanel) menuPanel.style.display = "none";
+        if (menuPanel) { menuPanel.style.display = "none"; }
 
       }
 
@@ -344,11 +360,7 @@
 
     const closeAbout = () => { aboutModal.style.display = "none"; document.documentElement.style.overflow = ""; };
 
-    document.getElementById("openAboutFromMenu")?.addEventListener("click", (e) => {
-
-      e.preventDefault(); openAbout(); if (menuPanel) menuPanel.style.display = "none";
-
-    });
+    document.getElementById("openAboutFromMenu")?.addEventListener("click", (e) => { e.preventDefault(); openAbout(); if (menuPanel) menuPanel.style.display = "none"; });
 
     document.getElementById("aboutClose")?.addEventListener("click", closeAbout);
 
@@ -372,15 +384,25 @@
 
 
 
-    function openDoor(){ modal.style.display="flex"; document.documentElement.style.overflow="hidden"; goStep(1); }
+    function openDoor() { modal.style.display = "flex"; document.documentElement.style.overflow = "hidden"; goStep(1); }
 
-    function closeDoor(){ modal.style.display="none"; document.documentElement.style.overflow=""; }
+    function closeDoor() { modal.style.display = "none"; document.documentElement.style.overflow = ""; }
 
-    function goStep(n){
+    function goStep(n) {
 
-      if(n===1){ step1.style.display="block"; step2.style.display="none"; document.getElementById("sheetTitle").textContent="Post a Job"; }
+      if (n === 1) {
 
-      else{ step1.style.display="none"; step2.style.display="block"; document.getElementById("sheetTitle").textContent="Post a Job"; sheet.scrollTop=0; }
+        step1.style.display = "block"; step2.style.display = "none";
+
+        document.getElementById("sheetTitle").textContent = "Post a Job";
+
+      } else {
+
+        step1.style.display = "none"; step2.style.display = "block";
+
+        document.getElementById("sheetTitle").textContent = "Post a Job"; sheet.scrollTop = 0;
+
+      }
 
     }
 
@@ -390,15 +412,17 @@
 
     document.getElementById("closeDoor").addEventListener("click", closeDoor);
 
-    document.getElementById("backBtn").addEventListener("click", ()=>{ if(step1.style.display==="block") closeDoor(); else goStep(1); });
+    document.getElementById("backBtn").addEventListener("click", () => { if (step1.style.display === "block") closeDoor(); else goStep(1); });
 
 
 
-    document.querySelectorAll(".cat-card").forEach((btn)=>{
+    document.querySelectorAll(".cat-card").forEach((btn) => {
 
-      btn.addEventListener("click", ()=>{
+      btn.addEventListener("click", () => {
 
-        const val = btn.dataset.cat; hiddenCat.value = val; selectedCatEl.textContent = val; goStep(2);
+        const val = btn.dataset.cat;
+
+        hiddenCat.value = val; selectedCatEl.textContent = val; goStep(2);
 
       });
 
@@ -406,17 +430,19 @@
 
 
 
-    document.getElementById("goQuick").addEventListener("click", ()=>{
+    // quick go to offers
+
+    document.getElementById("goQuick").addEventListener("click", () => {
 
       const id = document.getElementById("jobIdQuick").value.trim();
 
-      if(id){ location.href = "/offers.html?id=" + encodeURIComponent(id); }
+      if (id) location.href = "/offers.html?id=" + encodeURIComponent(id);
 
     });
 
 
 
-    // ====== FILES PREVIEW (optional UI only) ======
+    // ====== FILES PREVIEW ======
 
     const fileInput = document.getElementById("fileInput");
 
@@ -428,15 +454,17 @@
 
     if (pickBtn) pickBtn.onclick = () => fileInput.click();
 
-    const humanSize = (b)=> b<1024? b+" B" : b<1048576? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(1)+" MB";
 
-    const renderList = (files)=>{
+
+    const humanSize = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(1) + " MB";
+
+    const renderList = (files) => {
 
       fileList.innerHTML = "";
 
-      if(!files.length){ fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
+      if (!files.length) { fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
 
-      [...files].forEach((f)=>{
+      [...files].forEach((f) => {
 
         const isImg = /^image\//.test(f.type);
 
@@ -452,63 +480,69 @@
 
     };
 
-    fileInput?.addEventListener("change", ()=> renderList(fileInput.files));
+    fileInput?.addEventListener("change", () => renderList(fileInput.files));
 
-    ["dragenter","dragover","dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e,(ev)=>{ev.preventDefault();ev.stopPropagation();},false));
 
-    ["dragenter","dragover"].forEach((e)=> dropZone?.addEventListener(e, ()=> dropZone.classList.add("hover"), false));
 
-    ["dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e, ()=> dropZone.classList.remove("hover"), false));
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((e) =>
 
-    dropZone?.addEventListener("drop",(ev)=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files=dt.files; renderList(fileInput.files); }});
+      dropZone?.addEventListener(e, (ev) => { ev.preventDefault(); ev.stopPropagation(); }, false)
+
+    );
+
+    ["dragenter", "dragover"].forEach((e) => dropZone?.addEventListener(e, () => dropZone.classList.add("hover"), false));
+
+    ["dragleave", "drop"].forEach((e) => dropZone?.addEventListener(e, () => dropZone.classList.remove("hover"), false));
+
+    dropZone?.addEventListener("drop", (ev) => {
+
+      const dt = ev.dataTransfer;
+
+      if (dt?.files) { fileInput.files = dt.files; renderList(fileInput.files); }
+
+    });
 
 
 
     // ====== SEND BUTTON → Netlify Function ======
 
-    document.getElementById("sendBtn").addEventListener("click", async ()=>{
+    document.getElementById("sendBtn").addEventListener("click", async () => {
 
       const m = document.getElementById("sendMsg");
 
 
 
-      // نجمع و نطابق أسماء الحقول مع الـschema الموحّد
-
       const payload = {
 
         category: document.getElementById("categoryHidden").value || "General",
 
-        title: document.getElementById("title").value.trim(),
+        project_title: document.getElementById("title").value.trim(),
 
-        summary: document.getElementById("summary").value.trim(),
+        short_summary: document.getElementById("summary").value.trim(),
 
         city: document.getElementById("city").value.trim(),
 
         state: document.getElementById("state").value.trim(),
 
-        name: document.getElementById("contactName").value.trim(),
+        contact_name: document.getElementById("contactName").value.trim(),
 
         phone: document.getElementById("phone").value.trim(),
 
         email: document.getElementById("email").value.trim(),
 
-        address: document.getElementById("address").value.trim(),
+        full_address: document.getElementById("address").value.trim(),
 
-        description: document.getElementById("longDesc").value.trim()
+        full_description: document.getElementById("longDesc").value.trim()
 
       };
 
 
 
-      // required
-
-      if(!payload.title || !payload.name || !payload.phone || !payload.email || !payload.address || !payload.description){
+      if (!payload.project_title || !payload.contact_name || !payload.phone || !payload.email || !payload.full_address || !payload.full_description) {
 
         m.textContent = "Please fill all required fields.";
 
-        m.className = "hint err";
-
-        return;
+        m.className = "hint err"; return;
 
       }
 
@@ -520,37 +554,47 @@
 
 
 
-      try{
+      try {
 
-        const res = await fetch("/.netlify/functions/post-job", {
+        const res = await fetch("/.netlify/functions/save-homeowner-job", {
 
           method: "POST",
 
-          headers: { "Content-Type": "application/json", "Accept":"application/json" },
+          headers: { "Content-Type": "application/json" },
 
           body: JSON.stringify(payload)
 
         });
 
+        const text = await res.text();
 
-
-        const text = await res.text(); // حماية من HTML
-
-        let data; try{ data = JSON.parse(text); } catch{ throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
-
-
-
-        if(!res.ok || !data.ok){ throw new Error(data.error || `Failed with ${res.status}`); }
+        let data; try { data = JSON.parse(text); } catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
 
 
-        m.textContent = `✅ Job posted! Your Job ID: ${data.job_id}`;
+        if (data.ok) {
 
-        m.className = "hint ok";
+          m.textContent = "✅ Job posted!";
 
-        setTimeout(()=>{ m.textContent=""; closeDoor(); }, 1200);
+          m.className = "hint ok";
 
-      }catch(e){
+          // التحويل التلقائي لصفحة العروض المتوافقة
+
+          setTimeout(() => {
+
+            location.href = `/offers.html?id=${encodeURIComponent(data.job_id)}`;
+
+          }, 800);
+
+        } else {
+
+          m.textContent = "❌ Error: " + (data.error || "failed to save");
+
+          m.className = "hint err";
+
+        }
+
+      } catch (e) {
 
         m.textContent = "❌ Error: " + (e.message || "network error");
 
