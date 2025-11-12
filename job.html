@@ -1,0 +1,403 @@
+<!doctype html>
+
+<html lang="en" dir="ltr">
+
+<head>
+
+  <meta charset="utf-8"/>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>ProBuildZone — Job Details</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    :root{
+
+      --ink:#0F2A43;
+
+      --muted:#6b7a8c;
+
+      --ok:#0a7f3f;
+
+      --warn:#b00020;
+
+      --bg:#f5f7fb;
+
+      --card:#fff;
+
+      --shadow: 0 10px 24px rgba(15,42,67,.06);
+
+      --radius: 16px;
+
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+
+      margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+
+    }
+
+    .wrap{max-width:900px;margin:40px auto;padding:0 16px}
+
+    .card{
+
+      background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);
+
+      padding:24px 22px;
+
+    }
+
+    h1{margin:0 0 16px;font-size:36px;letter-spacing:.2px}
+
+    .row{display:flex;gap:10px;line-height:1.7;flex-wrap:wrap}
+
+    .label{font-weight:700;min-width:110px}
+
+    hr{border:none;border-top:1px solid #e7ecf3;margin:18px 0}
+
+    .error{
+
+      background:#ffeef0;border:1px solid #ffd3d8;color:#9a1e2a;border-radius:12px;padding:14px 16px;margin:0 0 18px
+
+    }
+
+    .muted{color:var(--muted)}
+
+    .offers h2{margin:10px 0 14px}
+
+    .offer{
+
+      border:1px solid #e7ecf3;border-radius:14px;padding:14px 16px;margin:10px 0;background:#fbfdff
+
+    }
+
+    .offer .head{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+    .pill{padding:2px 10px;border-radius:999px;border:1px solid #e0e6ef;font-size:13px}
+
+    .amount{font-weight:800}
+
+    .toolrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+    .btn{
+
+      display:inline-block;padding:12px 16px;border-radius:10px;border:none;cursor:pointer;
+
+      background:#0d5bd7;color:#fff;font-weight:700;text-decoration:none
+
+    }
+
+    .btn.secondary{background:#eef3fd;color:#0d5bd7}
+
+    .center{display:flex;align-items:center;justify-content:center}
+
+    .spinner{
+
+      width:20px;height:20px;border-radius:50%;border:3px solid #dfe7f6;border-top-color:#0d5bd7;animation:s 1s linear infinite
+
+    }
+
+    @keyframes s{to{transform:rotate(360deg)}}
+
+    .idpill{font-weight:800;letter-spacing:.6px}
+
+    .small{font-size:13px}
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <div id="alert"></div>
+
+
+
+    <div class="card" id="jobCard" style="display:none">
+
+      <h1>Job Details</h1>
+
+
+
+      <div class="row"><div class="label">Job ID:</div><div id="jobPublicId" class="idpill"></div></div>
+
+      <div class="row"><div class="label">Title:</div><div id="jobTitle"></div></div>
+
+      <div class="row"><div class="label">Name:</div><div id="jobName"></div></div>
+
+      <div class="row"><div class="label">Email:</div><div id="jobEmail"></div></div>
+
+      <div class="row"><div class="label">Phone:</div><div id="jobPhone"></div></div>
+
+      <div class="row"><div class="label">Address:</div><div id="jobAddress"></div></div>
+
+      <div class="row"><div class="label">Description:</div><div id="jobSummary"></div></div>
+
+
+
+      <hr/>
+
+
+
+      <div class="toolrow">
+
+        <a id="offerBtn" class="btn" href="#">Submit Offer</a>
+
+        <a class="btn secondary" href="/">Back to Home</a>
+
+      </div>
+
+
+
+      <div class="offers">
+
+        <h2>Offers</h2>
+
+        <div id="offersList" class="muted">No offers yet.</div>
+
+      </div>
+
+    </div>
+
+
+
+    <div id="loading" class="card center" style="min-height:150px">
+
+      <div class="spinner" aria-label="Loading"></div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Supabase JS (ESM) -->
+
+  <script type="module">
+
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+
+
+    // === 1) ضع بيانات Supabase هنا ===
+
+    // استبدل القيمتين بالقيم الحقيقية لمشروعك (URL و anon key)
+
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+
+    const SUPABASE_ANON = 'YOUR_PUBLIC_ANON_KEY';
+
+
+
+    // ملاحظة: تأكد أنك بالفعل فعّلت RLS وسياسات القراءة المناسبة للجدولين:
+
+    // homeowner_jobs (قراءة عامة بالفلترة على public_id) و pro_offers (قراءة بالفلترة على job_id)
+
+
+
+    // === 2) إنشاء الكلاينت
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+
+
+    // === 3) قراءة الـ id من الـ URL: ?id=PBZ-12345
+
+    const params = new URLSearchParams(location.search);
+
+    const PUBLIC_ID = (params.get('id') || '').trim();
+
+
+
+    const jobCard   = document.getElementById('jobCard');
+
+    const offersDiv = document.getElementById('offersList');
+
+    const loading   = document.getElementById('loading');
+
+    const alertBox  = document.getElementById('alert');
+
+
+
+    function showError(message){
+
+      alertBox.innerHTML = `<div class="error">${message}</div>`;
+
+    }
+
+
+
+    function fmtAmount(v){
+
+      if (v === null || v === undefined || v === '') return '—';
+
+      const n = Number(v);
+
+      if (Number.isNaN(n)) return '—';
+
+      return `$${n.toLocaleString()}`;
+
+    }
+
+
+
+    // === 4) تحقق من الـ id
+
+    if (!PUBLIC_ID){
+
+      loading.style.display = 'none';
+
+      showError(`Error: missing id in URL. Try <b>?id=PBZ-12345</b> or paste the full UUID.`);
+
+    } else {
+
+      document.getElementById('jobPublicId').textContent = PUBLIC_ID;
+
+      loadJob(PUBLIC_ID);
+
+    }
+
+
+
+    // === 5) جلب تفاصيل الجوب ثم العروض
+
+    async function loadJob(pubId){
+
+      // تفاصيل الجوب
+
+      const { data: job, error } = await supabase
+
+        .from('homeowner_jobs')
+
+        .select('id, public_id, title, full_name, email, phone, address, summary')
+
+        .eq('public_id', pubId)
+
+        .maybeSingle();
+
+
+
+      if (error){
+
+        loading.style.display = 'none';
+
+        showError('Database error while loading job.');
+
+        return;
+
+      }
+
+      if (!job){
+
+        loading.style.display = 'none';
+
+        showError('Job not found.');
+
+        return;
+
+      }
+
+
+
+      // تعبئة الحقول
+
+      document.getElementById('jobTitle').textContent   = job.title ?? '';
+
+      document.getElementById('jobName').textContent    = job.full_name ?? '';
+
+      document.getElementById('jobEmail').innerHTML     = job.email ? `<a href="mailto:${job.email}">${job.email}</a>` : '';
+
+      document.getElementById('jobPhone').innerHTML     = job.phone ? `<a href="tel:${job.phone}">${job.phone}</a>` : '';
+
+      document.getElementById('jobAddress').textContent = job.address ?? '';
+
+      document.getElementById('jobSummary').textContent = job.summary ?? '';
+
+
+
+      // زر تقديم عرض
+
+      const offerLink = document.getElementById('offerBtn');
+
+      offerLink.href = `/pro-offer.html?id=${encodeURIComponent(pubId)}`;
+
+
+
+      // جلب العروض
+
+      const { data: offers, error: offersErr } = await supabase
+
+        .from('pro_offers')
+
+        .select('pro_name, amount, phone, message, created_at, status')
+
+        .eq('job_id', job.id)
+
+        .order('created_at', { ascending:false });
+
+
+
+      loading.style.display = 'none';
+
+      jobCard.style.display = 'block';
+
+
+
+      if (offersErr){
+
+        offersDiv.innerHTML = `<span class="muted">Couldn’t load offers.</span>`;
+
+        return;
+
+      }
+
+      if (!offers || offers.length === 0){
+
+        offersDiv.innerHTML = `<span class="muted">No offers yet.</span>`;
+
+        return;
+
+      }
+
+
+
+      // رسم العروض
+
+      offersDiv.innerHTML = offers.map(o => `
+
+        <div class="offer">
+
+          <div class="head">
+
+            <div style="font-weight:800">${o.pro_name ?? '—'}</div>
+
+            <div class="pill amount">${fmtAmount(o.amount)}</div>
+
+            ${o.status ? `<div class="pill">${o.status}</div>` : ''}
+
+          </div>
+
+          <div class="small" style="margin:6px 0 2px">${o.message ?? ''}</div>
+
+          <div class="muted small">${new Date(o.created_at).toLocaleString()}</div>
+
+        </div>
+
+      `).join('');
+
+    }
+
+  </script>
+
+</body>
+
+</html>
