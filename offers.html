@@ -1,0 +1,169 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8"/>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>ProBuildZone — Job Offers</title>
+
+  <link rel="stylesheet" href="style.css"/>
+
+  <style>
+
+    .wrap{max-width:900px;margin:40px auto;padding:0 16px}
+
+    .search{display:flex;gap:8px;margin-bottom:16px}
+
+    .search input{flex:1;padding:12px;border:1px solid #d7dde6;border-radius:8px}
+
+    .search button{padding:12px 16px;border:0;border-radius:8px;background:#0b7ef4;color:#fff;font-weight:700}
+
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:20px;margin-top:16px}
+
+    .muted{color:#6b7a8c}
+
+    .offers{margin-top:16px;display:grid;gap:12px}
+
+    .offer{border:1px solid #e7ecf3;border-radius:10px;padding:14px}
+
+    .pill{display:inline-block;background:#eef5ff;border:1px solid #d3e6ff;border-radius:999px;padding:4px 10px;font-size:.85rem;margin-left:8px}
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <h1>🔎 View Job & Offers</h1>
+
+
+
+    <div class="search">
+
+      <input id="jobId" placeholder="Enter Job ID (e.g., PBZ-12345)" />
+
+      <button id="goBtn">Load</button>
+
+    </div>
+
+
+
+    <div id="msg" class="muted"></div>
+
+    <div id="job" class="card" style="display:none"></div>
+
+    <div id="offers" class="offers"></div>
+
+  </div>
+
+
+
+  <script>
+
+    const qs = new URLSearchParams(location.search);
+
+    const jobIdInput = document.getElementById('jobId');
+
+    const goBtn = document.getElementById('goBtn');
+
+    const msg = document.getElementById('msg');
+
+    const jobBox = document.getElementById('job');
+
+    const offersBox = document.getElementById('offers');
+
+
+
+    async function load(id){
+
+      msg.textContent = 'Loading…'; jobBox.style.display='none'; offersBox.innerHTML='';
+
+      try{
+
+        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(id)}`);
+
+        const text = await res.text();
+
+        let data; try{ data = JSON.parse(text); }catch{ throw new Error(`Non-JSON (${res.status})`); }
+
+        if(!res.ok || !data.ok) throw new Error(data.error || `Failed ${res.status}`);
+
+
+
+        const j = data.job;
+
+        jobBox.innerHTML = `
+
+          <h2>${j.project_title || '(Untitled Project)'} <span class="pill">${j.category || 'General'}</span></h2>
+
+          <p class="muted">${j.short_summary || ''}</p>
+
+          <p><b>Contact:</b> ${j.contact_name} — ${j.phone} — ${j.email}</p>
+
+          <p><b>Address:</b> ${j.full_address}</p>
+
+          <p style="white-space:pre-wrap">${j.full_description}</p>
+
+          <p class="muted">Job ID: ${j.job_id}</p>
+
+        `;
+
+        jobBox.style.display='block';
+
+
+
+        // عروض (لاحقاً نستبدلها ببيانات حقيقية من جدول offers)
+
+        offersBox.innerHTML = '';
+
+        if(!data.offers || !data.offers.length){
+
+          offersBox.innerHTML = `<div class="muted">No offers yet. Pros will start sending offers soon.</div>`;
+
+        }else{
+
+          data.offers.forEach(o=>{
+
+            const el = document.createElement('div');
+
+            el.className='offer';
+
+            el.innerHTML = `<b>${o.pro_name}</b> — $${o.amount}<br><span class="muted">${o.message||''}</span>`;
+
+            offersBox.appendChild(el);
+
+          });
+
+        }
+
+        msg.textContent='';
+
+      }catch(e){
+
+        msg.textContent = 'Error: '+e.message;
+
+      }
+
+    }
+
+
+
+    goBtn.onclick = ()=> jobIdInput.value.trim() && load(jobIdInput.value.trim());
+
+
+
+    // لو جاي بالرابط ?id=
+
+    if(qs.get('id')){ jobIdInput.value = qs.get('id'); load(qs.get('id')); }
+
+  </script>
+
+</body>
+
+</html>
