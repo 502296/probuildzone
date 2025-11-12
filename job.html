@@ -16,7 +16,7 @@
 
   <style>
 
-    :root{
+    :root {
 
       --ink:#0F2A43;
 
@@ -40,7 +40,13 @@
 
     body{
 
-      margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+      margin:0;
+
+      background:var(--bg);
+
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+
+      color:var(--ink);
 
     }
 
@@ -162,7 +168,7 @@
 
         <h2>Offers</h2>
 
-        <div id="offersList" class="muted">No offers yet.</div>
+        <div id="offersList" class="muted">Loading offers...</div>
 
       </div>
 
@@ -188,43 +194,29 @@
 
 
 
-    // === 1) ضع بيانات Supabase هنا ===
-
-    // استبدل القيمتين بالقيم الحقيقية لمشروعك (URL و anon key)
+    // === Supabase Config ===
 
     const SUPABASE_URL = 'https://hczahffwghbddqabpbmu.supabase.co';
 
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
 
-
-
-    // ملاحظة: تأكد أنك بالفعل فعّلت RLS وسياسات القراءة المناسبة للجدولين:
-
-    // homeowner_jobs (قراءة عامة بالفلترة على public_id) و pro_offers (قراءة بالفلترة على job_id)
-
-
-
-    // === 2) إنشاء الكلاينت
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 
 
-    // === 3) قراءة الـ id من الـ URL: ?id=PBZ-12345
+    // === Helpers ===
 
     const params = new URLSearchParams(location.search);
 
     const PUBLIC_ID = (params.get('id') || '').trim();
 
-
-
-    const jobCard   = document.getElementById('jobCard');
+    const jobCard = document.getElementById('jobCard');
 
     const offersDiv = document.getElementById('offersList');
 
-    const loading   = document.getElementById('loading');
+    const loading = document.getElementById('loading');
 
-    const alertBox  = document.getElementById('alert');
+    const alertBox = document.getElementById('alert');
 
 
 
@@ -250,13 +242,13 @@
 
 
 
-    // === 4) تحقق من الـ id
+    // === Load job + offers ===
 
     if (!PUBLIC_ID){
 
       loading.style.display = 'none';
 
-      showError(`Error: missing id in URL. Try <b>?id=PBZ-12345</b> or paste the full UUID.`);
+      showError(`Error: missing id in URL.`);
 
     } else {
 
@@ -268,11 +260,7 @@
 
 
 
-    // === 5) جلب تفاصيل الجوب ثم العروض
-
     async function loadJob(pubId){
-
-      // تفاصيل الجوب
 
       const { data: job, error } = await supabase
 
@@ -308,8 +296,6 @@
 
 
 
-      // تعبئة الحقول
-
       document.getElementById('jobTitle').textContent   = job.title ?? '';
 
       document.getElementById('jobName').textContent    = job.full_name ?? '';
@@ -324,19 +310,15 @@
 
 
 
-      // زر تقديم عرض
-
-      const offerLink = document.getElementById('offerBtn');
-
-      offerLink.href = `/pro-offer.html?id=${encodeURIComponent(pubId)}`;
+      document.getElementById('offerBtn').href = `/pro-offer.html?id=${encodeURIComponent(pubId)}`;
 
 
 
-      // جلب العروض
+      // === Load offers ===
 
       const { data: offers, error: offersErr } = await supabase
 
-        .from('pro_offers')
+        .from('job_offers')
 
         .select('pro_name, amount, phone, message, created_at, status')
 
@@ -356,6 +338,8 @@
 
         offersDiv.innerHTML = `<span class="muted">Couldn’t load offers.</span>`;
 
+        console.error(offersErr);
+
         return;
 
       }
@@ -369,8 +353,6 @@
       }
 
 
-
-      // رسم العروض
 
       offersDiv.innerHTML = offers.map(o => `
 
