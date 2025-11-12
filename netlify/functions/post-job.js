@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
 
 
-  // تأكد JSON صحيح
+  // تأكد أن الـ body صالح JSON
 
   let input;
 
@@ -50,7 +50,7 @@ exports.handler = async (event) => {
 
 
 
-  // عميل Supabase باستخدام SERVICE_ROLE_KEY من متغيرات نتلايف
+  // Supabase Client
 
   const supabase = createClient(
 
@@ -68,7 +68,7 @@ exports.handler = async (event) => {
 
     const { data, error } = await supabase
 
-      .from('homeowner_jobs') // غيّر للاسم الفعلي للجدول عندك
+      .from('homeowner_jobs') // غيّر الاسم إذا الجدول عندك مختلف
 
       .insert([{ name, email, phone, address, description }])
 
