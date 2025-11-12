@@ -4,51 +4,59 @@
 
 <head>
 
-<meta charset="utf-8"/>
+  <meta charset="utf-8"/>
 
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title>ProBuildZone — Submit Offer</title>
+  <title>ProBuildZone — Submit Offer</title>
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<style>
+  <style>
 
-  :root{--ink:#0F2A43;--bg:#f6f7fb;--card:#fff;}
+    :root{
 
-  *{box-sizing:border-box}
+      --ink:#0F2A43; --muted:#6b7a8c; --bg:#f5f7fb; --card:#fff;
 
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:var(--bg);color:var(--ink);padding:24px}
+      --shadow:0 10px 24px rgba(15,42,67,.06); --radius:16px; --blue:#0d5bd7;
 
-  .wrap{max-width:560px;margin:24px auto;background:var(--card);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:22px}
+    }
 
-  h1{margin:0 0 14px}
+    *{box-sizing:border-box}
 
-  label{display:block;font-weight:600;margin:12px 0 6px}
+    body{margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
 
-  input,textarea{width:100%;padding:12px;border:1px solid #d7dde6;border-radius:10px;font-size:16px;background:#fff}
+    .wrap{max-width:720px;margin:40px auto;padding:0 16px}
 
-  textarea{min-height:120px;resize:vertical}
+    .card{background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:24px}
 
-  .row{display:flex;gap:12px}
+    h1{margin:0 0 16px;font-size:36px}
 
-  .row>div{flex:1}
+    label{display:block;font-weight:700;margin:12px 0 6px}
 
-  button{width:100%;margin-top:16px;padding:14px 16px;border:0;border-radius:10px;background:#0b7ef4;color:#fff;font-weight:700;cursor:pointer}
+    input,textarea{
 
-  button:disabled{opacity:.6;cursor:not-allowed}
+      width:100%;padding:14px 12px;border-radius:12px;border:1px solid #dee6f1;background:#fbfdff;font-size:16px
 
-  .msg{margin-top:10px;text-align:center}
+    }
 
-  .ok{color:#0a7f4f;font-weight:700}
+    textarea{min-height:120px;resize:vertical}
 
-  .err{color:#b00020;font-weight:700}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-  .hint{color:#6b7a8c}
+    .btn{margin-top:16px;display:inline-block;background:var(--blue);color:#fff;font-weight:800;border:none;border-radius:12px;padding:14px 18px;cursor:pointer}
 
-</style>
+    .muted{color:var(--muted)}
+
+    .ok{color:#0a7f3f;font-weight:700;margin-top:10px}
+
+    .err{color:#b00020;font-weight:700;margin-top:10px}
+
+    .pill{display:inline-block;padding:4px 10px;border:1px solid #e0e6ef;border-radius:999px;margin-left:8px}
+
+  </style>
 
 </head>
 
@@ -56,243 +64,205 @@
 
   <div class="wrap">
 
-    <h1>Submit Offer</h1>
+    <div class="card">
 
-    <div id="jobInfo" class="hint">Loading job…</div>
-
-
-
-    <form id="offerForm" style="margin-top:10px" novalidate>
-
-      <label for="pro_name">Your business name *</label>
-
-      <input id="pro_name" placeholder="e.g., Bluegrass Roofing" required/>
+      <h1>Submit Offer <span id="jobIdPill" class="pill"></span></h1>
 
 
 
-      <div class="row">
+      <div id="jobMini" class="muted" style="margin:-6px 0 14px"></div>
 
-        <div>
 
-          <label for="amount">Offer amount (USD)</label>
 
-          <input id="amount" type="number" step="1" min="0" placeholder="e.g., 1250">
+      <form id="offerForm">
+
+        <label>Your business name *</label>
+
+        <input id="pro_name" required placeholder="e.g., Bluegrass Roofing"/>
+
+
+
+        <div class="row">
+
+          <div>
+
+            <label>Offer amount (USD)</label>
+
+            <input id="amount" inputmode="decimal" placeholder="e.g., 1250"/>
+
+          </div>
+
+          <div>
+
+            <label>Phone (optional)</label>
+
+            <input id="phone" placeholder="optional"/>
+
+          </div>
 
         </div>
 
-        <div>
 
-          <label for="phone">Phone (optional)</label>
 
-          <input id="phone" type="tel" placeholder="(optional)">
+        <label>Message to homeowner</label>
 
-        </div>
-
-      </div>
+        <textarea id="message" placeholder="Hello Ali, I can start next week. Includes materials & cleanup..."></textarea>
 
 
 
-      <label for="message">Message to homeowner</label>
+        <button class="btn" type="submit">Send Offer</button>
 
-      <textarea id="message" placeholder="Hello Ali, I can start next week. Includes materials & cleanup…"></textarea>
+        <div id="status" class="muted"></div>
 
+      </form>
 
-
-      <button id="sendBtn" type="submit">Send Offer</button>
-
-      <div id="status" class="msg"></div>
-
-    </form>
+    </div>
 
   </div>
 
 
 
-<script>
+  <script type="module">
 
-(async () => {
-
-  const params = new URLSearchParams(location.search);
-
-  const raw = (params.get('id') || '').trim();
-
-  const jobInfo = document.getElementById('jobInfo');
-
-  const form = document.getElementById('offerForm');
-
-  const statusEl = document.getElementById('status');
-
-  const btn = document.getElementById('sendBtn');
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 
 
-  const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.co';     // << بدّل لرابطك إن لزم
+    // ====== Supabase (ضع نفس القيم الموجودة في job.html) ======
 
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
+    const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.co';
 
+    const SUPABASE_ANON = 'PUT_YOUR_ANON_KEY_HERE';
 
-
-  const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
-
-  const toPublicId = s => {
-
-    const u = (s || '').toUpperCase();
-
-    if (isUUID(u)) return null;
-
-    const digits = u.replace(/^PBZ-/, '');
-
-    if (/^\d{5}$/.test(digits)) return `PBZ-${digits}`;
-
-    if (/^PBZ-\d{5}$/.test(u)) return u;
-
-    return null;
-
-  };
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 
 
-  if (!raw) {
+    // ====== Query string ======
 
-    jobInfo.innerHTML = `<span class="err">Error: missing ?id=PBZ-12345</span>`;
+    const params   = new URLSearchParams(location.search);
 
-    form.style.display = 'none';
+    const PUBLIC_ID = (params.get('id') || '').trim();
 
-    return;
+    const jobPill  = document.getElementById('jobIdPill');
 
-  }
+    const jobMini  = document.getElementById('jobMini');
+
+    const form     = document.getElementById('offerForm');
+
+    const statusEl = document.getElementById('status');
 
 
 
-  // 1) نجيب الـ job عبر UUID أو public_id
+    if(!PUBLIC_ID){
 
-  let url;
+      jobMini.textContent = 'Missing job id in URL.';
 
-  if (isUUID(raw)) {
+    }else{
 
-    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=id,public_id,project_title,contact_name&id=eq.${encodeURIComponent(raw)}`;
+      jobPill.textContent = PUBLIC_ID;
 
-  } else {
-
-    const pid = toPublicId(raw);
-
-    if (!pid) {
-
-      jobInfo.innerHTML = `<span class="err">Invalid Job ID format</span>`;
-
-      form.style.display = 'none';
-
-      return;
+      loadJobMini();
 
     }
 
-    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=id,public_id,project_title,contact_name&public_id=eq.${encodeURIComponent(pid)}`;
-
-  }
 
 
+    async function loadJobMini(){
 
-  const jr = await fetch(url, { headers: { apikey: SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}` }});
+      const { data: job, error } = await sb
 
-  const rows = await jr.json();
+        .from('homeowner_jobs')
 
-  if (!Array.isArray(rows) || rows.length === 0) {
+        .select('id, title')
 
-    jobInfo.innerHTML = `<span class="err">Job not found.</span>`;
+        .eq('public_id', PUBLIC_ID)
 
-    form.style.display = 'none';
-
-    return;
-
-  }
+        .maybeSingle();
 
 
 
-  const job = rows[0];
+      if(error){ jobMini.textContent = 'Error loading job.'; return; }
 
-  jobInfo.innerHTML = `Job: <b>${job.project_title || job.public_id}</b> (ID: ${job.public_id})`;
-
-
-
-  // 2) إرسال العرض
-
-  form.addEventListener('submit', async (e) => {
-
-    e.preventDefault();
-
-    statusEl.textContent = '';
-
-    statusEl.className = 'msg';
+      if(!job){ jobMini.textContent = 'Job not found.'; return; }
 
 
 
-    const pro_name = document.getElementById('pro_name').value.trim();
+      // keep job.id for insert
 
-    const amount = document.getElementById('amount').value ? Number(document.getElementById('amount').value) : null;
+      form.dataset.jobUuid = job.id;
 
-    const message = document.getElementById('message').value.trim();
-
-
-
-    if (!pro_name) {
-
-      statusEl.textContent = 'Please enter your business name.';
-
-      statusEl.className = 'msg err';
-
-      return;
+      jobMini.textContent  = `Job: ${job.title}`;
 
     }
 
 
 
-    btn.disabled = true;
+    form.addEventListener('submit', async (e)=>{
 
-    btn.textContent = 'Sending…';
+      e.preventDefault();
 
-    try {
+      statusEl.className = 'muted';
 
-      const res = await fetch('/.netlify/functions/post-offer', {
-
-        method:'POST',
-
-        headers:{ 'Content-Type':'application/json' },
-
-        body: JSON.stringify({ job_id: job.id, pro_name, amount, message })
-
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) throw new Error(data.error || `Failed (${res.status})`);
+      statusEl.textContent = 'Sending...';
 
 
+
+      const job_id  = form.dataset.jobUuid; // UUID from homeowner_jobs
+
+      if(!job_id){ statusEl.className='err'; statusEl.textContent='Job not found.'; return; }
+
+
+
+      const pro_name = document.getElementById('pro_name').value.trim();
+
+      const phone    = document.getElementById('phone').value.trim() || null;
+
+      const message  = document.getElementById('message').value.trim() || null;
+
+
+
+      // amount: allow empty → null, else parse to number
+
+      const amountRaw = document.getElementById('amount').value.trim();
+
+      const amount = amountRaw === '' ? null : Number(amountRaw);
+
+
+
+      const { error } = await sb.from('job_offers').insert([{
+
+        job_id, pro_name, amount, phone, message, status: 'sent'
+
+      }]);
+
+
+
+      if(error){
+
+        statusEl.className='err';
+
+        statusEl.textContent = 'Error: unable to send offer.';
+
+        console.error(error);
+
+        return;
+
+      }
+
+
+
+      statusEl.className='ok';
 
       statusEl.textContent = '✅ Offer sent!';
 
-      statusEl.className = 'msg ok';
+      // optional: back to job page
 
-      form.reset();
+      setTimeout(()=>location.href=`/job.html?id=${encodeURIComponent(PUBLIC_ID)}`, 700);
 
-    } catch (err) {
+    });
 
-      statusEl.textContent = `Error: ${err.message}`;
-
-      statusEl.className = 'msg err';
-
-    } finally {
-
-      btn.disabled = false;
-
-      btn.textContent = 'Send Offer';
-
-    }
-
-  });
-
-})();
-
-</script>
+  </script>
 
 </body>
 
