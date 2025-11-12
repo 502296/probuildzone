@@ -328,11 +328,7 @@
 
       if (!e.target.closest(".menu-wrap")) {
 
-        if (menuPanel) {
-
-          menuPanel.style.display = "none";
-
-        }
+        if (menuPanel) menuPanel.style.display = "none";
 
       }
 
@@ -344,41 +340,19 @@
 
     const aboutModal = document.getElementById("aboutModal");
 
-    const openAbout = (e) => {
+    const openAbout = (e) => { if (e) e.preventDefault(); aboutModal.style.display = "grid"; document.documentElement.style.overflow = "hidden"; };
 
-      if (e) e.preventDefault();
-
-      aboutModal.style.display = "grid";
-
-      document.documentElement.style.overflow = "hidden";
-
-    };
-
-    const closeAbout = () => {
-
-      aboutModal.style.display = "none";
-
-      document.documentElement.style.overflow = "";
-
-    };
+    const closeAbout = () => { aboutModal.style.display = "none"; document.documentElement.style.overflow = ""; };
 
     document.getElementById("openAboutFromMenu")?.addEventListener("click", (e) => {
 
-      e.preventDefault();
-
-      openAbout();
-
-      if (menuPanel) menuPanel.style.display = "none";
+      e.preventDefault(); openAbout(); if (menuPanel) menuPanel.style.display = "none";
 
     });
 
     document.getElementById("aboutClose")?.addEventListener("click", closeAbout);
 
-    aboutModal?.addEventListener("click", (ev) => {
-
-      if (ev.target === aboutModal) closeAbout();
-
-    });
+    aboutModal?.addEventListener("click", (ev) => { if (ev.target === aboutModal) closeAbout(); });
 
 
 
@@ -398,79 +372,33 @@
 
 
 
-    function openDoor() {
+    function openDoor(){ modal.style.display="flex"; document.documentElement.style.overflow="hidden"; goStep(1); }
 
-      modal.style.display = "flex";
+    function closeDoor(){ modal.style.display="none"; document.documentElement.style.overflow=""; }
 
-      document.documentElement.style.overflow = "hidden";
+    function goStep(n){
 
-      goStep(1);
+      if(n===1){ step1.style.display="block"; step2.style.display="none"; document.getElementById("sheetTitle").textContent="Post a Job"; }
 
-    }
-
-    function closeDoor() {
-
-      modal.style.display = "none";
-
-      document.documentElement.style.overflow = "";
-
-    }
-
-    function goStep(n) {
-
-      if (n === 1) {
-
-        step1.style.display = "block";
-
-        step2.style.display = "none";
-
-        document.getElementById("sheetTitle").textContent = "Post a Job";
-
-      } else {
-
-        step1.style.display = "none";
-
-        step2.style.display = "block";
-
-        document.getElementById("sheetTitle").textContent = "Post a Job";
-
-        sheet.scrollTop = 0;
-
-      }
+      else{ step1.style.display="none"; step2.style.display="block"; document.getElementById("sheetTitle").textContent="Post a Job"; sheet.scrollTop=0; }
 
     }
 
 
-
-    // open post job
 
     document.getElementById("postJobTop").addEventListener("click", openDoor);
 
     document.getElementById("closeDoor").addEventListener("click", closeDoor);
 
-    document.getElementById("backBtn").addEventListener("click", () => {
-
-      if (step1.style.display === "block") closeDoor();
-
-      else goStep(1);
-
-    });
+    document.getElementById("backBtn").addEventListener("click", ()=>{ if(step1.style.display==="block") closeDoor(); else goStep(1); });
 
 
 
-    // choose category
+    document.querySelectorAll(".cat-card").forEach((btn)=>{
 
-    document.querySelectorAll(".cat-card").forEach((btn) => {
+      btn.addEventListener("click", ()=>{
 
-      btn.addEventListener("click", () => {
-
-        const val = btn.dataset.cat;
-
-        hiddenCat.value = val;
-
-        selectedCatEl.textContent = val;
-
-        goStep(2);
+        const val = btn.dataset.cat; hiddenCat.value = val; selectedCatEl.textContent = val; goStep(2);
 
       });
 
@@ -478,23 +406,17 @@
 
 
 
-    // quick go to offers
-
-    document.getElementById("goQuick").addEventListener("click", () => {
+    document.getElementById("goQuick").addEventListener("click", ()=>{
 
       const id = document.getElementById("jobIdQuick").value.trim();
 
-      if (id) {
-
-        location.href = "/offers.html?id=" + encodeURIComponent(id);
-
-      }
+      if(id){ location.href = "/offers.html?id=" + encodeURIComponent(id); }
 
     });
 
 
 
-    // ====== FILES PREVIEW ======
+    // ====== FILES PREVIEW (optional UI only) ======
 
     const fileInput = document.getElementById("fileInput");
 
@@ -504,39 +426,17 @@
 
     const dropZone = document.getElementById("dropZone");
 
-
-
     if (pickBtn) pickBtn.onclick = () => fileInput.click();
 
+    const humanSize = (b)=> b<1024? b+" B" : b<1048576? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(1)+" MB";
 
-
-    const humanSize = (b) =>
-
-      b < 1024
-
-        ? b + " B"
-
-        : b < 1048576
-
-        ? (b / 1024).toFixed(1) + " KB"
-
-        : (b / 1048576).toFixed(1) + " MB";
-
-
-
-    const renderList = (files) => {
+    const renderList = (files)=>{
 
       fileList.innerHTML = "";
 
-      if (!files.length) {
+      if(!files.length){ fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
 
-        fileList.innerHTML = '<span class="hint">No files selected yet.</span>';
-
-        return;
-
-      }
-
-      [...files].forEach((f) => {
+      [...files].forEach((f)=>{
 
         const isImg = /^image\//.test(f.type);
 
@@ -544,11 +444,7 @@
 
         item.className = "file-item";
 
-        item.innerHTML = `<div class="thumb">${
-
-          isImg ? `<img src="${URL.createObjectURL(f)}" alt="">` : `<i class="fa-regular fa-file-lines"></i>`
-
-        }</div><div class="meta"><b>${f.name}</b><span>${f.type || "file"} • ${humanSize(f.size)}</span></div>`;
+        item.innerHTML = `<div class="thumb">${isImg ? `<img src="${URL.createObjectURL(f)}" alt="">` : `<i class="fa-regular fa-file-lines"></i>`}</div><div class="meta"><b>${f.name}</b><span>${f.type || "file"} • ${humanSize(f.size)}</span></div>`;
 
         fileList.appendChild(item);
 
@@ -556,81 +452,49 @@
 
     };
 
+    fileInput?.addEventListener("change", ()=> renderList(fileInput.files));
 
+    ["dragenter","dragover","dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e,(ev)=>{ev.preventDefault();ev.stopPropagation();},false));
 
-    fileInput?.addEventListener("change", () => renderList(fileInput.files));
+    ["dragenter","dragover"].forEach((e)=> dropZone?.addEventListener(e, ()=> dropZone.classList.add("hover"), false));
 
+    ["dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e, ()=> dropZone.classList.remove("hover"), false));
 
-
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((e) =>
-
-      dropZone?.addEventListener(
-
-        e,
-
-        (ev) => {
-
-          ev.preventDefault();
-
-          ev.stopPropagation();
-
-        },
-
-        false
-
-      )
-
-    );
-
-    ["dragenter", "dragover"].forEach((e) => dropZone?.addEventListener(e, () => dropZone.classList.add("hover"), false));
-
-    ["dragleave", "drop"].forEach((e) => dropZone?.addEventListener(e, () => dropZone.classList.remove("hover"), false));
-
-    dropZone?.addEventListener("drop", (ev) => {
-
-      const dt = ev.dataTransfer;
-
-      if (dt?.files) {
-
-        fileInput.files = dt.files;
-
-        renderList(fileInput.files);
-
-      }
-
-    });
+    dropZone?.addEventListener("drop",(ev)=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files=dt.files; renderList(fileInput.files); }});
 
 
 
-    // ====== SEND BUTTON → Netlify Function only ======
+    // ====== SEND BUTTON → Netlify Function ======
 
-    document.getElementById("sendBtn").addEventListener("click", async () => {
+    document.getElementById("sendBtn").addEventListener("click", async ()=>{
 
       const m = document.getElementById("sendMsg");
 
 
 
+      // نجمع و نطابق أسماء الحقول مع الـschema الموحّد
+
       const payload = {
 
         category: document.getElementById("categoryHidden").value || "General",
 
-        project_title: document.getElementById("title").value.trim(),
+        title: document.getElementById("title").value.trim(),
 
-        short_summary: document.getElementById("summary").value.trim(),
+        summary: document.getElementById("summary").value.trim(),
 
         city: document.getElementById("city").value.trim(),
 
         state: document.getElementById("state").value.trim(),
 
-        contact_name: document.getElementById("contactName").value.trim(),
+        name: document.getElementById("contactName").value.trim(),
 
         phone: document.getElementById("phone").value.trim(),
 
         email: document.getElementById("email").value.trim(),
 
-        full_address: document.getElementById("address").value.trim(),
+        address: document.getElementById("address").value.trim(),
 
-        full_description: document.getElementById("longDesc").value.trim()
+        description: document.getElementById("longDesc").value.trim()
 
       };
 
@@ -638,21 +502,7 @@
 
       // required
 
-      if (
-
-        !payload.project_title ||
-
-        !payload.contact_name ||
-
-        !payload.phone ||
-
-        !payload.email ||
-
-        !payload.full_address ||
-
-        !payload.full_description
-
-      ) {
+      if(!payload.title || !payload.name || !payload.phone || !payload.email || !payload.address || !payload.description){
 
         m.textContent = "Please fill all required fields.";
 
@@ -670,13 +520,13 @@
 
 
 
-      try {
+      try{
 
-        const res = await fetch("/.netlify/functions/save-homeowner-job", {
+        const res = await fetch("/.netlify/functions/post-job", {
 
           method: "POST",
 
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Accept":"application/json" },
 
           body: JSON.stringify(payload)
 
@@ -684,33 +534,23 @@
 
 
 
-        const data = await res.json();
+        const text = await res.text(); // حماية من HTML
+
+        let data; try{ data = JSON.parse(text); } catch{ throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
 
 
-        if (data.ok) {
+        if(!res.ok || !data.ok){ throw new Error(data.error || `Failed with ${res.status}`); }
 
-          m.textContent = "✅ Job posted!";
 
-          m.className = "hint ok";
 
-          setTimeout(() => {
+        m.textContent = `✅ Job posted! Your Job ID: ${data.job_id}`;
 
-            m.textContent = "";
+        m.className = "hint ok";
 
-            closeDoor();
+        setTimeout(()=>{ m.textContent=""; closeDoor(); }, 1200);
 
-          }, 1200);
-
-        } else {
-
-          m.textContent = "❌ Error: " + (data.error || "failed to save");
-
-          m.className = "hint err";
-
-        }
-
-      } catch (e) {
+      }catch(e){
 
         m.textContent = "❌ Error: " + (e.message || "network error");
 
