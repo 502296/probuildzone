@@ -8,29 +8,29 @@ exports.handler = async (event) => {
 
   try {
 
-    const publicId = (event.queryStringParameters && event.queryStringParameters.id) || '';
+    const publicId = event.queryStringParameters && event.queryStringParameters.id;
 
-    if (!publicId) return resp(400, { error: 'Missing id' });
+    if (!publicId) {
+
+      return { statusCode: 400, body: JSON.stringify({ error: 'Missing id' }) };
+
+    }
 
 
+
+    // مفاتيح Supabase من متغيرات بيئة نتلايفي (لا تكتبها في الكود)
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 
 
-    // نجيب الوظيفة بالـ public_id مباشرة من homeowner_jobs
+    // نقرأ السجل من homeowner_jobs باستخدام public_id
 
-    const { data: job, error: jobErr } = await supabase
+    const { data, error } = await supabase
 
       .from('homeowner_jobs')
 
-      .select(
-
-        // غيّر الأسماء هنا لتطابق أعمدة جدولك فعليًا
-
-        'id, public_id, title, summary, address, city, state, name, email, phone, created_at'
-
-      )
+      .select('id, public_id, title, name, email, phone, address, summary, created_at')
 
       .eq('public_id', publicId)
 
@@ -38,90 +38,32 @@ exports.handler = async (event) => {
 
 
 
-    if (jobErr) throw jobErr;
+    if (error) {
 
-    if (!job) return resp(404, { error: 'Job not found' });
+      console.error('get-job error:', error);
 
+      return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
 
-
-    // نجيب العروض المرتبطة بالـ UUID الداخلي job.id
-
-    const { data: offers, error: offersErr } = await supabase
-
-      .from('job_offers')
-
-      .select('id, amount, message, pro_name, phone, status, created_at')
-
-      .eq('job_id', job.id)
-
-      .order('created_at', { ascending: false });
+    }
 
 
 
-    if (offersErr) throw offersErr;
+    if (!data) {
+
+      return { statusCode: 404, body: JSON.stringify({ job: null }) };
+
+    }
 
 
 
-    return resp(200, {
-
-      job: {
-
-        public_id: job.public_id,
-
-        title: job.title,
-
-        summary: job.summary,
-
-        address: job.address || null,
-
-        name: job.name || null,
-
-        email: job.email || null,
-
-        phone: job.phone || null,
-
-        created_at: job.created_at,
-
-        city: job.city || null,
-
-        state: job.state || null,
-
-      },
-
-      offers: offers || [],
-
-    });
+    return { statusCode: 200, body: JSON.stringify({ job: data }) };
 
   } catch (e) {
 
     console.error(e);
 
-    return resp(500, { error: e.message || 'Server error' });
+    return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
 
   }
 
 };
-
-
-
-function resp(statusCode, body) {
-
-  return {
-
-    statusCode,
-
-    headers: {
-
-      'Content-Type': 'application/json',
-
-      'Access-Control-Allow-Origin': '*',
-
-      'Cache-Control': 'no-store',
-
-    },
-
-    body: JSON.stringify(body),
-
-  };
-
-}
