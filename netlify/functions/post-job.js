@@ -1,14 +1,12 @@
 // netlify/functions/post-job.js
 
-
-
 const HEADERS = {
 
   'Content-Type': 'application/json',
 
   'Access-Control-Allow-Origin': '*',
 
-  'Access-Control-Allow-Methods': 'POST,OPTIONS'
+  'Access-Control-Allow-Methods': 'POST,OPTIONS',
 
 };
 
@@ -16,73 +14,73 @@ const HEADERS = {
 
 exports.handler = async (event) => {
 
-  // CORS preflight
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: HEADERS, body: '' };
 
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: HEADERS, body: '' };
-
-
-
-  // Allow POST only
-
-  if (event.httpMethod !== 'POST') {
-
-    return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Method not allowed' }) };
-
-  }
+  if (event.httpMethod !== 'POST')   return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Method Not Allowed' }) };
 
 
-
-  // Parse JSON body
 
   let payload = {};
 
   try { payload = JSON.parse(event.body || '{}'); }
 
-  catch { return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON' }) }; }
+  catch { return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON body' }) }; }
 
 
-
-  // Pick fields (all strings)
 
   const {
 
-    title = null, summary = null, city = null, state = null,
+    category = 'General',
 
-    name, email, phone, address, description
+    project_title,
+
+    short_summary = null,
+
+    city = null,
+
+    state = null,
+
+    contact_name,
+
+    phone,
+
+    email,
+
+    full_address,
+
+    full_description,
+
+    files = null           // احتفظنا بها اختيارياً (json/array أو null)
 
   } = payload;
 
 
 
-  // Required
+  // تحقق الحقول المطلوبة
 
-  if (!name || !email || !phone || !address || !description) {
+  if (!project_title || !contact_name || !phone || !email || !full_address || !full_description) {
 
-    return { statusCode: 400, headers: HEADERS,
-
-      body: JSON.stringify({ ok:false, error:'Missing required fields (name, email, phone, address, description)' }) };
+    return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing required fields (project_title, contact_name, phone, email, full_address, full_description)' }) };
 
   }
 
 
 
-  // Env
+  const SUPABASE_URL   = process.env.SUPABASE_URL;
 
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SERVICE_ROLE   = process.env.SUPABASE_SERVICE_ROLE; // من Netlify env
 
-  const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
+  if (!SUPABASE_URL || !SERVICE_ROLE) {
 
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
-
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing server env vars' }) };
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Server not configured (Supabase env missing)' }) };
 
   }
 
 
-
-  // Insert via REST
 
   try {
+
+    // REST insert
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs`, {
 
@@ -92,9 +90,9 @@ exports.handler = async (event) => {
 
         'Content-Type': 'application/json',
 
-        'apikey': SUPABASE_SERVICE_ROLE,
+        'apikey': SERVICE_ROLE,
 
-        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE}`,
+        'Authorization': `Bearer ${SERVICE_ROLE}`,
 
         'Prefer': 'return=representation'
 
@@ -102,9 +100,27 @@ exports.handler = async (event) => {
 
       body: JSON.stringify([{
 
-        title, summary, city, state,
+        category,
 
-        name, email, phone, address, description
+        project_title,
+
+        short_summary,
+
+        city,
+
+        state,
+
+        contact_name,
+
+        phone,
+
+        email,
+
+        full_address,
+
+        full_description,
+
+        files
 
       }])
 
@@ -112,25 +128,47 @@ exports.handler = async (event) => {
 
 
 
-    const data = await res.json().catch(() => ({}));
+    const text = await res.text();
 
-    if (!res.ok) {
+    let data;
 
-      return { statusCode: res.status, headers: HEADERS,
+    try { data = JSON.parse(text); } catch { data = null; }
 
-        body: JSON.stringify({ ok:false, error: data?.message || 'Supabase insert failed' }) };
+
+
+    if (!res.ok || !data || !Array.isArray(data) || !data[0]?.id) {
+
+      const errMsg = data?.message || text || `Insert failed (${res.status})`;
+
+      return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: errMsg }) };
 
     }
 
 
 
-    const row = Array.isArray(data) ? data[0] : data;
+    // بناء كود إنساني قصير (آخر 5 من الUUID بدون الشرطة) لسهولة المشاركة
 
-    return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok:true, job_id: row?.id || null }) };
+    const id = data[0].id; // uuid
 
-  } catch (err) {
+    const short = id.replace(/-/g,'').slice(-5).toUpperCase();
 
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: err.message || 'Server error' }) };
+    const human_id = `PBZ-${short}`;
+
+
+
+    return {
+
+      statusCode: 200,
+
+      headers: HEADERS,
+
+      body: JSON.stringify({ ok:true, id, human_id })
+
+    };
+
+  } catch (e) {
+
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: e.message || 'Unknown error' }) };
 
   }
 
