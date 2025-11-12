@@ -6,7 +6,7 @@ const HEADERS = {
 
   'Access-Control-Allow-Origin': '*',
 
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
+  'Access-Control-Allow-Methods': 'POST,OPTIONS'
 
 };
 
@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: HEADERS, body: '' };
 
-  if (event.httpMethod !== 'POST')   return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Method Not Allowed' }) };
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Method not allowed' }) };
 
 
 
@@ -24,63 +24,41 @@ exports.handler = async (event) => {
 
   try { payload = JSON.parse(event.body || '{}'); }
 
-  catch { return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON body' }) }; }
+  catch { return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON' }) }; }
 
 
 
-  const {
+  const { category, title, summary, city, state, name, email, phone, address, description } = payload;
 
-    category = 'General',
+  if (!title || !name || !email || !phone || !address || !description) {
 
-    project_title,
-
-    short_summary = null,
-
-    city = null,
-
-    state = null,
-
-    contact_name,
-
-    phone,
-
-    email,
-
-    full_address,
-
-    full_description,
-
-    files = null           // احتفظنا بها اختيارياً (json/array أو null)
-
-  } = payload;
-
-
-
-  // تحقق الحقول المطلوبة
-
-  if (!project_title || !contact_name || !phone || !email || !full_address || !full_description) {
-
-    return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing required fields (project_title, contact_name, phone, email, full_address, full_description)' }) };
+    return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing required fields (title, name, email, phone, address, description)' }) };
 
   }
 
 
 
-  const SUPABASE_URL   = process.env.SUPABASE_URL;
+  const SUPABASE_URL = process.env.SUPABASE_URL;
 
-  const SERVICE_ROLE   = process.env.SUPABASE_SERVICE_ROLE; // من Netlify env
+  const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE; // Service role
 
-  if (!SUPABASE_URL || !SERVICE_ROLE) {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
 
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Server not configured (Supabase env missing)' }) };
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Server missing Supabase env vars' }) };
 
   }
+
+
+
+  // توليد public_id مثل PBZ-12345
+
+  const digits = Math.floor(10000 + Math.random()*90000);
+
+  const public_id = `PBZ-${digits}`;
 
 
 
   try {
-
-    // REST insert
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/homeowner_jobs`, {
 
@@ -90,9 +68,9 @@ exports.handler = async (event) => {
 
         'Content-Type': 'application/json',
 
-        'apikey': SERVICE_ROLE,
+        'apikey': SUPABASE_SERVICE_ROLE,
 
-        'Authorization': `Bearer ${SERVICE_ROLE}`,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE}`,
 
         'Prefer': 'return=representation'
 
@@ -100,27 +78,13 @@ exports.handler = async (event) => {
 
       body: JSON.stringify([{
 
-        category,
+        public_id,
 
-        project_title,
+        category: category || 'General',
 
-        short_summary,
+        title, summary, city, state, name, email, phone, address, description
 
-        city,
-
-        state,
-
-        contact_name,
-
-        phone,
-
-        email,
-
-        full_address,
-
-        full_description,
-
-        files
+        // ملاحظة: لا نرسل files هنا
 
       }])
 
@@ -128,47 +92,23 @@ exports.handler = async (event) => {
 
 
 
-    const text = await res.text();
+    const body = await res.json();
 
-    let data;
+    if (!res.ok) {
 
-    try { data = JSON.parse(text); } catch { data = null; }
-
-
-
-    if (!res.ok || !data || !Array.isArray(data) || !data[0]?.id) {
-
-      const errMsg = data?.message || text || `Insert failed (${res.status})`;
-
-      return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: errMsg }) };
+      return { statusCode: res.status, headers: HEADERS, body: JSON.stringify({ ok:false, error: (body && body.message) || 'Insert failed' }) };
 
     }
 
 
 
-    // بناء كود إنساني قصير (آخر 5 من الUUID بدون الشرطة) لسهولة المشاركة
+    const row = Array.isArray(body) ? body[0] : body;
 
-    const id = data[0].id; // uuid
-
-    const short = id.replace(/-/g,'').slice(-5).toUpperCase();
-
-    const human_id = `PBZ-${short}`;
-
-
-
-    return {
-
-      statusCode: 200,
-
-      headers: HEADERS,
-
-      body: JSON.stringify({ ok:true, id, human_id })
-
-    };
+    return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok:true, job_id: row.id, public_id: row.public_id }) };
 
   } catch (e) {
 
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: e.message || 'Unknown error' }) };
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: e.message || 'Server error' }) };
 
   }
 
