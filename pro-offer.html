@@ -1,0 +1,299 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>ProBuildZone — Submit Offer</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+  :root{--ink:#0F2A43;--bg:#f6f7fb;--card:#fff;}
+
+  *{box-sizing:border-box}
+
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:var(--bg);color:var(--ink);padding:24px}
+
+  .wrap{max-width:560px;margin:24px auto;background:var(--card);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:22px}
+
+  h1{margin:0 0 14px}
+
+  label{display:block;font-weight:600;margin:12px 0 6px}
+
+  input,textarea{width:100%;padding:12px;border:1px solid #d7dde6;border-radius:10px;font-size:16px;background:#fff}
+
+  textarea{min-height:120px;resize:vertical}
+
+  .row{display:flex;gap:12px}
+
+  .row>div{flex:1}
+
+  button{width:100%;margin-top:16px;padding:14px 16px;border:0;border-radius:10px;background:#0b7ef4;color:#fff;font-weight:700;cursor:pointer}
+
+  button:disabled{opacity:.6;cursor:not-allowed}
+
+  .msg{margin-top:10px;text-align:center}
+
+  .ok{color:#0a7f4f;font-weight:700}
+
+  .err{color:#b00020;font-weight:700}
+
+  .hint{color:#6b7a8c}
+
+</style>
+
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <h1>Submit Offer</h1>
+
+    <div id="jobInfo" class="hint">Loading job…</div>
+
+
+
+    <form id="offerForm" style="margin-top:10px" novalidate>
+
+      <label for="pro_name">Your business name *</label>
+
+      <input id="pro_name" placeholder="e.g., Bluegrass Roofing" required/>
+
+
+
+      <div class="row">
+
+        <div>
+
+          <label for="amount">Offer amount (USD)</label>
+
+          <input id="amount" type="number" step="1" min="0" placeholder="e.g., 1250">
+
+        </div>
+
+        <div>
+
+          <label for="phone">Phone (optional)</label>
+
+          <input id="phone" type="tel" placeholder="(optional)">
+
+        </div>
+
+      </div>
+
+
+
+      <label for="message">Message to homeowner</label>
+
+      <textarea id="message" placeholder="Hello Ali, I can start next week. Includes materials & cleanup…"></textarea>
+
+
+
+      <button id="sendBtn" type="submit">Send Offer</button>
+
+      <div id="status" class="msg"></div>
+
+    </form>
+
+  </div>
+
+
+
+<script>
+
+(async () => {
+
+  const params = new URLSearchParams(location.search);
+
+  const raw = (params.get('id') || '').trim();
+
+  const jobInfo = document.getElementById('jobInfo');
+
+  const form = document.getElementById('offerForm');
+
+  const statusEl = document.getElementById('status');
+
+  const btn = document.getElementById('sendBtn');
+
+
+
+  const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.co';     // << بدّل لرابطك إن لزم
+
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
+
+
+
+  const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
+
+  const toPublicId = s => {
+
+    const u = (s || '').toUpperCase();
+
+    if (isUUID(u)) return null;
+
+    const digits = u.replace(/^PBZ-/, '');
+
+    if (/^\d{5}$/.test(digits)) return `PBZ-${digits}`;
+
+    if (/^PBZ-\d{5}$/.test(u)) return u;
+
+    return null;
+
+  };
+
+
+
+  if (!raw) {
+
+    jobInfo.innerHTML = `<span class="err">Error: missing ?id=PBZ-12345</span>`;
+
+    form.style.display = 'none';
+
+    return;
+
+  }
+
+
+
+  // 1) نجيب الـ job عبر UUID أو public_id
+
+  let url;
+
+  if (isUUID(raw)) {
+
+    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=id,public_id,project_title,contact_name&id=eq.${encodeURIComponent(raw)}`;
+
+  } else {
+
+    const pid = toPublicId(raw);
+
+    if (!pid) {
+
+      jobInfo.innerHTML = `<span class="err">Invalid Job ID format</span>`;
+
+      form.style.display = 'none';
+
+      return;
+
+    }
+
+    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=id,public_id,project_title,contact_name&public_id=eq.${encodeURIComponent(pid)}`;
+
+  }
+
+
+
+  const jr = await fetch(url, { headers: { apikey: SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}` }});
+
+  const rows = await jr.json();
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+
+    jobInfo.innerHTML = `<span class="err">Job not found.</span>`;
+
+    form.style.display = 'none';
+
+    return;
+
+  }
+
+
+
+  const job = rows[0];
+
+  jobInfo.innerHTML = `Job: <b>${job.project_title || job.public_id}</b> (ID: ${job.public_id})`;
+
+
+
+  // 2) إرسال العرض
+
+  form.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    statusEl.textContent = '';
+
+    statusEl.className = 'msg';
+
+
+
+    const pro_name = document.getElementById('pro_name').value.trim();
+
+    const amount = document.getElementById('amount').value ? Number(document.getElementById('amount').value) : null;
+
+    const message = document.getElementById('message').value.trim();
+
+
+
+    if (!pro_name) {
+
+      statusEl.textContent = 'Please enter your business name.';
+
+      statusEl.className = 'msg err';
+
+      return;
+
+    }
+
+
+
+    btn.disabled = true;
+
+    btn.textContent = 'Sending…';
+
+    try {
+
+      const res = await fetch('/.netlify/functions/post-offer', {
+
+        method:'POST',
+
+        headers:{ 'Content-Type':'application/json' },
+
+        body: JSON.stringify({ job_id: job.id, pro_name, amount, message })
+
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) throw new Error(data.error || `Failed (${res.status})`);
+
+
+
+      statusEl.textContent = '✅ Offer sent!';
+
+      statusEl.className = 'msg ok';
+
+      form.reset();
+
+    } catch (err) {
+
+      statusEl.textContent = `Error: ${err.message}`;
+
+      statusEl.className = 'msg err';
+
+    } finally {
+
+      btn.disabled = false;
+
+      btn.textContent = 'Send Offer';
+
+    }
+
+  });
+
+})();
+
+</script>
+
+</body>
+
+</html>
