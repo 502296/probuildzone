@@ -1,111 +1,51 @@
-const { createClient } = require('@supabase/supabase-js');
-
-
+// netlify/functions/post-job.js
 
 exports.handler = async (event) => {
 
-  // السماح فقط بـ POST
+  const headers = {
+
+    'Content-Type': 'application/json',
+
+    'Access-Control-Allow-Origin': '*',
+
+    'Access-Control-Allow-Methods': 'POST,OPTIONS'
+
+  };
+
+
+
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
+
+
 
   if (event.httpMethod !== 'POST') {
 
-    return {
-
-      statusCode: 405,
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Use POST' }) };
 
   }
 
 
 
-  // تأكد أن الـ body صالح JSON
+  let payload = {};
 
-  let input;
+  try { payload = JSON.parse(event.body || '{}'); }
 
-  try {
+  catch { return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
 
-    input = JSON.parse(event.body || '{}');
 
-  } catch {
 
-    return {
+  const { name, email, address, description } = payload;
 
-      statusCode: 400,
+  if (!name || !email || !address || !description) {
 
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ error: 'Invalid JSON body' }),
-
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing required fields' }) };
 
   }
 
 
 
-  const { name, email, phone, address, description } = input;
+  // فقط للـ test
 
-
-
-  // Supabase Client
-
-  const supabase = createClient(
-
-    process.env.SUPABASE_URL,
-
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-
-    { auth: { persistSession: false } }
-
-  );
-
-
-
-  try {
-
-    const { data, error } = await supabase
-
-      .from('homeowner_jobs') // غيّر الاسم إذا الجدول عندك مختلف
-
-      .insert([{ name, email, phone, address, description }])
-
-      .select()
-
-      .single();
-
-
-
-    if (error) throw error;
-
-
-
-    return {
-
-      statusCode: 200,
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ ok: true, job: data }),
-
-    };
-
-  } catch (err) {
-
-    console.error('post-job error:', err);
-
-    return {
-
-      statusCode: 500,
-
-      headers: { 'Content-Type': 'application/json' },
-
-      body: JSON.stringify({ error: err.message }),
-
-    };
-
-  }
+  return { statusCode: 200, headers, body: JSON.stringify({ ok: true, received: payload }) };
 
 };
