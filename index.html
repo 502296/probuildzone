@@ -16,27 +16,25 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+  <!-- تعزيز وضوح الزر على الموبايل (لا يغيّر تصميمك العام) -->
+
   <style>
 
-    /* تفتيح طفيف للـ hero */
+    .sheet{max-height:90vh;overflow:auto;padding-bottom:120px;}
 
-    .hero .hero-bg::after { background: rgba(0,0,0,.35)!important; }
+    .sticky-submit{
 
-    /* المساحة قابلة للتمرير مع شريط إرسال ثابت */
+      position:sticky; bottom:0; background:rgba(255,255,255,.95);
 
-    .sheet { max-height: 90vh; overflow:auto; padding-bottom:88px; }
+      backdrop-filter:saturate(140%) blur(4px); padding:12px; border-top:1px solid #e6ebf2;
 
-    .submit-bar{
-
-      position:sticky; bottom:0; background:#fff; padding:10px 12px;
-
-      border-top:1px solid #e6e8ee; display:flex; gap:12px; justify-content:center;
+      box-shadow:0 -6px 20px rgba(0,0,0,.06); display:grid; gap:8px;
 
     }
 
-    .submit-bar .hint{ align-self:center; }
+    .sticky-submit .hint{display:block;font-size:.95rem;}
 
-    @media (max-width:640px){ .submit-bar{ padding-bottom:max(10px, env(safe-area-inset-bottom)); } }
+    @media (max-width:640px){ .sticky-submit{padding:12px 10px;} }
 
   </style>
 
@@ -92,7 +90,7 @@
 
       <div class="job-id">
 
-        <input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., PBZ-99999)" />
+        <input id="jobIdQuick" type="text" placeholder="Enter Job ID (e.g., PBZ-12345)" />
 
         <button id="goQuick">Go</button>
 
@@ -302,7 +300,7 @@
 
 
 
-        <div class="submit-bar">
+        <div class="sticky-submit">
 
           <button id="sendBtn" class="btn primary">🚀 Post Job</button>
 
@@ -320,123 +318,109 @@
 
   <script>
 
-    // ====== NAV MENU ======
+    // ===== NAV MENU =====
 
-    const menuBtn = document.getElementById("menuBtn");
+    const menuBtn=document.getElementById("menuBtn");
 
-    const menuPanel = document.getElementById("menuPanel");
+    const menuPanel=document.getElementById("menuPanel");
 
-    if (menuBtn) menuBtn.addEventListener("click", () => {
+    if(menuBtn) menuBtn.addEventListener("click",()=>{menuPanel.style.display=menuPanel.style.display==="block"?"none":"block";});
 
-      menuPanel.style.display = menuPanel.style.display === "block" ? "none" : "block";
-
-    });
-
-    document.addEventListener("click", (e) => { if (!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display = "none"); });
+    document.addEventListener("click",(e)=>{ if(!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display="none"); });
 
 
 
-    // ====== ABOUT MODAL ======
+    // ===== ABOUT =====
 
-    const aboutModal = document.getElementById("aboutModal");
+    const aboutModal=document.getElementById("aboutModal");
 
-    const openAbout = (e) => { if (e) e.preventDefault(); aboutModal.style.display = "grid"; document.documentElement.style.overflow = "hidden"; };
+    const openAbout=(e)=>{ if(e) e.preventDefault(); aboutModal.style.display="grid"; document.documentElement.style.overflow="hidden"; };
 
-    const closeAbout = () => { aboutModal.style.display = "none"; document.documentElement.style.overflow = ""; };
+    const closeAbout=()=>{ aboutModal.style.display="none"; document.documentElement.style.overflow=""; };
 
-    document.getElementById("openAboutFromMenu")?.addEventListener("click", (e) => { e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display = "none"); });
+    document.getElementById("openAboutFromMenu")?.addEventListener("click",(e)=>{ e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display="none"); });
 
-    document.getElementById("aboutClose")?.addEventListener("click", closeAbout);
+    document.getElementById("aboutClose")?.addEventListener("click",closeAbout);
 
-    aboutModal?.addEventListener("click", (ev) => { if (ev.target === aboutModal) closeAbout(); });
-
-
-
-    // ====== MODAL (POST JOB) ======
-
-    const modal = document.getElementById("modal");
-
-    const step1 = document.getElementById("step1");
-
-    const step2 = document.getElementById("step2");
-
-    const sheet = document.querySelector(".sheet");
-
-    const selectedCatEl = document.getElementById("selectedCat").querySelector("b");
-
-    const hiddenCat = document.getElementById("categoryHidden");
+    aboutModal?.addEventListener("click",(ev)=>{ if(ev.target===aboutModal) closeAbout(); });
 
 
 
-    function openDoor() { modal.style.display = "flex"; document.documentElement.style.overflow = "hidden"; goStep(1); }
+    // ===== MODAL =====
 
-    function closeDoor() { modal.style.display = "none"; document.documentElement.style.overflow = ""; }
+    const modal=document.getElementById("modal");
 
-    function goStep(n) {
+    const step1=document.getElementById("step1");
 
-      if (n === 1) { step1.style.display = "block"; step2.style.display = "none"; document.getElementById("sheetTitle").textContent = "Post a Job"; }
+    const step2=document.getElementById("step2");
 
-      else { step1.style.display = "none"; step2.style.display = "block"; document.getElementById("sheetTitle").textContent = "Post a Job"; sheet.scrollTop = 0; }
+    const sheet=document.querySelector(".sheet");
+
+    const selectedCatEl=document.getElementById("selectedCat").querySelector("b");
+
+    const hiddenCat=document.getElementById("categoryHidden");
+
+
+
+    function openDoor(){ modal.style.display="flex"; document.documentElement.style.overflow="hidden"; goStep(1); }
+
+    function closeDoor(){ modal.style.display="none"; document.documentElement.style.overflow=""; }
+
+    function goStep(n){
+
+      if(n===1){ step1.style.display="block"; step2.style.display="none"; document.getElementById("sheetTitle").textContent="Post a Job";}
+
+      else{ step1.style.display="none"; step2.style.display="block"; document.getElementById("sheetTitle").textContent="Post a Job"; sheet.scrollTop=0;}
 
     }
 
-    document.getElementById("postJobTop").addEventListener("click", openDoor);
+    document.getElementById("postJobTop").addEventListener("click",openDoor);
 
-    document.getElementById("closeDoor").addEventListener("click", closeDoor);
+    document.getElementById("closeDoor").addEventListener("click",closeDoor);
 
-    document.getElementById("backBtn").addEventListener("click", () => { if (step1.style.display === "block") closeDoor(); else goStep(1); });
-
-
-
-    document.querySelectorAll(".cat-card").forEach((btn) => {
-
-      btn.addEventListener("click", () => { const val = btn.dataset.cat; hiddenCat.value = val; selectedCatEl.textContent = val; goStep(2); });
-
-    });
+    document.getElementById("backBtn").addEventListener("click",()=>{ if(step1.style.display==="block") closeDoor(); else goStep(1); });
 
 
 
-    document.getElementById("goQuick").addEventListener("click", () => {
-
-      const id = document.getElementById("jobIdQuick").value.trim();
-
-      if (id) location.href = "/offers.html?id=" + encodeURIComponent(id);
-
-    });
+    document.querySelectorAll(".cat-card").forEach((btn)=>{ btn.addEventListener("click",()=>{ const val=btn.dataset.cat; hiddenCat.value=val; selectedCatEl.textContent=val; goStep(2); }); });
 
 
 
-    // ====== FILES PREVIEW (UI only) ======
+    document.getElementById("goQuick").addEventListener("click",()=>{ const id=document.getElementById("jobIdQuick").value.trim(); if(id) location.href="/offers.html?id="+encodeURIComponent(id); });
 
-    const fileInput = document.getElementById("fileInput");
 
-    const pickBtn = document.getElementById("pickBtn");
 
-    const fileList = document.getElementById("fileList");
+    // ===== FILES PREVIEW (UI only) =====
 
-    const dropZone = document.getElementById("dropZone");
+    const fileInput=document.getElementById("fileInput");
 
-    if (pickBtn) pickBtn.onclick = () => fileInput.click();
+    const pickBtn=document.getElementById("pickBtn");
 
-    const humanSize = (b)=> b<1024? b+' B' : b<1048576? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    const fileList=document.getElementById("fileList");
 
-    const renderList = (files) => {
+    const dropZone=document.getElementById("dropZone");
 
-      fileList.innerHTML = "";
+    if(pickBtn) pickBtn.onclick=()=>fileInput.click();
 
-      if (!files.length) { fileList.innerHTML = '<span class="hint">No files selected yet.</span>'; return; }
+    const humanSize=(b)=> b<1024? b+' B' : b<1048576? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
 
-      [...files].forEach((f) => {
+    const renderList=(files)=>{
 
-        const isImg = /^image\//.test(f.type);
+      fileList.innerHTML="";
 
-        const item = document.createElement("div");
+      if(!files.length){ fileList.innerHTML='<span class="hint">No files selected yet.</span>'; return; }
 
-        item.className = "file-item";
+      [...files].forEach((f)=>{
 
-        item.innerHTML = `<div class="thumb">${isImg ? `<img src="${URL.createObjectURL(f)}" alt="">` : `<i class="fa-regular fa-file-lines"></i>`}</div>
+        const isImg=/^image\//.test(f.type);
 
-                          <div class="meta"><b>${f.name}</b><span>${f.type || "file"} • ${humanSize(f.size)}</span></div>`;
+        const item=document.createElement("div");
+
+        item.className="file-item";
+
+        item.innerHTML=`<div class="thumb">${isImg?`<img src="${URL.createObjectURL(f)}" alt="">`:`<i class="fa-regular fa-file-lines"></i>`}</div>
+
+                        <div class="meta"><b>${f.name}</b><span>${f.type||"file"} • ${humanSize(f.size)}</span></div>`;
 
         fileList.appendChild(item);
 
@@ -444,107 +428,99 @@
 
     };
 
-    fileInput?.addEventListener("change", () => renderList(fileInput.files));
+    fileInput?.addEventListener("change",()=>renderList(fileInput.files));
 
-    ["dragenter","dragover","dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e,(ev)=>{ev.preventDefault();ev.stopPropagation();},false));
+    ["dragenter","dragover","dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,(ev)=>{ev.preventDefault();ev.stopPropagation();},false));
 
-    ["dragenter","dragover"].forEach((e)=> dropZone?.addEventListener(e,()=> dropZone.classList.add("hover"),false));
+    ["dragenter","dragover"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.add("hover"),false));
 
-    ["dragleave","drop"].forEach((e)=> dropZone?.addEventListener(e,()=> dropZone.classList.remove("hover"),false));
+    ["dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.remove("hover"),false));
 
-    dropZone?.addEventListener("drop",(ev)=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files = dt.files; renderList(fileInput.files);} });
-
-
-
-    // ====== SEND BUTTON → post-job (Netlify) ======
-
-    document.getElementById("sendBtn").addEventListener("click", async () => {
-
-      const m = document.getElementById("sendMsg");
+    dropZone?.addEventListener("drop",(ev)=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files=dt.files; renderList(fileInput.files);} });
 
 
 
-      // مهم: المفاتيح متوافقة مع post-job.js
+    // ===== SEND → post-job (Netlify) =====
 
-      const payload = {
+    document.getElementById("sendBtn").addEventListener("click", async ()=>{
 
-        category: document.getElementById("categoryHidden").value || "General",
+      const m=document.getElementById("sendMsg");
 
-        project_title: document.getElementById("title").value.trim(),
+      const payload={
 
-        short_summary: document.getElementById("summary").value.trim() || null,
+        category:    document.getElementById("categoryHidden").value || "General",
 
-        city: document.getElementById("city").value.trim() || null,
+        title:       document.getElementById("title").value.trim(),
 
-        state: document.getElementById("state").value.trim() || null,
+        summary:     document.getElementById("summary").value.trim(),
 
-        contact_name: document.getElementById("contactName").value.trim(),
+        city:        document.getElementById("city").value.trim(),
 
-        phone: document.getElementById("phone").value.trim(),
+        state:       document.getElementById("state").value.trim(),
 
-        email: document.getElementById("email").value.trim(),
+        name:        document.getElementById("contactName").value.trim(),
 
-        full_address: document.getElementById("address").value.trim(),
+        phone:       document.getElementById("phone").value.trim(),
 
-        full_description: document.getElementById("longDesc").value.trim()
+        email:       document.getElementById("email").value.trim(),
 
-        // files: سنضيفها لاحقًا مع الرفع الحقيقي
+        address:     document.getElementById("address").value.trim(),
+
+        description: document.getElementById("longDesc").value.trim()
+
+        // لا نرسل files الآن
 
       };
 
 
 
-      if (!payload.project_title || !payload.contact_name || !payload.phone || !payload.email || !payload.full_address || !payload.full_description) {
+      if(!payload.title||!payload.name||!payload.phone||!payload.email||!payload.address||!payload.description){
 
-        m.textContent = "Please fill all required fields."; m.className = "hint err"; return;
+        m.textContent="Please fill all required fields."; m.className="hint err"; return;
 
       }
 
 
 
-      m.textContent = "Saving to database…"; m.className = "hint";
+      m.textContent="Saving to database…"; m.className="hint";
 
-      try {
+      try{
 
-        const res = await fetch("/.netlify/functions/post-job", {
+        const res=await fetch("/.netlify/functions/post-job",{
 
-          method: "POST",
+          method:"POST",
 
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          headers:{"Content-Type":"application/json","Accept":"application/json"},
 
-          body: JSON.stringify(payload)
+          body:JSON.stringify(payload)
 
         });
 
-        const text = await res.text();
+        const text=await res.text(); let data; try{ data=JSON.parse(text);}catch{ throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
-        let data; try { data = JSON.parse(text); } catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
-
-        if (!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
+        if(!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
 
 
 
-        const { id, human_id } = data; // human_id مثل PBZ-7F3A2
+        const shown=data.public_id || data.job_id || "";
 
-        m.innerHTML = `✅ Job posted! Your Job Code: <b>${human_id}</b> &nbsp; <a href="/offers.html?id=${encodeURIComponent(human_id)}">See offers</a>`;
+        if(shown){
 
-        m.className = "hint ok";
+          m.textContent=`✅ Job posted! Your Job ID: ${shown}`; m.className="hint ok";
 
+          const quick=document.getElementById("jobIdQuick"); if(quick) quick.value=shown;
 
+        }else{
 
-        // تعبئة خانة الهيرو ونسخ الكود
+          m.textContent="✅ Job posted!"; m.className="hint ok";
 
-        const quick = document.getElementById("jobIdQuick"); if (quick) quick.value = human_id;
+        }
 
-        try { await navigator.clipboard.writeText(human_id); } catch {}
+        setTimeout(()=>{ m.textContent=""; closeDoor(); },1200);
 
-        // يمكن إغلاق النافذة بعد ثواني إن أردت:
+      }catch(e){
 
-        // setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1800);
-
-      } catch (e) {
-
-        m.textContent = "❌ Error: " + (e.message || "network error"); m.className = "hint err";
+        m.textContent="❌ Error: "+(e.message||"network error"); m.className="hint err";
 
       }
 
