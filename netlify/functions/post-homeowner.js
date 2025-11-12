@@ -1,103 +1,111 @@
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const form = document.querySelector("form");
+const { createClient } = require('@supabase/supabase-js');
 
 
 
-  form.addEventListener("submit", async (e) => {
+exports.handler = async (event) => {
 
-    e.preventDefault();
+  // السماح فقط بـ POST
 
+  if (event.httpMethod !== 'POST') {
 
+    return {
 
-    // 🔹 نجمع البيانات من الحقول
+      statusCode: 405,
 
-    const formData = {
+      headers: { 'Content-Type': 'application/json' },
 
-      category: form.category?.value || "General",
-
-      project_title: form.project_title?.value,
-
-      short_summary: form.short_summary?.value,
-
-      city: form.city?.value,
-
-      state: form.state?.value,
-
-      contact_name: form.contact_name?.value,
-
-      phone: form.phone?.value,
-
-      email: form.email?.value,
-
-      full_address: form.full_address?.value,
-
-      full_description: form.full_description?.value,
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
 
     };
 
-
-
-    // 🔹 نرسل الطلب إلى Netlify function
-
-    try {
-
-      const response = await fetch("https://probuildzone.netlify.app/.netlify/functions/save-homeowner-job", {
-
-        method: "POST",
-
-        headers: { "Content-Type": "application/json" },
-
-        body: JSON.stringify(formData),
-
-      });
+  }
 
 
 
-      // نقرأ الردّ كـ نصّ أولاً ثم نحاول نحوله إلى JSON
+  // تأكد JSON صحيح
 
-      const text = await response.text();
+  let input;
 
-      console.log("🔍 Raw response:", text);
+  try {
+
+    input = JSON.parse(event.body || '{}');
+
+  } catch {
+
+    return {
+
+      statusCode: 400,
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({ error: 'Invalid JSON body' }),
+
+    };
+
+  }
 
 
 
-      try {
-
-        const data = JSON.parse(text);
+  const { name, email, phone, address, description } = input;
 
 
 
-        if (data.ok) {
+  // عميل Supabase باستخدام SERVICE_ROLE_KEY من متغيرات نتلايف
 
-          alert("✅ Job saved successfully!");
+  const supabase = createClient(
 
-          form.reset();
+    process.env.SUPABASE_URL,
 
-        } else {
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
 
-          alert("❌ Error: " + data.error);
+    { auth: { persistSession: false } }
 
-        }
+  );
 
-      } catch {
 
-        alert("⚠️ Unexpected response from server:\n" + text);
 
-      }
+  try {
 
-    } catch (err) {
+    const { data, error } = await supabase
 
-      console.error("Fetch error:", err);
+      .from('homeowner_jobs') // غيّر للاسم الفعلي للجدول عندك
 
-      alert("⚠️ Network error, please try again.");
+      .insert([{ name, email, phone, address, description }])
 
-    }
+      .select()
 
-  });
+      .single();
 
-});
 
-</script>
+
+    if (error) throw error;
+
+
+
+    return {
+
+      statusCode: 200,
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({ ok: true, job: data }),
+
+    };
+
+  } catch (err) {
+
+    console.error('post-job error:', err);
+
+    return {
+
+      statusCode: 500,
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({ error: err.message }),
+
+    };
+
+  }
+
+};
