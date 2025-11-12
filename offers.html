@@ -1,363 +1,203 @@
-<!DOCTYPE html>
+<script>
 
-<html lang="en">
+(async () => {
 
-<head>
+  // 1) اقرأ id من الرابط
 
-  <meta charset="utf-8">
+  const params = new URLSearchParams(location.search);
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  let raw = (params.get('id') || '').trim();
 
-  <title>Offers — ProBuildZone</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <style>
+  const box = document.getElementById('offersBox') || document.body;
 
-    :root{
 
-      --bg:#f6f7fb; --ink:#0f2a43; --card:#fff; --muted:#6b7a8c; --ok:#0a7f4f; --err:#b00020; --brand:#0b7ef4;
+
+  // 2) دوال مساعدة
+
+  const isUUID = s => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
+
+  const toPublicId = s => {
+
+    // لو دخل 99999 نحولها PBZ-99999
+
+    if (!s) return null;
+
+    const u = s.toUpperCase();
+
+    if (isUUID(u)) return null;         // هذا UUID، ليس public_id
+
+    const digits = u.replace(/^PBZ-/, '');
+
+    if (/^\d{5}$/.test(digits)) return `PBZ-${digits}`;
+
+    // لو أعطى PBZ-xxxxx جاهزة نعيدها كما هي
+
+    if (/^PBZ-\d{5}$/.test(u)) return u;
+
+    return null;
+
+  };
+
+
+
+  if (!raw) {
+
+    box.innerHTML = `<div class="err">Error: missing id in URL. Try <code>?id=PBZ-12345</code> or paste the Job ID you received.</div>`;
+
+    return;
+
+  }
+
+
+
+  // 3) حضّر الاستعلام
+
+  let url;
+
+  const SUPABASE_URL  = '<YOUR_SUPABASE_URL>';        // مثل https://xxxx.supabase.co
+
+  const SUPABASE_ANON = '<YOUR_SUPABASE_ANON_KEY>';   // المفتاح العام (مسموح وضعه في العميل للقراءة)
+
+
+
+  if (isUUID(raw)) {
+
+    // ابحث بالـUUID الحقيقي
+
+    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*&id=eq.${encodeURIComponent(raw)}`;
+
+  } else {
+
+    // ابحث بالـ public_id (نقبل 99999 أو PBZ-99999)
+
+    const pid = toPublicId(raw);
+
+    if (!pid) {
+
+      box.innerHTML = `<div class="err">Error: invalid Job ID format. Use something like <b>PBZ-12345</b> or paste the full UUID.</div>`;
+
+      return;
 
     }
 
-    *{box-sizing:border-box}
+    url = `${SUPABASE_URL}/rest/v1/homeowner_jobs?select=*&public_id=eq.${encodeURIComponent(pid)}`;
 
-    body{margin:0; font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--ink)}
+  }
 
-    header{padding:16px 20px; display:flex; align-items:center; justify-content:space-between; background:#ffffffc0; backdrop-filter:saturate(1.2) blur(6px); position:sticky; top:0; z-index:2}
 
-    .brand{font-weight:800; letter-spacing:.2px}
 
-    .container{max-width:980px; margin:24px auto; padding:0 16px}
+  try {
 
-    .hero{
+    const res = await fetch(url, {
 
-      position:relative; height: 220px; border-radius:16px; overflow:hidden; margin-bottom:16px;
+      headers: {
 
-      background:url('hero.jpg'), linear-gradient(#ccc,#ddd);
+        apikey: SUPABASE_ANON,
 
-      background-size:cover; background-position:center;
+        Authorization: `Bearer ${SUPABASE_ANON}`
 
-      filter: brightness(1.05) contrast(1.02); /* زيادة سطوع بسيطة */
+      }
+
+    });
+
+    const rows = await res.json();
+
+
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+
+      box.innerHTML = `<div class="err">No job found for this ID.</div>`;
+
+      return;
 
     }
 
-    .card{background:var(--card); border-radius:14px; box-shadow:0 10px 28px rgba(0,0,0,.08); padding:18px}
 
-    h1{font-size:1.6rem; margin:0 0 10px}
 
-    .row{display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px}
-
-    .grid{display:grid; gap:12px}
-
-    .muted{color:var(--muted)}
-
-    .pill{display:inline-block; background:#eef3ff; color:#1b4bd7; padding:4px 10px; border-radius:999px; font-weight:600; font-size:.85rem}
-
-    .offers{margin-top:16px}
-
-    table{width:100%; border-collapse:collapse}
-
-    th,td{padding:12px 10px; text-align:left; border-bottom:1px solid #e8edf4; vertical-align:top}
-
-    th{font-size:.9rem; color:#334c66}
-
-    .empty{padding:14px; background:#fff8e6; border:1px dashed #ffe1a3; border-radius:10px; color:#6a5600}
-
-    .error{color:var(--err); font-weight:600}
-
-    .ok{color:var(--ok); font-weight:600}
-
-    .idbox{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-
-    .idbox input{flex:1; padding:10px 12px; border:1px solid #d7dde6; border-radius:8px}
-
-    .idbox button{background:var(--brand); color:#fff; font-weight:700; border:0; padding:10px 14px; border-radius:10px; cursor:pointer}
-
-    .skeleton{background:linear-gradient(90deg,#f1f4f9 25%,#e9edf3 37%,#f1f4f9 63%); background-size:400% 100%; animation:sh 1.3s infinite}
-
-    @keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
-
-    .hl{font-weight:700}
-
-  </style>
-
-</head>
-
-<body>
-
-  <header>
-
-    <div class="brand">ProBuildZone</div>
-
-    <a href="/" style="text-decoration:none;color:var(--brand);font-weight:700">Home</a>
-
-  </header>
+    const job = rows[0];
 
 
 
-  <div class="container">
+    // اعرض ملخّص الطلب (بساطة الآن)
 
-    <div class="hero"></div>
-
-
-
-    <div class="card" id="searchCard" style="display:none">
-
-      <h1>Find your Job</h1>
-
-      <p class="muted">Paste your Job ID to see offers.</p>
-
-      <div class="idbox">
-
-        <input id="jobIdInput" placeholder="PBZ-xxxx or UUID">
-
-        <button id="jobIdGo">Open</button>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="grid" id="jobWrap" style="display:none">
+    box.innerHTML = `
 
       <div class="card">
 
-        <h1>Project details <span class="pill" id="jobIdPill"></span></h1>
+        <h2>Job Details</h2>
 
-        <div class="row">
+        <p><b>Title:</b> ${job.project_title ?? '-'}</p>
 
-          <div>
+        <p><b>Name:</b> ${job.contact_name ?? job.name ?? '-'}</p>
 
-            <div><span class="muted">Title</span><div id="jobTitle" class="hl"></div></div>
+        <p><b>Email:</b> ${job.email ?? '-'}</p>
 
-            <div style="margin-top:10px"><span class="muted">Summary</span><div id="jobSummary"></div></div>
+        <p><b>Phone:</b> ${job.phone ?? '-'}</p>
 
-            <div style="margin-top:10px"><span class="muted">City / State</span><div id="jobCityState"></div></div>
+        <p><b>Address:</b> ${job.full_address ?? job.address ?? '-'}</p>
 
-          </div>
+        <p><b>Description:</b><br>${(job.full_description ?? job.description ?? '').replace(/\n/g,'<br>')}</p>
 
-          <div>
+        <hr/>
 
-            <div><span class="muted">Contact</span><div id="jobContact"></div></div>
+        <h3>Offers</h3>
 
-            <div style="margin-top:10px"><span class="muted">Address</span><div id="jobAddress"></div></div>
-
-          </div>
-
-        </div>
-
-        <div style="margin-top:12px">
-
-          <span class="muted">Description</span>
-
-          <div id="jobDesc" style="white-space:pre-wrap"></div>
-
-        </div>
+        <div id="offersList">Loading offers…</div>
 
       </div>
 
+    `;
 
 
-      <div class="card">
 
-        <h1>Offers</h1>
+    // (اختياري) اجلب العروض من جدول pro_offers لو أنشأناه
 
-        <div id="offersBox" class="offers">
+    const offersUrl = `${SUPABASE_URL}/rest/v1/pro_offers?select=pro_name,amount,message,created_at&job_id=eq.${job.id}`;
 
-          <div class="empty">No offers yet. Keep this page open — it refreshes automatically every 10s.</div>
+    const ores = await fetch(offersUrl, {
+
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+
+    });
+
+    const offers = await ores.json();
+
+
+
+    const list = document.getElementById('offersList');
+
+    if (Array.isArray(offers) && offers.length) {
+
+      list.innerHTML = offers.map(o => `
+
+        <div class="offer">
+
+          <div><b>${o.pro_name || 'Pro'}</b> — $${o.amount ?? '—'}</div>
+
+          <div>${(o.message || '').replace(/\n/g,'<br>')}</div>
+
+          <small>${new Date(o.created_at).toLocaleString()}</small>
 
         </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div id="msg" class="card" style="display:none"></div>
-
-  </div>
-
-
-
-  <script>
-
-    const $ = (s)=>document.querySelector(s);
-
-    const msg = $("#msg");
-
-    const jobWrap = $("#jobWrap");
-
-    const searchCard = $("#searchCard");
-
-    const offersBox = $("#offersBox");
-
-    const jobIdPill = $("#jobIdPill");
-
-
-
-    function setMsg(html, type){ msg.style.display='block'; msg.innerHTML = `<div class="${type||''}">${html}</div>`; }
-
-    function clearMsg(){ msg.style.display='none'; msg.innerHTML=''; }
-
-
-
-    // Parse id from URL
-
-    const params = new URLSearchParams(location.search);
-
-    let JOB_ID = (params.get('id')||'').trim();
-
-
-
-    if(!JOB_ID){
-
-      searchCard.style.display='block';
-
-      $("#jobIdGo").onclick = ()=> {
-
-        const v = $("#jobIdInput").value.trim();
-
-        if(v) location.href = `offers.html?id=${encodeURIComponent(v)}`;
-
-      };
-
-    } else {
-
-      loadAll();
-
-      // polling offers every 10s
-
-      setInterval(()=> loadOffers(JOB_ID, false), 10000);
-
-    }
-
-
-
-    async function loadAll(){
-
-      clearMsg();
-
-      jobWrap.style.display='none';
-
-      setMsg('Loading job…','');
-
-
-
-      try{
-
-        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(JOB_ID)}`);
-
-        const text = await res.text();
-
-        let data; try{ data = JSON.parse(text); } catch{ throw new Error(`Non-JSON (${res.status}) ${text.slice(0,120)}…`); }
-
-        if(!res.ok || !data.ok) throw new Error(data.error||`Failed (${res.status})`);
-
-        renderJob(data.job);
-
-        renderOffers(data.offers||[]);
-
-        jobWrap.style.display='grid';
-
-        clearMsg();
-
-      }catch(err){
-
-        setMsg(`<div class="error">Error: ${err.message}</div>`,'');
-
-      }
-
-    }
-
-
-
-    function renderJob(job){
-
-      JOB_ID = job.id;
-
-      jobIdPill.textContent = job.id;
-
-      $("#jobTitle").textContent = job.title || '—';
-
-      $("#jobSummary").textContent = job.summary || '—';
-
-      $("#jobCityState").textContent = [job.city, job.state].filter(Boolean).join(', ') || '—';
-
-      $("#jobContact").textContent = `${job.name || '—'} · ${job.email || '—'} · ${job.phone || '—'}`;
-
-      $("#jobAddress").textContent = job.address || '—';
-
-      $("#jobDesc").textContent = job.description || '—';
-
-    }
-
-
-
-    async function loadOffers(id, showLoading=true){
-
-      try{
-
-        if(showLoading) offersBox.innerHTML = `<div class="skeleton" style="height:48px;border-radius:10px"></div>`;
-
-        const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(id)}`);
-
-        const data = await res.json();
-
-        if(!res.ok || !data.ok) throw new Error(data.error || `Failed ${res.status}`);
-
-        renderOffers(data.offers||[]);
-
-      }catch(err){
-
-        offersBox.innerHTML = `<div class="error">Error loading offers: ${err.message}</div>`;
-
-      }
-
-    }
-
-
-
-    function renderOffers(offers){
-
-      if(!offers.length){
-
-        offersBox.innerHTML = `<div class="empty">No offers yet. Share your Job ID with local pros or wait for invitations.</div>`;
-
-        return;
-
-      }
-
-      const rows = offers.map(o => `
-
-        <tr>
-
-          <td><div class="hl">${o.pro_name || 'Pro'}</div><div class="muted" style="font-size:.9rem">${new Date(o.created_at).toLocaleString()}</div></td>
-
-          <td style="white-space:pre-wrap">${o.message || '—'}</td>
-
-          <td style="font-weight:800">$${(o.amount ?? 0).toLocaleString()}</td>
-
-        </tr>
 
       `).join('');
 
-      offersBox.innerHTML = `
+    } else {
 
-        <table>
-
-          <thead><tr><th>Pro</th><th>Message</th><th>Offer</th></tr></thead>
-
-          <tbody>${rows}</tbody>
-
-        </table>`;
+      list.textContent = 'No offers yet.';
 
     }
 
-  </script>
 
-</body>
 
-</html>
+  } catch (e) {
+
+    box.innerHTML = `<div class="err">Error: ${e.message}</div>`;
+
+  }
+
+})();
+
+</script>
