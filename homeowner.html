@@ -1,133 +1,211 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
 
-  <head>
+<head>
 
-    <meta charset="UTF-8" />
+  <meta charset="UTF-8" />
 
-    <title>Post a Job</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProBuildZone — Homeowner</title>
 
-    <link rel="stylesheet" href="/homeowner.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-  </head>
+  <style>
 
-  <body>
+    body {
 
-    <div class="post-job-modal">
+      font-family: "Inter", sans-serif;
 
-      <div class="header">
+      background: #f6f7fb;
 
-        <button class="back" onclick="history.back()">← Back</button>
+      color: #0f2a43;
 
-        <h2>Post a Job</h2>
+      padding: 40px;
 
-        <button class="close" onclick="history.back()">Close</button>
+    }
 
-      </div>
+    h1 { text-align: center; color: #0f2a43; }
 
+    form {
 
+      max-width: 500px;
 
-      <span class="chip" id="categoryLabel">Category: Roofing</span>
+      margin: 40px auto;
 
+      background: white;
 
+      padding: 25px;
 
-      <form id="homeowner-form">
+      border-radius: 10px;
 
-        <label>Project title * 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 
-          <input type="text" name="project_title" required />
+    }
 
-        </label>
+    input, textarea {
 
+      width: 100%;
 
+      padding: 10px;
 
-        <label>Short summary
+      margin: 10px 0;
 
-          <input type="text" name="short_summary" />
+      border: 1px solid #ccc;
 
-        </label>
+      border-radius: 6px;
 
+      font-size: 1rem;
 
+    }
 
-        <div class="row">
+    button {
 
-          <label class="half">City
+      width: 100%;
 
-            <input type="text" name="city" />
+      background-color: #0f2a43;
 
-          </label>
+      color: white;
 
-          <label class="half">State
+      font-weight: 600;
 
-            <input type="text" name="state" />
+      padding: 12px;
 
-          </label>
+      border: none;
 
-        </div>
+      border-radius: 6px;
 
+      cursor: pointer;
 
+      transition: 0.2s;
 
-        <!-- ما في budget هنا -->
+    }
 
+    button:hover {
 
+      background-color: #143756;
 
-        <label>Contact name *
+    }
 
-          <input type="text" name="contact_name" required />
+    #post-error {
 
-        </label>
+      color: red;
 
+      text-align: center;
 
+      font-weight: 500;
 
-        <div class="row">
+      margin-top: 10px;
 
-          <label class="half">Phone *
+    }
 
-            <input type="tel" name="phone" required />
+  </style>
 
-          </label>
+</head>
 
-          <label class="half">Email *
+<body>
 
-            <input type="email" name="email" required />
+  <h1>🏡 Post Your Project</h1>
 
-          </label>
 
-        </div>
 
+  <form id="job-form">
 
+    <input id="name" type="text" placeholder="Full Name" required />
 
-        <label>Full address *
+    <input id="email" type="email" placeholder="Email Address" required />
 
-          <input type="text" name="full_address" required />
+    <input id="phone" type="text" placeholder="Phone Number (optional)" />
 
-        </label>
+    <input id="address" type="text" placeholder="Project Address" required />
 
+    <textarea id="description" rows="4" placeholder="Describe your project" required></textarea>
 
+    <button type="submit">📋 Post Job</button>
 
-        <label>Full description *
+    <p id="post-error"></p>
 
-          <textarea name="full_description" rows="4" required></textarea>
+  </form>
 
-        </label>
 
 
+  <script>
 
-        <button id="postJobBtn" type="submit">🚀 Post Job</button>
+  document.getElementById('job-form').addEventListener('submit', async (e) => {
 
-        <p id="homeowner-status"></p>
+    e.preventDefault();
 
-      </form>
 
-    </div>
 
+    const payload = {
 
+      name: document.getElementById('name').value.trim(),
 
-    <script src="/assets/homeowner.js?v=1"></script>
+      email: document.getElementById('email').value.trim(),
 
-  </body>
+      phone: document.getElementById('phone')?.value?.trim() || null,
+
+      address: document.getElementById('address').value.trim(),
+
+      description: document.getElementById('description').value.trim(),
+
+    };
+
+
+
+    try {
+
+      const res = await fetch('/.netlify/functions/post-job', {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+
+        body: JSON.stringify(payload),
+
+      });
+
+
+
+      const text = await res.text();
+
+      let data;
+
+      try { data = JSON.parse(text); }
+
+      catch {
+
+        throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`);
+
+      }
+
+
+
+      if (!res.ok) throw new Error(data.error || 'Failed to post job');
+
+
+
+      alert('✅ Job posted successfully!');
+
+      e.target.reset();
+
+    } catch (err) {
+
+      console.error(err);
+
+      const msg = document.getElementById('post-error');
+
+      if (msg) msg.textContent = `Error: ${err.message}`;
+
+      else alert(`Error: ${err.message}`);
+
+    }
+
+  });
+
+  </script>
+
+</body>
 
 </html>
