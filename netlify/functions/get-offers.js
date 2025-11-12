@@ -1,61 +1,87 @@
+// netlify/functions/get-offers.js
+
+const { createClient } = require('@supabase/supabase-js');
+
+
+
 exports.handler = async (event) => {
 
   try {
 
-    const jobPublicId = event.queryStringParameters?.id;
+    const publicId = (event.queryStringParameters && event.queryStringParameters.id) || '';
 
-    if (!jobPublicId) return { statusCode: 400, body: "Missing id" };
+    if (!publicId) return resp(400, { error: 'Missing id' });
 
 
-
-    const { createClient } = await import("@supabase/supabase-js");
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 
 
-    // أولاً نحصل على id الداخلي للوظيفة
+    // نحول public_id -> UUID للوظيفة
 
-    const { data: jobRow, error: jobErr } = await supabase
+    const { data: job, error: jobErr } = await supabase
 
-      .from("homeowner_jobs")
+      .from('homeowner_jobs')
 
-      .select("id")
+      .select('id')
 
-      .eq("public_id", jobPublicId)
+      .eq('public_id', publicId)
 
       .maybeSingle();
 
+    if (jobErr) throw jobErr;
 
-
-    if (jobErr || !jobRow) return { statusCode: 404, body: JSON.stringify({ error: "Job not found" }) };
-
-
-
-    // نجيب العروض
-
-    const { data: offers, error: offErr } = await supabase
-
-      .from("pro_offers")
-
-      .select("id,business_name,amount,phone,message,status,created_at")
-
-      .eq("job_id", jobRow.id)
-
-      .order("created_at", { ascending: false });
+    if (!job) return resp(404, { error: 'Job not found' });
 
 
 
-    if (offErr) return { statusCode: 500, body: JSON.stringify({ error: offErr.message }) };
+    const { data: offers, error: offersErr } = await supabase
+
+      .from('job_offers')
+
+      .select('id, amount, message, pro_name, phone, status, created_at')
+
+      .eq('job_id', job.id)
+
+      .order('created_at', { ascending: false });
+
+    if (offersErr) throw offersErr;
 
 
 
-    return { statusCode: 200, body: JSON.stringify({ offers }) };
+    return resp(200, { offers: offers || [] });
 
   } catch (e) {
 
-    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
+    console.error(e);
+
+    return resp(500, { error: e.message || 'Server error' });
 
   }
 
 };
+
+
+
+function resp(statusCode, body) {
+
+  return {
+
+    statusCode,
+
+    headers: {
+
+      'Content-Type': 'application/json',
+
+      'Access-Control-Allow-Origin': '*',
+
+      'Cache-Control': 'no-store',
+
+    },
+
+    body: JSON.stringify(body),
+
+  };
+
+}
