@@ -1,12 +1,14 @@
 // netlify/functions/post-job.js
 
-const CORS_HEADERS = {
+
+
+const HEADERS = {
 
   'Content-Type': 'application/json',
 
   'Access-Control-Allow-Origin': '*',
 
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
+  'Access-Control-Allow-Methods': 'POST,OPTIONS'
 
 };
 
@@ -16,107 +18,69 @@ exports.handler = async (event) => {
 
   // CORS preflight
 
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: HEADERS, body: '' };
 
-    return { statusCode: 200, headers: CORS_HEADERS, body: '' };
 
-  }
+
+  // Allow POST only
 
   if (event.httpMethod !== 'POST') {
 
-    return { statusCode: 405, headers: CORS_HEADERS, body: JSON.stringify({ ok:false, error:'Method not allowed' }) };
+    return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Method not allowed' }) };
 
   }
 
 
 
-  // اقرأ الـpayload
+  // Parse JSON body
 
   let payload = {};
 
   try { payload = JSON.parse(event.body || '{}'); }
 
-  catch {
-
-    return { statusCode: 400, headers: CORS_HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON body' }) };
-
-  }
+  catch { return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Invalid JSON' }) }; }
 
 
 
-  // حقولنا الموحدة
+  // Pick fields (all strings)
 
   const {
 
-    category = 'General',
+    title = null, summary = null, city = null, state = null,
 
-    title = null,
-
-    summary = null,
-
-    city = null,
-
-    state = null,
-
-    name,
-
-    email,
-
-    phone,
-
-    address,
-
-    description,
+    name, email, phone, address, description
 
   } = payload;
 
 
 
-  // تحقق من الحقول المطلوبة
+  // Required
 
-  if (!name || !email || !phone || !address || !description || !title) {
+  if (!name || !email || !phone || !address || !description) {
 
-    return {
+    return { statusCode: 400, headers: HEADERS,
 
-      statusCode: 400,
-
-      headers: CORS_HEADERS,
-
-      body: JSON.stringify({ ok:false, error:'Missing required fields (title, name, email, phone, address, description)' }),
-
-    };
+      body: JSON.stringify({ ok:false, error:'Missing required fields (name, email, phone, address, description)' }) };
 
   }
 
 
 
-  // متغيرات البيئة (من Netlify)
+  // Env
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
 
   const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
 
-
-
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
 
-    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ ok:false, error:'Server env is not configured' }) };
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error:'Missing server env vars' }) };
 
   }
 
 
 
-  // جهّز السجل للإدخال
-
-  const record = {
-
-    category, title, summary, city, state,
-
-    name, email, phone, address, description,
-
-  };
-
-
+  // Insert via REST
 
   try {
 
@@ -132,49 +96,41 @@ exports.handler = async (event) => {
 
         'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE}`,
 
-        'Prefer': 'return=representation', // يرجّع الصف المُضاف
+        'Prefer': 'return=representation'
 
       },
 
-      body: JSON.stringify([record]),
+      body: JSON.stringify([{
+
+        title, summary, city, state,
+
+        name, email, phone, address, description
+
+      }])
 
     });
 
 
 
-    const text = await res.text();
-
-    let data;
-
-    try { data = JSON.parse(text); } catch { data = null; }
-
-
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
 
-      const msg = (data && data.message) || text || `Supabase insert failed (${res.status})`;
+      return { statusCode: res.status, headers: HEADERS,
 
-      return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ ok:false, error: msg }) };
+        body: JSON.stringify({ ok:false, error: data?.message || 'Supabase insert failed' }) };
 
     }
 
 
 
-    const inserted = Array.isArray(data) ? data[0] : data;
+    const row = Array.isArray(data) ? data[0] : data;
 
-    return {
-
-      statusCode: 200,
-
-      headers: CORS_HEADERS,
-
-      body: JSON.stringify({ ok:true, job_id: inserted?.id || null }),
-
-    };
+    return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok:true, job_id: row?.id || null }) };
 
   } catch (err) {
 
-    return { statusCode: 500, headers: CORS_HEADERS, body: JSON.stringify({ ok:false, error: err.message || 'Unknown error' }) };
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok:false, error: err.message || 'Server error' }) };
 
   }
 
