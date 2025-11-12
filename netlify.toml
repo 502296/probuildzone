@@ -1,52 +1,89 @@
 [build]
 
-  publish = "."
+  publish   = "."
 
   functions = "netlify/functions"
-  [[headers]]
 
-for = "/*"
+
+
+# واجهة /api تُحوَّل تلقائياً إلى وظائف Netlify
+
+[[redirects]]
+
+  from = "/api/*"
+
+  to   = "/.netlify/functions/:splat"
+
+  status = 200
+
+  force  = true
+
+
+
+# لا نُخزّن ردود الـ API في الكاش
+
+[[headers]]
+
+  for = "/api/*"
 
   [headers.values]
 
-  Cache-Control = "public, max-age=0, must-revalidate"
+    Cache-Control = "no-store"
+
+    Access-Control-Allow-Origin = "*"
+
+
+
+# الصفحات العامة: عدم التخزين الطويل
+
+[[headers]]
+
+  for = "/*"
+
+  [headers.values]
+
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+
+
+# أصول ثابتة طويلة الأجل
+
+[[headers]]
+
+  for = "/assets/*"
+
+  [headers.values]
+
+    Cache-Control = "public, max-age=31536000, immutable"
 
 
 
 [[headers]]
 
-for = "/assets/*"
+  for = "/images/*"
 
   [headers.values]
 
-  Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 
 
 [[headers]]
 
-for = "/images/*"
+  for = "/fonts/*"
 
   [headers.values]
 
-  Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 
+
+# Service worker لا يُخزَّن
 
 [[headers]]
 
-for = "/fonts/*"
+  for = "/sw.js"
 
   [headers.values]
 
-  Cache-Control = "public, max-age=31536000, immutable"
-
-
-
-[[headers]]
-
-for = "/sw.js"
-
-  [headers.values]
-
-  Cache-Control = "no-cache"
+    Cache-Control = "no-cache"
