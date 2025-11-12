@@ -38,15 +38,15 @@
 
     button:hover { filter:brightness(.95); }
 
-    button[disabled]{ opacity:.6; cursor:not-allowed; }
+    button[disabled] { opacity:.6; cursor:not-allowed; }
 
     .msg { margin-top:12px; text-align:center; }
 
     .msg.ok { color:var(--ok); font-weight:600; }
 
-    .msg.err{ color:var(--err); font-weight:600; }
+    .msg.err { color:var(--err); font-weight:600; }
 
-    small.muted{ color:#6b7a8c; display:block; margin-top:4px; }
+    small.muted { color:#6b7a8c; display:block; margin-top:4px; }
 
   </style>
 
@@ -61,24 +61,6 @@
   <div class="card">
 
     <form id="job-form" novalidate>
-
-      <label for="category">Category (optional)</label>
-
-      <select id="category">
-
-        <option value="General" selected>General</option>
-
-        <option>Roofing</option><option>Decks & Porches</option><option>Kitchens</option>
-
-        <option>Bathrooms</option><option>Flooring</option><option>Painting</option>
-
-        <option>Masonry</option><option>Electrical</option><option>Plumbing</option>
-
-        <option>Windows & Doors</option><option>Landscaping</option><option>Handyman</option>
-
-      </select>
-
-
 
       <label for="title">Project title (optional)</label>
 
@@ -178,43 +160,49 @@
 
 
 
-    function setStatus(text, type){ statusEl.textContent = text || ''; statusEl.className = 'msg ' + (type || ''); }
+    function setStatus(text, type) {
+
+      statusEl.textContent = text || '';
+
+      statusEl.className = 'msg ' + (type || '');
+
+    }
 
 
 
     form.addEventListener('submit', async (e) => {
 
-      e.preventDefault(); setStatus('', '');
+      e.preventDefault();
+
+      setStatus('', '');
 
 
 
       const payload = {
 
-        category:    document.getElementById('category').value || 'General',
+        title: document.getElementById('title').value.trim() || null,
 
-        title:       document.getElementById('title').value.trim() || null,
+        summary: document.getElementById('summary').value.trim() || null,
 
-        summary:     document.getElementById('summary').value.trim() || null,
+        city: document.getElementById('city').value.trim() || null,
 
-        city:        document.getElementById('city').value.trim() || null,
+        state: document.getElementById('state').value.trim() || null,
 
-        state:       document.getElementById('state').value.trim() || null,
+        name: document.getElementById('name').value.trim(),
 
-        name:        document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
 
-        email:       document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
 
-        phone:       document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
 
-        address:     document.getElementById('address').value.trim(),
-
-        description: document.getElementById('description').value.trim()
+        description: document.getElementById('description').value.trim(),
 
       };
 
 
 
-      if(!payload.name || !payload.email || !payload.phone || !payload.address || !payload.description){
+      if (!payload.name || !payload.email || !payload.phone || !payload.address || !payload.description) {
 
         return setStatus('Please fill all required fields.', 'err');
 
@@ -222,17 +210,21 @@
 
 
 
-      btn.disabled = true; btn.textContent = 'Saving to database…'; setStatus('', '');
+      btn.disabled = true;
+
+      btn.textContent = 'Saving to database…';
+
+      setStatus('', '');
 
 
 
-      try{
+      try {
 
         const res = await fetch('/.netlify/functions/post-job', {
 
-          method:'POST',
+          method: 'POST',
 
-          headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 
           body: JSON.stringify(payload)
 
@@ -242,11 +234,13 @@
 
         const text = await res.text();
 
-        let data; try{ data = JSON.parse(text); } catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
+        let data; try { data = JSON.parse(text); }
+
+        catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
 
 
-        if(!res.ok || !data.ok){ throw new Error(data.error || `Failed with ${res.status}`); }
+        if (!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
 
 
 
@@ -254,15 +248,17 @@
 
         form.reset();
 
-      }catch(err){
+      } catch (err) {
 
         console.error(err);
 
         setStatus(`Error: ${err.message}`, 'err');
 
-      }finally{
+      } finally {
 
-        btn.disabled = false; btn.textContent = '🚀 Post Job';
+        btn.disabled = false;
+
+        btn.textContent = '🚀 Post Job';
 
       }
 
