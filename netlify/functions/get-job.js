@@ -10,11 +10,7 @@ exports.handler = async (event) => {
 
     const publicId = (event.queryStringParameters && event.queryStringParameters.id) || '';
 
-    if (!publicId) {
-
-      return resp(400, { error: 'Missing id' });
-
-    }
+    if (!publicId) return resp(400, { error: 'Missing id' });
 
 
 
@@ -22,13 +18,19 @@ exports.handler = async (event) => {
 
 
 
-    // 1) نجيب السجل حسب public_id (مو الـ UUID)
+    // نجيب الوظيفة بالـ public_id مباشرة من homeowner_jobs
 
     const { data: job, error: jobErr } = await supabase
 
       .from('homeowner_jobs')
 
-      .select('id, public_id, title, summary, city, state, homeowner_id, created_at, address')
+      .select(
+
+        // غيّر الأسماء هنا لتطابق أعمدة جدولك فعليًا
+
+        'id, public_id, title, summary, address, city, state, name, email, phone, created_at'
+
+      )
 
       .eq('public_id', publicId)
 
@@ -42,23 +44,7 @@ exports.handler = async (event) => {
 
 
 
-    // 2) معلومات صاحب الطلب
-
-    const { data: owner, error: ownerErr } = await supabase
-
-      .from('homeowners')
-
-      .select('name, email, phone, address')
-
-      .eq('id', job.homeowner_id)
-
-      .maybeSingle();
-
-    if (ownerErr) throw ownerErr;
-
-
-
-    // 3) العروض المرتبطة (حسب UUID الداخلي job.id)
+    // نجيب العروض المرتبطة بالـ UUID الداخلي job.id
 
     const { data: offers, error: offersErr } = await supabase
 
@@ -69,6 +55,8 @@ exports.handler = async (event) => {
       .eq('job_id', job.id)
 
       .order('created_at', { ascending: false });
+
+
 
     if (offersErr) throw offersErr;
 
@@ -84,15 +72,19 @@ exports.handler = async (event) => {
 
         summary: job.summary,
 
-        address: owner?.address || job.address || null,
+        address: job.address || null,
 
-        name: owner?.name || null,
+        name: job.name || null,
 
-        email: owner?.email || null,
+        email: job.email || null,
 
-        phone: owner?.phone || null,
+        phone: job.phone || null,
 
         created_at: job.created_at,
+
+        city: job.city || null,
+
+        state: job.state || null,
 
       },
 
