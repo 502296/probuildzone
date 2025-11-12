@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+  <title>ProBuildZone — Submit an Offer</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    :root{
+
+      --ink:#0F2A43; --muted:#6b7a8c; --card:#fff; --bg:#f6f7fb; --ok:#0a7f4f; --err:#b00020;
+
+      --btn:#0b7ef4;
+
+    }
+
+    *{box-sizing:border-box}
+
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+
+    header{padding:14px 18px;font-weight:800}
+
+    .wrap{max-width:680px;margin:16px auto;padding:12px}
+
+    .card{background:var(--card);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:18px}
+
+    h1{font-size:1.4rem;margin:0 0 12px}
+
+    label{display:block;font-weight:600;margin:12px 0 6px}
+
+    input,textarea{width:100%;padding:12px;border:1px solid #d7dde6;border-radius:10px;background:#fff;font-size:1rem}
+
+    textarea{min-height:120px;resize:vertical}
+
+    .row{display:flex;gap:10px}
+
+    .row>div{flex:1}
+
+    .note{color:var(--muted);font-size:.92rem}
+
+    .actions{position:sticky;bottom:0;background:linear-gradient(#ffffff00,#ffffff);padding-top:8px;margin-top:8px}
+
+    button{width:100%;padding:14px 16px;border:0;border-radius:12px;background:var(--btn);color:#fff;font-weight:800;cursor:pointer}
+
+    button:hover{filter:brightness(.95)}
+
+    button[disabled]{opacity:.6;cursor:not-allowed}
+
+    .msg{margin-top:10px;text-align:center}
+
+    .msg.ok{color:var(--ok);font-weight:700}
+
+    .msg.err{color:var(--err);font-weight:700}
+
+    .jobbar{padding:10px;border:1px dashed #cfd8e3;border-radius:10px;background:#fafbff;margin-bottom:8px}
+
+    .small{font-size:.92rem;color:var(--muted)}
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>ProBuildZone — Offer</header>
+
+  <div class="wrap">
+
+    <div class="card">
+
+      <h1>Submit Your Offer</h1>
+
+      <div class="jobbar" id="jobInfo">
+
+        <b>Job ID:</b> <span id="jobIdDisplay">—</span>
+
+        <div class="small">Paste the Job ID we shared with the homeowner (e.g., PBZ-99870). The link can also include it automatically.</div>
+
+      </div>
+
+
+
+      <form id="offerForm" novalidate>
+
+        <label for="jobId">Job ID (PBZ-xxxxx or UUID) *</label>
+
+        <input id="jobId" type="text" placeholder="PBZ-12345" required>
+
+
+
+        <label for="proName">Your name *</label>
+
+        <input id="proName" type="text" required placeholder="John Doe">
+
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="company">Company</label>
+
+            <input id="company" type="text" placeholder="Company LLC">
+
+          </div>
+
+          <div>
+
+            <label for="amount">Offer amount ($)</label>
+
+            <input id="amount" type="number" step="0.01" min="0" placeholder="5000">
+
+          </div>
+
+        </div>
+
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="phone">Phone</label>
+
+            <input id="phone" type="tel" placeholder="(555) 555-5555">
+
+          </div>
+
+          <div>
+
+            <label for="email">Email</label>
+
+            <input id="email" type="email" placeholder="pro@example.com">
+
+          </div>
+
+        </div>
+
+
+
+        <label for="message">Message to homeowner</label>
+
+        <textarea id="message" placeholder="Timeline, scope, materials, availability..."></textarea>
+
+
+
+        <div class="actions">
+
+          <button id="sendBtn" type="submit">Send Offer</button>
+
+          <div id="status" class="msg" aria-live="polite"></div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <script>
+
+    // اقرا id من الرابط (لو أتى من offers.html)
+
+    const params = new URLSearchParams(location.search);
+
+    const preset = (params.get('id') || '').trim();
+
+    const jobIdInput = document.getElementById('jobId');
+
+    const jobIdDisplay = document.getElementById('jobIdDisplay');
+
+    if (preset) {
+
+      jobIdInput.value = preset;
+
+      jobIdDisplay.textContent = preset;
+
+    }
+
+
+
+    const form = document.getElementById('offerForm');
+
+    const btn  = document.getElementById('sendBtn');
+
+    const statusEl = document.getElementById('status');
+
+
+
+    function setStatus(t, type){ statusEl.textContent = t||''; statusEl.className = 'msg ' + (type||''); }
+
+
+
+    form.addEventListener('submit', async (e) => {
+
+      e.preventDefault();
+
+      setStatus('', '');
+
+
+
+      const payload = {
+
+        job_identifier: document.getElementById('jobId').value.trim(),
+
+        pro_name:       document.getElementById('proName').value.trim(),
+
+        company:        document.getElementById('company').value.trim() || null,
+
+        phone:          document.getElementById('phone').value.trim() || null,
+
+        email:          document.getElementById('email').value.trim() || null,
+
+        amount:         document.getElementById('amount').value ? Number(document.getElementById('amount').value) : null,
+
+        message:        document.getElementById('message').value.trim() || null
+
+      };
+
+
+
+      if (!payload.job_identifier || !payload.pro_name) {
+
+        return setStatus('Please fill required fields (Job ID, Your name).', 'err');
+
+      }
+
+
+
+      btn.disabled = true;
+
+      btn.textContent = 'Sending…';
+
+
+
+      try {
+
+        const res = await fetch('/.netlify/functions/post-offer.js'.replace('.js',''), {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json', 'Accept':'application/json' },
+
+          body: JSON.stringify(payload)
+
+        });
+
+
+
+        const text = await res.text();
+
+        let data; try { data = JSON.parse(text); } catch { throw new Error(`Non-JSON (${res.status}): ${text.slice(0,120)}…`); }
+
+
+
+        if (!res.ok || !data.ok) throw new Error(data.error || `Failed (${res.status})`);
+
+
+
+        setStatus('✅ Offer submitted successfully!', 'ok');
+
+        form.reset();
+
+      } catch (err) {
+
+        console.error(err);
+
+        setStatus('Error: ' + err.message, 'err');
+
+      } finally {
+
+        btn.disabled = false;
+
+        btn.textContent = 'Send Offer';
+
+      }
+
+    });
+
+  </script>
+
+</body>
+
+</html>
