@@ -16,6 +16,30 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+  <style>
+
+    /* تفتيح طفيف للـ hero */
+
+    .hero .hero-bg::after { background: rgba(0,0,0,.35)!important; }
+
+    /* المساحة قابلة للتمرير مع شريط إرسال ثابت */
+
+    .sheet { max-height: 90vh; overflow:auto; padding-bottom:88px; }
+
+    .submit-bar{
+
+      position:sticky; bottom:0; background:#fff; padding:10px 12px;
+
+      border-top:1px solid #e6e8ee; display:flex; gap:12px; justify-content:center;
+
+    }
+
+    .submit-bar .hint{ align-self:center; }
+
+    @media (max-width:640px){ .submit-bar{ padding-bottom:max(10px, env(safe-area-inset-bottom)); } }
+
+  </style>
+
 </head>
 
 <body>
@@ -278,7 +302,7 @@
 
 
 
-        <div class="center" style="margin-top:10px">
+        <div class="submit-bar">
 
           <button id="sendBtn" class="btn primary">🚀 Post Job</button>
 
@@ -350,15 +374,9 @@
 
     function goStep(n) {
 
-      if (n === 1) {
+      if (n === 1) { step1.style.display = "block"; step2.style.display = "none"; document.getElementById("sheetTitle").textContent = "Post a Job"; }
 
-        step1.style.display = "block"; step2.style.display = "none"; document.getElementById("sheetTitle").textContent = "Post a Job";
-
-      } else {
-
-        step1.style.display = "none"; step2.style.display = "block"; document.getElementById("sheetTitle").textContent = "Post a Job"; sheet.scrollTop = 0;
-
-      }
+      else { step1.style.display = "none"; step2.style.display = "block"; document.getElementById("sheetTitle").textContent = "Post a Job"; sheet.scrollTop = 0; }
 
     }
 
@@ -444,33 +462,39 @@
 
       const m = document.getElementById("sendMsg");
 
+
+
+      // مهم: المفاتيح متوافقة مع post-job.js
+
       const payload = {
 
         category: document.getElementById("categoryHidden").value || "General",
 
-        title: document.getElementById("title").value.trim(),
+        project_title: document.getElementById("title").value.trim(),
 
-        summary: document.getElementById("summary").value.trim(),
+        short_summary: document.getElementById("summary").value.trim() || null,
 
-        city: document.getElementById("city").value.trim(),
+        city: document.getElementById("city").value.trim() || null,
 
-        state: document.getElementById("state").value.trim(),
+        state: document.getElementById("state").value.trim() || null,
 
-        name: document.getElementById("contactName").value.trim(),
+        contact_name: document.getElementById("contactName").value.trim(),
 
         phone: document.getElementById("phone").value.trim(),
 
         email: document.getElementById("email").value.trim(),
 
-        address: document.getElementById("address").value.trim(),
+        full_address: document.getElementById("address").value.trim(),
 
-        description: document.getElementById("longDesc").value.trim()
+        full_description: document.getElementById("longDesc").value.trim()
+
+        // files: سنضيفها لاحقًا مع الرفع الحقيقي
 
       };
 
 
 
-      if (!payload.title || !payload.name || !payload.phone || !payload.email || !payload.address || !payload.description) {
+      if (!payload.project_title || !payload.contact_name || !payload.phone || !payload.email || !payload.full_address || !payload.full_description) {
 
         m.textContent = "Please fill all required fields."; m.className = "hint err"; return;
 
@@ -496,15 +520,27 @@
 
         let data; try { data = JSON.parse(text); } catch { throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
 
-
-
         if (!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
 
 
 
-        m.textContent = `✅ Job posted! Your Job ID: ${data.job_id || ''}`; m.className = "hint ok";
+        const { id, human_id } = data; // human_id مثل PBZ-7F3A2
 
-        setTimeout(()=>{ m.textContent = ""; closeDoor(); }, 1200);
+        m.innerHTML = `✅ Job posted! Your Job Code: <b>${human_id}</b> &nbsp; <a href="/offers.html?id=${encodeURIComponent(human_id)}">See offers</a>`;
+
+        m.className = "hint ok";
+
+
+
+        // تعبئة خانة الهيرو ونسخ الكود
+
+        const quick = document.getElementById("jobIdQuick"); if (quick) quick.value = human_id;
+
+        try { await navigator.clipboard.writeText(human_id); } catch {}
+
+        // يمكن إغلاق النافذة بعد ثواني إن أردت:
+
+        // setTimeout(()=>{ m.textContent=''; closeDoor(); }, 1800);
 
       } catch (e) {
 
