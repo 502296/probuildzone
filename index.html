@@ -40,6 +40,8 @@
 
 </head>
 
+
+
 <body>
 
   <header>
@@ -86,7 +88,15 @@
 
       <p>Post your project with photos. Local contractors send offers. You choose the best match.</p>
 
-      <div class="buttons"><button class="btn primary" id="postJobTop">Post a Job (Free)</button></div>
+      <div class="buttons">
+
+        <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
+
+      </div>
+
+
+
+      <!-- Quick Job ID box -->
 
       <div class="job-id">
 
@@ -210,7 +220,11 @@
 
           <input type="file" id="fileInput" multiple accept="image/*,application/pdf" style="display:none" />
 
-          <button type="button" class="btn outline" id="pickBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos/Files</button>
+          <button type="button" class="btn outline" id="pickBtn">
+
+            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos/Files
+
+          </button>
 
           <span class="hint">You can upload multiple images or a PDF.</span>
 
@@ -324,9 +338,17 @@
 
     const menuPanel=document.getElementById("menuPanel");
 
-    if(menuBtn) menuBtn.addEventListener("click",()=>{menuPanel.style.display=menuPanel.style.display==="block"?"none":"block";});
+    if(menuBtn) menuBtn.addEventListener("click",()=>{
 
-    document.addEventListener("click",(e)=>{ if(!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display="none"); });
+      menuPanel.style.display=menuPanel.style.display==="block"?"none":"block";
+
+    });
+
+    document.addEventListener("click",(e)=>{
+
+      if(!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display="none");
+
+    });
 
 
 
@@ -338,7 +360,11 @@
 
     const closeAbout=()=>{ aboutModal.style.display="none"; document.documentElement.style.overflow=""; };
 
-    document.getElementById("openAboutFromMenu")?.addEventListener("click",(e)=>{ e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display="none"); });
+    document.getElementById("openAboutFromMenu")?.addEventListener("click",(e)=>{
+
+      e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display="none");
+
+    });
 
     document.getElementById("aboutClose")?.addEventListener("click",closeAbout);
 
@@ -368,25 +394,73 @@
 
     function goStep(n){
 
-      if(n===1){ step1.style.display="block"; step2.style.display="none"; document.getElementById("sheetTitle").textContent="Post a Job";}
+      if(n===1){
 
-      else{ step1.style.display="none"; step2.style.display="block"; document.getElementById("sheetTitle").textContent="Post a Job"; sheet.scrollTop=0;}
+        step1.style.display="block";
+
+        step2.style.display="none";
+
+        document.getElementById("sheetTitle").textContent="Post a Job";
+
+      } else {
+
+        step1.style.display="none";
+
+        step2.style.display="block";
+
+        document.getElementById("sheetTitle").textContent="Post a Job";
+
+        sheet.scrollTop=0;
+
+      }
 
     }
+
+
 
     document.getElementById("postJobTop").addEventListener("click",openDoor);
 
     document.getElementById("closeDoor").addEventListener("click",closeDoor);
 
-    document.getElementById("backBtn").addEventListener("click",()=>{ if(step1.style.display==="block") closeDoor(); else goStep(1); });
+    document.getElementById("backBtn").addEventListener("click",()=>{
+
+      if(step1.style.display==="block") closeDoor(); else goStep(1);
+
+    });
 
 
 
-    document.querySelectorAll(".cat-card").forEach((btn)=>{ btn.addEventListener("click",()=>{ const val=btn.dataset.cat; hiddenCat.value=val; selectedCatEl.textContent=val; goStep(2); }); });
+    document.querySelectorAll(".cat-card").forEach((btn)=>{
+
+      btn.addEventListener("click",()=>{
+
+        const val=btn.dataset.cat;
+
+        hiddenCat.value=val;
+
+        selectedCatEl.textContent=val;
+
+        goStep(2);
+
+      });
+
+    });
 
 
 
-    document.getElementById("goQuick").addEventListener("click",()=>{ const id=document.getElementById("jobIdQuick").value.trim(); if(id) location.href="/offers.html?id="+encodeURIComponent(id); });
+    // ===== QUICK JOB ID → job.html =====
+
+    document.getElementById("goQuick").addEventListener("click",()=>{
+
+      const id=document.getElementById("jobIdQuick").value.trim();
+
+      if(!id) return;
+
+      // نرسل الزبون مباشرة لصفحة Job Details الجديدة
+
+      window.location.href="/job.html?id="+encodeURIComponent(id);
+
+    });
 
 
 
@@ -400,15 +474,27 @@
 
     const dropZone=document.getElementById("dropZone");
 
+
+
     if(pickBtn) pickBtn.onclick=()=>fileInput.click();
 
+
+
     const humanSize=(b)=> b<1024? b+' B' : b<1048576? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+
+
 
     const renderList=(files)=>{
 
       fileList.innerHTML="";
 
-      if(!files.length){ fileList.innerHTML='<span class="hint">No files selected yet.</span>'; return; }
+      if(!files.length){
+
+        fileList.innerHTML='<span class="hint">No files selected yet.</span>';
+
+        return;
+
+      }
 
       [...files].forEach((f)=>{
 
@@ -418,9 +504,23 @@
 
         item.className="file-item";
 
-        item.innerHTML=`<div class="thumb">${isImg?`<img src="${URL.createObjectURL(f)}" alt="">`:`<i class="fa-regular fa-file-lines"></i>`}</div>
+        item.innerHTML=
 
-                        <div class="meta"><b>${f.name}</b><span>${f.type||"file"} • ${humanSize(f.size)}</span></div>`;
+          `<div class="thumb">${
+
+            isImg ? `<img src="${URL.createObjectURL(f)}" alt="">`
+
+                  : `<i class="fa-regular fa-file-lines"></i>`
+
+          }</div>
+
+           <div class="meta">
+
+             <b>${f.name}</b>
+
+             <span>${f.type||"file"} • ${humanSize(f.size)}</span>
+
+           </div>`;
 
         fileList.appendChild(item);
 
@@ -428,15 +528,39 @@
 
     };
 
+
+
     fileInput?.addEventListener("change",()=>renderList(fileInput.files));
 
-    ["dragenter","dragover","dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,(ev)=>{ev.preventDefault();ev.stopPropagation();},false));
+
+
+    ["dragenter","dragover","dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,(ev)=>{
+
+      ev.preventDefault(); ev.stopPropagation();
+
+    },false));
+
+
 
     ["dragenter","dragover"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.add("hover"),false));
 
     ["dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.remove("hover"),false));
 
-    dropZone?.addEventListener("drop",(ev)=>{ const dt=ev.dataTransfer; if(dt?.files){ fileInput.files=dt.files; renderList(fileInput.files);} });
+
+
+    dropZone?.addEventListener("drop",(ev)=>{
+
+      const dt=ev.dataTransfer;
+
+      if(dt?.files){
+
+        fileInput.files=dt.files;
+
+        renderList(fileInput.files);
+
+      }
+
+    });
 
 
 
@@ -476,13 +600,21 @@
 
       if(!payload.title||!payload.name||!payload.phone||!payload.email||!payload.address||!payload.description){
 
-        m.textContent="Please fill all required fields."; m.className="hint err"; return;
+        m.textContent="Please fill all required fields.";
+
+        m.className="hint err";
+
+        return;
 
       }
 
 
 
-      m.textContent="Saving to database…"; m.className="hint";
+      m.textContent="Saving to database…";
+
+      m.className="hint";
+
+
 
       try{
 
@@ -490,13 +622,31 @@
 
           method:"POST",
 
-          headers:{"Content-Type":"application/json","Accept":"application/json"},
+          headers:{
+
+            "Content-Type":"application/json",
+
+            "Accept":"application/json"
+
+          },
 
           body:JSON.stringify(payload)
 
         });
 
-        const text=await res.text(); let data; try{ data=JSON.parse(text);}catch{ throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`); }
+
+
+        const text=await res.text();
+
+        let data;
+
+        try{ data=JSON.parse(text);}catch{
+
+          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`);
+
+        }
+
+
 
         if(!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
 
@@ -506,21 +656,31 @@
 
         if(shown){
 
-          m.textContent=`✅ Job posted! Your Job ID: ${shown}`; m.className="hint ok";
+          m.textContent=`✅ Job posted! Your Job ID: ${shown}`;
 
-          const quick=document.getElementById("jobIdQuick"); if(quick) quick.value=shown;
+          m.className="hint ok";
+
+          const quick=document.getElementById("jobIdQuick");
+
+          if(quick) quick.value=shown;
 
         }else{
 
-          m.textContent="✅ Job posted!"; m.className="hint ok";
+          m.textContent="✅ Job posted!";
+
+          m.className="hint ok";
 
         }
+
+
 
         setTimeout(()=>{ m.textContent=""; closeDoor(); },1200);
 
       }catch(e){
 
-        m.textContent="❌ Error: "+(e.message||"network error"); m.className="hint err";
+        m.textContent="❌ Error: "+(e.message||"network error");
+
+        m.className="hint err";
 
       }
 
