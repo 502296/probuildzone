@@ -1,69 +1,105 @@
 // netlify/functions/get-job.js
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 
 
-exports.handler = async (event) => {
+const supabaseUrl = process.env.SUPABASE_URL;
 
-  try {
-
-    const publicId = event.queryStringParameters && event.queryStringParameters.id;
-
-    if (!publicId) {
-
-      return { statusCode: 400, body: JSON.stringify({ error: 'Missing id' }) };
-
-    }
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 
 
-    // مفاتيح Supabase من متغيرات بيئة نتلايفي (لا تكتبها في الكود)
+const supabase = createClient(supabaseUrl, supabaseKey, {
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+  auth: { persistSession: false }
 
-
-
-    // نقرأ السجل من homeowner_jobs باستخدام public_id
-
-    const { data, error } = await supabase
-
-      .from('homeowner_jobs')
-
-      .select('id, public_id, title, name, email, phone, address, summary, created_at')
-
-      .eq('public_id', publicId)
-
-      .maybeSingle();
+});
 
 
 
-    if (error) {
+const headers = {
 
-      console.error('get-job error:', error);
+  'Access-Control-Allow-Origin': '*',
 
-      return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
 
-    }
+  'Access-Control-Allow-Headers': 'Content-Type',
 
-
-
-    if (!data) {
-
-      return { statusCode: 404, body: JSON.stringify({ job: null }) };
-
-    }
+};
 
 
 
-    return { statusCode: 200, body: JSON.stringify({ job: data }) };
+export async function handler(event) {
 
-  } catch (e) {
+  if (event.httpMethod === 'OPTIONS') {
 
-    console.error(e);
-
-    return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
+    return { statusCode: 200, headers, body: '' };
 
   }
 
-};
+
+
+  if (event.httpMethod !== 'GET') {
+
+    return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method not allowed' }) };
+
+  }
+
+
+
+  const publicId = event.queryStringParameters?.id;
+
+
+
+  if (!publicId) {
+
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Missing id' }) };
+
+  }
+
+
+
+  // 👉 نقرأ من homeowner_jobs ونبحث بالـ public_id
+
+  const { data, error } = await supabase
+
+    .from('homeowner_jobs')
+
+    .select('public_id, name, city, state, zip, project_title, short_summary, full_description, created_at')
+
+    .eq('public_id', publicId)
+
+    .maybeSingle();
+
+
+
+  if (error) {
+
+    console.error('get-job error:', error);
+
+    return { statusCode: 500, headers, body: JSON.stringify({ ok: false, error: error.message }) };
+
+  }
+
+
+
+  if (!data) {
+
+    return { statusCode: 404, headers, body: JSON.stringify({ ok: false, error: 'Job not found' }) };
+
+  }
+
+
+
+  return {
+
+    statusCode: 200,
+
+    headers,
+
+    body: JSON.stringify({ ok: true, job: data }),
+
+  };
+
+}
