@@ -382,7 +382,89 @@
 
   })();
 
-  </script>
+  <script>
+
+  const params = new URLSearchParams(window.location.search);
+
+  const publicId = params.get('id');
+
+
+
+  const titleEl = document.querySelector('#job-title');
+
+  const codeEl = document.querySelector('#job-code');
+
+  const locationEl = document.querySelector('#job-location');
+
+  const summaryEl = document.querySelector('#job-summary');
+
+  const descEl = document.querySelector('#job-description');
+
+  const errorEl = document.querySelector('#job-error');
+
+
+
+  async function loadJob() {
+
+    if (!publicId) {
+
+      errorEl.textContent = 'No job id provided.';
+
+      return;
+
+    }
+
+
+
+    try {
+
+      const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(publicId)}`);
+
+      const data = await res.json();
+
+
+
+      if (!data.ok) {
+
+        errorEl.textContent = data.error || 'Job not found.';
+
+        return;
+
+      }
+
+
+
+      const job = data.job;
+
+
+
+      titleEl.textContent = job.project_title || 'Home Project';
+
+      codeEl.textContent = `Project Code: ${job.public_id}`;
+
+      locationEl.textContent = `${job.city || ''}, ${job.state || ''} ${job.zip || ''}`;
+
+      summaryEl.textContent = job.short_summary || '';
+
+      descEl.textContent = job.full_description || '';
+
+      errorEl.textContent = '';
+
+    } catch (err) {
+
+      console.error(err);
+
+      errorEl.textContent = 'Error loading job.';
+
+    }
+
+  }
+
+
+
+  loadJob();
+
+</script>
 
 </body>
 
