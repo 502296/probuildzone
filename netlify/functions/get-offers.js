@@ -4,84 +4,130 @@ const { createClient } = require('@supabase/supabase-js');
 
 
 
-exports.handler = async (event) => {
+const supabaseUrl =
 
-  try {
+  process.env.SUPABASE_URL || process.env.SUPABASE_URL_PUBLIC;
 
-    const publicId = (event.queryStringParameters && event.queryStringParameters.id) || '';
+const supabaseKey =
 
-    if (!publicId) return resp(400, { error: 'Missing id' });
-
-
-
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 
 
-    // نحول public_id -> UUID للوظيفة
+const supabase = createClient(supabaseUrl, supabaseKey, {
 
-    const { data: job, error: jobErr } = await supabase
+  auth: { persistSession: false },
 
-      .from('homeowner_jobs')
-
-      .select('id')
-
-      .eq('public_id', publicId)
-
-      .maybeSingle();
-
-    if (jobErr) throw jobErr;
-
-    if (!job) return resp(404, { error: 'Job not found' });
+});
 
 
 
-    const { data: offers, error: offersErr } = await supabase
+const headers = {
 
-      .from('job_offers')
+  'Access-Control-Allow-Origin': '*',
 
-      .select('id, amount, message, pro_name, phone, status, created_at')
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
 
-      .eq('job_id', job.id)
-
-      .order('created_at', { ascending: false });
-
-    if (offersErr) throw offersErr;
-
-
-
-    return resp(200, { offers: offers || [] });
-
-  } catch (e) {
-
-    console.error(e);
-
-    return resp(500, { error: e.message || 'Server error' });
-
-  }
+  'Access-Control-Allow-Headers': 'Content-Type',
 
 };
 
 
 
-function resp(statusCode, body) {
+exports.handler = async (event) => {
+
+  if (event.httpMethod === 'OPTIONS') {
+
+    return { statusCode: 200, headers, body: '' };
+
+  }
+
+
+
+  if (event.httpMethod !== 'GET') {
+
+    return {
+
+      statusCode: 405,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+
+    };
+
+  }
+
+
+
+  const publicId = event.queryStringParameters
+
+    ? event.queryStringParameters.id
+
+    : null;
+
+
+
+  if (!publicId) {
+
+    return {
+
+      statusCode: 400,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Missing id' }),
+
+    };
+
+  }
+
+
+
+  // 👇 نقرأ من job_offers بالأعمدة الموجودة فعلياً في الجدول
+
+  const { data, error } = await supabase
+
+    .from('job_offers')
+
+    .select(
+
+      'id, job_public_id, business_name, amount, message, phone, status, created_at'
+
+    )
+
+    .eq('job_public_id', publicId)
+
+    .order('created_at', { ascending: false });
+
+
+
+  if (error) {
+
+    console.error('get-offers error:', error);
+
+    return {
+
+      statusCode: 500,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: error.message }),
+
+    };
+
+  }
+
+
 
   return {
 
-    statusCode,
+    statusCode: 200,
 
-    headers: {
+    headers,
 
-      'Content-Type': 'application/json',
-
-      'Access-Control-Allow-Origin': '*',
-
-      'Cache-Control': 'no-store',
-
-    },
-
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ok: true, offers: data || [] }),
 
   };
 
-}
+};
