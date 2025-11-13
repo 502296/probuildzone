@@ -44,23 +44,87 @@
 
     *{box-sizing:border-box}
 
-    html,body{margin:0;padding:0;background:var(--bg);font-family:Inter,system-ui,Arial,sans-serif;color:var(--ink)}
+    html,body{
+
+      margin:0;
+
+      padding:0;
+
+      background:var(--bg);
+
+      font-family:Inter,system-ui,Arial,sans-serif;
+
+      color:var(--ink);
+
+    }
 
     .wrap{max-width:980px;margin:28px auto;padding:0 16px}
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:22px 20px;box-shadow:0 10px 24px rgba(15,42,67,0.06)}
+    .card{
 
-    h1{margin:0 0 18px;font-size:40px;letter-spacing:-0.5px}
+      background:var(--card);
 
-    .grid{display:grid;grid-template-columns:1fr 2fr;gap:8px 16px}
+      border:1px solid var(--border);
+
+      border-radius:24px;
+
+      padding:22px 20px;
+
+      box-shadow:0 10px 24px rgba(15,42,67,0.06);
+
+    }
+
+    h1{
+
+      margin:0 0 18px;
+
+      font-size:40px;
+
+      letter-spacing:-0.5px;
+
+    }
+
+    .grid{
+
+      display:grid;
+
+      grid-template-columns:1fr 2fr;
+
+      gap:8px 16px;
+
+    }
 
     .k{color:var(--muted);font-weight:600}
 
     .v a{color:#0a58ca;text-decoration:none}
 
-    .btns{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+    .btns{
 
-    .btn{appearance:none;border:none;cursor:pointer;padding:12px 18px;border-radius:12px;font-weight:700}
+      display:flex;
+
+      gap:12px;
+
+      margin-top:18px;
+
+      flex-wrap:wrap;
+
+    }
+
+    .btn{
+
+      appearance:none;
+
+      border:none;
+
+      cursor:pointer;
+
+      padding:12px 18px;
+
+      border-radius:12px;
+
+      font-weight:700;
+
+    }
 
     .btn.primary{background:var(--blue);color:#fff}
 
@@ -68,7 +132,15 @@
 
     .btn.primary:hover{background:var(--blue-700)}
 
-    .btn.white{background:#fff;border:1px solid var(--border);color:var(--ink)}
+    .btn.white{
+
+      background:#fff;
+
+      border:1px solid var(--border);
+
+      color:var(--ink);
+
+    }
 
     h2{margin:26px 0 12px}
 
@@ -76,9 +148,33 @@
 
     .error{color:var(--err)}
 
-    .offer-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:12px}
+    .offer-card{
 
-    .badge{font-size:12px;padding:2px 8px;border-radius:10px;background:#eef4ff;margin-left:6px}
+      background:#fff;
+
+      border:1px solid var(--border);
+
+      border-radius:12px;
+
+      padding:14px 16px;
+
+      margin-top:12px;
+
+    }
+
+    .badge{
+
+      font-size:12px;
+
+      padding:2px 8px;
+
+      border-radius:10px;
+
+      background:#eef4ff;
+
+      margin-left:6px;
+
+    }
 
     @media (max-width:640px){
 
@@ -150,77 +246,47 @@
 
   <script>
 
-  (async () => {
+    (async () => {
 
-    const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(location.search);
 
-    const publicId = params.get('id');
-
-
-
-    const jobBox = document.getElementById('jobBox');
-
-    const jobError = document.getElementById('jobError');
+      const publicId = params.get('id');
 
 
 
-    const v_id = document.getElementById('v_id');
+      const jobBox    = document.getElementById('jobBox');
 
-    const v_title = document.getElementById('v_title');
+      const jobError  = document.getElementById('jobError');
 
-    const v_name = document.getElementById('v_name');
+      const v_id      = document.getElementById('v_id');
 
-    const v_email = document.getElementById('v_email');
+      const v_title   = document.getElementById('v_title');
 
-    const v_phone = document.getElementById('v_phone');
+      const v_name    = document.getElementById('v_name');
 
-    const v_address = document.getElementById('v_address');
+      const v_email   = document.getElementById('v_email');
 
-    const v_summary = document.getElementById('v_summary');
+      const v_phone   = document.getElementById('v_phone');
 
+      const v_address = document.getElementById('v_address');
 
-
-    const offerLink = document.getElementById('offerLink');
-
-    const offersBox = document.getElementById('offersBox');
-
-    const offersError = document.getElementById('offersError');
+      const v_summary = document.getElementById('v_summary');
 
 
 
-    if (!publicId) {
+      const offerLink  = document.getElementById('offerLink');
 
-      jobError.textContent = "Job not found.";
+      const offersBox  = document.getElementById('offersBox');
 
-      offersBox.textContent = "Couldn't load offers.";
-
-      return;
-
-    }
+      const offersError = document.getElementById('offersError');
 
 
 
-    // رابط صفحة تقديم العرض
+      if (!publicId) {
 
-    offerLink.href = `/pro-offer.html?id=${encodeURIComponent(publicId)}`;
+        jobError.textContent = "Job not found.";
 
-
-
-    try {
-
-      // 1) جلب تفاصيل الجوب
-
-      const jobRes = await fetch(`/api/get-job?id=${encodeURIComponent(publicId)}`);
-
-      const jobJson = await jobRes.json();
-
-
-
-      if (!jobRes.ok || !jobJson.job) {
-
-        jobError.textContent = jobJson.error || "Job not found.";
-
-        offersBox.textContent = "No offers yet.";
+        offersBox.textContent = "Couldn't load offers.";
 
         return;
 
@@ -228,243 +294,227 @@
 
 
 
-      const j = jobJson.job;
+      // link to pro offer page
 
-      jobBox.style.display = "";
+      offerLink.href = `/pro-offer.html?id=${encodeURIComponent(publicId)}`;
 
-      v_id.textContent = j.public_id || publicId;
 
-      v_title.textContent = j.title || "—";
 
-      v_name.textContent = j.name || "—";
+      try {
 
-      v_email.innerHTML = j.email ? `<a href="mailto:${j.email}">${j.email}</a>` : "—";
+        // 1) get job details from Netlify function
 
-      v_phone.innerHTML = j.phone ? `<a href="tel:${j.phone}">${j.phone}</a>` : "—";
+        const jobRes  = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(publicId)}`);
 
-      v_address.textContent = j.address || "—";
+        const jobJson = await jobRes.json();
 
-      v_summary.textContent = j.summary || "—";
 
 
+        if (!jobRes.ok || !jobJson.ok || !jobJson.job) {
 
-      // 2) جلب العروض
+          jobError.textContent = jobJson.error || "Job not found.";
 
-      const offRes = await fetch(`/api/get-offers?id=${encodeURIComponent(publicId)}`);
+          offersBox.textContent = "No offers yet.";
 
-      const offJson = await offRes.json();
+          return;
 
+        }
 
 
-      if (!offRes.ok) {
 
-        offersError.textContent = offJson.error || "Couldn't load offers.";
+        const j = jobJson.job;
 
-        offersBox.textContent = "";
 
-        return;
 
-      }
+        jobBox.style.display = "";
 
 
 
-      offersBox.innerHTML = "";
+        v_id.textContent    = j.public_id || publicId;
 
-      if (!offJson.offers || offJson.offers.length === 0) {
+        v_title.textContent = j.title || j.project_title || j.category || "—";
 
-        offersBox.innerHTML = `<p class="muted" style="margin:0">No offers yet.</p>`;
+        v_name.textContent  = j.name || j.full_name || "—";
 
-        return;
 
-      }
 
+        const email = j.email;
 
+        const phone = j.phone;
 
-      offJson.offers.forEach(o => {
 
-        const amount = (o.amount != null) ? `$${Number(o.amount).toLocaleString()}` : "$—";
 
-        const phone = o.phone ? ` • ${o.phone}` : "";
+        v_email.innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "—";
 
-        const statusBadge = `<span class="badge">${o.status}</span>`;
+        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`   : "—";
 
 
 
-        const div = document.createElement('div');
+        const addr =
 
-        div.className = 'offer-card';
+          j.address ||
 
-        div.innerHTML = `
+          j.full_address ||
 
-          <div style="font-weight:700;margin-bottom:4px">
+          [j.city, j.state, j.zip].filter(Boolean).join(", ");
 
-            ${o.business_name} — ${amount} ${statusBadge}
 
-          </div>
 
-          <div style="color:#334155;white-space:pre-wrap">${o.message || ""}</div>
+        v_address.textContent = addr || "—";
 
-          <div style="color:#6b7a8c;margin-top:6px">${new Date(o.created_at).toLocaleString()}${phone}</div>
 
-          <div style="margin-top:10px">
 
-            <button data-id="${o.id}" class="accept-btn btn primary" style="padding:8px 12px">Accept</button>
+        const summary = j.summary || j.short_summary || j.full_description;
 
-          </div>
+        v_summary.textContent = summary || "—";
 
-        `;
 
-        offersBox.appendChild(div);
 
-      });
+        // 2) get offers (نترك نفس مسار /api إذا كان شغال عندك)
 
+        const offRes  = await fetch(`/api/get-offers?id=${encodeURIComponent(publicId)}`);
 
+        const offJson = await offRes.json();
 
-      // 3) حدث زر القبول
 
-      offersBox.addEventListener('click', async (e) => {
 
-        const btn = e.target.closest('.accept-btn');
+        offersBox.innerHTML = "";
 
-        if (!btn) return;
+        if (!offRes.ok) {
 
-        btn.disabled = true;
+          offersError.textContent = offJson.error || "Couldn't load offers.";
 
-        try {
+          return;
 
-          const offerId = btn.getAttribute('data-id');
+        }
 
-          const res = await fetch('/api/accept-offer', {
 
-            method: 'POST',
 
-            headers: { 'Content-Type': 'application/json' },
+        if (!offJson.offers || offJson.offers.length === 0) {
 
-            body: JSON.stringify({ offer_id: offerId })
+          offersBox.innerHTML = `<p class="muted" style="margin:0">No offers yet.</p>`;
 
-          });
+          return;
 
-          if (res.ok) {
+        }
 
-            location.reload();
 
-          } else {
 
-            const err = await res.text();
+        offJson.offers.forEach(o => {
 
-            alert('Failed to accept offer: ' + err);
+          const amount = (o.amount != null) ? `$${Number(o.amount).toLocaleString()}` : "$—";
+
+          const phoneLine = o.phone ? ` • ${o.phone}` : "";
+
+          const statusBadge = `<span class="badge">${o.status}</span>`;
+
+
+
+          const div = document.createElement('div');
+
+          div.className = 'offer-card';
+
+          div.innerHTML = `
+
+            <div style="font-weight:700;margin-bottom:4px">
+
+              ${o.business_name} — ${amount} ${statusBadge}
+
+            </div>
+
+            <div style="color:#334155;white-space:pre-wrap">${o.message || ""}</div>
+
+            <div style="color:#6b7a8c;margin-top:6px">
+
+              ${new Date(o.created_at).toLocaleString()}${phoneLine}
+
+            </div>
+
+            <div style="margin-top:10px">
+
+              <button data-id="${o.id}" class="accept-btn btn primary" style="padding:8px 12px">
+
+                Accept
+
+              </button>
+
+            </div>
+
+          `;
+
+          offersBox.appendChild(div);
+
+        });
+
+
+
+        // 3) accept offer handler
+
+        offersBox.addEventListener('click', async (e) => {
+
+          const btn = e.target.closest('.accept-btn');
+
+          if (!btn) return;
+
+
+
+          btn.disabled = true;
+
+          try {
+
+            const offerId = btn.getAttribute('data-id');
+
+            const res = await fetch('/api/accept-offer', {
+
+              method: 'POST',
+
+              headers: { 'Content-Type': 'application/json' },
+
+              body: JSON.stringify({ offer_id: offerId }),
+
+            });
+
+
+
+            if (res.ok) {
+
+              location.reload();
+
+            } else {
+
+              const errText = await res.text();
+
+              alert('Failed to accept offer: ' + errText);
+
+              btn.disabled = false;
+
+            }
+
+          } catch (err) {
+
+            console.error(err);
+
+            alert('Failed to accept offer.');
 
             btn.disabled = false;
 
           }
 
-        } catch (err) {
+        });
 
-          alert('Failed to accept offer.');
+      } catch (err) {
 
-          btn.disabled = false;
+        console.error(err);
 
-        }
+        jobError.textContent   = "Job not found.";
 
-      });
-
-
-
-    } catch (err) {
-
-      console.error(err);
-
-      jobError.textContent = "Job not found.";
-
-      offersError.textContent = "Couldn't load offers.";
-
-    }
-
-  })();
-
-  <script>
-
-  const params = new URLSearchParams(window.location.search);
-
-  const publicId = params.get('id');
-
-
-
-  const titleEl = document.querySelector('#job-title');
-
-  const codeEl = document.querySelector('#job-code');
-
-  const locationEl = document.querySelector('#job-location');
-
-  const summaryEl = document.querySelector('#job-summary');
-
-  const descEl = document.querySelector('#job-description');
-
-  const errorEl = document.querySelector('#job-error');
-
-
-
-  async function loadJob() {
-
-    if (!publicId) {
-
-      errorEl.textContent = 'No job id provided.';
-
-      return;
-
-    }
-
-
-
-    try {
-
-      const res = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(publicId)}`);
-
-      const data = await res.json();
-
-
-
-      if (!data.ok) {
-
-        errorEl.textContent = data.error || 'Job not found.';
-
-        return;
+        offersError.textContent = "Couldn't load offers.";
 
       }
 
+    })();
 
-
-      const job = data.job;
-
-
-
-      titleEl.textContent = job.project_title || 'Home Project';
-
-      codeEl.textContent = `Project Code: ${job.public_id}`;
-
-      locationEl.textContent = `${job.city || ''}, ${job.state || ''} ${job.zip || ''}`;
-
-      summaryEl.textContent = job.short_summary || '';
-
-      descEl.textContent = job.full_description || '';
-
-      errorEl.textContent = '';
-
-    } catch (err) {
-
-      console.error(err);
-
-      errorEl.textContent = 'Error loading job.';
-
-    }
-
-  }
-
-
-
-  loadJob();
-
-</script>
+  </script>
 
 </body>
 
