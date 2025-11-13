@@ -1,18 +1,20 @@
 // netlify/functions/get-job.js
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 
 
 const supabaseUrl = process.env.SUPABASE_URL;
 
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseKey =
+
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 
 
 const supabase = createClient(supabaseUrl, supabaseKey, {
 
-  auth: { persistSession: false }
+  auth: { persistSession: false },
 
 });
 
@@ -30,7 +32,7 @@ const headers = {
 
 
 
-export async function handler(event) {
+exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') {
 
@@ -42,31 +44,55 @@ export async function handler(event) {
 
   if (event.httpMethod !== 'GET') {
 
-    return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method not allowed' }) };
+    return {
+
+      statusCode: 405,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+
+    };
 
   }
 
 
 
-  const publicId = event.queryStringParameters?.id;
+  const publicId = event.queryStringParameters
+
+    ? event.queryStringParameters.id
+
+    : null;
 
 
 
   if (!publicId) {
 
-    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Missing id' }) };
+    return {
+
+      statusCode: 400,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Missing id' }),
+
+    };
 
   }
 
 
 
-  // 👉 نقرأ من homeowner_jobs ونبحث بالـ public_id
+  // 👇 مهم: نقرأ من homeowner_jobs ونبحث بـ public_id
 
   const { data, error } = await supabase
 
     .from('homeowner_jobs')
 
-    .select('public_id, name, city, state, zip, project_title, short_summary, full_description, created_at')
+    .select(
+
+      'public_id, name, city, state, zip, project_title, short_summary, full_description, created_at'
+
+    )
 
     .eq('public_id', publicId)
 
@@ -78,7 +104,15 @@ export async function handler(event) {
 
     console.error('get-job error:', error);
 
-    return { statusCode: 500, headers, body: JSON.stringify({ ok: false, error: error.message }) };
+    return {
+
+      statusCode: 500,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: error.message }),
+
+    };
 
   }
 
@@ -86,7 +120,15 @@ export async function handler(event) {
 
   if (!data) {
 
-    return { statusCode: 404, headers, body: JSON.stringify({ ok: false, error: 'Job not found' }) };
+    return {
+
+      statusCode: 404,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Job not found' }),
+
+    };
 
   }
 
@@ -102,4 +144,4 @@ export async function handler(event) {
 
   };
 
-}
+};
