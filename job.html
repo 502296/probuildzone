@@ -204,19 +204,19 @@
 
       <div id="jobBox" class="grid" style="display:none">
 
-        <div class="k">Job ID:</div>      <div class="v" id="v_id"></div>
+        <div class="k">Job ID:</div>       <div class="v" id="v_id"></div>
 
-        <div class="k">Title:</div>       <div class="v" id="v_title"></div>
+        <div class="k">Title:</div>        <div class="v" id="v_title"></div>
 
-        <div class="k">Name:</div>        <div class="v" id="v_name"></div>
+        <div class="k">Name:</div>         <div class="v" id="v_name"></div>
 
-        <div class="k">Email:</div>       <div class="v" id="v_email"></div>
+        <div class="k">Email:</div>        <div class="v" id="v_email"></div>
 
-        <div class="k">Phone:</div>       <div class="v" id="v_phone"></div>
+        <div class="k">Phone:</div>        <div class="v" id="v_phone"></div>
 
-        <div class="k">Address:</div>     <div class="v" id="v_address"></div>
+        <div class="k">Address:</div>      <div class="v" id="v_address"></div>
 
-        <div class="k">Description:</div> <div class="v" id="v_summary"></div>
+        <div class="k">Description:</div>  <div class="v" id="v_summary"></div>
 
       </div>
 
@@ -248,35 +248,51 @@
 
     (async () => {
 
+      // نقرأ الـ id من أكثر من اسم باراميتر + نزيل الفراغات
+
       const params = new URLSearchParams(location.search);
 
-      const publicId = params.get('id');
+      const rawId =
+
+        params.get('id') ||
+
+        params.get('jobId') ||
+
+        params.get('job') ||
+
+        params.get('code') ||
+
+        params.get('public_id');
 
 
 
-      const jobBox    = document.getElementById('jobBox');
-
-      const jobError  = document.getElementById('jobError');
-
-      const v_id      = document.getElementById('v_id');
-
-      const v_title   = document.getElementById('v_title');
-
-      const v_name    = document.getElementById('v_name');
-
-      const v_email   = document.getElementById('v_email');
-
-      const v_phone   = document.getElementById('v_phone');
-
-      const v_address = document.getElementById('v_address');
-
-      const v_summary = document.getElementById('v_summary');
+      const publicId = rawId ? rawId.trim().toUpperCase() : null;
 
 
 
-      const offerLink  = document.getElementById('offerLink');
+      const jobBox      = document.getElementById('jobBox');
 
-      const offersBox  = document.getElementById('offersBox');
+      const jobError    = document.getElementById('jobError');
+
+      const v_id        = document.getElementById('v_id');
+
+      const v_title     = document.getElementById('v_title');
+
+      const v_name      = document.getElementById('v_name');
+
+      const v_email     = document.getElementById('v_email');
+
+      const v_phone     = document.getElementById('v_phone');
+
+      const v_address   = document.getElementById('v_address');
+
+      const v_summary   = document.getElementById('v_summary');
+
+
+
+      const offerLink   = document.getElementById('offerLink');
+
+      const offersBox   = document.getElementById('offersBox');
 
       const offersError = document.getElementById('offersError');
 
@@ -286,7 +302,7 @@
 
         jobError.textContent = "Job not found.";
 
-        offersBox.textContent = "Couldn't load offers.";
+        offersBox.textContent = "No offers yet.";
 
         return;
 
@@ -294,7 +310,7 @@
 
 
 
-      // link to pro offer page
+      // رابط صفحة عرض الـ Pro
 
       offerLink.href = `/pro-offer.html?id=${encodeURIComponent(publicId)}`;
 
@@ -302,7 +318,7 @@
 
       try {
 
-        // 1) get job details from Netlify function
+        // 1) جلب تفاصيل الجوب من Netlify Function
 
         const jobRes  = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(publicId)}`);
 
@@ -346,7 +362,7 @@
 
         v_email.innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "—";
 
-        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`   : "—";
+        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`     : "—";
 
 
 
@@ -370,7 +386,7 @@
 
 
 
-        // 2) get offers (نترك نفس مسار /api إذا كان شغال عندك)
+        // 2) جلب العروض
 
         const offRes  = await fetch(`/api/get-offers?id=${encodeURIComponent(publicId)}`);
 
@@ -379,6 +395,8 @@
 
 
         offersBox.innerHTML = "";
+
+
 
         if (!offRes.ok) {
 
@@ -448,7 +466,7 @@
 
 
 
-        // 3) accept offer handler
+        // 3) حدث زر قبول العرض
 
         offersBox.addEventListener('click', async (e) => {
 
@@ -506,7 +524,7 @@
 
         console.error(err);
 
-        jobError.textContent   = "Job not found.";
+        jobError.textContent    = "Job not found.";
 
         offersError.textContent = "Couldn't load offers.";
 
