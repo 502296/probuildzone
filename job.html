@@ -348,21 +348,9 @@
 
         v_id.textContent    = j.public_id || publicId;
 
-        const jobTitle =
+        v_title.textContent = j.title || j.project_title || j.category || "—";
 
-          j.title ||
-
-          j.project_title ||
-
-          j.category ||
-
-          "";
-
-        v_title.textContent = jobTitle || "—";
-
-        const homeownerName = j.name || j.full_name || "Homeowner";
-
-        v_name.textContent  = homeownerName;
+        v_name.textContent  = j.name || j.full_name || "—";
 
 
 
@@ -374,7 +362,7 @@
 
         v_email.innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "—";
 
-        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`   : "—";
+        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`     : "—";
 
 
 
@@ -438,7 +426,7 @@
 
           const phoneLine = o.phone ? ` • ${o.phone}` : "";
 
-          const statusBadge = `<span class="badge">${o.status}</span>`;
+          const isAccepted = (o.status === 'accepted');
 
 
 
@@ -446,11 +434,23 @@
 
           div.className = 'offer-card';
 
+
+
           div.innerHTML = `
 
             <div style="font-weight:700;margin-bottom:4px">
 
-              ${o.business_name} — ${amount} ${statusBadge}
+              ${o.business_name} — ${amount}
+
+              <span class="badge" style="${isAccepted
+
+                ? 'background:#d1fae5;color:#065f46;'
+
+                : 'background:#eef4ff;'}">
+
+                ${o.status}
+
+              </span>
 
             </div>
 
@@ -476,11 +476,13 @@
 
                 class="accept-btn btn primary"
 
-                style="padding:8px 12px"
+                style="padding:8px 12px;${isAccepted ? 'background:#9ca3af;cursor:not-allowed;' : ''}"
+
+                ${isAccepted ? 'disabled' : ''}
 
               >
 
-                Accept
+                ${isAccepted ? 'Accepted' : 'Accept'}
 
               </button>
 
@@ -494,7 +496,7 @@
 
 
 
-        // 3) حدث زر قبول العرض + إرسال الإيميل مع كل معلومات الـ homeowner
+        // 3) حدث زر قبول العرض + إرسال الإيميل
 
         offersBox.addEventListener('click', async (e) => {
 
@@ -504,19 +506,31 @@
 
 
 
+          // لو أصلاً accepted لا نكرر الطلب
+
+          if (btn.disabled && btn.textContent.trim() === 'Accepted') {
+
+            return;
+
+          }
+
+
+
           btn.disabled = true;
 
 
 
-          const offerId    = btn.getAttribute('data-id');
+          const offerId   = btn.getAttribute('data-id');
 
-          const proEmail   = btn.getAttribute('data-email');
+          const proEmail  = btn.getAttribute('data-email');
 
-          const proName    = btn.getAttribute('data-pro-name') || 'Pro';
+          const proName   = btn.getAttribute('data-pro-name') || 'Pro';
 
-          const amountVal  = btn.getAttribute('data-amount');
+          const amountVal = btn.getAttribute('data-amount');
 
 
+
+          const homeownerName = j.name || j.full_name || 'Homeowner';
 
           const jobIdForEmail = j.public_id || publicId;
 
@@ -524,7 +538,7 @@
 
           try {
 
-            // 3a) تحديث حالة العرض في الـ API
+            // 3a) تحديث حالة العرض في Supabase عبر API
 
             const res = await fetch('/api/accept-offer', {
 
@@ -538,11 +552,13 @@
 
 
 
-            if (!res.ok) {
+            const resJson = await res.json().catch(() => ({}));
 
-              const errText = await res.text();
 
-              alert('Failed to accept offer: ' + errText);
+
+            if (!res.ok || resJson.ok === false) {
+
+              alert('Failed to accept offer: ' + (resJson.error || 'Unknown error'));
 
               btn.disabled = false;
 
@@ -552,11 +568,37 @@
 
 
 
-            // 3b) إرسال إيميل للباني عبر Resend (Netlify Function)
+            // 3b) تحديث الـ UI مباشرة
+
+            const card  = btn.closest('.offer-card');
+
+            const badge = card ? card.querySelector('.badge') : null;
+
+            if (badge) {
+
+              badge.textContent = 'accepted';
+
+              badge.style.background = '#d1fae5';
+
+              badge.style.color = '#065f46';
+
+            }
+
+            btn.textContent = 'Accepted';
+
+            btn.style.background = '#9ca3af';
+
+            btn.style.cursor = 'not-allowed';
+
+            btn.disabled = true;
+
+
+
+            // 3c) إرسال إيميل للبرو (لو عندنا إيميله)
 
             if (proEmail) {
 
-              await fetch('/.netlify/functions/send-accept-email', {
+              const mailRes = await fetch('/.netlify/functions/send-accept-email', {
 
                 method: 'POST',
 
@@ -572,27 +614,29 @@
 
                   jobId: jobIdForEmail,
 
-                  offerAmount: amountVal,
-
-                  homeownerEmail: email || '',
-
-                  homeownerPhone: phone || '',
-
-                  homeownerAddress: addr || '',
-
-                  jobTitle: jobTitle || '',
+                  offerAmount: amountVal
 
                 })
 
               });
+
+
+
+              if (!mailRes.ok) {
+
+                const txt = await mailRes.text().catch(() => '');
+
+                alert('Offer accepted, but email could not be sent automatically. Please contact the pro manually.\n\nDetails: ' + txt);
+
+                return;
+
+              }
 
             }
 
 
 
             alert('Offer accepted successfully.');
-
-            location.reload();
 
 
 
