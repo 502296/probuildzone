@@ -1,12 +1,8 @@
-// netlify/functions/get-offers.js
-
 const { createClient } = require('@supabase/supabase-js');
 
 
 
-const supabaseUrl =
-
-  process.env.SUPABASE_URL || process.env.SUPABASE_URL_PUBLIC;
+const supabaseUrl = process.env.SUPABASE_URL;
 
 const supabaseKey =
 
@@ -60,13 +56,7 @@ exports.handler = async (event) => {
 
 
 
-  const publicId = event.queryStringParameters
-
-    ? event.queryStringParameters.id
-
-    : null;
-
-
+  const publicId = event.queryStringParameters?.id || null;
 
   if (!publicId) {
 
@@ -84,27 +74,21 @@ exports.handler = async (event) => {
 
 
 
-  // 👇 نقرأ من job_offers بالأعمدة الموجودة فعلياً في الجدول
+  // 1) نحصل UUID للجوب عبر public_id
 
-  const { data, error } = await supabase
+  const { data: jobRow, error: jobErr } = await supabase
 
-    .from('job_offers')
+    .from('homeowner_jobs')
 
-    .select(
+    .select('id')
 
-      'id, job_public_id, business_name, amount, message, phone, status, created_at'
+    .eq('public_id', publicId)
 
-    )
-
-    .eq('job_public_id', publicId)
-
-    .order('created_at', { ascending: false });
+    .maybeSingle();
 
 
 
-  if (error) {
-
-    console.error('get-offers error:', error);
+  if (jobErr) {
 
     return {
 
@@ -112,7 +96,57 @@ exports.handler = async (event) => {
 
       headers,
 
-      body: JSON.stringify({ ok: false, error: error.message }),
+      body: JSON.stringify({ ok: false, error: jobErr.message }),
+
+    };
+
+  }
+
+
+
+  if (!jobRow) {
+
+    return {
+
+      statusCode: 404,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: 'Job not found' }),
+
+    };
+
+  }
+
+
+
+  const jobUUID = jobRow.id;
+
+
+
+  // 2) الآن نجلب العروض التي لها job_id = هذا الـUUID
+
+  const { data: offers, error: offErr } = await supabase
+
+    .from('job_offers')
+
+    .select('id, pro_id, amount, message, created_at')
+
+    .eq('job_id', jobUUID)
+
+    .order('created_at', { ascending: false });
+
+
+
+  if (offErr) {
+
+    return {
+
+      statusCode: 500,
+
+      headers,
+
+      body: JSON.stringify({ ok: false, error: offErr.message }),
 
     };
 
@@ -126,7 +160,7 @@ exports.handler = async (event) => {
 
     headers,
 
-    body: JSON.stringify({ ok: true, offers: data || [] }),
+    body: JSON.stringify({ ok: true, offers }),
 
   };
 
