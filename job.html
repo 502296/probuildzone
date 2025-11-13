@@ -348,9 +348,21 @@
 
         v_id.textContent    = j.public_id || publicId;
 
-        v_title.textContent = j.title || j.project_title || j.category || "—";
+        const jobTitle =
 
-        v_name.textContent  = j.name || j.full_name || "—";
+          j.title ||
+
+          j.project_title ||
+
+          j.category ||
+
+          "";
+
+        v_title.textContent = jobTitle || "—";
+
+        const homeownerName = j.name || j.full_name || "Homeowner";
+
+        v_name.textContent  = homeownerName;
 
 
 
@@ -362,7 +374,7 @@
 
         v_email.innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "—";
 
-        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`     : "—";
+        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`   : "—";
 
 
 
@@ -482,7 +494,7 @@
 
 
 
-        // 3) حدث زر قبول العرض + إرسال الإيميل
+        // 3) حدث زر قبول العرض + إرسال الإيميل مع كل معلومات الـ homeowner
 
         offersBox.addEventListener('click', async (e) => {
 
@@ -496,17 +508,15 @@
 
 
 
-          const offerId   = btn.getAttribute('data-id');
+          const offerId    = btn.getAttribute('data-id');
 
-          const proEmail  = btn.getAttribute('data-email');
+          const proEmail   = btn.getAttribute('data-email');
 
-          const proName   = btn.getAttribute('data-pro-name') || 'Pro';
+          const proName    = btn.getAttribute('data-pro-name') || 'Pro';
 
-          const amountVal = btn.getAttribute('data-amount');
+          const amountVal  = btn.getAttribute('data-amount');
 
 
-
-          const homeownerName = j.name || j.full_name || 'Homeowner';
 
           const jobIdForEmail = j.public_id || publicId;
 
@@ -514,7 +524,7 @@
 
           try {
 
-            // 3a) تحديث حالة العرض في API الأصلي
+            // 3a) تحديث حالة العرض في الـ API
 
             const res = await fetch('/api/accept-offer', {
 
@@ -542,7 +552,7 @@
 
 
 
-            // 3b) إرسال إيميل للباني عن طريق Netlify Function + Resend
+            // 3b) إرسال إيميل للباني عبر Resend (Netlify Function)
 
             if (proEmail) {
 
@@ -562,7 +572,15 @@
 
                   jobId: jobIdForEmail,
 
-                  offerAmount: amountVal
+                  offerAmount: amountVal,
+
+                  homeownerEmail: email || '',
+
+                  homeownerPhone: phone || '',
+
+                  homeownerAddress: addr || '',
+
+                  jobTitle: jobTitle || '',
 
                 })
 
@@ -589,6 +607,8 @@
           }
 
         });
+
+
 
       } catch (err) {
 
