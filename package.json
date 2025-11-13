@@ -16,13 +16,19 @@
 
   },
 
-  "engines": { "node": ">=18" },
+  "engines": {
+
+    "node": ">=18"
+
+  },
 
   "dependencies": {
 
     "stripe": "^16.0.0",
 
-    "@supabase/supabase-js": "^2.48.0"
+    "@supabase/supabase-js": "^2.48.0",
+
+    "resend": "^4.0.0"
 
   }
 
