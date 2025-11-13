@@ -1,8 +1,16 @@
+// netlify/functions/get-offers.js
+
+
+
 const { createClient } = require('@supabase/supabase-js');
 
 
 
-const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl =
+
+  process.env.SUPABASE_URL;
+
+
 
 const supabaseKey =
 
@@ -32,6 +40,8 @@ const headers = {
 
 exports.handler = async (event) => {
 
+  // CORS preflight
+
   if (event.httpMethod === 'OPTIONS') {
 
     return { statusCode: 200, headers, body: '' };
@@ -56,7 +66,13 @@ exports.handler = async (event) => {
 
 
 
-  const publicId = event.queryStringParameters?.id || null;
+  const publicId = event.queryStringParameters
+
+    ? event.queryStringParameters.id
+
+    : null;
+
+
 
   if (!publicId) {
 
@@ -74,21 +90,111 @@ exports.handler = async (event) => {
 
 
 
-  // 1) نحصل UUID للجوب عبر public_id
+  try {
 
-  const { data: jobRow, error: jobErr } = await supabase
+    // 1) نجيب الـ UUID الداخلي للـ job من homeowner_jobs
 
-    .from('homeowner_jobs')
+    const { data: jobRow, error: jobError } = await supabase
 
-    .select('id')
+      .from('homeowner_jobs')
 
-    .eq('public_id', publicId)
+      .select('id')
 
-    .maybeSingle();
+      .eq('public_id', publicId)
+
+      .maybeSingle();
 
 
 
-  if (jobErr) {
+    if (jobError) {
+
+      console.error('get-offers job lookup error:', jobError);
+
+      return {
+
+        statusCode: 500,
+
+        headers,
+
+        body: JSON.stringify({ ok: false, error: jobError.message }),
+
+      };
+
+    }
+
+
+
+    if (!jobRow) {
+
+      // لا يوجد job بهذا الـ public_id
+
+      return {
+
+        statusCode: 200,
+
+        headers,
+
+        body: JSON.stringify({ ok: true, offers: [] }),
+
+      };
+
+    }
+
+
+
+    const jobUuid = jobRow.id;
+
+
+
+    // 2) نجيب العروض من جدول pro_offers على أساس job_id (UUID)
+
+    const { data: offers, error: offersError } = await supabase
+
+      .from('pro_offers')
+
+      .select(
+
+        'id, business_name, pro_name, phone, email, amount, city, message, status, created_at'
+
+      )
+
+      .eq('job_id', jobUuid)
+
+      .order('created_at', { ascending: true });
+
+
+
+    if (offersError) {
+
+      console.error('get-offers offers error:', offersError);
+
+      return {
+
+        statusCode: 500,
+
+        headers,
+
+        body: JSON.stringify({ ok: false, error: offersError.message }),
+
+      };
+
+    }
+
+
+
+    return {
+
+      statusCode: 200,
+
+      headers,
+
+      body: JSON.stringify({ ok: true, offers: offers || [] }),
+
+    };
+
+  } catch (err) {
+
+    console.error('get-offers unexpected error:', err);
 
     return {
 
@@ -96,72 +202,10 @@ exports.handler = async (event) => {
 
       headers,
 
-      body: JSON.stringify({ ok: false, error: jobErr.message }),
+      body: JSON.stringify({ ok: false, error: 'Unexpected error' }),
 
     };
 
   }
-
-
-
-  if (!jobRow) {
-
-    return {
-
-      statusCode: 404,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: 'Job not found' }),
-
-    };
-
-  }
-
-
-
-  const jobUUID = jobRow.id;
-
-
-
-  // 2) الآن نجلب العروض التي لها job_id = هذا الـUUID
-
-  const { data: offers, error: offErr } = await supabase
-
-    .from('job_offers')
-
-    .select('id, pro_id, amount, message, created_at')
-
-    .eq('job_id', jobUUID)
-
-    .order('created_at', { ascending: false });
-
-
-
-  if (offErr) {
-
-    return {
-
-      statusCode: 500,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: offErr.message }),
-
-    };
-
-  }
-
-
-
-  return {
-
-    statusCode: 200,
-
-    headers,
-
-    body: JSON.stringify({ ok: true, offers }),
-
-  };
 
 };
