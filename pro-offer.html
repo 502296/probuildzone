@@ -1,60 +1,294 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
 
   <meta charset="utf-8"/>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <title>ProBuildZone — Submit Offer</title>
+  <title>Submit Offer — ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+
+
   <style>
 
     :root{
 
-      --ink:#0F2A43; --muted:#6b7a8c; --bg:#f5f7fb; --card:#fff;
+      --ink:#0F2A43;
 
-      --shadow:0 10px 24px rgba(15,42,67,.06); --radius:16px; --blue:#0d5bd7;
+      --ink-2:#0b2033;
+
+      --muted:#6b7a8c;
+
+      --err:#b00020;
+
+      --ok:#0a7d2a;
+
+      --bg:#f6f7fb;
+
+      --card:#ffffff;
+
+      --border:#e7ecf3;
+
+      --blue:#0f62fe;
+
+      --blue-700:#0c4ed6;
+
+      --radius:18px;
 
     }
 
     *{box-sizing:border-box}
 
-    body{margin:0;background:var(--bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+    html,body{
 
-    .wrap{max-width:720px;margin:40px auto;padding:0 16px}
+      margin:0;
 
-    .card{background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:24px}
+      padding:0;
 
-    h1{margin:0 0 16px;font-size:36px}
+      background:var(--bg);
 
-    label{display:block;font-weight:700;margin:12px 0 6px}
+      font-family:Inter,system-ui,Arial,sans-serif;
 
-    input,textarea{
-
-      width:100%;padding:14px 12px;border-radius:12px;border:1px solid #dee6f1;background:#fbfdff;font-size:16px
+      color:var(--ink);
 
     }
 
-    textarea{min-height:120px;resize:vertical}
+    .wrap{
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+      max-width:960px;
 
-    .btn{margin-top:16px;display:inline-block;background:var(--blue);color:#fff;font-weight:800;border:none;border-radius:12px;padding:14px 18px;cursor:pointer}
+      margin:28px auto;
 
-    .muted{color:var(--muted)}
+      padding:0 16px 40px;
 
-    .ok{color:#0a7f3f;font-weight:700;margin-top:10px}
+    }
 
-    .err{color:#b00020;font-weight:700;margin-top:10px}
+    .card{
 
-    .pill{display:inline-block;padding:4px 10px;border:1px solid #e0e6ef;border-radius:999px;margin-left:8px}
+      background:var(--card);
+
+      border:1px solid var(--border);
+
+      border-radius:24px;
+
+      padding:22px 20px 24px;
+
+      box-shadow:0 10px 24px rgba(15,42,67,0.06);
+
+    }
+
+    h1{
+
+      margin:0 0 14px;
+
+      font-size:40px;
+
+      letter-spacing:-0.5px;
+
+    }
+
+    .sub{
+
+      margin:0 0 18px;
+
+      color:var(--muted);
+
+      font-size:0.95rem;
+
+    }
+
+    .pill{
+
+      display:inline-flex;
+
+      align-items:center;
+
+      gap:6px;
+
+      padding:6px 12px;
+
+      border-radius:999px;
+
+      background:#eef2ff;
+
+      color:#1e293b;
+
+      font-size:0.9rem;
+
+      margin-bottom:16px;
+
+    }
+
+    .pill code{
+
+      font-family:inherit;
+
+      font-weight:700;
+
+      background:rgba(255,255,255,.8);
+
+      padding:2px 8px;
+
+      border-radius:999px;
+
+    }
+
+    form{
+
+      display:grid;
+
+      gap:12px;
+
+    }
+
+    label{
+
+      font-size:0.9rem;
+
+      font-weight:600;
+
+      color:var(--ink-2);
+
+      display:block;
+
+      margin-bottom:3px;
+
+    }
+
+    input,textarea{
+
+      width:100%;
+
+      border-radius:12px;
+
+      border:1px solid var(--border);
+
+      padding:10px 12px;
+
+      font-family:inherit;
+
+      font-size:0.96rem;
+
+      outline:none;
+
+      background:#fff;
+
+    }
+
+    input:focus,textarea:focus{
+
+      border-color:#b3c5ff;
+
+      box-shadow:0 0 0 1px #b3c5ff;
+
+    }
+
+    textarea{resize:vertical;min-height:90px;}
+
+    .row2{
+
+      display:grid;
+
+      grid-template-columns:1fr 1fr;
+
+      gap:12px;
+
+    }
+
+    .hint{
+
+      font-size:0.85rem;
+
+      color:var(--muted);
+
+    }
+
+    .error{
+
+      font-size:0.9rem;
+
+      color:var(--err);
+
+      margin-top:4px;
+
+    }
+
+    .ok{
+
+      font-size:0.9rem;
+
+      color:var(--ok);
+
+      margin-top:4px;
+
+    }
+
+    .btns{
+
+      display:flex;
+
+      flex-wrap:wrap;
+
+      gap:10px;
+
+      margin-top:10px;
+
+    }
+
+    .btn{
+
+      appearance:none;
+
+      border:none;
+
+      cursor:pointer;
+
+      border-radius:12px;
+
+      padding:12px 18px;
+
+      font-weight:700;
+
+      font-size:0.98rem;
+
+    }
+
+    .btn.primary{
+
+      background:var(--blue);
+
+      color:#fff;
+
+    }
+
+    .btn.primary:hover{background:var(--blue-700);}
+
+    .btn.primary:active{transform:translateY(1px);}
+
+    .btn.white{
+
+      background:#fff;
+
+      border:1px solid var(--border);
+
+      color:var(--ink);
+
+    }
+
+    @media (max-width:640px){
+
+      h1{font-size:32px;}
+
+      .row2{grid-template-columns:1fr;}
+
+    }
 
   </style>
 
@@ -66,37 +300,57 @@
 
     <div class="card">
 
-      <h1>Submit Offer <span id="jobIdPill" class="pill"></span></h1>
+      <h1>Submit Offer</h1>
+
+      <p class="sub">
+
+        Send a clear, professional offer for this project. The homeowner will see your business name,
+
+        amount, and message.
+
+      </p>
 
 
 
-      <div id="jobMini" class="muted" style="margin:-6px 0 14px"></div>
+      <div id="jobTag" class="pill" style="display:none;">
+
+        Job ID: <code id="jobIdLabel"></code>
+
+      </div>
 
 
 
-      <form id="offerForm">
-
-        <label>Your business name *</label>
-
-        <input id="pro_name" required placeholder="e.g., Bluegrass Roofing"/>
+      <p id="topError" class="error" style="display:none;"></p>
 
 
 
-        <div class="row">
+      <form id="offerForm" novalidate>
+
+        <div>
+
+          <label for="businessName">Business name *</label>
+
+          <input id="businessName" type="text" placeholder="Your company name" required />
+
+        </div>
+
+
+
+        <div class="row2">
 
           <div>
 
-            <label>Offer amount (USD)</label>
+            <label for="proName">Your name *</label>
 
-            <input id="amount" inputmode="decimal" placeholder="e.g., 1250"/>
+            <input id="proName" type="text" placeholder="Contact person" required />
 
           </div>
 
           <div>
 
-            <label>Phone (optional)</label>
+            <label for="phone">Phone *</label>
 
-            <input id="phone" placeholder="optional"/>
+            <input id="phone" type="tel" placeholder="Best phone number" required />
 
           </div>
 
@@ -104,15 +358,61 @@
 
 
 
-        <label>Message to homeowner</label>
+        <div>
 
-        <textarea id="message" placeholder="Hello Ali, I can start next week. Includes materials & cleanup..."></textarea>
+          <label for="email">Email *</label>
+
+          <input id="email" type="email" placeholder="you@company.com" required />
+
+        </div>
 
 
 
-        <button class="btn" type="submit">Send Offer</button>
+        <div class="row2">
 
-        <div id="status" class="muted"></div>
+          <div>
+
+            <label for="amount">Offer amount (USD) *</label>
+
+            <input id="amount" type="number" min="0" step="1" placeholder="Example: 7500" required />
+
+          </div>
+
+          <div>
+
+            <label for="city">City (optional)</label>
+
+            <input id="city" type="text" placeholder="Your service area" />
+
+          </div>
+
+        </div>
+
+
+
+        <div>
+
+          <label for="message">Message to homeowner *</label>
+
+          <textarea id="message" placeholder="Explain what is included in your offer, timeline, and next steps." required></textarea>
+
+          <div class="hint">Be specific and professional — this is what the homeowner will read.</div>
+
+        </div>
+
+
+
+        <div class="btns">
+
+          <button type="submit" class="btn primary" id="submitBtn">Send Offer</button>
+
+          <a href="javascript:history.back()" class="btn white">Back</a>
+
+        </div>
+
+
+
+        <div id="formMsg" class="hint" style="margin-top:8px;"></div>
 
       </form>
 
@@ -122,129 +422,37 @@
 
 
 
-  <script type="module">
+  <script>
 
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    (function () {
 
+      const params   = new URLSearchParams(location.search);
 
+      const publicId = params.get('id');
 
-    // ====== Supabase (ضع نفس القيم الموجودة في job.html) ======
 
-    const SUPABASE_URL  = 'https://hczahffwghbddqabpbmu.supabase.coo';
 
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjemFoZmZ3Z2hiZGRxYWJwYm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDc1ODIsImV4cCI6MjA3NzkyMzU4Mn0.rpPNAFSKYhDRu8FTVRX2HZFHmyfpOgqflaKf3LrxPoU';
+      const jobTag      = document.getElementById('jobTag');
 
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+      const jobIdLabel  = document.getElementById('jobIdLabel');
 
+      const topError    = document.getElementById('topError');
 
+      const form        = document.getElementById('offerForm');
 
-    // ====== Query string ======
+      const formMsg     = document.getElementById('formMsg');
 
-    const params   = new URLSearchParams(location.search);
+      const submitBtn   = document.getElementById('submitBtn');
 
-    const PUBLIC_ID = (params.get('id') || '').trim();
 
-    const jobPill  = document.getElementById('jobIdPill');
 
-    const jobMini  = document.getElementById('jobMini');
+      if (!publicId) {
 
-    const form     = document.getElementById('offerForm');
+        topError.style.display = 'block';
 
-    const statusEl = document.getElementById('status');
+        topError.textContent   = 'Missing Job ID. Please open this page from the job details link.';
 
-
-
-    if(!PUBLIC_ID){
-
-      jobMini.textContent = 'Missing job id in URL.';
-
-    }else{
-
-      jobPill.textContent = PUBLIC_ID;
-
-      loadJobMini();
-
-    }
-
-
-
-    async function loadJobMini(){
-
-      const { data: job, error } = await sb
-
-        .from('homeowner_jobs')
-
-        .select('id, title')
-
-        .eq('public_id', PUBLIC_ID)
-
-        .maybeSingle();
-
-
-
-      if(error){ jobMini.textContent = 'Error loading job.'; return; }
-
-      if(!job){ jobMini.textContent = 'Job not found.'; return; }
-
-
-
-      // keep job.id for insert
-
-      form.dataset.jobUuid = job.id;
-
-      jobMini.textContent  = `Job: ${job.title}`;
-
-    }
-
-
-
-    form.addEventListener('submit', async (e)=>{
-
-      e.preventDefault();
-
-      statusEl.className = 'muted';
-
-      statusEl.textContent = 'Sending...';
-
-
-
-      const job_id  = form.dataset.jobUuid; // UUID from homeowner_jobs
-
-      if(!job_id){ statusEl.className='err'; statusEl.textContent='Job not found.'; return; }
-
-
-
-      const pro_name = document.getElementById('pro_name').value.trim();
-
-      const phone    = document.getElementById('phone').value.trim() || null;
-
-      const message  = document.getElementById('message').value.trim() || null;
-
-
-
-      // amount: allow empty → null, else parse to number
-
-      const amountRaw = document.getElementById('amount').value.trim();
-
-      const amount = amountRaw === '' ? null : Number(amountRaw);
-
-
-
-      const { error } = await sb.from('job_offers').insert([{
-
-        job_id, pro_name, amount, phone, message, status: 'sent'
-
-      }]);
-
-
-
-      if(error){
-
-        statusEl.className='err';
-
-        statusEl.textContent = 'Error: unable to send offer.';
-
-        console.error(error);
+        form.style.display     = 'none';
 
         return;
 
@@ -252,15 +460,159 @@
 
 
 
-      statusEl.className='ok';
+      jobIdLabel.textContent = publicId;
 
-      statusEl.textContent = '✅ Offer sent!';
+      jobTag.style.display   = 'inline-flex';
 
-      // optional: back to job page
 
-      setTimeout(()=>location.href=`/job.html?id=${encodeURIComponent(PUBLIC_ID)}`, 700);
 
-    });
+      form.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+
+
+        const businessName = document.getElementById('businessName').value.trim();
+
+        const proName      = document.getElementById('proName').value.trim();
+
+        const phone        = document.getElementById('phone').value.trim();
+
+        const email        = document.getElementById('email').value.trim();
+
+        const amountStr    = document.getElementById('amount').value.trim();
+
+        const city         = document.getElementById('city').value.trim();
+
+        const message      = document.getElementById('message').value.trim();
+
+
+
+        if (!businessName || !proName || !phone || !email || !amountStr || !message) {
+
+          formMsg.textContent = 'Please fill all required fields.';
+
+          formMsg.className   = 'error';
+
+          return;
+
+        }
+
+
+
+        const amount = Number(amountStr);
+
+        if (isNaN(amount) || amount <= 0) {
+
+          formMsg.textContent = 'Please enter a valid offer amount.';
+
+          formMsg.className   = 'error';
+
+          return;
+
+        }
+
+
+
+        const payload = {
+
+          job_id: publicId,          // نرسل الـ Job ID العام
+
+          job_public_id: publicId,   // حقل إضافي لو السكربت يحتاجه
+
+          business_name: businessName,
+
+          pro_name: proName,
+
+          phone,
+
+          email,
+
+          city,
+
+          amount,
+
+          message
+
+        };
+
+
+
+        formMsg.textContent = 'Sending your offer…';
+
+        formMsg.className   = 'hint';
+
+        submitBtn.disabled  = true;
+
+
+
+        try {
+
+          const res  = await fetch('/api/post-offer', {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+
+            body: JSON.stringify(payload)
+
+          });
+
+
+
+          const text = await res.text();
+
+          let data;
+
+          try {
+
+            data = JSON.parse(text);
+
+          } catch {
+
+            throw new Error(`Unexpected response (${res.status})`);
+
+          }
+
+
+
+          if (!res.ok || data.ok === false) {
+
+            throw new Error(data.error || `Failed with status ${res.status}`);
+
+          }
+
+
+
+          formMsg.textContent = '✅ Offer submitted successfully. Thank you!';
+
+          formMsg.className   = 'ok';
+
+
+
+          // بعد الإرسال رجّع البنّاء لصفحة الجوب لرؤية عرضه
+
+          setTimeout(() => {
+
+            window.location.href = `/job.html?id=${encodeURIComponent(publicId)}`;
+
+          }, 1200);
+
+        } catch (err) {
+
+          console.error(err);
+
+          formMsg.textContent = '❌ Error sending offer: ' + (err.message || 'network error');
+
+          formMsg.className   = 'error';
+
+          submitBtn.disabled  = false;
+
+        }
+
+      });
+
+    })();
 
   </script>
 
