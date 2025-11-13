@@ -420,7 +420,9 @@
 
         offJson.offers.forEach(o => {
 
-          const amount = (o.amount != null) ? `$${Number(o.amount).toLocaleString()}` : "$—";
+          const amountNumber = o.amount != null ? Number(o.amount) : null;
+
+          const amount = amountNumber != null ? `$${amountNumber.toLocaleString()}` : "$—";
 
           const phoneLine = o.phone ? ` • ${o.phone}` : "";
 
@@ -450,7 +452,21 @@
 
             <div style="margin-top:10px">
 
-              <button data-id="${o.id}" class="accept-btn btn primary" style="padding:8px 12px">
+              <button
+
+                data-id="${o.id}"
+
+                data-email="${o.email || ''}"
+
+                data-pro-name="${o.pro_name || o.business_name || ''}"
+
+                data-amount="${amountNumber != null ? amountNumber : ''}"
+
+                class="accept-btn btn primary"
+
+                style="padding:8px 12px"
+
+              >
 
                 Accept
 
@@ -466,7 +482,7 @@
 
 
 
-        // 3) حدث زر قبول العرض
+        // 3) حدث زر قبول العرض + إرسال الإيميل
 
         offersBox.addEventListener('click', async (e) => {
 
@@ -478,9 +494,27 @@
 
           btn.disabled = true;
 
+
+
+          const offerId   = btn.getAttribute('data-id');
+
+          const proEmail  = btn.getAttribute('data-email');
+
+          const proName   = btn.getAttribute('data-pro-name') || 'Pro';
+
+          const amountVal = btn.getAttribute('data-amount');
+
+
+
+          const homeownerName = j.name || j.full_name || 'Homeowner';
+
+          const jobIdForEmail = j.public_id || publicId;
+
+
+
           try {
 
-            const offerId = btn.getAttribute('data-id');
+            // 3a) تحديث حالة العرض في API الأصلي
 
             const res = await fetch('/api/accept-offer', {
 
@@ -494,11 +528,7 @@
 
 
 
-            if (res.ok) {
-
-              location.reload();
-
-            } else {
+            if (!res.ok) {
 
               const errText = await res.text();
 
@@ -506,7 +536,47 @@
 
               btn.disabled = false;
 
+              return;
+
             }
+
+
+
+            // 3b) إرسال إيميل للباني عن طريق Netlify Function + Resend
+
+            if (proEmail) {
+
+              await fetch('/.netlify/functions/send-accept-email', {
+
+                method: 'POST',
+
+                headers: { 'Content-Type': 'application/json' },
+
+                body: JSON.stringify({
+
+                  proEmail,
+
+                  proName,
+
+                  homeownerName,
+
+                  jobId: jobIdForEmail,
+
+                  offerAmount: amountVal
+
+                })
+
+              });
+
+            }
+
+
+
+            alert('Offer accepted successfully.');
+
+            location.reload();
+
+
 
           } catch (err) {
 
