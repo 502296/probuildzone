@@ -1,7 +1,3 @@
-// netlify/functions/send-accept-email.js
-
-
-
 const { Resend } = require('resend');
 
 
@@ -14,7 +10,7 @@ exports.handler = async (event) => {
 
       statusCode: 405,
 
-      body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method not allowed' }),
 
     };
 
@@ -24,19 +20,9 @@ exports.handler = async (event) => {
 
   try {
 
-    const body = JSON.parse(event.body || '{}');
+    const { proEmail, proName, homeownerName, jobId, offerAmount } =
 
-
-
-    const proEmail       = body.proEmail;
-
-    const proName        = body.proName || 'Pro';
-
-    const homeownerName  = body.homeownerName || 'Homeowner';
-
-    const jobId          = body.jobId || '';
-
-    const offerAmount    = body.offerAmount || '';
+      JSON.parse(event.body || '{}');
 
 
 
@@ -46,7 +32,7 @@ exports.handler = async (event) => {
 
         statusCode: 400,
 
-        body: JSON.stringify({ ok: false, error: 'Missing proEmail' }),
+        body: JSON.stringify({ error: 'Missing proEmail' }),
 
       };
 
@@ -58,65 +44,29 @@ exports.handler = async (event) => {
 
 
 
-    const fromAddress =
+    await resend.emails.send({
 
-      process.env.PROBUILDZONE_FROM_EMAIL || 'ProBuildZone <noreply@probuildzone.com>';
-
-
-
-    const subject = `You have been selected for job ${jobId} on ProBuildZone`;
-
-
-
-    const html = `
-
-      <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #0F2A43;">
-
-        <h2>Hi ${proName},</h2>
-
-        <p><strong>${homeownerName}</strong> accepted your offer on ProBuildZone.</p>
-
-        <p>
-
-          <strong>Job ID:</strong> ${jobId}<br/>
-
-          <strong>Accepted amount:</strong> $${offerAmount}
-
-        </p>
-
-        <p>You can now contact the homeowner using the phone number shown in your ProBuildZone dashboard.</p>
-
-        <p style="margin-top: 24px;">Best regards,<br/>ProBuildZone Team</p>
-
-      </div>
-
-    `;
-
-
-
-    const result = await resend.emails.send({
-
-      from: fromAddress,
+      from: 'ProBuildZone <onboarding@resend.dev>', // مؤقتاً للاختبار
 
       to: proEmail,
 
-      subject,
+      subject: `Your offer was accepted for Job ${jobId}`,
 
-      html,
+      html: `
+
+        <h2>Good news, ${proName || 'Pro'}!</h2>
+
+        <p>Your offer for job <strong>${jobId}</strong> was <strong>accepted</strong> by ${homeownerName}.</p>
+
+        <p><strong>Offer amount:</strong> $${offerAmount || '—'}</p>
+
+        <p>You can now contact the homeowner and schedule the work.</p>
+
+        <p>— ProBuildZone</p>
+
+      `,
 
     });
-
-
-
-    console.log('Resend response:', JSON.stringify(result));
-
-
-
-    if (result.error) {
-
-      throw new Error(result.error.message || 'Resend error');
-
-    }
 
 
 
@@ -130,13 +80,13 @@ exports.handler = async (event) => {
 
   } catch (err) {
 
-    console.error('send-accept-email error:', err);
+    console.error('Resend error:', err);
 
     return {
 
       statusCode: 500,
 
-      body: JSON.stringify({ ok: false, error: err.message || 'Unknown error' }),
+      body: JSON.stringify({ error: 'Failed to send email' }),
 
     };
 
