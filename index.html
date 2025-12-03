@@ -22,7 +22,7 @@
 
 
 
-  <!-- تعزيز وضوح الزر على الموبايل (لا يغيّر تصميمك العام) -->
+  <!-- تعزيز وضوح الزر + أنيميشن اللوجو (لا يغيّر تصميمك العام) -->
 
   <style>
 
@@ -54,7 +54,9 @@
 
       gap:8px;
 
-      margin-top:10px;
+      margin-top:14px;
+
+      margin-bottom:12px;
 
       padding:6px 12px;
 
@@ -90,6 +92,114 @@
 
     }
 
+
+
+    /* ===== أنيميشن اللوجو (قبعة + مطرقة) ===== */
+
+    .brand-logo{
+
+      position:relative;
+
+      display:inline-flex;
+
+      align-items:center;
+
+      gap:2px;
+
+    }
+
+    .logo-hat,
+
+    .logo-hammer{
+
+      position:absolute;
+
+      font-size:16px;
+
+      pointer-events:none;
+
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+
+    }
+
+
+
+    /* القبعة تمشي فوق الاسم */
+
+    .logo-hat{
+
+      top:-18px;
+
+      left:0;
+
+      animation:hat-walk 7s linear infinite;
+
+    }
+
+    @keyframes hat-walk{
+
+      0%   { transform:translateX(0) translateY(0); opacity:0; }
+
+      10%  { opacity:1; }
+
+      40%  { transform:translateX(80px) translateY(-2px); opacity:1; }
+
+      60%  { transform:translateX(140px) translateY(-3px); opacity:1; }
+
+      80%  { opacity:0.0; }
+
+      100% { transform:translateX(140px) translateY(-3px); opacity:0; }
+
+    }
+
+
+
+    /* المطرقة تعمل حركة طرق خفيفة فوق نهاية الاسم */
+
+    .logo-hammer{
+
+      top:-20px;
+
+      right:-6px;
+
+      transform-origin:50% 100%;
+
+      animation:hammer-tap 4.5s ease-in-out infinite 2.5s;
+
+    }
+
+    @keyframes hammer-tap{
+
+      0%   { transform:rotate(0deg); }
+
+      15%  { transform:rotate(-25deg); }
+
+      30%  { transform:rotate(0deg); }
+
+      45%  { transform:rotate(-18deg); }
+
+      60%  { transform:rotate(0deg); }
+
+      100% { transform:rotate(0deg); }
+
+    }
+
+
+
+    /* لو حاب تخفف الحركة على الشاشات الصغيرة جداً */
+
+    @media (max-width:430px){
+
+      .logo-hat,
+
+      .logo-hammer{
+
+        display:none;
+
+      }
+
+    }
+
   </style>
 
 </head>
@@ -105,6 +215,12 @@
       <div class="brand-logo">
 
         <span class="pro">Pro</span><span class="build">Build</span><span class="zone">Zone</span>
+
+        <!-- أيقونات الأنيميشن (يمكن استبدالها لاحقاً بصور PNG) -->
+
+        <span class="logo-hat">🦺</span>
+
+        <span class="logo-hammer">🔨</span>
 
       </div>
 
@@ -150,7 +266,7 @@
 
 
 
-      <!-- أوتوميشن احترافي على ستايل الشركات العالمية -->
+      <!-- أوتوميشن احترافي -->
 
       <div class="automation-pill">
 
@@ -167,8 +283,6 @@
         <button class="btn primary" id="postJobTop">Post a Job (Free)</button>
 
       </div>
-
-      <!-- لا يوجد Job ID box هنا (تمت إزالته من قبل حسب رغبتك) -->
 
     </div>
 
@@ -380,7 +494,7 @@
 
         <div class="sticky-submit">
 
-          <button id="sendBtn" class="btn primary">🚀 Post Job</button>
+          <button id="sendBtn" class="btn primary">🚀 Post a Job</button>
 
           <span id="sendMsg" class="hint"></span>
 
