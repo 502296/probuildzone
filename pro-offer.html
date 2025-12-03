@@ -4,289 +4,265 @@
 
 <head>
 
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
 
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Submit Offer — ProBuildZone</title>
+  <title>Send an Offer – ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
 
-    :root{
+    :root {
 
-      --ink:#0F2A43;
+      --pbz: #0F2A43;
 
-      --ink-2:#0b2033;
+      --gold: #D4AF37;
 
-      --muted:#6b7a8c;
+      --muted: #617186;
 
-      --err:#b00020;
+      --bg: #f3f5f7;
 
-      --ok:#0a7d2a;
+      --danger: #b91c1c;
 
-      --bg:#f6f7fb;
-
-      --card:#ffffff;
-
-      --border:#e7ecf3;
-
-      --blue:#0f62fe;
-
-      --blue-700:#0c4ed6;
-
-      --radius:18px;
+      --success: #166534;
 
     }
 
-    *{box-sizing:border-box}
+    * { box-sizing: border-box; }
 
-    html,body{
+    body {
 
-      margin:0;
+      margin: 0;
 
-      padding:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-      background:var(--bg);
+      background: var(--bg);
 
-      font-family:Inter,system-ui,Arial,sans-serif;
-
-      color:var(--ink);
+      color: var(--pbz);
 
     }
 
-    .wrap{
+    .page {
 
-      max-width:960px;
+      max-width: 760px;
 
-      margin:28px auto;
+      margin: 28px auto 40px;
 
-      padding:0 16px 40px;
-
-    }
-
-    .card{
-
-      background:var(--card);
-
-      border:1px solid var(--border);
-
-      border-radius:24px;
-
-      padding:22px 20px 24px;
-
-      box-shadow:0 10px 24px rgba(15,42,67,0.06);
+      padding: 0 16px;
 
     }
 
-    h1{
+    .header {
 
-      margin:0 0 14px;
-
-      font-size:40px;
-
-      letter-spacing:-0.5px;
+      margin-bottom: 18px;
 
     }
 
-    .sub{
+    .logo {
 
-      margin:0 0 18px;
+      font-weight: 700;
 
-      color:var(--muted);
+      letter-spacing: 0.04em;
 
-      font-size:0.95rem;
+      text-transform: uppercase;
 
-    }
+      font-size: 14px;
 
-    .pill{
-
-      display:inline-flex;
-
-      align-items:center;
-
-      gap:6px;
-
-      padding:6px 12px;
-
-      border-radius:999px;
-
-      background:#eef2ff;
-
-      color:#1e293b;
-
-      font-size:0.9rem;
-
-      margin-bottom:16px;
+      color: var(--muted);
 
     }
 
-    .pill code{
+    h1 {
 
-      font-family:inherit;
+      margin: 6px 0 8px;
 
-      font-weight:700;
-
-      background:rgba(255,255,255,.8);
-
-      padding:2px 8px;
-
-      border-radius:999px;
+      font-size: 24px;
 
     }
 
-    form{
+    .job-tag {
 
-      display:grid;
+      font-size: 14px;
 
-      gap:12px;
-
-    }
-
-    label{
-
-      font-size:0.9rem;
-
-      font-weight:600;
-
-      color:var(--ink-2);
-
-      display:block;
-
-      margin-bottom:3px;
+      color: var(--muted);
 
     }
 
-    input,textarea{
+    .card {
 
-      width:100%;
+      background: #fff;
 
-      border-radius:12px;
+      border-radius: 16px;
 
-      border:1px solid var(--border);
+      border: 1px solid #e3e7eb;
 
-      padding:10px 12px;
+      padding: 18px 16px 20px;
 
-      font-family:inherit;
-
-      font-size:0.96rem;
-
-      outline:none;
-
-      background:#fff;
+      box-shadow: 0 6px 22px rgba(0,0,0,.03);
 
     }
 
-    input:focus,textarea:focus{
+    label {
 
-      border-color:#b3c5ff;
+      display: block;
 
-      box-shadow:0 0 0 1px #b3c5ff;
+      font-weight: 600;
 
-    }
+      margin-bottom: 6px;
 
-    textarea{resize:vertical;min-height:90px;}
-
-    .row2{
-
-      display:grid;
-
-      grid-template-columns:1fr 1fr;
-
-      gap:12px;
+      font-size: 14px;
 
     }
 
-    .hint{
+    input, textarea {
 
-      font-size:0.85rem;
+      width: 100%;
 
-      color:var(--muted);
+      padding: 11px 12px;
 
-    }
+      border-radius: 10px;
 
-    .error{
+      border: 1px solid #d5d9de;
 
-      font-size:0.9rem;
+      font: inherit;
 
-      color:var(--err);
-
-      margin-top:4px;
+      background: #fff;
 
     }
 
-    .ok{
+    textarea {
 
-      font-size:0.9rem;
+      min-height: 120px;
 
-      color:var(--ok);
-
-      margin-top:4px;
+      resize: vertical;
 
     }
 
-    .btns{
+    .field {
 
-      display:flex;
-
-      flex-wrap:wrap;
-
-      gap:10px;
-
-      margin-top:10px;
+      margin-bottom: 14px;
 
     }
 
-    .btn{
+    .hint {
 
-      appearance:none;
+      font-size: 12px;
 
-      border:none;
+      color: var(--muted);
 
-      cursor:pointer;
-
-      border-radius:12px;
-
-      padding:12px 18px;
-
-      font-weight:700;
-
-      font-size:0.98rem;
+      margin-top: 4px;
 
     }
 
-    .btn.primary{
+    .actions {
 
-      background:var(--blue);
+      margin-top: 18px;
 
-      color:#fff;
+      display: flex;
 
-    }
+      gap: 10px;
 
-    .btn.primary:hover{background:var(--blue-700);}
-
-    .btn.primary:active{transform:translateY(1px);}
-
-    .btn.white{
-
-      background:#fff;
-
-      border:1px solid var(--border);
-
-      color:var(--ink);
+      flex-wrap: wrap;
 
     }
 
-    @media (max-width:640px){
+    button {
 
-      h1{font-size:32px;}
+      border: none;
 
-      .row2{grid-template-columns:1fr;}
+      cursor: pointer;
+
+      font-weight: 600;
+
+      font-family: inherit;
+
+    }
+
+    .btn-main {
+
+      background: var(--gold);
+
+      color: #000;
+
+      padding: 11px 18px;
+
+      border-radius: 10px;
+
+      min-width: 140px;
+
+    }
+
+    .btn-secondary {
+
+      background: #edf0f3;
+
+      color: var(--pbz);
+
+      padding: 11px 18px;
+
+      border-radius: 10px;
+
+    }
+
+    .alert {
+
+      margin-top: 12px;
+
+      border-radius: 10px;
+
+      padding: 10px 12px;
+
+      font-size: 13px;
+
+      display: none;
+
+      white-space: pre-wrap;
+
+    }
+
+    .alert.error {
+
+      background: #fef2f2;
+
+      border: 1px solid #fecaca;
+
+      color: var(--danger);
+
+    }
+
+    .alert.success {
+
+      background: #ecfdf3;
+
+      border: 1px solid #bbf7d0;
+
+      color: var(--success);
+
+    }
+
+    .note {
+
+      margin-top: 16px;
+
+      font-size: 13px;
+
+      color: var(--muted);
+
+      line-height: 1.5;
+
+    }
+
+    @media (max-width: 540px) {
+
+      .card { padding: 16px 14px 20px; }
+
+      .actions { flex-direction: column; }
+
+      .btn-main, .btn-secondary { width: 100%; text-align: center; }
 
     }
 
@@ -296,61 +272,45 @@
 
 <body>
 
-  <div class="wrap">
+  <div class="page">
+
+    <div class="header">
+
+      <div class="logo">PROBUILDZONE</div>
+
+      <h1>Send an offer</h1>
+
+      <div id="jobTag" class="job-tag"></div>
+
+    </div>
+
+
 
     <div class="card">
 
-      <h1>Submit Offer</h1>
+      <form id="offerForm" novalidate autocomplete="off">
 
-      <p class="sub">
+        <!-- نخزّن الـ public_id في متغير JS، ما نعرضه للمستخدم -->
 
-        Send a clear, professional offer for this project. The homeowner will see your business name,
+        <div class="field">
 
-        amount, and message.
+          <label for="business_name">Business / Pro name</label>
 
-      </p>
-
-
-
-      <div id="jobTag" class="pill" style="display:none;">
-
-        Job ID: <code id="jobIdLabel"></code>
-
-      </div>
-
-
-
-      <p id="topError" class="error" style="display:none;"></p>
-
-
-
-      <form id="offerForm" novalidate>
-
-        <div>
-
-          <label for="businessName">Business name *</label>
-
-          <input id="businessName" type="text" placeholder="Your company name" required />
+          <input id="business_name" name="business_name" placeholder="John &amp; Sons Builders" required>
 
         </div>
 
 
 
-        <div class="row2">
+        <div class="field">
 
-          <div>
+          <label for="pro_email">Your email (optional but recommended)</label>
 
-            <label for="proName">Your name *</label>
+          <input id="pro_email" name="pro_email" type="email" placeholder="you@example.com">
 
-            <input id="proName" type="text" placeholder="Contact person" required />
+          <div class="hint">
 
-          </div>
-
-          <div>
-
-            <label for="phone">Phone *</label>
-
-            <input id="phone" type="tel" placeholder="Best phone number" required />
+            If you add your email, the homeowner can simply hit “Reply” on the email we send them.
 
           </div>
 
@@ -358,61 +318,61 @@
 
 
 
-        <div>
+        <div class="field">
 
-          <label for="email">Email *</label>
+          <label for="phone">Phone number</label>
 
-          <input id="email" type="email" placeholder="you@company.com" required />
-
-        </div>
-
-
-
-        <div class="row2">
-
-          <div>
-
-            <label for="amount">Offer amount (USD) *</label>
-
-            <input id="amount" type="number" min="0" step="1" placeholder="Example: 7500" required />
-
-          </div>
-
-          <div>
-
-            <label for="city">City (optional)</label>
-
-            <input id="city" type="text" placeholder="Your service area" />
-
-          </div>
+          <input id="phone" name="phone" placeholder="5022968111" required>
 
         </div>
 
 
 
-        <div>
+        <div class="field">
 
-          <label for="message">Message to homeowner *</label>
+          <label for="amount">Estimated price (USD)</label>
 
-          <textarea id="message" placeholder="Explain what is included in your offer, timeline, and next steps." required></textarea>
+          <input id="amount" name="amount" type="number" step="0.01" placeholder="2500" required>
 
-          <div class="hint">Be specific and professional — this is what the homeowner will read.</div>
-
-        </div>
-
-
-
-        <div class="btns">
-
-          <button type="submit" class="btn primary" id="submitBtn">Send Offer</button>
-
-          <a href="javascript:history.back()" class="btn white">Back</a>
+          <div class="hint">You can fine-tune the final price after you talk to the homeowner.</div>
 
         </div>
 
 
 
-        <div id="formMsg" class="hint" style="margin-top:8px;"></div>
+        <div class="field">
+
+          <label for="message">Message / details (optional)</label>
+
+          <textarea id="message" name="message" placeholder="Briefly describe what’s included, timeline, or any warranty..."></textarea>
+
+        </div>
+
+
+
+        <div id="alert" class="alert error"></div>
+
+        <div id="success" class="alert success"></div>
+
+
+
+        <div class="actions">
+
+          <button type="button" class="btn-secondary" id="cancelBtn">Back</button>
+
+          <button type="submit" class="btn-main" id="sendBtn">Send offer</button>
+
+        </div>
+
+
+
+        <div class="note">
+
+          ProBuildZone simply connects homeowners and local Pros.
+
+          All project details, payments, and agreements are handled directly between you and the homeowner.
+
+        </div>
 
       </form>
 
@@ -424,35 +384,113 @@
 
   <script>
 
-    (function () {
+    function getJobPublicId() {
 
-      const params   = new URLSearchParams(location.search);
+      try {
 
-      const publicId = params.get('id');
+        const params = new URLSearchParams(window.location.search);
 
+        return params.get('job') || params.get('job_public_id') || '';
 
+      } catch (e) {
 
-      const jobTag      = document.getElementById('jobTag');
+        return '';
 
-      const jobIdLabel  = document.getElementById('jobIdLabel');
+      }
 
-      const topError    = document.getElementById('topError');
-
-      const form        = document.getElementById('offerForm');
-
-      const formMsg     = document.getElementById('formMsg');
-
-      const submitBtn   = document.getElementById('submitBtn');
+    }
 
 
 
-      if (!publicId) {
+    const jobPublicId = getJobPublicId();
 
-        topError.style.display = 'block';
 
-        topError.textContent   = 'Missing Job ID. Please open this page from the job details link.';
 
-        form.style.display     = 'none';
+    const jobTagEl = document.getElementById('jobTag');
+
+    if (jobPublicId) {
+
+      jobTagEl.textContent = 'For job: ' + jobPublicId;
+
+    } else {
+
+      jobTagEl.textContent = 'Job ID missing – please open this page from the project link.';
+
+    }
+
+
+
+    const form = document.getElementById('offerForm');
+
+    const alertBox = document.getElementById('alert');
+
+    const successBox = document.getElementById('success');
+
+    const sendBtn = document.getElementById('sendBtn');
+
+    const cancelBtn = document.getElementById('cancelBtn');
+
+
+
+    function showError(msg) {
+
+      alertBox.textContent = msg;
+
+      alertBox.style.display = 'block';
+
+      successBox.style.display = 'none';
+
+    }
+
+
+
+    function showSuccess(msg) {
+
+      successBox.textContent = msg;
+
+      successBox.style.display = 'block';
+
+      alertBox.style.display = 'none';
+
+    }
+
+
+
+    function clearMessages() {
+
+      alertBox.style.display = 'none';
+
+      successBox.style.display = 'none';
+
+      alertBox.textContent = '';
+
+      successBox.textContent = '';
+
+    }
+
+
+
+    cancelBtn.addEventListener('click', () => {
+
+      // ترجع صفحة واحدة للخلف – تقدر تغيّرها لو تحب
+
+      window.history.back();
+
+    });
+
+
+
+    form.addEventListener('submit', async (e) => {
+
+      e.preventDefault();
+
+      clearMessages();
+
+
+
+      if (!jobPublicId) {
+
+        showError('Job ID is missing. Please go back and open this offer page from the project link.');
 
         return;
 
@@ -460,159 +498,103 @@
 
 
 
-      jobIdLabel.textContent = publicId;
+      const business_name = document.getElementById('business_name').value.trim();
 
-      jobTag.style.display   = 'inline-flex';
+      const pro_email = document.getElementById('pro_email').value.trim();
 
+      const phone = document.getElementById('phone').value.trim();
 
+      const amount = document.getElementById('amount').value.trim();
 
-      form.addEventListener('submit', async (e) => {
-
-        e.preventDefault();
-
-
-
-        const businessName = document.getElementById('businessName').value.trim();
-
-        const proName      = document.getElementById('proName').value.trim();
-
-        const phone        = document.getElementById('phone').value.trim();
-
-        const email        = document.getElementById('email').value.trim();
-
-        const amountStr    = document.getElementById('amount').value.trim();
-
-        const city         = document.getElementById('city').value.trim();
-
-        const message      = document.getElementById('message').value.trim();
+      const message = document.getElementById('message').value.trim();
 
 
 
-        if (!businessName || !proName || !phone || !email || !amountStr || !message) {
+      if (!business_name || !phone || !amount) {
 
-          formMsg.textContent = 'Please fill all required fields.';
+        showError('Please fill business name, phone, and estimated price.');
 
-          formMsg.className   = 'error';
+        return;
 
-          return;
+      }
+
+
+
+      const payload = {
+
+        job_public_id: jobPublicId,
+
+        business_name,
+
+        pro_email: pro_email || null,
+
+        phone,
+
+        amount,
+
+        message
+
+      };
+
+
+
+      sendBtn.disabled = true;
+
+      sendBtn.textContent = 'Sending...';
+
+
+
+      try {
+
+        const res = await fetch('/.netlify/functions/post-offer', {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify(payload),
+
+        });
+
+
+
+        const data = await res.json().catch(() => ({}));
+
+
+
+        if (!res.ok || !data.ok) {
+
+          console.error('post-offer error:', data);
+
+          showError(data.error || 'Something went wrong while sending your offer. Please try again.');
+
+        } else {
+
+          showSuccess('Your offer has been sent to the homeowner. They will contact you directly if it’s a good fit.');
+
+          // لو تحب: فعّل السطر التالي للانتقال إلى thankyou.html
+
+          // window.location.href = 'thankyou.html';
+
+          form.reset();
 
         }
 
+      } catch (err) {
 
+        console.error(err);
 
-        const amount = Number(amountStr);
+        showError('Network error. Please check your connection and try again.');
 
-        if (isNaN(amount) || amount <= 0) {
+      } finally {
 
-          formMsg.textContent = 'Please enter a valid offer amount.';
+        sendBtn.disabled = false;
 
-          formMsg.className   = 'error';
+        sendBtn.textContent = 'Send offer';
 
-          return;
+      }
 
-        }
-
-
-
-        const payload = {
-
-          job_id: publicId,          // نرسل الـ Job ID العام
-
-          job_public_id: publicId,   // حقل إضافي لو السكربت يحتاجه
-
-          business_name: businessName,
-
-          pro_name: proName,
-
-          phone,
-
-          email,
-
-          city,
-
-          amount,
-
-          message
-
-        };
-
-
-
-        formMsg.textContent = 'Sending your offer…';
-
-        formMsg.className   = 'hint';
-
-        submitBtn.disabled  = true;
-
-
-
-        try {
-
-          const res  = await fetch('/api/post-offer', {
-
-            method: 'POST',
-
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-
-            body: JSON.stringify(payload)
-
-          });
-
-
-
-          const text = await res.text();
-
-          let data;
-
-          try {
-
-            data = JSON.parse(text);
-
-          } catch {
-
-            throw new Error(`Unexpected response (${res.status})`);
-
-          }
-
-
-
-          if (!res.ok || data.ok === false) {
-
-            throw new Error(data.error || `Failed with status ${res.status}`);
-
-          }
-
-
-
-          formMsg.textContent = '✅ Offer submitted successfully. Thank you!';
-
-          formMsg.className   = 'ok';
-
-
-
-          // بعد الإرسال رجّع البنّاء لصفحة الجوب لرؤية عرضه
-
-          setTimeout(() => {
-
-            window.location.href = `/job.html?id=${encodeURIComponent(publicId)}`;
-
-          }, 1200);
-
-        } catch (err) {
-
-          console.error(err);
-
-          formMsg.textContent = '❌ Error sending offer: ' + (err.message || 'network error');
-
-          formMsg.className   = 'error';
-
-          submitBtn.disabled  = false;
-
-        }
-
-      });
-
-    })();
+    });
 
   </script>
 
