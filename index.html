@@ -22,225 +22,199 @@
 
 
 
-  <!-- تعزيز وضوح الزر + Smart Build Sequence للّوجو -->
+  <!-- تحسين المودال + أنيميشن لوجو احترافي -->
 
   <style>
 
-    .sheet{max-height:90vh;overflow:auto;padding-bottom:120px;}
-
-    .sticky-submit{
-
-      position:sticky; bottom:0; background:rgba(255,255,255,.95);
-
-      backdrop-filter:saturate(140%) blur(4px); padding:12px; border-top:1px solid #e6ebf2;
-
-      box-shadow:0 -6px 20px rgba(0,0,0,.06); display:grid; gap:8px;
-
-    }
-
-    .sticky-submit .hint{display:block;font-size:.95rem;}
-
-    @media (max-width:640px){ .sticky-submit{padding:12px 10px;} }
+    .sheet { max-height: 90vh; overflow: auto; padding-bottom: 120px; }
 
 
 
-    /* Automation badge الاحترافي */
+    .sticky-submit {
 
-    .automation-pill{
+      position: sticky;
 
-      display:inline-flex;
+      bottom: 0;
 
-      align-items:center;
+      background: rgba(255, 255, 255, .95);
 
-      gap:8px;
+      backdrop-filter: saturate(140%) blur(4px);
 
-      margin-top:14px;
+      padding: 12px;
 
-      margin-bottom:12px;
+      border-top: 1px solid #e6ebf2;
 
-      padding:6px 12px;
+      box-shadow: 0 -6px 20px rgba(0, 0, 0, .06);
 
-      border-radius:999px;
+      display: grid;
 
-      background:rgba(15,42,67,0.82);
-
-      color:#f9fafb;
-
-      font-size:12px;
-
-      letter-spacing:0.04em;
-
-      text-transform:uppercase;
-
-      border:1px solid rgba(212,175,55,0.5);
-
-      box-shadow:0 8px 24px rgba(0,0,0,0.25);
-
-    }
-
-    .automation-pill .dot{
-
-      width:8px;
-
-      height:8px;
-
-      border-radius:999px;
-
-      background:#22c55e;
-
-      box-shadow:0 0 0 4px rgba(34,197,94,0.35);
+      gap: 8px;
 
     }
 
 
 
-    /* ===== Smart Build Sequence – حركة راقية لاسم ProBuildZone ===== */
+    .sticky-submit .hint { display: block; font-size: .95rem; }
 
-    .brand-logo{
 
-      position:relative;
 
-      display:inline-flex;
+    @media (max-width: 640px) {
 
-      align-items:center;
-
-      gap:.25rem;
+      .sticky-submit { padding: 12px 10px; }
 
     }
 
 
 
-    /* دخول ناعم للحروف */
+    /* Automation badge */
 
-    .brand-logo span{
+    .automation-pill {
 
-      position:relative;
+      display: inline-flex;
 
-      animation:logo-fade-up .45s ease-out both;
+      align-items: center;
 
-    }
+      gap: 8px;
 
+      margin-top: 14px;
 
+      margin-bottom: 12px;
 
-    .brand-logo .pro{
+      padding: 6px 12px;
 
-      animation:
+      border-radius: 999px;
 
-        logo-fade-up .45s ease-out both,
+      background: rgba(15, 42, 67, 0.82);
 
-        pro-pulse 6s ease-in-out infinite .4s;   /* أول نبضة */
+      color: #f9fafb;
 
-    }
+      font-size: 12px;
 
+      letter-spacing: 0.04em;
 
+      text-transform: uppercase;
 
-    .brand-logo .build{
+      border: 1px solid rgba(212, 175, 55, 0.5);
 
-      animation:
-
-        logo-fade-up .45s ease-out both .07s,
-
-        build-glow 6s ease-in-out infinite 1.2s; /* موجة على Build */
-
-    }
-
-
-
-    .brand-logo .zone{
-
-      animation:
-
-        logo-fade-up .45s ease-out both .14s,
-
-        zone-focus 6s ease-in-out infinite 2s;   /* قوة وثبات على Zone */
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 
     }
 
 
 
-    @keyframes logo-fade-up{
+    .automation-pill .dot {
 
-      0%{
+      width: 8px;
 
-        transform:translateY(6px);
+      height: 8px;
 
-        opacity:0;
+      border-radius: 999px;
+
+      background: #22c55e;
+
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
+
+    }
+
+
+
+    /* ===== لوجو ProBuildZone – حركة راقية جداً ===== */
+
+    .brand-logo {
+
+      position: relative;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: .25rem;
+
+      padding-bottom: 2px; /* مساحة صغيرة للخط المتحرك */
+
+    }
+
+
+
+    /* خط ذهبي متدرّج يمسح تحت اللوجو */
+
+    .brand-logo::after {
+
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+
+      bottom: -4px;
+
+      width: 100%;
+
+      height: 3px;
+
+      border-radius: 999px;
+
+      background: linear-gradient(90deg, #b37b10, #f7e08a, #d89a26);
+
+      background-size: 200% 100%;
+
+      opacity: 0;
+
+      transform: scaleX(.55);
+
+      transform-origin: left center;
+
+      animation: pbz-underline 4s ease-in-out infinite;
+
+    }
+
+
+
+    /* توهج بسيط على كلمة Build وقت مرور الخط */
+
+    .brand-logo .build {
+
+      position: relative;
+
+      z-index: 1;
+
+      animation: pbz-build 4s ease-in-out infinite;
+
+    }
+
+
+
+    @keyframes pbz-underline {
+
+      0% {
+
+        opacity: 0;
+
+        background-position: 0% 50%;
+
+        transform: scaleX(.55);
 
       }
 
-      100%{
+      10% { opacity: 1; }
 
-        transform:translateY(0);
+      35% {
 
-        opacity:1;
+        background-position: 100% 50%;
 
-      }
-
-    }
-
-
-
-    /* نبضة ذكاء خفيفة على Pro */
-
-    @keyframes pro-pulse{
-
-      0%, 20%, 100%{
-
-        text-shadow:0 10px 25px rgba(0,0,0,.25);
-
-        filter:none;
+        transform: scaleX(1);
 
       }
 
-      40%{
+      60% { opacity: 1; }
 
-        text-shadow:
+      100% {
 
-          0 0 10px rgba(56,189,248,.9),
+        opacity: 0;
 
-          0 10px 25px rgba(0,0,0,.25);
+        background-position: 0% 50%;
 
-        filter:brightness(1.06);
-
-      }
-
-      60%{
-
-        text-shadow:0 10px 25px rgba(0,0,0,.25);
-
-      }
-
-    }
-
-
-
-    /* موجة ذهبية ناعمة على Build */
-
-    @keyframes build-glow{
-
-      0%, 25%, 100%{
-
-        text-shadow:0 10px 25px rgba(0,0,0,.25);
-
-      }
-
-      40%{
-
-        text-shadow:
-
-          0 0 14px rgba(252,177,26,.95),
-
-          0 10px 25px rgba(0,0,0,.25);
-
-      }
-
-      55%{
-
-        text-shadow:
-
-          0 0 6px rgba(252,177,26,.6),
-
-          0 10px 25px rgba(0,0,0,.25);
+        transform: scaleX(.55);
 
       }
 
@@ -248,123 +222,35 @@
 
 
 
-    /* تركيز وقوة على Zone – تكبير 1.02 ثم رجوع */
+    @keyframes pbz-build {
 
-    @keyframes zone-focus{
+      0% {
 
-      0%, 25%, 100%{
+        text-shadow: 0 0 0 rgba(0, 0, 0, 0);
 
-        transform:scale(1);
-
-        letter-spacing:normal;
+        transform: translateY(0);
 
       }
 
-      40%{
+      12% {
 
-        transform:scale(1.02);
+        text-shadow: 0 0 10px rgba(0, 0, 0, .45);
 
-        letter-spacing:.02em;
-
-        text-shadow:
-
-          0 0 16px rgba(248,191,60,.95),
-
-          0 10px 25px rgba(0,0,0,.3);
+        transform: translateY(-0.5px);
 
       }
 
-      55%{
+      40% {
 
-        transform:scale(1.01);
-
-      }
-
-    }
-
-
-
-    /* خط أوتوميشن يمسح تحت اللوجو – راقي وسريع نسبياً */
-
-    .brand-logo::after{
-
-      content:"";
-
-      position:absolute;
-
-      left:0;
-
-      bottom:-4px;
-
-      height:2px;
-
-      width:0;
-
-      border-radius:999px;
-
-      background:linear-gradient(90deg,#ffffff,#fcb11a);
-
-      opacity:0;
-
-      animation:logo-scan 6s ease-out infinite 0.9s;
-
-    }
-
-
-
-    @keyframes logo-scan{
-
-      0%{
-
-        width:0;
-
-        transform:translateX(0);
-
-        opacity:0;
+        text-shadow: 0 0 18px rgba(0, 0, 0, .7);
 
       }
 
-      8%{
+      100% {
 
-        width:40%;
+        text-shadow: 0 0 0 rgba(0, 0, 0, 0);
 
-        opacity:1;
-
-      }
-
-      30%{
-
-        width:100%;
-
-        transform:translateX(0);
-
-        opacity:1;
-
-      }
-
-      45%{
-
-        width:40%;
-
-        transform:translateX(110%);
-
-        opacity:1;
-
-      }
-
-      60%{
-
-        width:0;
-
-        opacity:0;
-
-      }
-
-      100%{
-
-        width:0;
-
-        opacity:0;
+        transform: translateY(0);
 
       }
 
@@ -372,47 +258,11 @@
 
 
 
-    /* على الموبايل نخلي كل شيء أنعم وأهدأ شوي */
+    @media (max-width: 430px) {
 
-    @media (max-width:430px){
+      .brand-logo::after {
 
-      .brand-logo::after{
-
-        bottom:-3px;
-
-        height:1.5px;
-
-      }
-
-
-
-      .brand-logo .pro{
-
-        animation:
-
-          logo-fade-up .45s ease-out both,
-
-          pro-pulse 7s ease-in-out infinite .6s;
-
-      }
-
-      .brand-logo .build{
-
-        animation:
-
-          logo-fade-up .45s ease-out both .07s,
-
-          build-glow 7s ease-in-out infinite 1.6s;
-
-      }
-
-      .brand-logo .zone{
-
-        animation:
-
-          logo-fade-up .45s ease-out both .14s,
-
-          zone-focus 7s ease-in-out infinite 2.4s;
+        height: 2px; /* أنحف قليلاً على الشاشات الصغيرة */
 
       }
 
@@ -477,8 +327,6 @@
       <p>Post your project with photos. Local contractors send offers. You choose the best match, and talk directly.</p>
 
 
-
-      <!-- أوتوميشن احترافي -->
 
       <div class="automation-pill">
 
@@ -724,19 +572,19 @@
 
     // ===== NAV MENU =====
 
-    const menuBtn=document.getElementById("menuBtn");
+    const menuBtn = document.getElementById("menuBtn");
 
-    const menuPanel=document.getElementById("menuPanel");
+    const menuPanel = document.getElementById("menuPanel");
 
-    if(menuBtn) menuBtn.addEventListener("click",()=>{
+    if (menuBtn) menuBtn.addEventListener("click", () => {
 
-      menuPanel.style.display=menuPanel.style.display==="block"?"none":"block";
+      menuPanel.style.display = menuPanel.style.display === "block" ? "none" : "block";
 
     });
 
-    document.addEventListener("click",(e)=>{
+    document.addEventListener("click", (e) => {
 
-      if(!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display="none");
+      if (!e.target.closest(".menu-wrap")) menuPanel && (menuPanel.style.display = "none");
 
     });
 
@@ -744,91 +592,91 @@
 
     // ===== ABOUT =====
 
-    const aboutModal=document.getElementById("aboutModal");
+    const aboutModal = document.getElementById("aboutModal");
 
-    const openAbout=(e)=>{
+    const openAbout = (e) => {
 
-      if(e) e.preventDefault();
+      if (e) e.preventDefault();
 
-      aboutModal.style.display="grid";
+      aboutModal.style.display = "grid";
 
-      document.documentElement.style.overflow="hidden";
-
-    };
-
-    const closeAbout=()=>{
-
-      aboutModal.style.display="none";
-
-      document.documentElement.style.overflow="";
+      document.documentElement.style.overflow = "hidden";
 
     };
 
-    document.getElementById("openAboutFromMenu")?.addEventListener("click",(e)=>{
+    const closeAbout = () => {
 
-      e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display="none");
+      aboutModal.style.display = "none";
+
+      document.documentElement.style.overflow = "";
+
+    };
+
+    document.getElementById("openAboutFromMenu")?.addEventListener("click", (e) => {
+
+      e.preventDefault(); openAbout(); menuPanel && (menuPanel.style.display = "none");
 
     });
 
-    document.getElementById("aboutClose")?.addEventListener("click",closeAbout);
+    document.getElementById("aboutClose")?.addEventListener("click", closeAbout);
 
-    aboutModal?.addEventListener("click",(ev)=>{ if(ev.target===aboutModal) closeAbout(); });
+    aboutModal?.addEventListener("click", (ev) => { if (ev.target === aboutModal) closeAbout(); });
 
 
 
     // ===== MODAL =====
 
-    const modal=document.getElementById("modal");
+    const modal = document.getElementById("modal");
 
-    const step1=document.getElementById("step1");
+    const step1 = document.getElementById("step1");
 
-    const step2=document.getElementById("step2");
+    const step2 = document.getElementById("step2");
 
-    const sheet=document.querySelector(".sheet");
+    const sheet = document.querySelector(".sheet");
 
-    const selectedCatEl=document.getElementById("selectedCat").querySelector("b");
+    const selectedCatEl = document.getElementById("selectedCat").querySelector("b");
 
-    const hiddenCat=document.getElementById("categoryHidden");
+    const hiddenCat = document.getElementById("categoryHidden");
 
 
 
-    function openDoor(){
+    function openDoor() {
 
-      modal.style.display="flex";
+      modal.style.display = "flex";
 
-      document.documentElement.style.overflow="hidden";
+      document.documentElement.style.overflow = "hidden";
 
       goStep(1);
 
     }
 
-    function closeDoor(){
+    function closeDoor() {
 
-      modal.style.display="none";
+      modal.style.display = "none";
 
-      document.documentElement.style.overflow="";
+      document.documentElement.style.overflow = "";
 
     }
 
-    function goStep(n){
+    function goStep(n) {
 
-      if(n===1){
+      if (n === 1) {
 
-        step1.style.display="block";
+        step1.style.display = "block";
 
-        step2.style.display="none";
+        step2.style.display = "none";
 
-        document.getElementById("sheetTitle").textContent="Post a Job";
+        document.getElementById("sheetTitle").textContent = "Post a Job";
 
       } else {
 
-        step1.style.display="none";
+        step1.style.display = "none";
 
-        step2.style.display="block";
+        step2.style.display = "block";
 
-        document.getElementById("sheetTitle").textContent="Post a Job";
+        document.getElementById("sheetTitle").textContent = "Post a Job";
 
-        sheet.scrollTop=0;
+        sheet.scrollTop = 0;
 
       }
 
@@ -836,27 +684,27 @@
 
 
 
-    document.getElementById("postJobTop").addEventListener("click",openDoor);
+    document.getElementById("postJobTop").addEventListener("click", openDoor);
 
-    document.getElementById("closeDoor").addEventListener("click",closeDoor);
+    document.getElementById("closeDoor").addEventListener("click", closeDoor);
 
-    document.getElementById("backBtn").addEventListener("click",()=>{
+    document.getElementById("backBtn").addEventListener("click", () => {
 
-      if(step1.style.display==="block") closeDoor(); else goStep(1);
+      if (step1.style.display === "block") closeDoor(); else goStep(1);
 
     });
 
 
 
-    document.querySelectorAll(".cat-card").forEach((btn)=>{
+    document.querySelectorAll(".cat-card").forEach((btn) => {
 
-      btn.addEventListener("click",()=>{
+      btn.addEventListener("click", () => {
 
-        const val=btn.dataset.cat;
+        const val = btn.dataset.cat;
 
-        hiddenCat.value=val;
+        hiddenCat.value = val;
 
-        selectedCatEl.textContent=val;
+        selectedCatEl.textContent = val;
 
         goStep(2);
 
@@ -868,59 +716,63 @@
 
     // ===== FILES PREVIEW (UI only) =====
 
-    const fileInput=document.getElementById("fileInput");
+    const fileInput = document.getElementById("fileInput");
 
-    const pickBtn=document.getElementById("pickBtn");
+    const pickBtn = document.getElementById("pickBtn");
 
-    const fileList=document.getElementById("fileList");
+    const fileList = document.getElementById("fileList");
 
-    const dropZone=document.getElementById("dropZone");
-
-
-
-    if(pickBtn) pickBtn.onclick=()=>fileInput.click();
+    const dropZone = document.getElementById("dropZone");
 
 
 
-    const humanSize=(b)=> b<1024? b+' B' : b<1048576? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+    if (pickBtn) pickBtn.onclick = () => fileInput.click();
 
 
 
-    const renderList=(files)=>{
+    const humanSize = (b) =>
 
-      fileList.innerHTML="";
+      b < 1024 ? b + ' B'
 
-      if(!files.length){
+        : b < 1048576 ? (b / 1024).toFixed(1) + ' KB'
 
-        fileList.innerHTML='<span class="hint">No files selected yet.</span>';
+          : (b / 1048576).toFixed(1) + ' MB';
+
+
+
+    const renderList = (files) => {
+
+      fileList.innerHTML = "";
+
+      if (!files.length) {
+
+        fileList.innerHTML = '<span class="hint">No files selected yet.</span>';
 
         return;
 
       }
 
-      [...files].forEach((f)=>{
+      [...files].forEach((f) => {
 
-        const isImg=/^image\//.test(f.type);
+        const isImg = /^image\//.test(f.type);
 
-        const item=document.createElement("div");
+        const item = document.createElement("div");
 
-        item.className="file-item";
+        item.className = "file-item";
 
-        item.innerHTML=
+        item.innerHTML =
 
-          `<div class="thumb">${
+          `<div class="thumb">${isImg
 
-            isImg ? `<img src="${URL.createObjectURL(f)}" alt="">`
+            ? `<img src="${URL.createObjectURL(f)}" alt="">`
 
-                  : `<i class="fa-regular fa-file-lines"></i>`
-
-          }</div>
+            : `<i class="fa-regular fa-file-lines"></i>`}</div>
 
            <div class="meta">
 
              <b>${f.name}</b>
 
-             <span>${f.type||"file"} • ${humanSize(f.size)}</span>
+             <span>${f.type || "file"} • ${humanSize(f.size)}</span>
 
            </div>`;
 
@@ -932,31 +784,43 @@
 
 
 
-    fileInput?.addEventListener("change",()=>renderList(fileInput.files));
+    fileInput?.addEventListener("change", () => renderList(fileInput.files));
 
 
 
-    ["dragenter","dragover","dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,(ev)=>{
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((e) =>
 
-      ev.preventDefault(); ev.stopPropagation();
+      dropZone?.addEventListener(e, (ev) => {
 
-    },false));
+        ev.preventDefault(); ev.stopPropagation();
 
+      }, false)
 
-
-    ["dragenter","dragover"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.add("hover"),false));
-
-    ["dragleave","drop"].forEach((e)=>dropZone?.addEventListener(e,()=>dropZone.classList.remove("hover"),false));
+    );
 
 
 
-    dropZone?.addEventListener("drop",(ev)=>{
+    ["dragenter", "dragover"].forEach((e) =>
 
-      const dt=ev.dataTransfer;
+      dropZone?.addEventListener(e, () => dropZone.classList.add("hover"), false)
 
-      if(dt?.files){
+    );
 
-        fileInput.files=dt.files;
+    ["dragleave", "drop"].forEach((e) =>
+
+      dropZone?.addEventListener(e, () => dropZone.classList.remove("hover"), false)
+
+    );
+
+
+
+    dropZone?.addEventListener("drop", (ev) => {
+
+      const dt = ev.dataTransfer;
+
+      if (dt?.files) {
+
+        fileInput.files = dt.files;
 
         renderList(fileInput.files);
 
@@ -968,45 +832,43 @@
 
     // ===== SEND → post-job (Netlify) =====
 
-    document.getElementById("sendBtn").addEventListener("click", async ()=>{
+    document.getElementById("sendBtn").addEventListener("click", async () => {
 
-      const m=document.getElementById("sendMsg");
+      const m = document.getElementById("sendMsg");
 
-      const payload={
+      const payload = {
 
-        category:    document.getElementById("categoryHidden").value || "General",
+        category: document.getElementById("categoryHidden").value || "General",
 
-        title:       document.getElementById("title").value.trim(),
+        title: document.getElementById("title").value.trim(),
 
-        summary:     document.getElementById("summary").value.trim(),
+        summary: document.getElementById("summary").value.trim(),
 
-        city:        document.getElementById("city").value.trim(),
+        city: document.getElementById("city").value.trim(),
 
-        state:       document.getElementById("state").value.trim(),
+        state: document.getElementById("state").value.trim(),
 
-        name:        document.getElementById("contactName").value.trim(),
+        name: document.getElementById("contactName").value.trim(),
 
-        phone:       document.getElementById("phone").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
 
-        email:       document.getElementById("email").value.trim(),
+        email: document.getElementById("email").value.trim(),
 
-        address:     document.getElementById("address").value.trim(),
+        address: document.getElementById("address").value.trim(),
 
         description: document.getElementById("longDesc").value.trim()
-
-        // لا نرسل files الآن
 
       };
 
 
 
-      if(!payload.title||!payload.name||!payload.phone||!payload.email||
+      if (!payload.title || !payload.name || !payload.phone ||
 
-         !payload.address||!payload.description){
+        !payload.email || !payload.address || !payload.description) {
 
-        m.textContent="Please fill all required fields.";
+        m.textContent = "Please fill all required fields.";
 
-        m.className="hint err";
+        m.className = "hint err";
 
         return;
 
@@ -1014,63 +876,61 @@
 
 
 
-      m.textContent="Saving to database…";
+      m.textContent = "Saving to database…";
 
-      m.className="hint";
+      m.className = "hint";
 
 
 
-      try{
+      try {
 
-        const res=await fetch("/.netlify/functions/post-job",{
+        const res = await fetch("/.netlify/functions/post-job", {
 
-          method:"POST",
+          method: "POST",
 
-          headers:{
+          headers: {
 
-            "Content-Type":"application/json",
+            "Content-Type": "application/json",
 
-            "Accept":"application/json"
+            "Accept": "application/json"
 
           },
 
-          body:JSON.stringify(payload)
+          body: JSON.stringify(payload)
 
         });
 
 
 
-        const text=await res.text();
+        const text = await res.text();
 
         let data;
 
-        try{ data=JSON.parse(text);}catch{
+        try { data = JSON.parse(text); } catch {
 
-          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0,120)}…`);
+          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 120)}…`);
 
         }
 
 
 
-        if(!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
+        if (!res.ok || !data.ok) throw new Error(data.error || `Failed with ${res.status}`);
 
 
 
-        // رسالة نجاح بسيطة بدون Job ID
+        m.textContent = "✅ Job posted! Local pros will review your project soon.";
 
-        m.textContent="✅ Job posted! Local pros will review your project soon.";
-
-        m.className="hint ok";
+        m.className = "hint ok";
 
 
 
-        setTimeout(()=>{ m.textContent=""; closeDoor(); },1200);
+        setTimeout(() => { m.textContent = ""; closeDoor(); }, 1200);
 
-      }catch(e){
+      } catch (e) {
 
-        m.textContent="❌ Error: "+(e.message||"network error");
+        m.textContent = "❌ Error: " + (e.message || "network error");
 
-        m.className="hint err";
+        m.className = "hint err";
 
       }
 
