@@ -1,186 +1,204 @@
-// pros.js
-// ProBuildZone — robust client-side submit helper
-// Sends Pro signup data to Netlify -> Stripe / backend
-// Built to support both old and current form IDs without breaking working flows
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ProBuildZone — Start Free Trial</title>
 
-(function () {
-  function getField(idOrName) {
-    const byId = document.getElementById(idOrName);
-    if (byId) return byId;
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    const byName = document.querySelector(`[name="${idOrName}"]`);
-    if (byName) return byName;
+  <style>
+    :root{
+      --pbz:#0F2A43;
+      --gold:#D4AF37;
+      --muted:#617186;
+      --bg:#f3f5f7;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--pbz);
+    }
+    .page{
+      max-width:820px;
+      margin:28px auto 40px;
+      padding:0 14px;
+    }
+    h1{
+      margin-bottom:16px;
+      font-size:26px;
+    }
+    .card{
+      background:#fff;
+      border:1px solid #e3e7eb;
+      border-radius:16px;
+      padding:18px 16px 20px;
+      box-shadow:0 6px 22px rgba(0,0,0,.03);
+    }
+    label{
+      display:block;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    input,select,textarea{
+      width:100%;
+      padding:12px;
+      border:1px solid #d5d9de;
+      border-radius:10px;
+      font:inherit;
+      background:#fff;
+    }
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:14px;
+    }
+    .actions{
+      margin-top:18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button{
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      font-family:inherit;
+    }
+    .btn-main{
+      background:var(--gold);
+      color:#000;
+      padding:12px 16px;
+      border-radius:10px;
+    }
+    .btn-secondary{
+      background:#edf0f3;
+      color:var(--pbz);
+      padding:12px 16px;
+      border-radius:10px;
+    }
+    .alert{
+      margin-top:12px;
+      background:#fdeeee;
+      border:1px solid #f4c3c3;
+      border-radius:10px;
+      padding:10px 12px;
+      color:#a52f2f;
+      display:none;
+      white-space:pre-wrap;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:6px;
+      line-height:1.45;
+    }
 
-    return null;
-  }
-
-  function getVal(...keys) {
-    for (const key of keys) {
-      const el = getField(key);
-      if (el && typeof el.value === "string") {
-        return el.value.trim();
+    @media (max-width:540px){
+      .card{
+        padding:16px 14px 20px;
+      }
+      .actions{
+        flex-direction:column;
+      }
+      .btn-main,.btn-secondary{
+        width:100%;
+        text-align:center;
       }
     }
-    return "";
-  }
+  </style>
+</head>
 
-  function showInlineError(message) {
-    const alertBox = document.getElementById("alert");
-    if (alertBox) {
-      alertBox.textContent = message;
-      alertBox.style.display = "block";
-      return true;
-    }
-    return false;
-  }
+<body>
+  <div class="page">
+    <h1>ProBuildZone — Start Free Trial</h1>
 
-  function clearInlineError() {
-    const alertBox = document.getElementById("alert");
-    if (alertBox) {
-      alertBox.textContent = "";
-      alertBox.style.display = "none";
-    }
-  }
+    <div class="card">
+      <form id="prosForm" novalidate autocomplete="off">
 
-  function getSubmitButton(e) {
-    return (
-      document.getElementById("startBtn") ||
-      document.getElementById("startTrialBtn") ||
-      document.getElementById("start-free-trial") ||
-      (e && e.submitter) ||
-      null
-    );
-  }
+        <div class="grid">
+          <div>
+            <label for="name">Business / Owner name *</label>
+            <input id="name" name="name" required>
+          </div>
 
-  function setButtonState(btn, busy) {
-    if (!btn) return;
-    btn.disabled = !!busy;
-    btn.textContent = busy ? "Processing..." : "Start Free Trial";
-  }
+          <div>
+            <label for="email">Email *</label>
+            <input id="email" name="email" type="email" required>
+          </div>
 
-  function buildPayload() {
-    return {
-      name: getVal("name", "businessName", "ownerName", "biz", "fullName", "pro_name"),
-      email: getVal("email", "pro_email"),
-      phone: getVal("phone", "pro_phone"),
-      address: getVal("address", "businessAddress", "pro_address"),
-      license: getVal("license", "businessLicense", "pro_license"),
-      insurance: getVal("insurance", "pro_insurance"),
-      notes: getVal("notes", "services", "pro_notes"),
+          <div>
+            <label for="phone">Phone *</label>
+            <input id="phone" name="phone" required>
+          </div>
 
-      // New explicit fields for durable matching architecture
-      category: getVal("category", "trade", "serviceCategory", "pro_category"),
-      city: getVal("city", "pro_city"),
-      state: getVal("state", "pro_state"),
-    };
-  }
+          <div>
+            <label for="address">Business address</label>
+            <input id="address" name="address">
+          </div>
 
-  function validatePayload(payload) {
-    if (!payload.name || !payload.email || !payload.phone || !payload.license) {
-      return "Please fill name, email, phone, and license.";
-    }
+          <div>
+            <label for="license">Business license *</label>
+            <input id="license" name="license" required>
+          </div>
 
-    const agree =
-      document.getElementById("agree") ||
-      document.querySelector('input[name="agree"]');
+          <div>
+            <label for="insurance">Insurance</label>
+            <input id="insurance" name="insurance" placeholder="Optional">
+          </div>
 
-    if (agree && !agree.checked) {
-      return "Please accept the Terms and Privacy notice to continue.";
-    }
+          <div>
+            <label for="category">Category *</label>
+            <select id="category" name="category" required>
+              <option value="">Select</option>
+              <option value="Roofing">Roofing</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Electrical">Electrical</option>
+              <option value="HVAC">HVAC</option>
+              <option value="Painting">Painting</option>
+              <option value="Flooring">Flooring</option>
+              <option value="Remodeling">Remodeling</option>
+              <option value="Landscaping">Landscaping</option>
+            </select>
+          </div>
 
-    return "";
-  }
+          <div>
+            <label for="city">City *</label>
+            <input id="city" name="city" required placeholder="Louisville">
+          </div>
 
-  async function handleSubmit(e) {
-    if (e && e.preventDefault) e.preventDefault();
+          <div>
+            <label for="state">State *</label>
+            <input id="state" name="state" required placeholder="KY">
+          </div>
 
-    clearInlineError();
+          <div style="grid-column:1/-1">
+            <label for="notes">Services & Notes</label>
+            <textarea id="notes" name="notes" placeholder="Tell homeowners what kind of work you do best."></textarea>
+            <div class="hint">
+              Keep this short and practical. Your category, city, and state are stored as separate fields for accurate matching.
+            </div>
+          </div>
+        </div>
 
-    const btn = getSubmitButton(e);
-    setButtonState(btn, true);
+        <div id="alert" class="alert"></div>
 
-    const payload = buildPayload();
-    const validationError = validatePayload(payload);
+        <div class="actions">
+          <button type="reset" class="btn-secondary">Reset</button>
+          <button id="startBtn" type="submit" class="btn-main">Start Free Trial</button>
+        </div>
 
-    if (validationError) {
-      if (!showInlineError(validationError)) {
-        alert(validationError);
-      }
-      setButtonState(btn, false);
-      return;
-    }
+      </form>
+    </div>
+  </div>
 
-    try {
-      // Save locally if page wants to reuse data later
-      try {
-        localStorage.setItem("pbz_form_data", JSON.stringify(payload));
-      } catch (_) {}
-
-      const res = await fetch("/.netlify/functions/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const text = await res.text();
-      let data = {};
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(`Non-JSON response (${res.status})`);
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || `Function error (${res.status})`);
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      throw new Error("Did not get checkout URL.");
-    } catch (err) {
-      console.error("pros.js submit error:", err);
-
-      const message = err && err.message
-        ? err.message
-        : "Something went wrong. Please try again.";
-
-      if (!showInlineError(message)) {
-        alert(message);
-      }
-    } finally {
-      setButtonState(btn, false);
-    }
-  }
-
-  function boot() {
-    const form =
-      document.getElementById("prosForm") ||
-      document.getElementById("proForm");
-
-    if (form) {
-      form.addEventListener("submit", handleSubmit);
-    }
-
-    const btn =
-      document.getElementById("startBtn") ||
-      document.getElementById("startTrialBtn") ||
-      document.getElementById("start-free-trial");
-
-    if (btn && !form) {
-      btn.addEventListener("click", handleSubmit);
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
+  <script src="pros.js"></script>
+</body>
+</html>
