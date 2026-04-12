@@ -22,156 +22,183 @@
       background:var(--bg);
       color:var(--pbz);
     }
-    .page{max-width:820px;margin:28px auto 40px;padding:0 14px;}
-    h1{margin-bottom:16px;font-size:26px}
+    .page{
+      max-width:820px;
+      margin:28px auto 40px;
+      padding:0 14px;
+    }
+    h1{
+      margin-bottom:16px;
+      font-size:26px;
+    }
     .card{
-      background:#fff;border:1px solid #e3e7eb;border-radius:16px;
-      padding:18px 16px 20px;box-shadow:0 6px 22px rgba(0,0,0,.03);
+      background:#fff;
+      border:1px solid #e3e7eb;
+      border-radius:16px;
+      padding:18px 16px 20px;
+      box-shadow:0 6px 22px rgba(0,0,0,.03);
     }
-    label{display:block;font-weight:600;margin-bottom:6px}
+    label{
+      display:block;
+      font-weight:600;
+      margin-bottom:6px;
+    }
     input,select,textarea{
-      width:100%;padding:12px;border:1px solid #d5d9de;border-radius:10px;
-      font:inherit;background:#fff;
+      width:100%;
+      padding:12px;
+      border:1px solid #d5d9de;
+      border-radius:10px;
+      font:inherit;
+      background:#fff;
     }
-    textarea{min-height:110px;resize:vertical}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
-    .agree{margin-top:14px;display:flex;gap:10px;align-items:flex-start;}
-    .agree input{width:20px;height:20px;margin-top:2px;}
-    .agree label{margin:0;font-weight:400;}
-    .agree a{color:#0b70ff;text-decoration:underline}
-    .actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;}
-    button{border:none;cursor:pointer;font-weight:600}
-    .btn-main{background:var(--gold);color:#000;padding:12px 16px;border-radius:10px;}
-    .btn-secondary{background:#edf0f3;color:var(--pbz);padding:12px 16px;border-radius:10px;}
-    .alert{margin-top:12px;background:#fdeeee;border:1px solid #f4c3c3;border-radius:10px;padding:10px 12px;color:#a52f2f;display:none;}
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:14px;
+    }
+    .actions{
+      margin-top:18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    button{
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      font-family:inherit;
+    }
+    .btn-main{
+      background:var(--gold);
+      color:#000;
+      padding:12px 16px;
+      border-radius:10px;
+    }
+    .btn-secondary{
+      background:#edf0f3;
+      color:var(--pbz);
+      padding:12px 16px;
+      border-radius:10px;
+    }
+    .alert{
+      margin-top:12px;
+      background:#fdeeee;
+      border:1px solid #f4c3c3;
+      border-radius:10px;
+      padding:10px 12px;
+      color:#a52f2f;
+      display:none;
+      white-space:pre-wrap;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:6px;
+      line-height:1.45;
+    }
+
+    @media (max-width:540px){
+      .card{
+        padding:16px 14px 20px;
+      }
+      .actions{
+        flex-direction:column;
+      }
+      .btn-main,.btn-secondary{
+        width:100%;
+        text-align:center;
+      }
+    }
   </style>
 </head>
 
 <body>
-<div class="page">
-  <h1>ProBuildZone — Start Free Trial</h1>
+  <div class="page">
+    <h1>ProBuildZone — Start Free Trial</h1>
 
-  <div class="card">
-    <form id="prosForm" novalidate autocomplete="off">
+    <div class="card">
+      <form id="prosForm" novalidate autocomplete="off">
 
-      <div class="grid">
+        <div class="grid">
+          <div>
+            <label for="name">Business / Owner name *</label>
+            <input id="name" name="name" required>
+          </div>
 
-        <div>
-          <label>Business / Owner name</label>
-          <input id="name" required>
+          <div>
+            <label for="email">Email *</label>
+            <input id="email" name="email" type="email" required>
+          </div>
+
+          <div>
+            <label for="phone">Phone *</label>
+            <input id="phone" name="phone" required>
+          </div>
+
+          <div>
+            <label for="address">Business address</label>
+            <input id="address" name="address">
+          </div>
+
+          <div>
+            <label for="license">Business license *</label>
+            <input id="license" name="license" required>
+          </div>
+
+          <div>
+            <label for="insurance">Insurance</label>
+            <input id="insurance" name="insurance" placeholder="Optional">
+          </div>
+
+          <div>
+            <label for="category">Category *</label>
+            <select id="category" name="category" required>
+              <option value="">Select</option>
+              <option value="Roofing">Roofing</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Electrical">Electrical</option>
+              <option value="HVAC">HVAC</option>
+              <option value="Painting">Painting</option>
+              <option value="Flooring">Flooring</option>
+              <option value="Remodeling">Remodeling</option>
+              <option value="Landscaping">Landscaping</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="city">City *</label>
+            <input id="city" name="city" required placeholder="Louisville">
+          </div>
+
+          <div>
+            <label for="state">State *</label>
+            <input id="state" name="state" required placeholder="KY">
+          </div>
+
+          <div style="grid-column:1/-1">
+            <label for="notes">Services & Notes</label>
+            <textarea id="notes" name="notes" placeholder="Tell homeowners what kind of work you do best."></textarea>
+            <div class="hint">
+              Your profile will be saved directly in ProBuildZone for matching and onboarding.
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label>Email</label>
-          <input id="email" type="email" required>
+        <div id="alert" class="alert"></div>
+
+        <div class="actions">
+          <button type="reset" class="btn-secondary">Reset</button>
+          <button id="startBtn" type="submit" class="btn-main">Start Free Trial</button>
         </div>
 
-        <div>
-          <label>Phone</label>
-          <input id="phone" required>
-        </div>
-
-        <div>
-          <label>Business address</label>
-          <input id="address">
-        </div>
-
-        <div>
-          <label>Business license</label>
-          <input id="license" required>
-        </div>
-
-        <div>
-          <label>Category *</label>
-          <select id="category" required>
-            <option value="">Select</option>
-            <option>Roofing</option>
-            <option>Plumbing</option>
-            <option>Electrical</option>
-            <option>HVAC</option>
-            <option>Painting</option>
-            <option>Flooring</option>
-            <option>Remodeling</option>
-            <option>Landscaping</option>
-          </select>
-        </div>
-
-        <div>
-          <label>City *</label>
-          <input id="city" required placeholder="Louisville">
-        </div>
-
-        <div>
-          <label>State *</label>
-          <input id="state" required placeholder="KY">
-        </div>
-
-        <div style="grid-column:1/-1">
-          <label>Services & Notes</label>
-          <textarea id="notes"></textarea>
-        </div>
-
-      </div>
-
-      <div id="alert" class="alert"></div>
-
-      <div class="actions">
-        <button type="reset" class="btn-secondary">Reset</button>
-        <button id="startBtn" type="button" class="btn-main">Start Free Trial</button>
-      </div>
-
-    </form>
+      </form>
+    </div>
   </div>
-</div>
 
-<script>
-const btn = document.getElementById('startBtn');
-const alertBox = document.getElementById('alert');
-
-function showError(msg){
-  alertBox.textContent = msg;
-  alertBox.style.display = 'block';
-}
-
-async function startTrial(){
-
-  const payload = {
-    name: name.value,
-    email: email.value,
-    phone: phone.value,
-    address: address.value,
-    license: license.value,
-
-    // دمج البيانات الجديدة بدون كسر DB
-    notes: `
-Category: ${category.value}
-City: ${city.value}, ${state.value}
-
-${notes.value || ''}
-    `
-  };
-
-  if(!payload.name || !payload.email || !payload.phone || !payload.license || !category.value){
-    return showError('Fill all required fields.');
-  }
-
-  btn.disabled = true;
-
-  try{
-    await fetch('/.netlify/functions/create-checkout-session',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-  }catch(e){
-    console.warn(e);
-  }
-
-  btn.disabled = false;
-}
-
-btn.addEventListener('click', startTrial);
-</script>
-
+  <script src="/pros.js"></script>
 </body>
 </html>
