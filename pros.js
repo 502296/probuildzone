@@ -1,5 +1,6 @@
 // pros.js
 // ProBuildZone — signup flow using Supabase only (no Stripe redirect)
+// After successful signup, redirect Pro to matching jobs page
 
 (function () {
   function getField(idOrName) {
@@ -101,6 +102,16 @@
     return "";
   }
 
+  function buildJobsRedirectUrl(payload) {
+    const q = new URLSearchParams({
+      category: payload.category || "",
+      city: payload.city || "",
+      state: payload.state || "",
+    });
+
+    return `/jobs.html?${q.toString()}`;
+  }
+
   async function handleSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -146,17 +157,15 @@
       }
 
       showInlineMessage(
-        "Success. Your ProBuildZone profile has been saved. We will use this information for matching and onboarding.",
+        "Success. Your ProBuildZone profile has been saved. Redirecting you to matching jobs...",
         "success"
       );
 
-      const form =
-        document.getElementById("prosForm") ||
-        document.getElementById("proForm");
+      const redirectUrl = buildJobsRedirectUrl(payload);
 
-      if (form) {
-        form.reset();
-      }
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1200);
     } catch (err) {
       console.error("pros.js submit error:", err);
 
