@@ -2,105 +2,282 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Available Jobs - ProBuildZone</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      font-family: Arial;
-      background: #f5f5f5;
-      padding: 20px;
+    :root{
+      --pbz:#0F2A43;
+      --gold:#D4AF37;
+      --muted:#617186;
+      --bg:#f3f5f7;
+      --card:#ffffff;
+      --border:#e3e7eb;
     }
 
-    h1 {
-      text-align: center;
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--pbz);
+      padding:28px 16px 40px;
     }
 
-    .job {
-      background: white;
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 10px;
-      max-width: 600px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    .page{
+      max-width:1000px;
+      margin:0 auto;
     }
 
-    .job h3 {
-      margin: 0 0 10px;
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
     }
 
-    .job button {
-      background: gold;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 6px;
+    h1{
+      margin:0;
+      font-size:30px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:8px;
+      margin-bottom:20px;
+      line-height:1.5;
+    }
+
+    .filters{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    .pill{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      color:var(--pbz);
+    }
+
+    .jobs-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+      gap:16px;
+    }
+
+    .job-card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+
+    .job-title{
+      margin:0 0 10px;
+      font-size:20px;
+      line-height:1.35;
+    }
+
+    .meta{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:10px;
+      line-height:1.5;
+    }
+
+    .desc{
+      font-size:15px;
+      line-height:1.6;
+      margin-bottom:16px;
+      color:#24384d;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      border-radius:10px;
+      padding:10px 14px;
+      font-family:inherit;
+    }
+
+    .btn-main{
+      background:var(--gold);
+      color:#000;
+    }
+
+    .btn-secondary{
+      background:#edf0f3;
+      color:var(--pbz);
+    }
+
+    .empty,
+    .error,
+    .loading{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .error{
+      color:#a52f2f;
+      background:#fdeeee;
+      border-color:#f4c3c3;
+    }
+
+    @media (max-width:640px){
+      h1{font-size:26px}
     }
   </style>
 </head>
 <body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <h1>Available Jobs</h1>
+        <div class="subtitle">
+          Browse homeowner projects that match your trade and location.
+        </div>
+      </div>
+      <a class="btn btn-secondary" href="/pros.html">Back to Pro Signup</a>
+    </div>
 
-<h1>Available Jobs</h1>
+    <div class="filters" id="filters"></div>
 
-<div id="jobs"></div>
+    <div id="statusBox" class="loading">Loading jobs...</div>
+    <div id="jobsBox" class="jobs-grid" style="display:none;"></div>
+  </div>
 
-<script>
-  // 🔑 بيانات Supabase
-  const SUPABASE_URL = "YOUR_SUPABASE_URL";
-  const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
+  <script>
+    const SUPABASE_URL = "https://ekegbmhmgwxjqedkglvg.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_2bnkkC7qhGd1bSQ2VTEbZA_EgdZFaX_";
 
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // 📥 قراءة القيم من الرابط
-  const params = new URLSearchParams(window.location.search);
-  const category = params.get("category");
-  const city = params.get("city");
-  const state = params.get("state");
+    const params = new URLSearchParams(window.location.search);
+    const category = (params.get("category") || "").trim();
+    const city = (params.get("city") || "").trim();
+    const state = (params.get("state") || "").trim();
 
-  async function loadJobs() {
-    let query = supabase
-      .from("homeowner_jobs")
-      .select("*")
-      .order("id", { ascending: false });
+    const filtersEl = document.getElementById("filters");
+    const statusBox = document.getElementById("statusBox");
+    const jobsBox = document.getElementById("jobsBox");
 
-    if (category) query = query.eq("category", category);
-    if (city) query = query.eq("city", city);
-    if (state) query = query.eq("state", state);
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error(error);
-      return;
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    const container = document.getElementById("jobs");
-
-    if (!data.length) {
-      container.innerHTML = "<p style='text-align:center'>No jobs found</p>";
-      return;
+    function shortText(text, max = 140) {
+      const value = String(text || "").trim();
+      if (!value) return "No description provided.";
+      return value.length > max ? value.slice(0, max) + "..." : value;
     }
 
-    data.forEach(job => {
-      const div = document.createElement("div");
-      div.className = "job";
+    function renderFilters() {
+      const pills = [];
 
-      div.innerHTML = `
-        <h3>${job.title || "No title"}</h3>
-        <p><strong>Category:</strong> ${job.category || "-"}</p>
-        <p><strong>City:</strong> ${job.city || "-"}</p>
-        <button onclick="viewJob('${job.id}')">View Details</button>
-      `;
+      if (category) pills.push(`<div class="pill">Category: ${escapeHtml(category)}</div>`);
+      if (city) pills.push(`<div class="pill">City: ${escapeHtml(city)}</div>`);
+      if (state) pills.push(`<div class="pill">State: ${escapeHtml(state)}</div>`);
 
-      container.appendChild(div);
-    });
-  }
+      if (!pills.length) {
+        pills.push(`<div class="pill">Showing all available jobs</div>`);
+      }
 
-  function viewJob(id) {
-    window.location.href = `/job.html?id=${id}`;
-  }
+      filtersEl.innerHTML = pills.join("");
+    }
 
-  loadJobs();
-</script>
+    async function loadJobs() {
+      renderFilters();
 
+      let query = client
+        .from("homeowner_jobs")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (category) query = query.eq("category", category);
+      if (city) query = query.ilike("city", city);
+      if (state) query = query.ilike("state", state);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Jobs load error:", error);
+        statusBox.className = "error";
+        statusBox.textContent = "Could not load jobs right now.";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        statusBox.className = "empty";
+        statusBox.textContent = "No jobs found for this area and category yet.";
+        return;
+      }
+
+      statusBox.style.display = "none";
+      jobsBox.style.display = "grid";
+
+      jobsBox.innerHTML = data.map(job => {
+        const title =
+          job.title ||
+          job.project_title ||
+          "Untitled job";
+
+        const summary =
+          job.summary ||
+          job.short_summary ||
+          job.description ||
+          job.full_description ||
+          "";
+
+        const location = [job.city, job.state].filter(Boolean).join(", ");
+
+        const jobId =
+          job.public_id ||
+          job.id;
+
+        return `
+          <div class="job-card">
+            <h3 class="job-title">${escapeHtml(title)}</h3>
+            <div class="meta">
+              <div><strong>Category:</strong> ${escapeHtml(job.category || "-")}</div>
+              <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
+            </div>
+            <div class="desc">${escapeHtml(shortText(summary))}</div>
+            <div class="actions">
+              <a class="btn btn-main" href="/job.html?id=${encodeURIComponent(jobId)}">View Details</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    loadJobs();
+  </script>
 </body>
 </html>
