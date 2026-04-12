@@ -1,147 +1,92 @@
-// netlify/functions/get-job.js
+// netlify/functions/get-jobs.js
 
 const { createClient } = require('@supabase/supabase-js');
 
-
-
-const supabaseUrl = process.env.SUPABASE_URL;
-
-const supabaseKey =
-
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-
-
-
-const supabase = createClient(supabaseUrl, supabaseKey, {
-
-  auth: { persistSession: false },
-
-});
-
-
-
-const headers = {
-
+const HEADERS = {
+  'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
-
   'Access-Control-Allow-Headers': 'Content-Type',
-
 };
 
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE ||
+  process.env.SUPABASE_ANON_KEY;
 
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false },
+});
 
 exports.handler = async (event) => {
-
   if (event.httpMethod === 'OPTIONS') {
-
-    return { statusCode: 200, headers, body: '' };
-
+    return { statusCode: 200, headers: HEADERS, body: '' };
   }
-
-
 
   if (event.httpMethod !== 'GET') {
-
     return {
-
       statusCode: 405,
-
-      headers,
-
+      headers: HEADERS,
       body: JSON.stringify({ ok: false, error: 'Method not allowed' }),
-
     };
-
   }
 
-
-
-  const publicId = event.queryStringParameters
-
-    ? event.queryStringParameters.id
-
-    : null;
-
-
-
-  if (!publicId) {
-
+  if (!supabaseUrl || !supabaseKey) {
     return {
-
-      statusCode: 400,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: 'Missing id' }),
-
-    };
-
-  }
-
-
-
-  // 👇 مهم: نقرأ من homeowner_jobs ونبحث بـ public_id
-
-  const { data, error } = await supabase
-
-    .from('homeowner_jobs')
-
-    .select(
-
-      'public_id, name, city, state, zip, project_title, short_summary, full_description, created_at'
-
-    )
-
-    .eq('public_id', publicId)
-
-    .maybeSingle();
-
-
-
-  if (error) {
-
-    console.error('get-job error:', error);
-
-    return {
-
       statusCode: 500,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: error.message }),
-
+      headers: HEADERS,
+      body: JSON.stringify({
+        ok: false,
+        error: 'Missing Supabase env vars',
+      }),
     };
-
   }
 
+  try {
+    const { data, error } = await supabase
+      .from('homeowner_jobs')
+      .select(`
+        id,
+        public_id,
+        title,
+        project_title,
+        summary,
+        short_summary,
+        city,
+        state,
+        created_at
+      `)
+      .order('created_at', { ascending: false })
+      .limit(50);
 
-
-  if (!data) {
+    if (error) {
+      console.error('get-jobs error:', error);
+      return {
+        statusCode: 500,
+        headers: HEADERS,
+        body: JSON.stringify({ ok: false, error: error.message }),
+      };
+    }
 
     return {
-
-      statusCode: 404,
-
-      headers,
-
-      body: JSON.stringify({ ok: false, error: 'Job not found' }),
-
+      statusCode: 200,
+      headers: HEADERS,
+      body: JSON.stringify({
+        ok: true,
+        jobs: data || [],
+      }),
     };
 
+  } catch (err) {
+    console.error('get-jobs unexpected error:', err);
+    return {
+      statusCode: 500,
+      headers: HEADERS,
+      body: JSON.stringify({
+        ok: false,
+        error: 'Unexpected error',
+      }),
+    };
   }
-
-
-
-  return {
-
-    statusCode: 200,
-
-    headers,
-
-    body: JSON.stringify({ ok: true, job: data }),
-
-  };
-
 };
