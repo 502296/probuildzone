@@ -1,204 +1,198 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ProBuildZone — Start Free Trial</title>
+// pros.js
+// ProBuildZone — signup flow using Supabase only (no Stripe redirect)
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+(function () {
+  function getField(idOrName) {
+    const byId = document.getElementById(idOrName);
+    if (byId) return byId;
 
-  <style>
-    :root{
-      --pbz:#0F2A43;
-      --gold:#D4AF37;
-      --muted:#617186;
-      --bg:#f3f5f7;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--pbz);
-    }
-    .page{
-      max-width:820px;
-      margin:28px auto 40px;
-      padding:0 14px;
-    }
-    h1{
-      margin-bottom:16px;
-      font-size:26px;
-    }
-    .card{
-      background:#fff;
-      border:1px solid #e3e7eb;
-      border-radius:16px;
-      padding:18px 16px 20px;
-      box-shadow:0 6px 22px rgba(0,0,0,.03);
-    }
-    label{
-      display:block;
-      font-weight:600;
-      margin-bottom:6px;
-    }
-    input,select,textarea{
-      width:100%;
-      padding:12px;
-      border:1px solid #d5d9de;
-      border-radius:10px;
-      font:inherit;
-      background:#fff;
-    }
-    textarea{
-      min-height:110px;
-      resize:vertical;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-      gap:14px;
-    }
-    .actions{
-      margin-top:18px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    button{
-      border:none;
-      cursor:pointer;
-      font-weight:600;
-      font-family:inherit;
-    }
-    .btn-main{
-      background:var(--gold);
-      color:#000;
-      padding:12px 16px;
-      border-radius:10px;
-    }
-    .btn-secondary{
-      background:#edf0f3;
-      color:var(--pbz);
-      padding:12px 16px;
-      border-radius:10px;
-    }
-    .alert{
-      margin-top:12px;
-      background:#fdeeee;
-      border:1px solid #f4c3c3;
-      border-radius:10px;
-      padding:10px 12px;
-      color:#a52f2f;
-      display:none;
-      white-space:pre-wrap;
-    }
-    .hint{
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
-      line-height:1.45;
-    }
+    const byName = document.querySelector(`[name="${idOrName}"]`);
+    if (byName) return byName;
 
-    @media (max-width:540px){
-      .card{
-        padding:16px 14px 20px;
-      }
-      .actions{
-        flex-direction:column;
-      }
-      .btn-main,.btn-secondary{
-        width:100%;
-        text-align:center;
+    return null;
+  }
+
+  function getVal(...keys) {
+    for (const key of keys) {
+      const el = getField(key);
+      if (el && typeof el.value === "string") {
+        return el.value.trim();
       }
     }
-  </style>
-</head>
+    return "";
+  }
 
-<body>
-  <div class="page">
-    <h1>ProBuildZone — Start Free Trial</h1>
+  function showInlineMessage(message, type) {
+    const alertBox = document.getElementById("alert");
+    if (!alertBox) {
+      if (type === "error") alert(message);
+      return;
+    }
 
-    <div class="card">
-      <form id="prosForm" novalidate autocomplete="off">
+    alertBox.textContent = message;
+    alertBox.style.display = "block";
 
-        <div class="grid">
-          <div>
-            <label for="name">Business / Owner name *</label>
-            <input id="name" name="name" required>
-          </div>
+    if (type === "success") {
+      alertBox.style.background = "#ecfdf3";
+      alertBox.style.border = "1px solid #bbf7d0";
+      alertBox.style.color = "#166534";
+    } else {
+      alertBox.style.background = "#fdeeee";
+      alertBox.style.border = "1px solid #f4c3c3";
+      alertBox.style.color = "#a52f2f";
+    }
+  }
 
-          <div>
-            <label for="email">Email *</label>
-            <input id="email" name="email" type="email" required>
-          </div>
+  function clearInlineMessage() {
+    const alertBox = document.getElementById("alert");
+    if (!alertBox) return;
 
-          <div>
-            <label for="phone">Phone *</label>
-            <input id="phone" name="phone" required>
-          </div>
+    alertBox.textContent = "";
+    alertBox.style.display = "none";
+    alertBox.style.background = "#fdeeee";
+    alertBox.style.border = "1px solid #f4c3c3";
+    alertBox.style.color = "#a52f2f";
+  }
 
-          <div>
-            <label for="address">Business address</label>
-            <input id="address" name="address">
-          </div>
+  function getSubmitButton(e) {
+    return (
+      document.getElementById("startBtn") ||
+      document.getElementById("startTrialBtn") ||
+      document.getElementById("start-free-trial") ||
+      (e && e.submitter) ||
+      null
+    );
+  }
 
-          <div>
-            <label for="license">Business license *</label>
-            <input id="license" name="license" required>
-          </div>
+  function setButtonState(btn, busy) {
+    if (!btn) return;
+    btn.disabled = !!busy;
+    btn.textContent = busy ? "Saving..." : "Start Free Trial";
+  }
 
-          <div>
-            <label for="insurance">Insurance</label>
-            <input id="insurance" name="insurance" placeholder="Optional">
-          </div>
+  function buildPayload() {
+    return {
+      name: getVal("name", "businessName", "ownerName", "biz", "fullName", "pro_name"),
+      email: getVal("email", "pro_email"),
+      phone: getVal("phone", "pro_phone"),
+      address: getVal("address", "businessAddress", "pro_address"),
+      license: getVal("license", "businessLicense", "pro_license"),
+      insurance: getVal("insurance", "pro_insurance"),
+      notes: getVal("notes", "services", "pro_notes"),
+      category: getVal("category", "trade", "serviceCategory", "pro_category"),
+      city: getVal("city", "pro_city"),
+      state: getVal("state", "pro_state"),
+    };
+  }
 
-          <div>
-            <label for="category">Category *</label>
-            <select id="category" name="category" required>
-              <option value="">Select</option>
-              <option value="Roofing">Roofing</option>
-              <option value="Plumbing">Plumbing</option>
-              <option value="Electrical">Electrical</option>
-              <option value="HVAC">HVAC</option>
-              <option value="Painting">Painting</option>
-              <option value="Flooring">Flooring</option>
-              <option value="Remodeling">Remodeling</option>
-              <option value="Landscaping">Landscaping</option>
-            </select>
-          </div>
+  function validatePayload(payload) {
+    if (
+      !payload.name ||
+      !payload.email ||
+      !payload.phone ||
+      !payload.license ||
+      !payload.category ||
+      !payload.city ||
+      !payload.state
+    ) {
+      return "Please fill all required fields.";
+    }
 
-          <div>
-            <label for="city">City *</label>
-            <input id="city" name="city" required placeholder="Louisville">
-          </div>
+    return "";
+  }
 
-          <div>
-            <label for="state">State *</label>
-            <input id="state" name="state" required placeholder="KY">
-          </div>
+  async function handleSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
 
-          <div style="grid-column:1/-1">
-            <label for="notes">Services & Notes</label>
-            <textarea id="notes" name="notes" placeholder="Tell homeowners what kind of work you do best."></textarea>
-            <div class="hint">
-              Keep this short and practical. Your category, city, and state are stored as separate fields for accurate matching.
-            </div>
-          </div>
-        </div>
+    clearInlineMessage();
 
-        <div id="alert" class="alert"></div>
+    const btn = getSubmitButton(e);
+    setButtonState(btn, true);
 
-        <div class="actions">
-          <button type="reset" class="btn-secondary">Reset</button>
-          <button id="startBtn" type="submit" class="btn-main">Start Free Trial</button>
-        </div>
+    const payload = buildPayload();
+    const validationError = validatePayload(payload);
 
-      </form>
-    </div>
-  </div>
+    if (validationError) {
+      showInlineMessage(validationError, "error");
+      setButtonState(btn, false);
+      return;
+    }
 
-  <script src="pros.js"></script>
-</body>
-</html>
+    try {
+      try {
+        localStorage.setItem("pbz_form_data", JSON.stringify(payload));
+      } catch (_) {}
+
+      const res = await fetch("/.netlify/functions/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const text = await res.text();
+      let data = {};
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(`Non-JSON response (${res.status})`);
+      }
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || `Request failed (${res.status})`);
+      }
+
+      showInlineMessage(
+        "Success. Your ProBuildZone profile has been saved. We will use this information for matching and onboarding.",
+        "success"
+      );
+
+      const form =
+        document.getElementById("prosForm") ||
+        document.getElementById("proForm");
+
+      if (form) {
+        form.reset();
+      }
+    } catch (err) {
+      console.error("pros.js submit error:", err);
+
+      const message =
+        err && err.message
+          ? err.message
+          : "Something went wrong. Please try again.";
+
+      showInlineMessage(message, "error");
+    } finally {
+      setButtonState(btn, false);
+    }
+  }
+
+  function boot() {
+    const form =
+      document.getElementById("prosForm") ||
+      document.getElementById("proForm");
+
+    if (form) {
+      form.addEventListener("submit", handleSubmit);
+    }
+
+    const btn =
+      document.getElementById("startBtn") ||
+      document.getElementById("startTrialBtn") ||
+      document.getElementById("start-free-trial");
+
+    if (btn && !form) {
+      btn.addEventListener("click", handleSubmit);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
