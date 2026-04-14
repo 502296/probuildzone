@@ -1,673 +1,361 @@
 <!doctype html>
-
 <html lang="en" dir="ltr">
-
 <head>
-
   <meta charset="utf-8"/>
-
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
   <title>Job Details — ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-
     :root{
-
       --ink:#0F2A43;
-
       --ink-2:#0b2033;
-
       --muted:#6b7a8c;
-
-      --ok:#0a7d2a;
-
-      --err:#b00020;
-
       --bg:#f6f7fb;
-
       --card:#ffffff;
-
       --border:#e7ecf3;
-
+      --gold:#D4AF37;
+      --gold-2:#c49c1f;
       --blue:#0f62fe;
-
       --blue-700:#0c4ed6;
-
       --radius:16px;
-
+      --err:#b00020;
+      --soft:#eef4ff;
     }
 
     *{box-sizing:border-box}
 
     html,body{
-
       margin:0;
-
       padding:0;
-
       background:var(--bg);
-
       font-family:Inter,system-ui,Arial,sans-serif;
-
       color:var(--ink);
-
     }
 
-    .wrap{max-width:980px;margin:28px auto;padding:0 16px}
+    .wrap{
+      max-width:980px;
+      margin:28px auto;
+      padding:0 16px;
+    }
 
     .card{
-
       background:var(--card);
-
       border:1px solid var(--border);
-
       border-radius:24px;
-
       padding:22px 20px;
-
       box-shadow:0 10px 24px rgba(15,42,67,0.06);
+    }
 
+    .eyebrow{
+      display:inline-block;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--ink);
+      background:#f3f7fb;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:6px 10px;
+      margin-bottom:14px;
     }
 
     h1{
-
-      margin:0 0 18px;
-
+      margin:0 0 14px;
       font-size:40px;
-
       letter-spacing:-0.5px;
-
+      line-height:1.1;
     }
 
-    .grid{
+    .subtitle{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:760px;
+    }
 
+    .info-grid{
       display:grid;
-
-      grid-template-columns:1fr 2fr;
-
-      gap:8px 16px;
-
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+      margin:18px 0 8px;
     }
 
-    .k{color:var(--muted);font-weight:600}
+    .info-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 14px;
+    }
 
-    .v a{color:#0a58ca;text-decoration:none}
+    .info-label{
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .info-value{
+      font-size:16px;
+      color:var(--ink-2);
+      line-height:1.6;
+      word-break:break-word;
+    }
+
+    .section{
+      margin-top:24px;
+    }
+
+    .section h2{
+      margin:0 0 12px;
+      font-size:22px;
+      line-height:1.25;
+    }
+
+    .description-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      line-height:1.8;
+      color:#24384d;
+      white-space:pre-wrap;
+    }
+
+    .privacy-note{
+      margin-top:18px;
+      background:var(--soft);
+      border:1px solid #d7e5ff;
+      border-radius:16px;
+      padding:16px;
+      color:#23406a;
+      line-height:1.7;
+    }
+
+    .privacy-note strong{
+      color:var(--ink);
+    }
 
     .btns{
-
       display:flex;
-
       gap:12px;
-
-      margin-top:18px;
-
+      margin-top:22px;
       flex-wrap:wrap;
-
     }
 
     .btn{
-
       appearance:none;
-
       border:none;
-
       cursor:pointer;
-
       padding:12px 18px;
-
       border-radius:12px;
-
       font-weight:700;
-
+      text-decoration:none;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
-    .btn.primary{background:var(--blue);color:#fff}
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(15,42,67,0.08);
+    }
 
-    .btn.primary:active{transform:translateY(1px)}
+    .btn.primary{
+      background:var(--gold);
+      color:#000;
+    }
 
-    .btn.primary:hover{background:var(--blue-700)}
+    .btn.primary:hover{
+      background:var(--gold-2);
+    }
 
     .btn.white{
-
       background:#fff;
-
       border:1px solid var(--border);
-
       color:var(--ink);
-
     }
-
-    h2{margin:26px 0 12px}
 
     .muted{color:var(--muted)}
-
-    .error{color:var(--err)}
-
-    .offer-card{
-
-      background:#fff;
-
-      border:1px solid var(--border);
-
-      border-radius:12px;
-
-      padding:14px 16px;
-
-      margin-top:12px;
-
+    .error{
+      color:var(--err);
+      margin-bottom:10px;
     }
 
-    .badge{
-
-      font-size:12px;
-
-      padding:2px 8px;
-
-      border-radius:10px;
-
-      background:#eef4ff;
-
-      margin-left:6px;
-
+    .loading-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      color:var(--muted);
+      text-align:center;
     }
 
     @media (max-width:640px){
-
       h1{font-size:34px}
-
-      .grid{grid-template-columns:1fr}
-
+      .info-grid{grid-template-columns:1fr}
     }
-
   </style>
-
 </head>
 
 <body>
-
   <div class="wrap">
-
     <div class="card">
-
+      <div class="eyebrow">ProBuildZone Project</div>
       <h1>Job Details</h1>
+      <p class="subtitle">
+        Review the homeowner project details below. If this project is a good fit for your trade,
+        you can request a connection through ProBuildZone.
+      </p>
 
+      <div id="jobError" class="error"></div>
+      <div id="loadingBox" class="loading-box">Loading job details...</div>
 
+      <div id="jobContent" style="display:none;">
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-label">Job ID</div>
+            <div class="info-value" id="v_id">—</div>
+          </div>
 
-      <div id="jobError" class="error" style="margin-bottom:8px"></div>
+          <div class="info-card">
+            <div class="info-label">Category</div>
+            <div class="info-value" id="v_category">—</div>
+          </div>
 
+          <div class="info-card">
+            <div class="info-label">Location</div>
+            <div class="info-value" id="v_location">—</div>
+          </div>
 
+          <div class="info-card">
+            <div class="info-label">Posted</div>
+            <div class="info-value" id="v_posted">—</div>
+          </div>
+        </div>
 
-      <div id="jobBox" class="grid" style="display:none">
+        <div class="section">
+          <h2 id="v_title">Untitled job</h2>
+          <div class="description-box" id="v_summary">—</div>
+        </div>
 
-        <div class="k">Job ID:</div>       <div class="v" id="v_id"></div>
+        <div class="privacy-note">
+          <strong>Privacy by design:</strong> homeowner contact details are not shown publicly on this page.
+          Builders first request a connection through the platform. This creates a cleaner, safer, and more professional workflow for both sides.
+        </div>
 
-        <div class="k">Title:</div>        <div class="v" id="v_title"></div>
-
-        <div class="k">Name:</div>         <div class="v" id="v_name"></div>
-
-        <div class="k">Email:</div>        <div class="v" id="v_email"></div>
-
-        <div class="k">Phone:</div>        <div class="v" id="v_phone"></div>
-
-        <div class="k">Address:</div>      <div class="v" id="v_address"></div>
-
-        <div class="k">Description:</div>  <div class="v" id="v_summary"></div>
-
+        <div class="btns">
+          <a id="connectLink" class="btn primary" href="#">Request Connection</a>
+          <a class="btn white" href="/jobs.html">Back to Jobs</a>
+          <a class="btn white" href="/index.html">Back to Home</a>
+        </div>
       </div>
-
-
-
-      <div class="btns">
-
-        <a id="offerLink" class="btn primary" href="#">Submit Offer</a>
-
-        <a class="btn white" href="/index.html">Back to Home</a>
-
-      </div>
-
-
-
-      <h2>Offers</h2>
-
-      <div id="offersBox" class="muted">Loading...</div>
-
-      <p id="offersError" class="error"></p>
-
     </div>
-
   </div>
 
-
-
   <script>
-
     (async () => {
-
-      // نقرأ الـ id من أكثر من اسم باراميتر + نزيل الفراغات
-
       const params = new URLSearchParams(location.search);
-
       const rawId =
+        params.get("id") ||
+        params.get("jobId") ||
+        params.get("job") ||
+        params.get("code") ||
+        params.get("public_id");
 
-        params.get('id') ||
+      const identifier = rawId ? rawId.trim() : "";
 
-        params.get('jobId') ||
+      const jobError = document.getElementById("jobError");
+      const loadingBox = document.getElementById("loadingBox");
+      const jobContent = document.getElementById("jobContent");
 
-        params.get('job') ||
+      const v_id = document.getElementById("v_id");
+      const v_title = document.getElementById("v_title");
+      const v_category = document.getElementById("v_category");
+      const v_location = document.getElementById("v_location");
+      const v_posted = document.getElementById("v_posted");
+      const v_summary = document.getElementById("v_summary");
 
-        params.get('code') ||
+      const connectLink = document.getElementById("connectLink");
 
-        params.get('public_id');
+      function formatDate(value) {
+        if (!value) return "Recently";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "Recently";
 
-
-
-      const publicId = rawId ? rawId.trim().toUpperCase() : null;
-
-
-
-      const jobBox      = document.getElementById('jobBox');
-
-      const jobError    = document.getElementById('jobError');
-
-      const v_id        = document.getElementById('v_id');
-
-      const v_title     = document.getElementById('v_title');
-
-      const v_name      = document.getElementById('v_name');
-
-      const v_email     = document.getElementById('v_email');
-
-      const v_phone     = document.getElementById('v_phone');
-
-      const v_address   = document.getElementById('v_address');
-
-      const v_summary   = document.getElementById('v_summary');
-
-
-
-      const offerLink   = document.getElementById('offerLink');
-
-      const offersBox   = document.getElementById('offersBox');
-
-      const offersError = document.getElementById('offersError');
-
-
-
-      if (!publicId) {
-
-        jobError.textContent = "Job not found.";
-
-        offersBox.textContent = "No offers yet.";
-
-        return;
-
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
       }
 
+      if (!identifier) {
+        loadingBox.style.display = "none";
+        jobError.textContent = "Job not found.";
+        return;
+      }
 
-
-      // رابط صفحة عرض الـ Pro
-
-      offerLink.href = `/pro-offer.html?id=${encodeURIComponent(publicId)}`;
-
-
+      connectLink.href = `/pro-offer.html?id=${encodeURIComponent(identifier)}`;
 
       try {
-
-        // 1) جلب تفاصيل الجوب من Netlify Function
-
-        const jobRes  = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(publicId)}`);
-
+        const jobRes = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(identifier)}`);
         const jobJson = await jobRes.json();
 
-
-
         if (!jobRes.ok || !jobJson.ok || !jobJson.job) {
-
+          loadingBox.style.display = "none";
           jobError.textContent = jobJson.error || "Job not found.";
-
-          offersBox.textContent = "No offers yet.";
-
           return;
-
         }
-
-
 
         const j = jobJson.job;
 
+        const jobId = j.public_id || j.id || identifier;
+        const title =
+          j.title ||
+          j.project_title ||
+          j.job_title ||
+          j.category ||
+          "Untitled job";
 
+        const category =
+          j.category ||
+          j.trade ||
+          j.service_category ||
+          "—";
 
-        jobBox.style.display = "";
-
-
-
-        v_id.textContent    = j.public_id || publicId;
-
-        v_title.textContent = j.title || j.project_title || j.category || "—";
-
-        v_name.textContent  = j.name || j.full_name || "—";
-
-
-
-        const email = j.email;
-
-        const phone = j.phone;
-
-
-
-        v_email.innerHTML = email ? `<a href="mailto:${email}">${email}</a>` : "—";
-
-        v_phone.innerHTML = phone ? `<a href="tel:${phone}">${phone}</a>`     : "—";
-
-
-
-        const addr =
-
+        const location =
+          [j.city, j.state, j.zip].filter(Boolean).join(", ") ||
           j.address ||
-
           j.full_address ||
-
-          [j.city, j.state, j.zip].filter(Boolean).join(", ");
-
-
-
-        v_address.textContent = addr || "—";
-
-
-
-        const summary = j.summary || j.short_summary || j.full_description;
-
-        v_summary.textContent = summary || "—";
-
-
-
-        // 2) جلب العروض
-
-        const offRes  = await fetch(`/api/get-offers?id=${encodeURIComponent(publicId)}`);
-
-        const offJson = await offRes.json();
-
-
-
-        offersBox.innerHTML = "";
-
-
-
-        if (!offRes.ok) {
-
-          offersError.textContent = offJson.error || "Couldn't load offers.";
-
-          return;
-
-        }
-
-
-
-        if (!offJson.offers || offJson.offers.length === 0) {
-
-          offersBox.innerHTML = `<p class="muted" style="margin:0">No offers yet.</p>`;
-
-          return;
-
-        }
-
-
-
-        offJson.offers.forEach(o => {
-
-          const amountNumber = o.amount != null ? Number(o.amount) : null;
-
-          const amount = amountNumber != null ? `$${amountNumber.toLocaleString()}` : "$—";
-
-          const phoneLine = o.phone ? ` • ${o.phone}` : "";
-
-          const isAccepted = (o.status === 'accepted');
-
-
-
-          const div = document.createElement('div');
-
-          div.className = 'offer-card';
-
-
-
-          div.innerHTML = `
-
-            <div style="font-weight:700;margin-bottom:4px">
-
-              ${o.business_name} — ${amount}
-
-              <span class="badge" style="${isAccepted
-
-                ? 'background:#d1fae5;color:#065f46;'
-
-                : 'background:#eef4ff;'}">
-
-                ${o.status}
-
-              </span>
-
-            </div>
-
-            <div style="color:#334155;white-space:pre-wrap">${o.message || ""}</div>
-
-            <div style="color:#6b7a8c;margin-top:6px">
-
-              ${new Date(o.created_at).toLocaleString()}${phoneLine}
-
-            </div>
-
-            <div style="margin-top:10px">
-
-              <button
-
-                data-id="${o.id}"
-
-                data-email="${o.email || ''}"
-
-                data-pro-name="${o.pro_name || o.business_name || ''}"
-
-                data-amount="${amountNumber != null ? amountNumber : ''}"
-
-                class="accept-btn btn primary"
-
-                style="padding:8px 12px;${isAccepted ? 'background:#9ca3af;cursor:not-allowed;' : ''}"
-
-                ${isAccepted ? 'disabled' : ''}
-
-              >
-
-                ${isAccepted ? 'Accepted' : 'Accept'}
-
-              </button>
-
-            </div>
-
-          `;
-
-          offersBox.appendChild(div);
-
-        });
-
-
-
-        // 3) حدث زر قبول العرض + إرسال الإيميل
-
-        offersBox.addEventListener('click', async (e) => {
-
-          const btn = e.target.closest('.accept-btn');
-
-          if (!btn) return;
-
-
-
-          // لو أصلاً accepted لا نكرر الطلب
-
-          if (btn.disabled && btn.textContent.trim() === 'Accepted') {
-
-            return;
-
-          }
-
-
-
-          btn.disabled = true;
-
-
-
-          const offerId   = btn.getAttribute('data-id');
-
-          const proEmail  = btn.getAttribute('data-email');
-
-          const proName   = btn.getAttribute('data-pro-name') || 'Pro';
-
-          const amountVal = btn.getAttribute('data-amount');
-
-
-
-          const homeownerName = j.name || j.full_name || 'Homeowner';
-
-          const jobIdForEmail = j.public_id || publicId;
-
-
-
-          try {
-
-            // 3a) تحديث حالة العرض في Supabase عبر API
-
-            const res = await fetch('/api/accept-offer', {
-
-              method: 'POST',
-
-              headers: { 'Content-Type': 'application/json' },
-
-              body: JSON.stringify({ offer_id: offerId }),
-
-            });
-
-
-
-            const resJson = await res.json().catch(() => ({}));
-
-
-
-            if (!res.ok || resJson.ok === false) {
-
-              alert('Failed to accept offer: ' + (resJson.error || 'Unknown error'));
-
-              btn.disabled = false;
-
-              return;
-
-            }
-
-
-
-            // 3b) تحديث الـ UI مباشرة
-
-            const card  = btn.closest('.offer-card');
-
-            const badge = card ? card.querySelector('.badge') : null;
-
-            if (badge) {
-
-              badge.textContent = 'accepted';
-
-              badge.style.background = '#d1fae5';
-
-              badge.style.color = '#065f46';
-
-            }
-
-            btn.textContent = 'Accepted';
-
-            btn.style.background = '#9ca3af';
-
-            btn.style.cursor = 'not-allowed';
-
-            btn.disabled = true;
-
-
-
-            // 3c) إرسال إيميل للبرو (لو عندنا إيميله)
-
-            if (proEmail) {
-
-              const mailRes = await fetch('/.netlify/functions/send-accept-email', {
-
-                method: 'POST',
-
-                headers: { 'Content-Type': 'application/json' },
-
-                body: JSON.stringify({
-
-                  proEmail,
-
-                  proName,
-
-                  homeownerName,
-
-                  jobId: jobIdForEmail,
-
-                  offerAmount: amountVal
-
-                })
-
-              });
-
-
-
-              if (!mailRes.ok) {
-
-                const txt = await mailRes.text().catch(() => '');
-
-                alert('Offer accepted, but email could not be sent automatically. Please contact the pro manually.\n\nDetails: ' + txt);
-
-                return;
-
-              }
-
-            }
-
-
-
-            alert('Offer accepted successfully.');
-
-
-
-          } catch (err) {
-
-            console.error(err);
-
-            alert('Failed to accept offer.');
-
-            btn.disabled = false;
-
-          }
-
-        });
-
-
-
+          "—";
+
+        const summary =
+          j.summary ||
+          j.short_summary ||
+          j.description ||
+          j.full_description ||
+          j.details ||
+          "No project description provided yet.";
+
+        v_id.textContent = jobId;
+        v_title.textContent = title;
+        v_category.textContent = category;
+        v_location.textContent = location;
+        v_posted.textContent = formatDate(j.created_at);
+        v_summary.textContent = summary;
+
+        loadingBox.style.display = "none";
+        jobContent.style.display = "block";
       } catch (err) {
-
         console.error(err);
-
-        jobError.textContent    = "Job not found.";
-
-        offersError.textContent = "Couldn't load offers.";
-
+        loadingBox.style.display = "none";
+        jobError.textContent = "Could not load this job right now.";
       }
-
     })();
-
   </script>
-
 </body>
-
 </html>
