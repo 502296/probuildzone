@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -201,6 +201,7 @@
       </div>
 
       <div class="topbar-actions">
+        <a id="dashboardLink" class="btn btn-secondary" href="/pro-dashboard.html">Dashboard</a>
         <a class="btn btn-secondary" href="/pros.html">Back to Pro Signup</a>
         <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
       </div>
@@ -224,6 +225,7 @@
     const statusBox = document.getElementById("statusBox");
     const jobsBox = document.getElementById("jobsBox");
     const logoutBtn = document.getElementById("logoutBtn");
+    const dashboardLink = document.getElementById("dashboardLink");
 
     function escapeHtml(value) {
       return String(value || "")
@@ -269,6 +271,7 @@
       };
     }
 
+    const storedPro = getStoredPro();
     const activeFilters = resolveFilters();
 
     function renderFilters() {
@@ -294,6 +297,10 @@
     function buildJobDetailsUrl(job) {
       const identifier = job.public_id || job.id || "";
       return `/job.html?id=${encodeURIComponent(identifier)}`;
+    }
+
+    function buildDashboardUrl() {
+      return "/pro-dashboard.html";
     }
 
     function renderJobs(data) {
@@ -406,11 +413,31 @@
       window.location.href = "/pros.html";
     }
 
+    function bootSessionLinks() {
+      if (dashboardLink) {
+        dashboardLink.href = buildDashboardUrl();
+      }
+    }
+
+    function guardSession() {
+      if (!storedPro) {
+        statusBox.className = "error";
+        statusBox.textContent = "No active Pro session found. Please return to Pro signup.";
+        jobsBox.style.display = "none";
+        return false;
+      }
+      return true;
+    }
+
     if (logoutBtn) {
       logoutBtn.addEventListener("click", handleLogout);
     }
 
-    loadJobs();
+    bootSessionLinks();
+
+    if (guardSession()) {
+      loadJobs();
+    }
   </script>
 </body>
 </html>
