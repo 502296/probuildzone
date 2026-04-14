@@ -1,4 +1,7 @@
 // netlify/functions/get-offers.js
+// Transitional architecture:
+// Keeps compatibility with the existing pro_offers table,
+// but semantically returns connection requests for a homeowner job.
 
 const { createClient } = require("@supabase/supabase-js");
 
@@ -15,9 +18,13 @@ const supabaseKey =
   process.env.SUPABASE_SERVICE_ROLE ||
   process.env.SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
+function buildClient() {
+  if (!supabaseUrl || !supabaseKey) return null;
+
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
@@ -32,18 +39,6 @@ exports.handler = async (event) => {
     };
   }
 
-  const publicId = event.queryStringParameters
-    ? String(event.queryStringParameters.id || "").trim()
-    : "";
-
-  if (!publicId) {
-    return {
-      statusCode: 400,
-      headers: HEADERS,
-      body: JSON.stringify({ ok: false, error: "Missing id" }),
-    };
-  }
-
   if (!supabaseUrl || !supabaseKey) {
     return {
       statusCode: 500,
@@ -55,7 +50,26 @@ exports.handler = async (event) => {
     };
   }
 
+  const params = event.queryStringParameters || {};
+  const publicId = String(
+    params.id ||
+    params.jobId ||
+    params.job ||
+    params.public_id ||
+    ""
+  ).trim();
+
+  if (!publicId) {
+    return {
+      statusCode: 400,
+      headers: HEADERS,
+      body: JSON.stringify({ ok: false, error: "Missing job identifier" }),
+    };
+  }
+
   try {
+    const supabase = buildClient();
+
     // 1) Resolve homeowner job UUID from public_id
     const { data: jobRow, error: jobError } = await supabase
       .from("homeowner_jobs")
@@ -76,23 +90,23 @@ exports.handler = async (event) => {
       return {
         statusCode: 200,
         headers: HEADERS,
-        body: JSON.stringify({ ok: true, offers: [] }),
+        body: JSON.stringify({ ok: true, requests: [] }),
       };
     }
 
     const jobUuid = jobRow.id;
 
-    // 2) Fetch offers for this job
+    // 2) Fetch stored connection requests from pro_offers (temporary table compatibility)
     const { data: offers, error: offersError } = await supabase
       .from("pro_offers")
       .select(
         "id, business_name, pro_name, phone, pro_email, email, amount, message, status, created_at"
       )
       .eq("job_id", jobUuid)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (offersError) {
-      console.error("get-offers offers error:", offersError);
+      console.error("get-offers requests error:", offersError);
       return {
         statusCode: 500,
         headers: HEADERS,
@@ -100,24 +114,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // 3) Normalize response so frontend gets one stable shape
-    const normalizedOffers = (offers || []).map((offer) => ({
+    // 3) Normalize response to a stable "connection request" shape
+    const normalizedRequests = (offers || []).map((offer) => ({
       id: offer.id,
       business_name: offer.business_name || offer.pro_name || "Pro",
       pro_name: offer.pro_name || offer.business_name || "Pro",
       phone: offer.phone || null,
       email: offer.pro_email || offer.email || null,
       pro_email: offer.pro_email || offer.email || null,
-      amount: offer.amount ?? null,
+      amount: offer.amount ?? null, // optional now
       message: offer.message || "",
       status: offer.status || "pending",
       created_at: offer.created_at || null,
+      request_type: "connection_request",
     }));
 
     return {
       statusCode: 200,
       headers: HEADERS,
-      body: JSON.stringify({ ok: true, offers: normalizedOffers }),
+      body: JSON.stringify({
+        ok: true,
+        requests: normalizedRequests,
+      }),
     };
   } catch (err) {
     console.error("get-offers unexpected error:", err);
