@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Send an Offer – ProBuildZone</title>
+  <title>Request Connection – ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,10 +12,13 @@
     :root {
       --pbz: #0F2A43;
       --gold: #D4AF37;
+      --gold-dark: #c39d2b;
       --muted: #617186;
       --bg: #f3f5f7;
       --danger: #b91c1c;
       --success: #166534;
+      --border: #e3e7eb;
+      --soft: #eef4ff;
     }
 
     * { box-sizing: border-box; }
@@ -48,19 +51,44 @@
     h1 {
       margin: 6px 0 8px;
       font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .subhead {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 680px;
     }
 
     .job-tag {
       font-size: 14px;
       color: var(--muted);
+      margin-top: 10px;
     }
 
     .card {
       background: #fff;
       border-radius: 16px;
-      border: 1px solid #e3e7eb;
+      border: 1px solid var(--border);
       padding: 18px 16px 20px;
       box-shadow: 0 6px 22px rgba(0,0,0,.03);
+    }
+
+    .privacy-box {
+      background: var(--soft);
+      border: 1px solid #d7e5ff;
+      border-radius: 14px;
+      padding: 14px 14px;
+      margin-bottom: 16px;
+      color: #23406a;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .privacy-box strong {
+      color: var(--pbz);
     }
 
     label {
@@ -92,6 +120,7 @@
       font-size: 12px;
       color: var(--muted);
       margin-top: 4px;
+      line-height: 1.5;
     }
 
     .actions {
@@ -106,6 +135,12 @@
       cursor: pointer;
       font-weight: 600;
       font-family: inherit;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0,0,0,.06);
     }
 
     .btn-main {
@@ -113,7 +148,11 @@
       color: #000;
       padding: 11px 18px;
       border-radius: 10px;
-      min-width: 140px;
+      min-width: 180px;
+    }
+
+    .btn-main:hover {
+      background: var(--gold-dark);
     }
 
     .btn-secondary {
@@ -148,7 +187,7 @@
       margin-top: 16px;
       font-size: 13px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     @media (max-width: 540px) {
@@ -162,39 +201,45 @@
   <div class="page">
     <div class="header">
       <div class="logo">PROBUILDZONE</div>
-      <h1>Send an Offer</h1>
+      <h1>Request Connection</h1>
+      <p class="subhead">
+        Send a professional connection request for this project. The homeowner can review your request
+        and decide whether to continue the conversation through ProBuildZone.
+      </p>
       <div id="jobTag" class="job-tag"></div>
     </div>
 
     <div class="card">
+      <div class="privacy-box">
+        <strong>Professional workflow:</strong> ProBuildZone does not publicly expose homeowner contact details on this step.
+        Builders first send a connection request, which keeps the platform safer, cleaner, and more valuable long term.
+      </div>
+
       <form id="offerForm" novalidate autocomplete="off">
         <div class="field">
-          <label for="business_name">Business / Pro name</label>
+          <label for="business_name">Business / Pro name *</label>
           <input id="business_name" name="business_name" placeholder="John &amp; Sons Builders" required>
         </div>
 
         <div class="field">
-          <label for="pro_email">Your email (optional but recommended)</label>
-          <input id="pro_email" name="pro_email" type="email" placeholder="you@example.com">
+          <label for="pro_email">Your email *</label>
+          <input id="pro_email" name="pro_email" type="email" placeholder="you@example.com" required>
           <div class="hint">
-            If you add your email, the homeowner can simply hit “Reply” on the email we send them.
+            This helps the homeowner or platform reach you after reviewing your request.
           </div>
         </div>
 
         <div class="field">
-          <label for="phone">Phone number</label>
-          <input id="phone" name="phone" placeholder="5022968111" required>
+          <label for="phone">Phone number *</label>
+          <input id="phone" name="phone" placeholder="(502) 296-8111" required>
         </div>
 
         <div class="field">
-          <label for="amount">Estimated price (USD)</label>
-          <input id="amount" name="amount" type="number" step="0.01" placeholder="2500" required>
-          <div class="hint">You can fine-tune the final price after you talk to the homeowner.</div>
-        </div>
-
-        <div class="field">
-          <label for="message">Message / details (optional)</label>
-          <textarea id="message" name="message" placeholder="Briefly describe what’s included, timeline, or any warranty..."></textarea>
+          <label for="message">Short introduction / message *</label>
+          <textarea id="message" name="message" placeholder="Briefly introduce your company, experience, availability, and why you are a good fit for this project." required></textarea>
+          <div class="hint">
+            Keep it clear and professional. This is your first impression.
+          </div>
         </div>
 
         <div id="alert" class="alert error"></div>
@@ -202,12 +247,12 @@
 
         <div class="actions">
           <button type="button" class="btn-secondary" id="cancelBtn">Back</button>
-          <button type="submit" class="btn-main" id="sendBtn">Send Offer</button>
+          <button type="submit" class="btn-main" id="sendBtn">Request Connection</button>
         </div>
 
         <div class="note">
-          ProBuildZone simply connects homeowners and local Pros.
-          All project details, payments, and agreements are handled directly between you and the homeowner.
+          This request is currently stored through the same backend path used for offers, so we keep compatibility with the current ProBuildZone build.
+          Later, we can rename the backend and database layer to a dedicated connection-request architecture without breaking the user flow.
         </div>
       </form>
     </div>
@@ -218,110 +263,153 @@
       try {
         const params = new URLSearchParams(window.location.search);
         return (
-          params.get('id') ||
-          params.get('job') ||
-          params.get('job_public_id') ||
-          ''
+          params.get("id") ||
+          params.get("job") ||
+          params.get("job_public_id") ||
+          ""
         ).trim();
       } catch (e) {
-        return '';
+        return "";
+      }
+    }
+
+    function getStoredPro() {
+      try {
+        const raw = localStorage.getItem("pbz_user");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch (e) {
+        return null;
       }
     }
 
     const jobPublicId = getJobPublicId();
+    const storedPro = getStoredPro();
 
-    const jobTagEl = document.getElementById('jobTag');
-    const form = document.getElementById('offerForm');
-    const alertBox = document.getElementById('alert');
-    const successBox = document.getElementById('success');
-    const sendBtn = document.getElementById('sendBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
+    const jobTagEl = document.getElementById("jobTag");
+    const form = document.getElementById("offerForm");
+    const alertBox = document.getElementById("alert");
+    const successBox = document.getElementById("success");
+    const sendBtn = document.getElementById("sendBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    const businessNameInput = document.getElementById("business_name");
+    const proEmailInput = document.getElementById("pro_email");
+    const phoneInput = document.getElementById("phone");
+    const messageInput = document.getElementById("message");
 
     if (jobPublicId) {
-      jobTagEl.textContent = 'For job: ' + jobPublicId;
+      jobTagEl.textContent = "For job: " + jobPublicId;
     } else {
-      jobTagEl.textContent = 'Job ID missing. Please open this page from the project link.';
+      jobTagEl.textContent = "Job ID missing. Please open this page from the project link.";
+    }
+
+    if (storedPro) {
+      if (!businessNameInput.value && storedPro.name) {
+        businessNameInput.value = storedPro.name;
+      }
+      if (!proEmailInput.value && storedPro.email) {
+        proEmailInput.value = storedPro.email;
+      }
+      if (!phoneInput.value && storedPro.phone) {
+        phoneInput.value = storedPro.phone;
+      }
+      if (!messageInput.value && (storedPro.category || storedPro.city || storedPro.state)) {
+        const parts = [];
+        if (storedPro.category) parts.push(`We specialize in ${storedPro.category}.`);
+        if (storedPro.city || storedPro.state) {
+          parts.push(`We are based in ${[storedPro.city, storedPro.state].filter(Boolean).join(", ")}.`);
+        }
+        parts.push("We would like to request a connection for this project and discuss the next steps.");
+        messageInput.value = parts.join(" ");
+      }
     }
 
     function showError(msg) {
       alertBox.textContent = msg;
-      alertBox.style.display = 'block';
-      successBox.style.display = 'none';
-      successBox.textContent = '';
+      alertBox.style.display = "block";
+      successBox.style.display = "none";
+      successBox.textContent = "";
     }
 
     function showSuccess(msg) {
       successBox.textContent = msg;
-      successBox.style.display = 'block';
-      alertBox.style.display = 'none';
-      alertBox.textContent = '';
+      successBox.style.display = "block";
+      alertBox.style.display = "none";
+      alertBox.textContent = "";
     }
 
     function clearMessages() {
-      alertBox.style.display = 'none';
-      successBox.style.display = 'none';
-      alertBox.textContent = '';
-      successBox.textContent = '';
+      alertBox.style.display = "none";
+      successBox.style.display = "none";
+      alertBox.textContent = "";
+      successBox.textContent = "";
     }
 
-    cancelBtn.addEventListener('click', () => {
+    cancelBtn.addEventListener("click", () => {
       window.history.back();
     });
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       clearMessages();
 
       if (!jobPublicId) {
-        showError('Job ID is missing. Please go back and open this offer page from the project link.');
+        showError("Job ID is missing. Please go back and open this page from the project link.");
         return;
       }
 
-      const business_name = document.getElementById('business_name').value.trim();
-      const pro_email = document.getElementById('pro_email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const amount = document.getElementById('amount').value.trim();
-      const message = document.getElementById('message').value.trim();
+      const business_name = businessNameInput.value.trim();
+      const pro_email = proEmailInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const message = messageInput.value.trim();
 
-      if (!business_name || !phone || !amount) {
-        showError('Please fill business name, phone, and estimated price.');
+      if (!business_name || !pro_email || !phone || !message) {
+        showError("Please fill business name, email, phone, and your message.");
         return;
       }
 
       const payload = {
         job_public_id: jobPublicId,
         business_name,
-        pro_email: pro_email || null,
+        pro_email,
         phone,
-        amount,
+        amount: null,
         message
       };
 
       sendBtn.disabled = true;
-      sendBtn.textContent = 'Sending...';
+      sendBtn.textContent = "Sending...";
 
       try {
-        const res = await fetch('/.netlify/functions/post-offer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/.netlify/functions/post-offer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.ok) {
-          console.error('post-offer error:', data);
-          showError(data.error || 'Something went wrong while sending your offer. Please try again.');
+          console.error("post-offer error:", data);
+          showError(data.error || "Something went wrong while sending your request. Please try again.");
         } else {
-          showSuccess('Your offer has been sent to the homeowner. They will contact you directly if it’s a good fit.');
+          showSuccess("Your connection request has been sent successfully. The homeowner can now review it and decide whether to continue the conversation.");
           form.reset();
+
+          if (storedPro) {
+            if (storedPro.name) businessNameInput.value = storedPro.name;
+            if (storedPro.email) proEmailInput.value = storedPro.email;
+            if (storedPro.phone) phoneInput.value = storedPro.phone;
+          }
         }
       } catch (err) {
         console.error(err);
-        showError('Network error. Please check your connection and try again.');
+        showError("Network error. Please check your connection and try again.");
       } finally {
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Offer';
+        sendBtn.textContent = "Request Connection";
       }
     });
   </script>
