@@ -1,4 +1,7 @@
 // netlify/functions/post-offer.js
+// Transitional architecture:
+// Frontend now uses "Request Connection" language,
+// while backend temporarily keeps compatibility with the existing pro_offers table.
 
 const HEADERS = {
   "Content-Type": "application/json",
@@ -75,34 +78,38 @@ exports.handler = async (event) => {
       pro_email,
     } = payload;
 
-    if (!job_public_id || !business_name || !phone || amount === undefined || amount === null || amount === "") {
+    if (!job_public_id || !business_name || !phone || !pro_email || !message) {
       return {
         statusCode: 400,
         headers: HEADERS,
         body: JSON.stringify({
           ok: false,
-          error: "Missing required fields: job_public_id, business_name, phone, amount",
+          error: "Missing required fields: job_public_id, business_name, phone, pro_email, message",
         }),
       };
     }
 
-    const parsedAmount = Number(amount);
-    if (!Number.isFinite(parsedAmount) || parsedAmount < 0) {
-      return {
-        statusCode: 400,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Invalid amount",
-        }),
-      };
+    let parsedAmount = null;
+    if (amount !== undefined && amount !== null && String(amount).trim() !== "") {
+      const numeric = Number(amount);
+      if (!Number.isFinite(numeric) || numeric < 0) {
+        return {
+          statusCode: 400,
+          headers: HEADERS,
+          body: JSON.stringify({
+            ok: false,
+            error: "Invalid amount",
+          }),
+        };
+      }
+      parsedAmount = numeric;
     }
 
     // 1) Fetch the job by public_id
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowner_jobs")
       .select(
-        "id, public_id, title, project_title, name, homeowner_name, email, homeowner_email"
+        "id, public_id, title, project_title, category, city, state, name, homeowner_name, email, homeowner_email"
       )
       .eq("public_id", String(job_public_id).trim())
       .maybeSingle();
@@ -132,17 +139,24 @@ exports.handler = async (event) => {
 
     const homeownerEmail = jobRow.homeowner_email || jobRow.email || null;
     const homeownerName = jobRow.homeowner_name || jobRow.name || "Homeowner";
-    const jobTitle = jobRow.title || jobRow.project_title || "your project";
+    const jobTitle =
+      jobRow.title ||
+      jobRow.project_title ||
+      jobRow.category ||
+      "your project";
 
-    // 2) Insert the offer into pro_offers
+    const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
+
+    // 2) Insert into pro_offers table temporarily
+    // We keep this table for compatibility, but semantically this is now a connection request.
     const insertPayload = {
       job_id: jobRow.id,
       business_name: String(business_name).trim(),
-      message: message ? String(message).trim() : "",
+      message: String(message).trim(),
       amount: parsedAmount,
-      phone: phone ? String(phone).trim() : null,
+      phone: String(phone).trim(),
       status: "pending",
-      pro_email: pro_email ? String(pro_email).trim() : null,
+      pro_email: String(pro_email).trim(),
     };
 
     const { data: insertedOffer, error: insErr } = await supabase
@@ -158,7 +172,7 @@ exports.handler = async (event) => {
         headers: HEADERS,
         body: JSON.stringify({
           ok: false,
-          error: insErr.message || "Failed to save offer",
+          error: insErr.message || "Failed to save connection request",
         }),
       };
     }
@@ -167,62 +181,51 @@ exports.handler = async (event) => {
     if (homeownerEmail && RESEND_API_KEY) {
       try {
         const resend = new Resend(RESEND_API_KEY);
-        const safeAmount = `$${parsedAmount.toFixed(2)}`;
 
-        const subject = `New offer from ${insertPayload.business_name} for "${jobTitle}"`;
+        const subject = `New connection request from ${insertPayload.business_name} for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
-            <h2 style="margin-bottom: 0.5rem;">You received a new offer on ProBuildZone 🎉</h2>
+            <h2 style="margin-bottom: 0.5rem;">You received a new connection request on ProBuildZone</h2>
 
             <p>Hi ${homeownerName},</p>
 
             <p>
-              <strong>${insertPayload.business_name}</strong> just sent you an offer for your project:
+              <strong>${insertPayload.business_name}</strong> is interested in your project:
               <strong>${jobTitle}</strong>.
             </p>
 
-            <h3 style="margin-top: 1.5rem;">Offer summary</h3>
+            <h3 style="margin-top: 1.5rem;">Builder details</h3>
             <ul>
-              <li><strong>Pro / Business:</strong> ${insertPayload.business_name}</li>
-              <li><strong>Estimated price:</strong> ${safeAmount}</li>
+              <li><strong>Business / Pro:</strong> ${insertPayload.business_name}</li>
+              <li><strong>Phone:</strong> ${insertPayload.phone}</li>
+              <li><strong>Email:</strong> ${insertPayload.pro_email}</li>
               ${
-                insertPayload.phone
-                  ? `<li><strong>Phone:</strong> ${insertPayload.phone}</li>`
+                locationText
+                  ? `<li><strong>Project location:</strong> ${locationText}</li>`
                   : ""
               }
               ${
-                insertPayload.pro_email
-                  ? `<li><strong>Email:</strong> ${insertPayload.pro_email}</li>`
+                parsedAmount !== null
+                  ? `<li><strong>Estimated price:</strong> $${parsedAmount.toFixed(2)}</li>`
                   : ""
               }
             </ul>
 
-            ${
-              insertPayload.message
-                ? `
-            <h3 style="margin-top: 1.5rem;">Message from the Pro</h3>
+            <h3 style="margin-top: 1.5rem;">Message from the Builder</h3>
             <p>${insertPayload.message.replace(/\n/g, "<br/>")}</p>
-            `
-                : ""
-            }
 
             <p style="margin-top: 1.5rem;">
-              <strong>Next step:</strong> If this offer feels like a good fit,
-              contact <strong>${insertPayload.business_name}</strong> directly
-              ${insertPayload.pro_email ? "by email or phone" : "by phone"}
-              to discuss details, schedule a visit, and confirm the final agreement.
+              <strong>Next step:</strong> If this builder looks like a good fit,
+              you can contact <strong>${insertPayload.business_name}</strong> directly
+              to discuss the project, timing, site visit, and next steps.
             </p>
 
-            ${
-              insertPayload.pro_email
-                ? `<p>You can reply directly to this email to reach the Pro.</p>`
-                : ""
-            }
+            <p>You can reply directly to this email to reach the builder.</p>
 
             <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
-              ProBuildZone simply connects homeowners and local Pros.
-              All project details, payments, and agreements are handled directly between you and the Pro.
+              ProBuildZone connects homeowners with local professionals.
+              Final scope, pricing, timeline, contracts, and payments are handled directly between both sides.
             </p>
           </div>
         `;
@@ -232,11 +235,11 @@ exports.handler = async (event) => {
           to: homeownerEmail,
           subject,
           html,
-          ...(insertPayload.pro_email ? { reply_to: insertPayload.pro_email } : {}),
+          reply_to: insertPayload.pro_email,
         });
       } catch (emailErr) {
         console.error("Error sending email to homeowner:", emailErr);
-        // Do not fail the offer if email sending fails
+        // Do not fail the request if email sending fails
       }
     } else {
       console.warn("Skipping email: missing homeownerEmail or RESEND_API_KEY", {
@@ -251,7 +254,7 @@ exports.handler = async (event) => {
       headers: HEADERS,
       body: JSON.stringify({
         ok: true,
-        offer: insertedOffer || null,
+        request: insertedOffer || null,
       }),
     };
   } catch (e) {
