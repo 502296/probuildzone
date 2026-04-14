@@ -8,6 +8,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+  <script>
+    (function () {
+      try {
+        const raw = localStorage.getItem("pbz_user");
+        if (!raw) return;
+
+        const user = JSON.parse(raw);
+        const category = (user.category || "").trim();
+        const city = (user.city || "").trim();
+        const state = (user.state || "").trim();
+
+        if (!category || !city || !state) return;
+
+        const params = new URLSearchParams({
+          category,
+          city,
+          state
+        });
+
+        window.location.replace("/jobs.html?" + params.toString());
+      } catch (err) {
+        console.warn("PBZ auto-redirect skipped:", err);
+      }
+    })();
+  </script>
+
   <style>
     :root{
       --pbz:#0F2A43;
