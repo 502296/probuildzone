@@ -69,7 +69,7 @@
       border-radius:10px;
       padding:10px 14px;
       font-family:inherit;
-      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease, background .12s ease;
     }
 
     .btn:hover{
@@ -91,6 +91,27 @@
       background:#fff;
       color:var(--danger);
       border:1px solid #f2c7c2;
+    }
+
+    .btn-accept{
+      background:#ecfdf3;
+      color:var(--success);
+      border:1px solid #bbf7d0;
+    }
+
+    .btn-decline{
+      background:#fef2f2;
+      color:var(--danger);
+      border:1px solid #fecaca;
+    }
+
+    .btn-disabled{
+      background:#f3f4f6 !important;
+      color:#6b7280 !important;
+      border:1px solid #e5e7eb !important;
+      cursor:not-allowed !important;
+      box-shadow:none !important;
+      transform:none !important;
     }
 
     .hero-grid{
@@ -249,6 +270,13 @@
       color:#24384d;
       white-space:pre-wrap;
       margin-top:8px;
+    }
+
+    .request-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
     }
 
     .job-actions{
@@ -448,6 +476,44 @@
       statRequestsEl.textContent = String(totalRequests);
     }
 
+    async function updateRequestStatus(requestId, nextStatus, buttonGroup) {
+      const buttons = buttonGroup ? buttonGroup.querySelectorAll("button") : [];
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add("btn-disabled");
+      });
+
+      try {
+        const res = await fetch("/.netlify/functions/update-request-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            request_id: requestId,
+            status: nextStatus
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to update request status");
+        }
+
+        await loadDashboard();
+      } catch (err) {
+        console.error("updateRequestStatus error:", err);
+        alert(err.message || "Could not update request status.");
+
+        buttons.forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove("btn-disabled");
+        });
+      }
+    }
+
     function renderProjects(projects) {
       jobsBox.innerHTML = projects.map((project) => {
         const title = project.title || "Untitled job";
@@ -457,6 +523,7 @@
         const requestsHtml = requests.length
           ? requests.map((req) => {
               const status = String(req.status || "pending").toLowerCase();
+              const isResolved = status === "accepted" || status === "declined";
 
               return `
                 <div class="request-item">
@@ -472,6 +539,28 @@
                   </div>
 
                   <div class="request-message">${escapeHtml(shortText(req.message || "", 300))}</div>
+
+                  <div class="request-actions" data-request-buttons="${escapeHtml(req.id || "")}">
+                    <button
+                      type="button"
+                      class="btn btn-accept ${isResolved ? "btn-disabled" : ""}"
+                      data-request-id="${escapeHtml(req.id || "")}"
+                      data-next-status="accepted"
+                      ${isResolved ? "disabled" : ""}
+                    >
+                      Accept
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-decline ${isResolved ? "btn-disabled" : ""}"
+                      data-request-id="${escapeHtml(req.id || "")}"
+                      data-next-status="declined"
+                      ${isResolved ? "disabled" : ""}
+                    >
+                      Decline
+                    </button>
+                  </div>
                 </div>
               `;
             }).join("")
@@ -501,6 +590,18 @@
           </div>
         `;
       }).join("");
+
+      jobsBox.querySelectorAll("[data-next-status]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const requestId = btn.getAttribute("data-request-id");
+          const nextStatus = btn.getAttribute("data-next-status");
+          const buttonGroup = btn.closest("[data-request-buttons]");
+
+          if (!requestId || !nextStatus) return;
+
+          updateRequestStatus(requestId, nextStatus, buttonGroup);
+        });
+      });
     }
 
     async function loadDashboard() {
@@ -531,6 +632,7 @@
         if (!projects.length) {
           statusBox.className = "empty";
           statusBox.textContent = "You have not posted any projects yet.";
+          jobsBox.style.display = "none";
           return;
         }
 
