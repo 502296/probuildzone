@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Homeowner Dashboard - ProBuildZone</title>
+  <style>
+    :root{
+      --pbz:#0F2A43;
+      --gold:#D4AF37;
+      --muted:#617186;
+      --bg:#f3f5f7;
+      --card:#ffffff;
+      --border:#e3e7eb;
+      --danger:#b42318;
+      --success:#166534;
+      --soft:#eef4ff;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--pbz);
+      padding:28px 16px 40px;
+    }
+
+    .page{
+      max-width:1150px;
+      margin:0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    h1{
+      margin:0;
+      font-size:30px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.6;
+      max-width:780px;
+    }
+
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      border-radius:10px;
+      padding:10px 14px;
+      font-family:inherit;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 16px rgba(0,0,0,.06);
+    }
+
+    .btn-main{
+      background:var(--gold);
+      color:#000;
+    }
+
+    .btn-secondary{
+      background:#edf0f3;
+      color:var(--pbz);
+    }
+
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #f2c7c2;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+
+    .eyebrow{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    .profile-name{
+      font-size:24px;
+      font-weight:700;
+      line-height:1.25;
+      margin-bottom:8px;
+    }
+
+    .profile-meta{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:15px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .stat{
+      background:var(--soft);
+      border:1px solid #dbe7fb;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:24px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .section-title{
+      font-size:22px;
+      margin:0 0 14px;
+    }
+
+    .jobs-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+      gap:16px;
+    }
+
+    .job-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .job-title{
+      margin:0 0 8px;
+      font-size:20px;
+      line-height:1.35;
+    }
+
+    .job-meta{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      margin-bottom:12px;
+    }
+
+    .job-summary{
+      font-size:15px;
+      line-height:1.65;
+      color:#24384d;
+      margin-bottom:16px;
+      white-space:pre-wrap;
+    }
+
+    .requests-block{
+      margin-top:12px;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+    }
+
+    .requests-label{
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    .request-item{
+      background:#fafbfd;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+
+    .request-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
+
+    .request-name{
+      font-weight:700;
+      color:var(--pbz);
+    }
+
+    .request-meta{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .request-message{
+      font-size:14px;
+      line-height:1.6;
+      color:#24384d;
+      white-space:pre-wrap;
+      margin-top:8px;
+    }
+
+    .job-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:auto;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:700;
+      border-radius:999px;
+      padding:6px 10px;
+      border:1px solid transparent;
+    }
+
+    .badge.pending{
+      background:#eef4ff;
+      color:#23406a;
+      border-color:#d7e5ff;
+    }
+
+    .badge.accepted{
+      background:#ecfdf3;
+      color:var(--success);
+      border-color:#bbf7d0;
+    }
+
+    .badge.declined{
+      background:#fef2f2;
+      color:var(--danger);
+      border-color:#fecaca;
+    }
+
+    .loading,
+    .empty,
+    .error{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .error{
+      color:#a52f2f;
+      background:#fdeeee;
+      border-color:#f4c3c3;
+    }
+
+    @media (max-width:860px){
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      h1{font-size:26px}
+      .topbar{
+        align-items:stretch;
+      }
+      .topbar-actions{
+        width:100%;
+      }
+      .topbar-actions .btn{
+        flex:1;
+        text-align:center;
+      }
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <h1>Homeowner Dashboard</h1>
+        <div class="subtitle">
+          Review your posted projects and see connection requests sent by local builders through ProBuildZone.
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a class="btn btn-secondary" href="/homeowner.html">Post New Project</a>
+        <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="card">
+        <div class="eyebrow">Profile</div>
+        <div id="profileName" class="profile-name">Loading...</div>
+        <div id="profileMeta" class="profile-meta">Please wait while we load your homeowner profile.</div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Overview</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">My Projects</div>
+            <div id="statProjects" class="stat-value">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Incoming Requests</div>
+            <div id="statRequests" class="stat-value">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">My Projects</h2>
+
+    <div id="statusBox" class="loading">Loading your projects...</div>
+    <div id="jobsBox" class="jobs-grid" style="display:none;"></div>
+  </div>
+
+  <script>
+    const profileNameEl = document.getElementById("profileName");
+    const profileMetaEl = document.getElementById("profileMeta");
+    const statProjectsEl = document.getElementById("statProjects");
+    const statRequestsEl = document.getElementById("statRequests");
+    const statusBox = document.getElementById("statusBox");
+    const jobsBox = document.getElementById("jobsBox");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function shortText(text, max = 220) {
+      const value = String(text || "").trim();
+      if (!value) return "No description provided.";
+      return value.length > max ? value.slice(0, max).trim() + "..." : value;
+    }
+
+    function formatDate(value) {
+      if (!value) return "Recently";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Recently";
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function badgeClass(status) {
+      const value = String(status || "pending").toLowerCase();
+      if (value === "accepted") return "accepted";
+      if (value === "declined") return "declined";
+      return "pending";
+    }
+
+    function getStoredHomeowner() {
+      try {
+        const raw = localStorage.getItem("pbz_homeowner");
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch (err) {
+        console.warn("Could not parse pbz_homeowner:", err);
+        return null;
+      }
+    }
+
+    function renderProfile(user) {
+      profileNameEl.textContent = user.name || "Homeowner";
+      profileMetaEl.innerHTML = `
+        <div><strong>Email:</strong> ${escapeHtml(user.email || "-")}</div>
+        <div><strong>Phone:</strong> ${escapeHtml(user.phone || "-")}</div>
+        <div><strong>Last Job ID:</strong> ${escapeHtml(user.last_job_public_id || "-")}</div>
+      `;
+    }
+
+    function renderStats(projects) {
+      const totalProjects = projects.length;
+      const totalRequests = projects.reduce((sum, item) => {
+        const requests = Array.isArray(item.requests) ? item.requests : [];
+        return sum + requests.length;
+      }, 0);
+
+      statProjectsEl.textContent = String(totalProjects);
+      statRequestsEl.textContent = String(totalRequests);
+    }
+
+    function renderProjects(projects) {
+      jobsBox.innerHTML = projects.map((project) => {
+        const title = project.title || "Untitled job";
+        const location = [project.city, project.state].filter(Boolean).join(", ");
+        const requests = Array.isArray(project.requests) ? project.requests : [];
+
+        const requestsHtml = requests.length
+          ? requests.map((req) => {
+              const status = String(req.status || "pending").toLowerCase();
+
+              return `
+                <div class="request-item">
+                  <div class="request-head">
+                    <div class="request-name">${escapeHtml(req.business_name || "Builder")}</div>
+                    <span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span>
+                  </div>
+
+                  <div class="request-meta">
+                    <div><strong>Email:</strong> ${escapeHtml(req.pro_email || "-")}</div>
+                    <div><strong>Phone:</strong> ${escapeHtml(req.phone || "-")}</div>
+                    <div><strong>Sent:</strong> ${escapeHtml(formatDate(req.created_at))}</div>
+                  </div>
+
+                  <div class="request-message">${escapeHtml(shortText(req.message || "", 300))}</div>
+                </div>
+              `;
+            }).join("")
+          : `<div class="request-item"><div class="request-meta">No connection requests yet for this project.</div></div>`;
+
+        return `
+          <div class="job-card">
+            <h3 class="job-title">${escapeHtml(title)}</h3>
+
+            <div class="job-meta">
+              <div><strong>Job ID:</strong> ${escapeHtml(project.public_id || "-")}</div>
+              <div><strong>Category:</strong> ${escapeHtml(project.category || "-")}</div>
+              <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
+              <div><strong>Posted:</strong> ${escapeHtml(formatDate(project.created_at))}</div>
+            </div>
+
+            <div class="job-summary">${escapeHtml(shortText(project.summary || project.description || "", 260))}</div>
+
+            <div class="requests-block">
+              <div class="requests-label">Incoming Requests</div>
+              ${requestsHtml}
+            </div>
+
+            <div class="job-actions">
+              <a class="btn btn-main" href="/job.html?id=${encodeURIComponent(project.public_id || "")}">View Project</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadDashboard() {
+      const user = getStoredHomeowner();
+
+      if (!user || !user.email) {
+        statusBox.className = "error";
+        statusBox.textContent = "No active homeowner session found. Please post a project first.";
+        profileNameEl.textContent = "Session missing";
+        profileMetaEl.textContent = "Please return to the homeowner project page and create a project first.";
+        return;
+      }
+
+      renderProfile(user);
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-homeowner-requests?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load homeowner dashboard");
+        }
+
+        const projects = Array.isArray(data.projects) ? data.projects : [];
+
+        renderStats(projects);
+
+        if (!projects.length) {
+          statusBox.className = "empty";
+          statusBox.textContent = "You have not posted any projects yet.";
+          return;
+        }
+
+        statusBox.style.display = "none";
+        jobsBox.style.display = "grid";
+        renderProjects(projects);
+      } catch (err) {
+        console.error("Homeowner dashboard load error:", err);
+        statusBox.className = "error";
+        statusBox.textContent = "Could not load your homeowner dashboard right now.";
+      }
+    }
+
+    function handleLogout() {
+      try {
+        localStorage.removeItem("pbz_homeowner");
+      } catch (_) {}
+
+      window.location.href = "/homeowner.html";
+    }
+
+    logoutBtn.addEventListener("click", handleLogout);
+    loadDashboard();
+  </script>
+</body>
+</html>
