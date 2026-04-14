@@ -18,11 +18,9 @@
       --border:#e7ecf3;
       --gold:#D4AF37;
       --gold-2:#c49c1f;
-      --blue:#0f62fe;
-      --blue-700:#0c4ed6;
-      --radius:16px;
       --err:#b00020;
       --soft:#eef4ff;
+      --danger:#b42318;
     }
 
     *{box-sizing:border-box}
@@ -47,6 +45,22 @@
       border-radius:24px;
       padding:22px 20px;
       box-shadow:0 10px 24px rgba(15,42,67,0.06);
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
     .eyebrow{
@@ -179,6 +193,12 @@
       color:var(--ink);
     }
 
+    .btn.danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #f2c7c2;
+    }
+
     .muted{color:var(--muted)}
     .error{
       color:var(--err);
@@ -197,6 +217,16 @@
     @media (max-width:640px){
       h1{font-size:34px}
       .info-grid{grid-template-columns:1fr}
+      .topbar{
+        align-items:stretch;
+      }
+      .topbar-actions{
+        width:100%;
+      }
+      .topbar-actions .btn{
+        flex:1;
+        text-align:center;
+      }
     }
   </style>
 </head>
@@ -204,7 +234,17 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="eyebrow">ProBuildZone Project</div>
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">ProBuildZone Project</div>
+        </div>
+
+        <div class="topbar-actions">
+          <a id="dashboardLink" class="btn white" href="/pro-dashboard.html">Dashboard</a>
+          <button id="logoutBtn" class="btn danger" type="button">Logout</button>
+        </div>
+      </div>
+
       <h1>Job Details</h1>
       <p class="subtitle">
         Review the homeowner project details below. If this project is a good fit for your trade,
@@ -249,7 +289,7 @@
 
         <div class="btns">
           <a id="connectLink" class="btn primary" href="#">Request Connection</a>
-          <a class="btn white" href="/jobs.html">Back to Jobs</a>
+          <a id="jobsLink" class="btn white" href="/jobs.html">Back to Matching Jobs</a>
           <a class="btn white" href="/index.html">Back to Home</a>
         </div>
       </div>
@@ -280,6 +320,32 @@
       const v_summary = document.getElementById("v_summary");
 
       const connectLink = document.getElementById("connectLink");
+      const jobsLink = document.getElementById("jobsLink");
+      const dashboardLink = document.getElementById("dashboardLink");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      function getStoredPro() {
+        try {
+          const raw = localStorage.getItem("pbz_user");
+          if (!raw) return null;
+
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === "object" ? parsed : null;
+        } catch (err) {
+          console.warn("Could not parse pbz_user:", err);
+          return null;
+        }
+      }
+
+      function buildJobsUrl(user) {
+        const q = new URLSearchParams({
+          category: user.category || "",
+          city: user.city || "",
+          state: user.state || ""
+        });
+
+        return "/jobs.html?" + q.toString();
+      }
 
       function formatDate(value) {
         if (!value) return "Recently";
@@ -293,6 +359,34 @@
         });
       }
 
+      function handleLogout() {
+        try {
+          localStorage.removeItem("pbz_user");
+        } catch (_) {}
+
+        window.location.href = "/pros.html";
+      }
+
+      const storedPro = getStoredPro();
+
+      if (dashboardLink) {
+        dashboardLink.href = "/pro-dashboard.html";
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", handleLogout);
+      }
+
+      if (storedPro) {
+        jobsLink.href = buildJobsUrl(storedPro);
+      }
+
+      if (!storedPro) {
+        loadingBox.style.display = "none";
+        jobError.textContent = "No active Pro session found. Please return to Pro signup first.";
+        return;
+      }
+
       if (!identifier) {
         loadingBox.style.display = "none";
         jobError.textContent = "Job not found.";
@@ -303,7 +397,7 @@
 
       try {
         const jobRes = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(identifier)}`);
-        const jobJson = await jobRes.json();
+        const jobJson = await jobRes.json().catch(() => ({}));
 
         if (!jobRes.ok || !jobJson.ok || !jobJson.job) {
           loadingBox.style.display = "none";
