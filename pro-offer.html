@@ -31,9 +31,25 @@
     }
 
     .page {
-      max-width: 760px;
+      max-width: 860px;
       margin: 28px auto 40px;
       padding: 0 16px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     .header {
@@ -130,14 +146,17 @@
       flex-wrap: wrap;
     }
 
+    .btn,
     button {
       border: none;
       cursor: pointer;
       font-weight: 600;
       font-family: inherit;
+      text-decoration: none;
       transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
+    .btn:hover,
     button:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 16px rgba(0,0,0,.06);
@@ -158,6 +177,14 @@
     .btn-secondary {
       background: #edf0f3;
       color: var(--pbz);
+      padding: 11px 18px;
+      border-radius: 10px;
+    }
+
+    .btn-danger {
+      background: #fff;
+      color: var(--danger);
+      border: 1px solid #f2c7c2;
       padding: 11px 18px;
       border-radius: 10px;
     }
@@ -193,12 +220,32 @@
     @media (max-width: 540px) {
       .card { padding: 16px 14px 20px; }
       .actions { flex-direction: column; }
-      .btn-main, .btn-secondary { width: 100%; text-align: center; }
+      .btn-main, .btn-secondary, .btn-danger { width: 100%; text-align: center; }
+      .topbar {
+        align-items: stretch;
+      }
+      .topbar-actions {
+        width: 100%;
+      }
+      .topbar-actions .btn,
+      .topbar-actions button {
+        flex: 1;
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
+    <div class="topbar">
+      <div></div>
+      <div class="topbar-actions">
+        <a id="dashboardLink" class="btn btn-secondary" href="/pro-dashboard.html">Dashboard</a>
+        <a id="jobBackLink" class="btn btn-secondary" href="/job.html">Back to Job</a>
+        <button id="logoutBtn" class="btn-danger" type="button">Logout</button>
+      </div>
+    </div>
+
     <div class="header">
       <div class="logo">PROBUILDZONE</div>
       <h1>Request Connection</h1>
@@ -284,6 +331,24 @@
       }
     }
 
+    function buildJobsUrl(user) {
+      const q = new URLSearchParams({
+        category: user.category || "",
+        city: user.city || "",
+        state: user.state || ""
+      });
+
+      return "/jobs.html?" + q.toString();
+    }
+
+    function handleLogout() {
+      try {
+        localStorage.removeItem("pbz_user");
+      } catch (_) {}
+
+      window.location.href = "/pros.html";
+    }
+
     const jobPublicId = getJobPublicId();
     const storedPro = getStoredPro();
 
@@ -293,19 +358,35 @@
     const successBox = document.getElementById("success");
     const sendBtn = document.getElementById("sendBtn");
     const cancelBtn = document.getElementById("cancelBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const dashboardLink = document.getElementById("dashboardLink");
+    const jobBackLink = document.getElementById("jobBackLink");
 
     const businessNameInput = document.getElementById("business_name");
     const proEmailInput = document.getElementById("pro_email");
     const phoneInput = document.getElementById("phone");
     const messageInput = document.getElementById("message");
 
-    if (jobPublicId) {
-      jobTagEl.textContent = "For job: " + jobPublicId;
-    } else {
-      jobTagEl.textContent = "Job ID missing. Please open this page from the project link.";
+    if (dashboardLink) {
+      dashboardLink.href = "/pro-dashboard.html";
     }
 
-    if (storedPro) {
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", handleLogout);
+    }
+
+    if (jobPublicId) {
+      jobTagEl.textContent = "For job: " + jobPublicId;
+      jobBackLink.href = `/job.html?id=${encodeURIComponent(jobPublicId)}`;
+    } else {
+      jobTagEl.textContent = "Job ID missing. Please open this page from the project link.";
+      jobBackLink.href = storedPro ? buildJobsUrl(storedPro) : "/jobs.html";
+    }
+
+    if (!storedPro) {
+      showError("No active Pro session found. Please return to Pro signup first.");
+      form.style.display = "none";
+    } else {
       if (!businessNameInput.value && storedPro.name) {
         businessNameInput.value = storedPro.name;
       }
@@ -348,12 +429,27 @@
     }
 
     cancelBtn.addEventListener("click", () => {
-      window.history.back();
+      if (jobPublicId) {
+        window.location.href = `/job.html?id=${encodeURIComponent(jobPublicId)}`;
+        return;
+      }
+
+      if (storedPro) {
+        window.location.href = buildJobsUrl(storedPro);
+        return;
+      }
+
+      window.location.href = "/pros.html";
     });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       clearMessages();
+
+      if (!storedPro) {
+        showError("No active Pro session found. Please return to Pro signup first.");
+        return;
+      }
 
       if (!jobPublicId) {
         showError("Job ID is missing. Please go back and open this page from the project link.");
@@ -396,12 +492,21 @@
           showError(data.error || "Something went wrong while sending your request. Please try again.");
         } else {
           showSuccess("Your connection request has been sent successfully. The homeowner can now review it and decide whether to continue the conversation.");
+
           form.reset();
 
           if (storedPro) {
             if (storedPro.name) businessNameInput.value = storedPro.name;
             if (storedPro.email) proEmailInput.value = storedPro.email;
             if (storedPro.phone) phoneInput.value = storedPro.phone;
+
+            const parts = [];
+            if (storedPro.category) parts.push(`We specialize in ${storedPro.category}.`);
+            if (storedPro.city || storedPro.state) {
+              parts.push(`We are based in ${[storedPro.city, storedPro.state].filter(Boolean).join(", ")}.`);
+            }
+            parts.push("We would like to request a connection for this project and discuss the next steps.");
+            messageInput.value = parts.join(" ");
           }
         }
       } catch (err) {
