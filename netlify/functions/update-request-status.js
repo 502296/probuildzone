@@ -23,6 +23,8 @@ const supabaseKey =
   process.env.SUPABASE_SERVICE_ROLE ||
   process.env.SUPABASE_ANON_KEY;
 
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
 function buildClient() {
   if (!supabaseUrl || !supabaseKey) return null;
 
@@ -91,31 +93,138 @@ exports.handler = async (event) => {
       });
     }
 
-    const { data, error } = await supabase
+    // 1) Update request status and fetch full request row
+    const { data: updatedRequest, error: updateError } = await supabase
       .from("pro_offers")
       .update({ status: nextStatus })
       .eq("id", requestId)
-      .select("id, status")
+      .select("id, job_id, business_name, pro_email, phone, message, amount, status, created_at")
       .maybeSingle();
 
-    if (error) {
-      console.error("update-request-status error:", error);
+    if (updateError) {
+      console.error("update-request-status error:", updateError);
       return json(500, {
         ok: false,
-        error: error.message || "Failed to update request status",
+        error: updateError.message || "Failed to update request status",
       });
     }
 
-    if (!data) {
+    if (!updatedRequest) {
       return json(404, {
         ok: false,
         error: "Request not found",
       });
     }
 
+    let emailSent = false;
+
+    // 2) If accepted, send email to the builder
+    if (nextStatus === "accepted" && updatedRequest.pro_email && RESEND_API_KEY) {
+      try {
+        const { Resend } = await import("resend");
+        const resend = new Resend(RESEND_API_KEY);
+
+        // Load related homeowner job
+        const { data: jobRow, error: jobError } = await supabase
+          .from("homeowner_jobs")
+          .select("id, public_id, title, project_title, category, city, state, name, email")
+          .eq("id", updatedRequest.job_id)
+          .maybeSingle();
+
+        if (jobError) {
+          console.error("update-request-status job lookup error:", jobError);
+        }
+
+        const jobTitle =
+          (jobRow && (jobRow.title || jobRow.project_title || jobRow.category)) ||
+          "your project";
+
+        const homeownerName =
+          (jobRow && jobRow.name) ||
+          "Homeowner";
+
+        const locationText = jobRow
+          ? [jobRow.city, jobRow.state].filter(Boolean).join(", ")
+          : "";
+
+        const safeAmount =
+          updatedRequest.amount !== null && updatedRequest.amount !== undefined
+            ? `$${Number(updatedRequest.amount).toFixed(2)}`
+            : null;
+
+        const subject = `Your ProBuildZone request was accepted for "${jobTitle}"`;
+
+        const html = `
+          <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
+            <h2 style="margin-bottom: 0.5rem;">Your request was accepted on ProBuildZone</h2>
+
+            <p>Hi ${updatedRequest.business_name || "Builder"},</p>
+
+            <p>
+              Good news. A homeowner accepted your connection request for:
+              <strong>${jobTitle}</strong>.
+            </p>
+
+            <h3 style="margin-top: 1.5rem;">Project details</h3>
+            <ul>
+              <li><strong>Project:</strong> ${jobTitle}</li>
+              ${
+                jobRow && jobRow.public_id
+                  ? `<li><strong>Job ID:</strong> ${jobRow.public_id}</li>`
+                  : ""
+              }
+              ${
+                locationText
+                  ? `<li><strong>Location:</strong> ${locationText}</li>`
+                  : ""
+              }
+              <li><strong>Homeowner:</strong> ${homeownerName}</li>
+              ${
+                safeAmount
+                  ? `<li><strong>Your estimate:</strong> ${safeAmount}</li>`
+                  : ""
+              }
+            </ul>
+
+            ${
+              updatedRequest.message
+                ? `
+            <h3 style="margin-top: 1.5rem;">Your original message</h3>
+            <p>${String(updatedRequest.message).replace(/\n/g, "<br/>")}</p>
+            `
+                : ""
+            }
+
+            <p style="margin-top: 1.5rem;">
+              <strong>Next step:</strong> you may now follow up professionally and continue discussing project scope,
+              timing, visit details, and next steps.
+            </p>
+
+            <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
+              ProBuildZone connects homeowners with local builders.
+              Final agreements, pricing, and project terms are handled directly between both sides.
+            </p>
+          </div>
+        `;
+
+        await resend.emails.send({
+          from: "ProBuildZone <onboarding@resend.dev>",
+          to: updatedRequest.pro_email,
+          subject,
+          html,
+        });
+
+        emailSent = true;
+      } catch (emailErr) {
+        console.error("update-request-status acceptance email error:", emailErr);
+        // Do not fail the status update if email sending fails
+      }
+    }
+
     return json(200, {
       ok: true,
-      request: data,
+      request: updatedRequest,
+      email_sent: emailSent,
     });
   } catch (err) {
     console.error("update-request-status unexpected error:", err);
