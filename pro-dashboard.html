@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pro Dashboard - ProBuildZone</title>
+  <style>
+    :root{
+      --pbz:#0F2A43;
+      --gold:#D4AF37;
+      --muted:#617186;
+      --bg:#f3f5f7;
+      --card:#ffffff;
+      --border:#e3e7eb;
+      --danger:#b42318;
+      --success:#166534;
+      --soft:#eef4ff;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--pbz);
+      padding:28px 16px 40px;
+    }
+
+    .page{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    h1{
+      margin:0;
+      font-size:30px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.6;
+      max-width:760px;
+    }
+
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      border-radius:10px;
+      padding:10px 14px;
+      font-family:inherit;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 16px rgba(0,0,0,.06);
+    }
+
+    .btn-main{
+      background:var(--gold);
+      color:#000;
+    }
+
+    .btn-secondary{
+      background:#edf0f3;
+      color:var(--pbz);
+    }
+
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #f2c7c2;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+
+    .eyebrow{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    .profile-name{
+      font-size:24px;
+      font-weight:700;
+      line-height:1.25;
+      margin-bottom:8px;
+    }
+
+    .profile-meta{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:15px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .stat{
+      background:var(--soft);
+      border:1px solid #dbe7fb;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .stat-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:24px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .section-title{
+      font-size:22px;
+      margin:0 0 14px;
+    }
+
+    .requests-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+      gap:16px;
+    }
+
+    .request-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .request-title{
+      margin:0 0 8px;
+      font-size:20px;
+      line-height:1.35;
+    }
+
+    .request-meta{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      margin-bottom:12px;
+    }
+
+    .request-message{
+      font-size:15px;
+      line-height:1.65;
+      color:#24384d;
+      margin-bottom:16px;
+      white-space:pre-wrap;
+      flex:1;
+    }
+
+    .request-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:auto;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:700;
+      border-radius:999px;
+      padding:6px 10px;
+      margin-left:8px;
+      border:1px solid transparent;
+    }
+
+    .badge.pending{
+      background:#eef4ff;
+      color:#23406a;
+      border-color:#d7e5ff;
+    }
+
+    .badge.accepted{
+      background:#ecfdf3;
+      color:var(--success);
+      border-color:#bbf7d0;
+    }
+
+    .badge.declined{
+      background:#fef2f2;
+      color:var(--danger);
+      border-color:#fecaca;
+    }
+
+    .loading,
+    .empty,
+    .error{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .error{
+      color:#a52f2f;
+      background:#fdeeee;
+      border-color:#f4c3c3;
+    }
+
+    @media (max-width:860px){
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      h1{font-size:26px}
+      .topbar{
+        align-items:stretch;
+      }
+      .topbar-actions{
+        width:100%;
+      }
+      .topbar-actions .btn{
+        flex:1;
+        text-align:center;
+      }
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <h1>Pro Dashboard</h1>
+        <div class="subtitle">
+          Review your profile and track the connection requests you have already sent through ProBuildZone.
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a id="jobsLink" class="btn btn-secondary" href="/jobs.html">Matching Jobs</a>
+        <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="card">
+        <div class="eyebrow">Profile</div>
+        <div id="profileName" class="profile-name">Loading...</div>
+        <div id="profileMeta" class="profile-meta">Please wait while we load your profile.</div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Overview</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Total Requests</div>
+            <div id="statTotal" class="stat-value">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Pending</div>
+            <div id="statPending" class="stat-value">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">My Connection Requests</h2>
+
+    <div id="statusBox" class="loading">Loading your requests...</div>
+    <div id="requestsBox" class="requests-grid" style="display:none;"></div>
+  </div>
+
+  <script>
+    const profileNameEl = document.getElementById("profileName");
+    const profileMetaEl = document.getElementById("profileMeta");
+    const statTotalEl = document.getElementById("statTotal");
+    const statPendingEl = document.getElementById("statPending");
+    const statusBox = document.getElementById("statusBox");
+    const requestsBox = document.getElementById("requestsBox");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const jobsLink = document.getElementById("jobsLink");
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function shortText(text, max = 220) {
+      const value = String(text || "").trim();
+      if (!value) return "No message provided.";
+      return value.length > max ? value.slice(0, max).trim() + "..." : value;
+    }
+
+    function formatDate(value) {
+      if (!value) return "Recently";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Recently";
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function badgeClass(status) {
+      const value = String(status || "pending").toLowerCase();
+      if (value === "accepted") return "accepted";
+      if (value === "declined") return "declined";
+      return "pending";
+    }
+
+    function getStoredPro() {
+      try {
+        const raw = localStorage.getItem("pbz_user");
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch (err) {
+        console.warn("Could not parse pbz_user:", err);
+        return null;
+      }
+    }
+
+    function buildJobsUrl(user) {
+      const params = new URLSearchParams({
+        category: user.category || "",
+        city: user.city || "",
+        state: user.state || ""
+      });
+      return "/jobs.html?" + params.toString();
+    }
+
+    function renderProfile(user) {
+      profileNameEl.textContent = user.name || "Pro";
+      profileMetaEl.innerHTML = `
+        <div><strong>Trade:</strong> ${escapeHtml(user.category || "-")}</div>
+        <div><strong>Location:</strong> ${escapeHtml([user.city, user.state].filter(Boolean).join(", ") || "-")}</div>
+        <div><strong>Email:</strong> ${escapeHtml(user.email || "-")}</div>
+        <div><strong>Phone:</strong> ${escapeHtml(user.phone || "-")}</div>
+      `;
+      jobsLink.href = buildJobsUrl(user);
+    }
+
+    function renderStats(requests) {
+      const total = requests.length;
+      const pending = requests.filter(item => String(item.status || "").toLowerCase() === "pending").length;
+
+      statTotalEl.textContent = String(total);
+      statPendingEl.textContent = String(pending);
+    }
+
+    function renderRequests(requests) {
+      requestsBox.innerHTML = requests.map((item) => {
+        const title = item.job_title || item.title || "Untitled job";
+        const location = [item.city, item.state].filter(Boolean).join(", ");
+        const status = String(item.status || "pending").toLowerCase();
+        const jobId = item.job_public_id || item.public_id || item.job_id || "";
+
+        return `
+          <div class="request-card">
+            <h3 class="request-title">
+              ${escapeHtml(title)}
+              <span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span>
+            </h3>
+
+            <div class="request-meta">
+              <div><strong>Job ID:</strong> ${escapeHtml(jobId || "-")}</div>
+              <div><strong>Category:</strong> ${escapeHtml(item.category || "-")}</div>
+              <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
+              <div><strong>Sent:</strong> ${escapeHtml(formatDate(item.created_at))}</div>
+            </div>
+
+            <div class="request-message">${escapeHtml(shortText(item.message || ""))}</div>
+
+            <div class="request-actions">
+              <a class="btn btn-main" href="/job.html?id=${encodeURIComponent(jobId)}">View Job</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadDashboard() {
+      const user = getStoredPro();
+
+      if (!user || !user.email) {
+        statusBox.className = "error";
+        statusBox.textContent = "No active Pro session found. Please sign in again.";
+        profileNameEl.textContent = "Session missing";
+        profileMetaEl.textContent = "Please return to the Pro signup page and continue from there.";
+        return;
+      }
+
+      renderProfile(user);
+
+      try {
+        const res = await fetch(`/.netlify/functions/get-pro-requests?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load dashboard data");
+        }
+
+        const requests = Array.isArray(data.requests) ? data.requests : [];
+
+        renderStats(requests);
+
+        if (!requests.length) {
+          statusBox.className = "empty";
+          statusBox.textContent = "You have not sent any connection requests yet.";
+          return;
+        }
+
+        statusBox.style.display = "none";
+        requestsBox.style.display = "grid";
+        renderRequests(requests);
+      } catch (err) {
+        console.error("Dashboard load error:", err);
+        statusBox.className = "error";
+        statusBox.textContent = "Could not load your dashboard right now.";
+      }
+    }
+
+    function handleLogout() {
+      try {
+        localStorage.removeItem("pbz_user");
+      } catch (_) {}
+
+      window.location.href = "/pros.html";
+    }
+
+    logoutBtn.addEventListener("click", handleLogout);
+    loadDashboard();
+  </script>
+</body>
+</html>
