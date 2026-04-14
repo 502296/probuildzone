@@ -1,6 +1,6 @@
 // pros.js
 // ProBuildZone — signup flow using Supabase only (no Stripe redirect)
-// After successful signup, redirect Pro to matching jobs page
+// After successful signup, save Pro locally and redirect to matching jobs page
 
 (function () {
   function getField(idOrName) {
@@ -112,6 +112,32 @@
     return `/jobs.html?${q.toString()}`;
   }
 
+  function saveLocalProSession(payload, serverData) {
+    const pbzUser = {
+      name: payload.name || "",
+      email: payload.email || "",
+      phone: payload.phone || "",
+      address: payload.address || "",
+      license: payload.license || "",
+      insurance: payload.insurance || "",
+      notes: payload.notes || "",
+      category: payload.category || "",
+      city: payload.city || "",
+      state: payload.state || "",
+      pro_id:
+        (serverData && (serverData.pro_id || serverData.id || serverData.proId)) || "",
+      saved_at: new Date().toISOString(),
+    };
+
+    try {
+      localStorage.setItem("pbz_form_data", JSON.stringify(payload));
+    } catch (_) {}
+
+    try {
+      localStorage.setItem("pbz_user", JSON.stringify(pbzUser));
+    } catch (_) {}
+  }
+
   async function handleSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -155,6 +181,8 @@
       if (!res.ok || !data.ok) {
         throw new Error(data.error || `Request failed (${res.status})`);
       }
+
+      saveLocalProSession(payload, data);
 
       showInlineMessage(
         "Success. Your ProBuildZone profile has been saved. Redirecting you to matching jobs...",
