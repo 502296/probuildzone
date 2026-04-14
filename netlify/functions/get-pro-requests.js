@@ -23,6 +23,14 @@ function buildClient() {
   });
 }
 
+function json(statusCode, body) {
+  return {
+    statusCode,
+    headers: HEADERS,
+    body: JSON.stringify(body),
+  };
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -33,64 +41,69 @@ exports.handler = async (event) => {
   }
 
   if (event.httpMethod !== "GET") {
-    return {
-      statusCode: 405,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: false,
-        error: "Method not allowed",
-      }),
-    };
+    return json(405, {
+      ok: false,
+      error: "Method not allowed",
+    });
   }
 
   if (!supabaseUrl || !supabaseKey) {
-    return {
-      statusCode: 500,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: false,
-        error: "Missing Supabase env vars",
-      }),
-    };
+    return json(500, {
+      ok: false,
+      error: "Missing Supabase env vars",
+    });
   }
 
   try {
     const supabase = buildClient();
 
-    const params = event.queryStringParameters || {};
-    const email = String(params.email || "").trim().toLowerCase();
-
-    if (!email) {
-      return {
-        statusCode: 400,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Missing pro email",
-        }),
-      };
+    if (!supabase) {
+      return json(500, {
+        ok: false,
+        error: "Failed to initialize Supabase client",
+      });
     }
 
+    const params = event.queryStringParameters || {};
+    const email = String(params.email || "")
+      .trim()
+      .toLowerCase();
+
+    if (!email) {
+      return json(400, {
+        ok: false,
+        error: "Missing pro email",
+      });
+    }
+
+    // Step 1: Load this Pro's connection requests
     const { data: requestsRaw, error: reqError } = await supabase
       .from("pro_offers")
-      .select("id, job_id, business_name, pro_email, phone, amount, message, status, created_at")
+      .select(
+        "id, job_id, business_name, pro_email, phone, amount, message, status, created_at"
+      )
       .ilike("pro_email", email)
       .order("created_at", { ascending: false });
 
     if (reqError) {
       console.error("get-pro-requests query error:", reqError);
-      return {
-        statusCode: 500,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: reqError.message || "Failed to load pro requests",
-        }),
-      };
+      return json(500, {
+        ok: false,
+        error: reqError.message || "Failed to load pro requests",
+      });
     }
 
     const requests = Array.isArray(requestsRaw) ? requestsRaw : [];
-    const jobIds = [...new Set(requests.map(item => item.job_id).filter(Boolean))];
+
+    if (!requests.length) {
+      return json(200, {
+        ok: true,
+        requests: [],
+      });
+    }
+
+    // Step 2: Collect related homeowner job IDs
+    const jobIds = [...new Set(requests.map((item) => item.job_id).filter(Boolean))];
 
     let jobsMap = new Map();
 
@@ -102,24 +115,21 @@ exports.handler = async (event) => {
 
       if (jobsError) {
         console.error("get-pro-requests jobs lookup error:", jobsError);
-        return {
-          statusCode: 500,
-          headers: HEADERS,
-          body: JSON.stringify({
-            ok: false,
-            error: jobsError.message || "Failed to load related jobs",
-          }),
-        };
+        return json(500, {
+          ok: false,
+          error: jobsError.message || "Failed to load related jobs",
+        });
       }
 
-      jobsMap = new Map((jobsRaw || []).map(job => [job.id, job]));
+      jobsMap = new Map((jobsRaw || []).map((job) => [job.id, job]));
     }
 
+    // Step 3: Normalize the response for dashboard use
     const normalized = requests.map((item) => {
       const job = jobsMap.get(item.job_id) || {};
 
       return {
-        id: item.id,
+        id: item.id || null,
         job_id: item.job_id || null,
         job_public_id: job.public_id || null,
         job_title: job.title || job.project_title || "Untitled job",
@@ -136,23 +146,15 @@ exports.handler = async (event) => {
       };
     });
 
-    return {
-      statusCode: 200,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: true,
-        requests: normalized,
-      }),
-    };
+    return json(200, {
+      ok: true,
+      requests: normalized,
+    });
   } catch (err) {
     console.error("get-pro-requests unexpected error:", err);
-    return {
-      statusCode: 500,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: false,
-        error: err.message || "Unexpected error",
-      }),
-    };
+    return json(500, {
+      ok: false,
+      error: err.message || "Unexpected error",
+    });
   }
 };
