@@ -244,10 +244,6 @@
       return String(value || "").trim();
     }
 
-    function normalizeCompare(value) {
-      return String(value || "").trim().toLowerCase();
-    }
-
     function getStoredPro() {
       try {
         const raw = localStorage.getItem("pbz_user");
@@ -266,22 +262,10 @@
     function resolveFilters() {
       const stored = getStoredPro();
 
-      const resolvedCategory = normalizeValue(
-        params.get("category") || (stored && stored.category) || ""
-      );
-
-      const resolvedCity = normalizeValue(
-        params.get("city") || (stored && stored.city) || ""
-      );
-
-      const resolvedState = normalizeValue(
-        params.get("state") || (stored && stored.state) || ""
-      );
-
       return {
-        category: resolvedCategory,
-        city: resolvedCity,
-        state: resolvedState
+        category: normalizeValue(params.get("category") || (stored && stored.category) || ""),
+        city: normalizeValue(params.get("city") || (stored && stored.city) || ""),
+        state: normalizeValue(params.get("state") || (stored && stored.state) || "")
       };
     }
 
@@ -317,15 +301,12 @@
         const title =
           job.title ||
           job.project_title ||
-          job.job_title ||
           "Untitled job";
 
         const summary =
           job.summary ||
           job.short_summary ||
           job.description ||
-          job.full_description ||
-          job.details ||
           "";
 
         const location = [job.city, job.state].filter(Boolean).join(", ");
@@ -359,28 +340,39 @@
       }).join("");
     }
 
-    function applyClientSideFilters(jobs) {
-      return jobs.filter((job) => {
-        const jobCategory = normalizeCompare(job.category);
-        const jobCity = normalizeCompare(job.city);
-        const jobState = normalizeCompare(job.state);
-
-        const categoryOk = !activeFilters.category || jobCategory === normalizeCompare(activeFilters.category);
-        const cityOk = !activeFilters.city || jobCity === normalizeCompare(activeFilters.city);
-        const stateOk = !activeFilters.state || jobState === normalizeCompare(activeFilters.state);
-
-        return categoryOk && cityOk && stateOk;
-      });
-    }
-
     async function loadJobs() {
       renderFilters();
 
       try {
         let query = client
           .from("homeowner_jobs")
-          .select("*")
-          .order("created_at", { ascending: false });
+          .select(`
+            id,
+            public_id,
+            category,
+            title,
+            project_title,
+            summary,
+            short_summary,
+            description,
+            city,
+            state,
+            created_at
+          `)
+          .order("created_at", { ascending: false })
+          .limit(30);
+
+        if (activeFilters.category) {
+          query = query.eq("category", activeFilters.category);
+        }
+
+        if (activeFilters.city) {
+          query = query.ilike("city", activeFilters.city);
+        }
+
+        if (activeFilters.state) {
+          query = query.ilike("state", activeFilters.state);
+        }
 
         const { data, error } = await query;
 
@@ -388,7 +380,7 @@
           throw error;
         }
 
-        const jobs = Array.isArray(data) ? applyClientSideFilters(data) : [];
+        const jobs = Array.isArray(data) ? data : [];
 
         if (!jobs.length) {
           statusBox.className = "empty";
