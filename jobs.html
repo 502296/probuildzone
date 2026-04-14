@@ -13,6 +13,7 @@
       --bg:#f3f5f7;
       --card:#ffffff;
       --border:#e3e7eb;
+      --danger:#b42318;
     }
 
     *{box-sizing:border-box}
@@ -26,17 +27,24 @@
     }
 
     .page{
-      max-width:1000px;
+      max-width:1100px;
       margin:0 auto;
     }
 
     .topbar{
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:flex-start;
       gap:12px;
       flex-wrap:wrap;
       margin-bottom:22px;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
     h1{
@@ -47,8 +55,9 @@
     .subtitle{
       color:var(--muted);
       margin-top:8px;
-      margin-bottom:20px;
+      margin-bottom:0;
       line-height:1.5;
+      max-width:720px;
     }
 
     .filters{
@@ -69,7 +78,7 @@
 
     .jobs-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
       gap:16px;
     }
 
@@ -79,6 +88,9 @@
       border-radius:16px;
       padding:18px;
       box-shadow:0 6px 18px rgba(0,0,0,.04);
+      display:flex;
+      flex-direction:column;
+      min-height:100%;
     }
 
     .job-title{
@@ -90,21 +102,27 @@
     .meta{
       color:var(--muted);
       font-size:14px;
-      margin-bottom:10px;
-      line-height:1.5;
+      margin-bottom:12px;
+      line-height:1.6;
+    }
+
+    .meta div{
+      margin-bottom:4px;
     }
 
     .desc{
       font-size:15px;
-      line-height:1.6;
+      line-height:1.65;
       margin-bottom:16px;
       color:#24384d;
+      flex:1;
     }
 
     .actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      margin-top:auto;
     }
 
     .btn{
@@ -116,6 +134,12 @@
       border-radius:10px;
       padding:10px 14px;
       font-family:inherit;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 16px rgba(0,0,0,.06);
     }
 
     .btn-main{
@@ -126,6 +150,12 @@
     .btn-secondary{
       background:#edf0f3;
       color:var(--pbz);
+    }
+
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #f2c7c2;
     }
 
     .empty,
@@ -147,6 +177,16 @@
 
     @media (max-width:640px){
       h1{font-size:26px}
+      .topbar{
+        align-items:stretch;
+      }
+      .topbar-actions{
+        width:100%;
+      }
+      .topbar-actions .btn{
+        flex:1;
+        text-align:center;
+      }
     }
   </style>
 </head>
@@ -159,7 +199,11 @@
           Browse homeowner projects that match your trade and location.
         </div>
       </div>
-      <a class="btn btn-secondary" href="/pros.html">Back to Pro Signup</a>
+
+      <div class="topbar-actions">
+        <a class="btn btn-secondary" href="/pros.html">Back to Pro Signup</a>
+        <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
+      </div>
     </div>
 
     <div class="filters" id="filters"></div>
@@ -175,13 +219,11 @@
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const params = new URLSearchParams(window.location.search);
-    const category = (params.get("category") || "").trim();
-    const city = (params.get("city") || "").trim();
-    const state = (params.get("state") || "").trim();
 
     const filtersEl = document.getElementById("filters");
     const statusBox = document.getElementById("statusBox");
     const jobsBox = document.getElementById("jobsBox");
+    const logoutBtn = document.getElementById("logoutBtn");
 
     function escapeHtml(value) {
       return String(value || "")
@@ -192,18 +234,71 @@
         .replace(/'/g, "&#039;");
     }
 
-    function shortText(text, max = 140) {
+    function shortText(text, max = 180) {
       const value = String(text || "").trim();
       if (!value) return "No description provided.";
-      return value.length > max ? value.slice(0, max) + "..." : value;
+      return value.length > max ? value.slice(0, max).trim() + "..." : value;
     }
+
+    function normalizeValue(value) {
+      return String(value || "").trim();
+    }
+
+    function normalizeCompare(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function getStoredPro() {
+      try {
+        const raw = localStorage.getItem("pbz_user");
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+
+        return parsed;
+      } catch (err) {
+        console.warn("Could not parse pbz_user:", err);
+        return null;
+      }
+    }
+
+    function resolveFilters() {
+      const stored = getStoredPro();
+
+      const resolvedCategory = normalizeValue(
+        params.get("category") || (stored && stored.category) || ""
+      );
+
+      const resolvedCity = normalizeValue(
+        params.get("city") || (stored && stored.city) || ""
+      );
+
+      const resolvedState = normalizeValue(
+        params.get("state") || (stored && stored.state) || ""
+      );
+
+      return {
+        category: resolvedCategory,
+        city: resolvedCity,
+        state: resolvedState
+      };
+    }
+
+    const activeFilters = resolveFilters();
 
     function renderFilters() {
       const pills = [];
 
-      if (category) pills.push(`<div class="pill">Category: ${escapeHtml(category)}</div>`);
-      if (city) pills.push(`<div class="pill">City: ${escapeHtml(city)}</div>`);
-      if (state) pills.push(`<div class="pill">State: ${escapeHtml(state)}</div>`);
+      if (activeFilters.category) {
+        pills.push(`<div class="pill">Category: ${escapeHtml(activeFilters.category)}</div>`);
+      }
+      if (activeFilters.city) {
+        pills.push(`<div class="pill">City: ${escapeHtml(activeFilters.city)}</div>`);
+      }
+      if (activeFilters.state) {
+        pills.push(`<div class="pill">State: ${escapeHtml(activeFilters.state)}</div>`);
+      }
 
       if (!pills.length) {
         pills.push(`<div class="pill">Showing all available jobs</div>`);
@@ -212,40 +307,17 @@
       filtersEl.innerHTML = pills.join("");
     }
 
-    async function loadJobs() {
-      renderFilters();
+    function buildJobDetailsUrl(job) {
+      const identifier = job.public_id || job.id || "";
+      return `/job.html?id=${encodeURIComponent(identifier)}`;
+    }
 
-      let query = client
-        .from("homeowner_jobs")
-        .select("*")
-        .order("id", { ascending: false });
-
-      if (category) query = query.eq("category", category);
-      if (city) query = query.ilike("city", city);
-      if (state) query = query.ilike("state", state);
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Jobs load error:", error);
-        statusBox.className = "error";
-        statusBox.textContent = "Could not load jobs right now.";
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        statusBox.className = "empty";
-        statusBox.textContent = "No jobs found for this area and category yet.";
-        return;
-      }
-
-      statusBox.style.display = "none";
-      jobsBox.style.display = "grid";
-
-      jobsBox.innerHTML = data.map(job => {
+    function renderJobs(data) {
+      jobsBox.innerHTML = data.map((job) => {
         const title =
           job.title ||
           job.project_title ||
+          job.job_title ||
           "Untitled job";
 
         const summary =
@@ -253,28 +325,97 @@
           job.short_summary ||
           job.description ||
           job.full_description ||
+          job.details ||
           "";
 
         const location = [job.city, job.state].filter(Boolean).join(", ");
 
-        const jobId =
-          job.public_id ||
-          job.id;
+        const postedLabel =
+          job.created_at
+            ? new Date(job.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+              })
+            : "";
 
         return `
           <div class="job-card">
             <h3 class="job-title">${escapeHtml(title)}</h3>
+
             <div class="meta">
               <div><strong>Category:</strong> ${escapeHtml(job.category || "-")}</div>
               <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
+              <div><strong>Posted:</strong> ${escapeHtml(postedLabel || "Recently")}</div>
             </div>
+
             <div class="desc">${escapeHtml(shortText(summary))}</div>
+
             <div class="actions">
-              <a class="btn btn-main" href="/job.html?id=${encodeURIComponent(jobId)}">View Details</a>
+              <a class="btn btn-main" href="${buildJobDetailsUrl(job)}">View Details</a>
             </div>
           </div>
         `;
       }).join("");
+    }
+
+    function applyClientSideFilters(jobs) {
+      return jobs.filter((job) => {
+        const jobCategory = normalizeCompare(job.category);
+        const jobCity = normalizeCompare(job.city);
+        const jobState = normalizeCompare(job.state);
+
+        const categoryOk = !activeFilters.category || jobCategory === normalizeCompare(activeFilters.category);
+        const cityOk = !activeFilters.city || jobCity === normalizeCompare(activeFilters.city);
+        const stateOk = !activeFilters.state || jobState === normalizeCompare(activeFilters.state);
+
+        return categoryOk && cityOk && stateOk;
+      });
+    }
+
+    async function loadJobs() {
+      renderFilters();
+
+      try {
+        let query = client
+          .from("homeowner_jobs")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        const { data, error } = await query;
+
+        if (error) {
+          throw error;
+        }
+
+        const jobs = Array.isArray(data) ? applyClientSideFilters(data) : [];
+
+        if (!jobs.length) {
+          statusBox.className = "empty";
+          statusBox.textContent = "No jobs found for this area and category yet.";
+          return;
+        }
+
+        statusBox.style.display = "none";
+        jobsBox.style.display = "grid";
+        renderJobs(jobs);
+      } catch (error) {
+        console.error("Jobs load error:", error);
+        statusBox.className = "error";
+        statusBox.textContent = "Could not load jobs right now.";
+      }
+    }
+
+    function handleLogout() {
+      try {
+        localStorage.removeItem("pbz_user");
+      } catch (_) {}
+
+      window.location.href = "/pros.html";
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", handleLogout);
     }
 
     loadJobs();
