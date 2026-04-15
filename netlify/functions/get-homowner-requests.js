@@ -74,20 +74,22 @@ exports.handler = async (event) => {
       });
     }
 
-    // 1) Load homeowner jobs by email
+    // 1) Load homeowner projects by email
     const { data: jobsRaw, error: jobsError } = await supabase
       .from("homeowner_jobs")
       .select(`
         id,
-        public_id,
         category,
-        title,
-        summary,
-        description,
+        project_title,
+        short_summary,
+        full_description,
         city,
         state,
-        created_at,
-        email
+        contact_name,
+        phone,
+        email,
+        full_address,
+        created_at
       `)
       .ilike("email", email)
       .order("created_at", { ascending: false });
@@ -111,9 +113,9 @@ exports.handler = async (event) => {
 
     const jobIds = jobs.map((job) => job.id).filter(Boolean);
 
-    // 2) Load all requests for those jobs
+    // 2) Load all connection requests for those jobs
     const { data: requestsRaw, error: requestsError } = await supabase
-      .from("pro_offers")
+      .from("connection_requests")
       .select(`
         id,
         job_id,
@@ -155,13 +157,16 @@ exports.handler = async (event) => {
 
     const projects = jobs.map((job) => ({
       id: job.id || null,
-      public_id: job.public_id || null,
       category: job.category || null,
-      title: job.title || "Untitled job",
-      summary: job.summary || null,
-      description: job.description || null,
+      project_title: job.project_title || "Untitled project",
+      short_summary: job.short_summary || null,
+      full_description: job.full_description || null,
       city: job.city || null,
       state: job.state || null,
+      contact_name: job.contact_name || null,
+      phone: job.phone || null,
+      email: job.email || null,
+      full_address: job.full_address || null,
       created_at: job.created_at || null,
       requests: grouped.get(job.id) || [],
     }));
