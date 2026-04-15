@@ -97,19 +97,20 @@ exports.handler = async (event) => {
       short_summary,
       description,
       full_description,
-      details,
       city,
       state,
       zip,
       address,
       full_address,
-      created_at
+      created_at,
+      name,
+      email,
+      phone
     `;
 
     let data = null;
     let error = null;
 
-    // 1) إذا وصل public_id صريح، نبحث به أولاً
     if (rawPublicId) {
       const result = await supabase
         .from("homeowner_jobs")
@@ -121,7 +122,6 @@ exports.handler = async (event) => {
       error = result.error;
     }
 
-    // 2) إذا ما لقينا شيء، جرّب id الحقيقي كما هو
     if (!data && rawId) {
       const result = await supabase
         .from("homeowner_jobs")
@@ -137,7 +137,6 @@ exports.handler = async (event) => {
       }
     }
 
-    // 3) إذا ما زال ما لقى شيء، وidentifier شكله PBZ-xxxx فجرّب public_id
     if (!data && /^PBZ-/i.test(identifier)) {
       const result = await supabase
         .from("homeowner_jobs")
@@ -153,7 +152,6 @@ exports.handler = async (event) => {
       }
     }
 
-    // 4) إذا كان رقميًا، جرّب id رقمي
     if (!data && /^\d+$/.test(identifier)) {
       const result = await supabase
         .from("homeowner_jobs")
