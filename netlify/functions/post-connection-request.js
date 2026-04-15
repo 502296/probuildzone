@@ -67,102 +67,71 @@ exports.handler = async (event) => {
 
     const {
       job_id,
-      job_public_id,
       business_name,
       pro_email,
       phone,
       message,
     } = payload;
 
-    if (!job_public_id || !business_name || !pro_email || !phone || !message) {
+    if (!job_id || !business_name || !pro_email || !phone || !message) {
       return {
         statusCode: 400,
         headers: HEADERS,
         body: JSON.stringify({
           ok: false,
-          error: "Missing required fields: job_public_id, business_name, pro_email, phone, message",
+          error: "Missing required fields: job_id, business_name, pro_email, phone, message",
         }),
       };
     }
 
+    const cleanJobId = String(job_id).trim();
+    const cleanBusinessName = String(business_name).trim();
+    const cleanProEmail = String(pro_email).trim();
+    const cleanPhone = String(phone).trim();
+    const cleanMessage = String(message).trim();
+
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowners_jobs")
       .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-      .eq("id", job_id || "")
-      .eq("id", job_id || "")
+      .eq("id", cleanJobId)
       .maybeSingle();
 
-    let resolvedJob = jobRow;
-    let resolvedJobErr = jobErr;
-
-    if ((!resolvedJob || resolvedJobErr) && job_public_id) {
-      const retry = await supabase
-        .from("homeowners_jobs")
-        .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-        .ilike("id", String(job_public_id).trim());
-
-      if (!resolvedJob && !resolvedJobErr && retry?.data?.length === 1) {
-        resolvedJob = retry.data[0];
-      }
+    if (jobErr) {
+      console.error("Error fetching homeowners_jobs:", jobErr);
+      return {
+        statusCode: 500,
+        headers: HEADERS,
+        body: JSON.stringify({
+          ok: false,
+          error: jobErr.message || "Failed to load job",
+        }),
+      };
     }
 
-    if (!resolvedJob) {
-      const byFields = await supabase
-        .from("homeowners_jobs")
-        .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-        .or(`project_title.eq.${String(job_public_id).trim()},short_summary.eq.${String(job_public_id).trim()}`);
-
-      if (byFields?.data?.length === 1) {
-        resolvedJob = byFields.data[0];
-      }
-    }
-
-    if (resolvedJobErr && !resolvedJob) {
-      console.error("Error fetching homeowners_jobs:", resolvedJobErr);
-    }
-
-    if (!resolvedJob) {
-      const byId = await supabase
-        .from("homeowners_jobs")
-        .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-        .eq("id", String(job_id || "").trim())
-        .maybeSingle();
-
-      if (byId.data) resolvedJob = byId.data;
-    }
-
-    if (!resolvedJob) {
+    if (!jobRow) {
       return {
         statusCode: 404,
         headers: HEADERS,
         body: JSON.stringify({
           ok: false,
-          error: "Job not found in homeowners_jobs",
+          error: "Job not found",
         }),
       };
     }
 
-    const homeownerEmail = resolvedJob.email || null;
-    const homeownerName = resolvedJob.contact_name || "Homeowner";
-    const jobTitle =
-      resolvedJob.project_title ||
-      resolvedJob.category ||
-      "your project";
-
     const insertPayload = {
-      job_id: resolvedJob.id,
-      job_public_id: job_public_id ? String(job_public_id).trim() : null,
-      business_name: String(business_name).trim(),
-      pro_email: String(pro_email).trim(),
-      phone: String(phone).trim(),
-      message: String(message).trim(),
+      job_id: jobRow.id,
+      business_name: cleanBusinessName,
+      pro_email: cleanProEmail,
+      phone: cleanPhone,
+      message: cleanMessage,
       status: "pending",
     };
 
     const { data: insertedRequest, error: insErr } = await supabase
       .from("connection_requests")
       .insert(insertPayload)
-      .select("id, job_id, job_public_id, business_name, pro_email, phone, message, status, created_at")
+      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
       .maybeSingle();
 
     if (insErr) {
@@ -177,13 +146,19 @@ exports.handler = async (event) => {
       };
     }
 
+    const homeownerEmail = jobRow.email || null;
+    const homeownerName = jobRow.contact_name || "Homeowner";
+    const jobTitle =
+      jobRow.project_title ||
+      jobRow.category ||
+      "your project";
+
     if (homeownerEmail && RESEND_API_KEY) {
       try {
         const resend = new Resend(RESEND_API_KEY);
+        const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
 
-        const locationText = [resolvedJob.city, resolvedJob.state].filter(Boolean).join(", ");
-
-        const subject = `New message from ${insertPayload.business_name} for "${jobTitle}"`;
+        const subject = `New message from ${cleanBusinessName} for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
@@ -192,23 +167,28 @@ exports.handler = async (event) => {
             <p>Hi ${homeownerName},</p>
 
             <p>
-              <strong>${insertPayload.business_name}</strong> is interested in your project:
+              <strong>${cleanBusinessName}</strong> is interested in your project:
               <strong>${jobTitle}</strong>.
             </p>
 
             <h3 style="margin-top: 1.5rem;">Builder details</h3>
             <ul>
-              <li><strong>Business / Pro:</strong> ${insertPayload.business_name}</li>
-              <li><strong>Email:</strong> ${insertPayload.pro_email}</li>
-              <li><strong>Phone:</strong> ${insertPayload.phone}</li>
+              <li><strong>Business / Pro:</strong> ${cleanBusinessName}</li>
+              <li><strong>Email:</strong> ${cleanProEmail}</li>
+              <li><strong>Phone:</strong> ${cleanPhone}</li>
               ${locationText ? `<li><strong>Project location:</strong> ${locationText}</li>` : ""}
             </ul>
 
             <h3 style="margin-top: 1.5rem;">Message</h3>
-            <p>${insertPayload.message.replace(/\n/g, "<br/>")}</p>
+            <p>${cleanMessage.replace(/\n/g, "<br/>")}</p>
 
             <p style="margin-top: 1.5rem;">
               You can reply directly to this email to continue the conversation with the builder.
+            </p>
+
+            <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
+              ProBuildZone connects homeowners with local professionals.
+              Final scope, pricing, timeline, contracts, and payments are handled directly between both sides.
             </p>
           </div>
         `;
@@ -218,7 +198,7 @@ exports.handler = async (event) => {
           to: homeownerEmail,
           subject,
           html,
-          reply_to: insertPayload.pro_email,
+          reply_to: cleanProEmail,
         });
       } catch (emailErr) {
         console.error("Error sending homeowner email:", emailErr);
