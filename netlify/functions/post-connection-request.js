@@ -85,7 +85,7 @@ exports.handler = async (event) => {
     }
 
     const { data: jobRow, error: jobErr } = await supabase
-      .from("homeowners_jobs")
+      .from("homeowner_jobs")
       .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
       .eq("id", String(job_id).trim())
       .maybeSingle();
