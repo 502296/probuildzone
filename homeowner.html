@@ -54,6 +54,19 @@
       box-shadow:0 6px 20px rgba(0,0,0,.08);
     }
 
+    .mode-badge {
+      display:none;
+      margin:0 auto 14px;
+      text-align:center;
+      font-weight:700;
+      color:#23406a;
+      background:#eef4ff;
+      border:1px solid #d7e5ff;
+      border-radius:999px;
+      padding:10px 14px;
+      max-width:320px;
+    }
+
     label {
       display:block;
       font-weight:600;
@@ -189,12 +202,14 @@
 </head>
 <body>
   <div class="page">
-    <h1>🏡 Post Your Project</h1>
-    <p class="subhead">
+    <h1 id="pageTitle">🏡 Post Your Project</h1>
+    <p id="pageSubhead" class="subhead">
       Describe your project clearly so qualified local builders can discover it and request a connection through ProBuildZone.
     </p>
 
     <div class="card">
+      <div id="modeBadge" class="mode-badge">Edit Mode</div>
+
       <form id="job-form" novalidate>
         <label for="category">Project category *</label>
         <select id="category" required>
@@ -260,7 +275,7 @@
       </form>
 
       <div id="successPanel" class="success-panel">
-        <div class="success-title">Project posted successfully.</div>
+        <div class="success-title" id="successTitle">Project posted successfully.</div>
         <div id="successDetails" class="muted"></div>
 
         <div class="success-actions">
@@ -276,9 +291,18 @@
     const btn = document.getElementById("postBtn");
     const statusEl = document.getElementById("status");
     const successPanel = document.getElementById("successPanel");
+    const successTitle = document.getElementById("successTitle");
     const successDetails = document.getElementById("successDetails");
     const dashboardLink = document.getElementById("dashboardLink");
     const postAnotherLink = document.getElementById("postAnotherLink");
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubhead = document.getElementById("pageSubhead");
+    const modeBadge = document.getElementById("modeBadge");
+
+    const params = new URLSearchParams(window.location.search);
+    const editId = (params.get("edit_id") || params.get("id") || "").trim();
+    const editPublicId = (params.get("public_id") || "").trim();
+    const isEditMode = !!(editId || editPublicId);
 
     function setStatus(text, type) {
       statusEl.textContent = text || "";
@@ -290,9 +314,22 @@
       successDetails.textContent = "";
     }
 
-    function showSuccessPanel(message) {
+    function showSuccessPanel(title, message) {
+      successTitle.textContent = title || "Success";
       successDetails.textContent = message || "";
       successPanel.style.display = "block";
+    }
+
+    function getStoredHomeowner() {
+      try {
+        const raw = localStorage.getItem("pbz_homeowner");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch (err) {
+        console.warn("Could not parse pbz_homeowner:", err);
+        return null;
+      }
     }
 
     function buildHomeownerSession(payload, responseData) {
@@ -326,7 +363,58 @@
       form.style.display = "block";
       btn.disabled = false;
       btn.textContent = "🚀 Post Job";
+      pageTitle.textContent = "🏡 Post Your Project";
+      pageSubhead.textContent = "Describe your project clearly so qualified local builders can discover it and request a connection through ProBuildZone.";
+      modeBadge.style.display = "none";
+      window.history.replaceState({}, "", "/homeowner.html");
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function populateForm(job) {
+      document.getElementById("category").value = job.category || "";
+      document.getElementById("title").value = job.title || job.project_title || "";
+      document.getElementById("summary").value = job.summary || "";
+      document.getElementById("city").value = job.city || "";
+      document.getElementById("state").value = job.state || "";
+      document.getElementById("name").value = job.name || "";
+      document.getElementById("email").value = job.email || "";
+      document.getElementById("phone").value = job.phone || "";
+      document.getElementById("address").value = job.address || job.full_address || "";
+      document.getElementById("description").value =
+        job.description || job.full_description || job.details || "";
+    }
+
+    async function loadJobForEditing() {
+      if (!isEditMode) return;
+
+      const homeowner = getStoredHomeowner();
+      if (!homeowner || !homeowner.email) {
+        setStatus("No active homeowner session found. Please return to your dashboard first.", "err");
+        return;
+      }
+
+      try {
+        const url = new URL("/.netlify/functions/get-job", window.location.origin);
+        if (editId) url.searchParams.set("id", editId);
+        if (editPublicId) url.searchParams.set("public_id", editPublicId);
+
+        const res = await fetch(url.toString());
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok || !data.job) {
+          throw new Error(data.error || "Could not load this project for editing");
+        }
+
+        populateForm(data.job);
+
+        pageTitle.textContent = "✏️ Edit Your Project";
+        pageSubhead.textContent = "Update your project details so builders see the latest scope, location, and description.";
+        modeBadge.style.display = "block";
+        btn.textContent = "💾 Save Changes";
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Could not load project data.", "err");
+      }
     }
 
     postAnotherLink.addEventListener("click", (e) => {
@@ -338,6 +426,8 @@
       e.preventDefault();
       hideSuccessPanel();
       setStatus("", "");
+
+      const homeowner = getStoredHomeowner();
 
       const payload = {
         category: document.getElementById("category").value.trim(),
@@ -357,14 +447,27 @@
       }
 
       btn.disabled = true;
-      btn.textContent = "Saving to database…";
+      btn.textContent = isEditMode ? "Saving changes…" : "Saving to database…";
       setStatus("", "");
 
       try {
-        const res = await fetch("/.netlify/functions/post-job", {
+        let endpoint = "/.netlify/functions/post-job";
+        let requestPayload = { ...payload };
+
+        if (isEditMode) {
+          endpoint = "/.netlify/functions/update-job";
+          requestPayload = {
+            ...payload,
+            email: (homeowner && homeowner.email) ? homeowner.email : payload.email,
+            job_id: editId || null,
+            public_id: editPublicId || null,
+          };
+        }
+
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(requestPayload)
         });
 
         const text = await res.text();
@@ -382,22 +485,32 @@
         const homeownerSession = buildHomeownerSession(payload, data);
         saveHomeownerSession(homeownerSession);
 
-        setStatus(`✅ Job posted successfully! Public Job ID: ${data.public_id || homeownerSession.last_job_public_id || "Created"}`, "ok");
+        if (isEditMode) {
+          setStatus(`✅ Project updated successfully!`, "ok");
+          showSuccessPanel(
+            "Project updated successfully.",
+            "Your changes have been saved. You can now return to your homeowner dashboard and continue reviewing builder requests."
+          );
+        } else {
+          setStatus(`✅ Job posted successfully! Public Job ID: ${data.public_id || homeownerSession.last_job_public_id || "Created"}`, "ok");
+          showSuccessPanel(
+            "Project posted successfully.",
+            "Your project has been saved. You can now continue to your homeowner dashboard to review your project and incoming connection requests."
+          );
+        }
 
         dashboardLink.href = "/homeowner-dashboard.html";
-        showSuccessPanel(
-          `Your project has been saved. You can now continue to your homeowner dashboard to review your project and incoming connection requests.`
-        );
-
         form.style.display = "none";
       } catch (err) {
         console.error(err);
         setStatus(`Error: ${err.message}`, "err");
       } finally {
         btn.disabled = false;
-        btn.textContent = "🚀 Post Job";
+        btn.textContent = isEditMode ? "💾 Save Changes" : "🚀 Post Job";
       }
     });
+
+    loadJobForEditing();
   </script>
 </body>
 </html>
