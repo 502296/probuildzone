@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Request Connection – ProBuildZone</title>
+  <title>Send Your Message – ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -19,6 +19,9 @@
       --success: #166534;
       --border: #e3e7eb;
       --soft: #eef4ff;
+      --soft-green: #f3faf5;
+      --soft-green-border: #d7eadb;
+      --soft-green-text: #244735;
     }
 
     * { box-sizing: border-box; }
@@ -107,6 +110,21 @@
       color: var(--pbz);
     }
 
+    .intro-box {
+      background: var(--soft-green);
+      border: 1px solid var(--soft-green-border);
+      border-radius: 14px;
+      padding: 14px 14px;
+      margin-bottom: 16px;
+      color: var(--soft-green-text);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .intro-box strong {
+      color: var(--pbz);
+    }
+
     label {
       display: block;
       font-weight: 600;
@@ -121,6 +139,13 @@
       border: 1px solid #d5d9de;
       font: inherit;
       background: #fff;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #9fb3c8;
+      box-shadow: 0 0 0 3px rgba(15, 42, 67, 0.08);
     }
 
     textarea {
@@ -248,18 +273,23 @@
 
     <div class="header">
       <div class="logo">PROBUILDZONE</div>
-      <h1>Request Connection</h1>
+      <h1>Send Your Message</h1>
       <p class="subhead">
-        Send a professional connection request for this project. The homeowner can review your request
-        and decide whether to continue the conversation through ProBuildZone.
+        Introduce yourself clearly and explain why you are a strong fit for this project.
+        A professional first message can help you stand out quickly.
       </p>
       <div id="jobTag" class="job-tag"></div>
     </div>
 
     <div class="card">
       <div class="privacy-box">
-        <strong>Professional workflow:</strong> ProBuildZone does not publicly expose homeowner contact details on this step.
-        Builders first send a connection request, which keeps the platform safer, cleaner, and more valuable long term.
+        <strong>Professional communication, built in:</strong> homeowner contact details are not shown directly at this step.
+        Builders can send a message through ProBuildZone first, helping both sides connect in a cleaner, safer, and more professional way.
+      </div>
+
+      <div class="intro-box">
+        <strong>Tip:</strong> clear messages sent early often get noticed first.
+        Mention your experience, service area, availability, and why you are a good fit for the work.
       </div>
 
       <form id="offerForm" novalidate autocomplete="off">
@@ -272,7 +302,7 @@
           <label for="pro_email">Your email *</label>
           <input id="pro_email" name="pro_email" type="email" placeholder="you@example.com" required>
           <div class="hint">
-            This helps the homeowner or platform reach you after reviewing your request.
+            This helps the homeowner or platform reach you after reviewing your message.
           </div>
         </div>
 
@@ -282,10 +312,10 @@
         </div>
 
         <div class="field">
-          <label for="message">Short introduction / message *</label>
-          <textarea id="message" name="message" placeholder="Briefly introduce your company, experience, availability, and why you are a good fit for this project." required></textarea>
+          <label for="message">Your message *</label>
+          <textarea id="message" name="message" placeholder="Hi, we’re a local builder with experience in this type of project. We would be happy to discuss the details, timeline, and next steps with you." required></textarea>
           <div class="hint">
-            Keep it clear and professional. This is your first impression.
+            Keep it clear, short, and professional. This is your first impression.
           </div>
         </div>
 
@@ -294,12 +324,12 @@
 
         <div class="actions">
           <button type="button" class="btn-secondary" id="cancelBtn">Back</button>
-          <button type="submit" class="btn-main" id="sendBtn">Request Connection</button>
+          <button type="submit" class="btn-main" id="sendBtn">Send Message</button>
         </div>
 
         <div class="note">
-          This request is currently stored through the same backend path used for offers, so we keep compatibility with the current ProBuildZone build.
-          Later, we can rename the backend and database layer to a dedicated connection-request architecture without breaking the user flow.
+          This message is currently stored through the same backend path used for offers, so we keep compatibility with the current ProBuildZone build.
+          Later, we can rename the backend and database layer to a dedicated message or connection-request architecture without breaking the user flow.
         </div>
       </form>
     </div>
@@ -416,7 +446,7 @@
         if (storedPro.city || storedPro.state) {
           parts.push(`We are based in ${[storedPro.city, storedPro.state].filter(Boolean).join(", ")}.`);
         }
-        parts.push("We would like to request a connection for this project and discuss the next steps.");
+        parts.push("We would be happy to discuss this project and the next steps.");
         messageInput.value = parts.join(" ");
       }
     }
@@ -507,9 +537,9 @@
 
         if (!res.ok || !data.ok) {
           console.error("post-offer error:", data);
-          showError(data.error || "Something went wrong while sending your request. Please try again.");
+          showError(data.error || "Something went wrong while sending your message. Please try again.");
         } else {
-          showSuccess("Your connection request has been sent successfully. The homeowner can now review it and decide whether to continue the conversation.");
+          showSuccess("Your message has been sent successfully. The homeowner can now review it and reach back if your profile is a good fit.");
 
           form.reset();
 
@@ -523,7 +553,7 @@
             if (storedPro.city || storedPro.state) {
               parts.push(`We are based in ${[storedPro.city, storedPro.state].filter(Boolean).join(", ")}.`);
             }
-            parts.push("We would like to request a connection for this project and discuss the next steps.");
+            parts.push("We would be happy to discuss this project and the next steps.");
             messageInput.value = parts.join(" ");
           }
         }
@@ -532,7 +562,7 @@
         showError("Network error. Please check your connection and try again.");
       } finally {
         sendBtn.disabled = false;
-        sendBtn.textContent = "Request Connection";
+        sendBtn.textContent = "Send Message";
       }
     });
   </script>
