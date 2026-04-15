@@ -515,10 +515,40 @@
     }
 
     async function deleteProject(projectId, projectTitle) {
+      const homeowner = getStoredHomeowner();
+
+      if (!homeowner || !homeowner.email) {
+        alert("No active homeowner session found.");
+        return;
+      }
+
       const confirmed = window.confirm(`Are you sure you want to delete "${projectTitle || "this project"}"?`);
       if (!confirmed) return;
 
-      alert("Delete function will be connected in the next step after you send me delete-job.js or I build it for you.");
+      try {
+        const res = await fetch("/.netlify/functions/delete-job", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            job_id: projectId,
+            email: homeowner.email
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to delete project");
+        }
+
+        await loadDashboard();
+      } catch (err) {
+        console.error("deleteProject error:", err);
+        alert(err.message || "Could not delete this project.");
+      }
     }
 
     function renderProjects(projects) {
