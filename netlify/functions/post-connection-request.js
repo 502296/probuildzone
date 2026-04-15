@@ -84,16 +84,10 @@ exports.handler = async (event) => {
       };
     }
 
-    const cleanJobId = String(job_id).trim();
-    const cleanBusinessName = String(business_name).trim();
-    const cleanProEmail = String(pro_email).trim();
-    const cleanPhone = String(phone).trim();
-    const cleanMessage = String(message).trim();
-
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowners_jobs")
       .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-      .eq("id", cleanJobId)
+      .eq("id", String(job_id).trim())
       .maybeSingle();
 
     if (jobErr) {
@@ -119,12 +113,19 @@ exports.handler = async (event) => {
       };
     }
 
+    const homeownerEmail = jobRow.email || null;
+    const homeownerName = jobRow.contact_name || "Homeowner";
+    const jobTitle =
+      jobRow.project_title ||
+      jobRow.category ||
+      "your project";
+
     const insertPayload = {
       job_id: jobRow.id,
-      business_name: cleanBusinessName,
-      pro_email: cleanProEmail,
-      phone: cleanPhone,
-      message: cleanMessage,
+      business_name: String(business_name).trim(),
+      pro_email: String(pro_email).trim(),
+      phone: String(phone).trim(),
+      message: String(message).trim(),
       status: "pending",
     };
 
@@ -146,19 +147,17 @@ exports.handler = async (event) => {
       };
     }
 
-    const homeownerEmail = jobRow.email || null;
-    const homeownerName = jobRow.contact_name || "Homeowner";
-    const jobTitle =
-      jobRow.project_title ||
-      jobRow.category ||
-      "your project";
-
     if (homeownerEmail && RESEND_API_KEY) {
       try {
         const resend = new Resend(RESEND_API_KEY);
         const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
+        const safeMessage = insertPayload.message
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br/>");
 
-        const subject = `New message from ${cleanBusinessName} for "${jobTitle}"`;
+        const subject = `New message from ${insertPayload.business_name} for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
@@ -167,28 +166,23 @@ exports.handler = async (event) => {
             <p>Hi ${homeownerName},</p>
 
             <p>
-              <strong>${cleanBusinessName}</strong> is interested in your project:
+              <strong>${insertPayload.business_name}</strong> is interested in your project:
               <strong>${jobTitle}</strong>.
             </p>
 
             <h3 style="margin-top: 1.5rem;">Builder details</h3>
             <ul>
-              <li><strong>Business / Pro:</strong> ${cleanBusinessName}</li>
-              <li><strong>Email:</strong> ${cleanProEmail}</li>
-              <li><strong>Phone:</strong> ${cleanPhone}</li>
+              <li><strong>Business / Pro:</strong> ${insertPayload.business_name}</li>
+              <li><strong>Email:</strong> ${insertPayload.pro_email}</li>
+              <li><strong>Phone:</strong> ${insertPayload.phone}</li>
               ${locationText ? `<li><strong>Project location:</strong> ${locationText}</li>` : ""}
             </ul>
 
             <h3 style="margin-top: 1.5rem;">Message</h3>
-            <p>${cleanMessage.replace(/\n/g, "<br/>")}</p>
+            <p>${safeMessage}</p>
 
             <p style="margin-top: 1.5rem;">
               You can reply directly to this email to continue the conversation with the builder.
-            </p>
-
-            <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
-              ProBuildZone connects homeowners with local professionals.
-              Final scope, pricing, timeline, contracts, and payments are handled directly between both sides.
             </p>
           </div>
         `;
@@ -198,7 +192,7 @@ exports.handler = async (event) => {
           to: homeownerEmail,
           subject,
           html,
-          reply_to: cleanProEmail,
+          reply_to: insertPayload.pro_email,
         });
       } catch (emailErr) {
         console.error("Error sending homeowner email:", emailErr);
