@@ -229,7 +229,6 @@
       border:1px solid #f2c7c2;
     }
 
-    .muted{color:var(--muted)}
     .error{
       color:var(--err);
       margin-bottom:10px;
@@ -247,20 +246,10 @@
     @media (max-width:640px){
       h1{font-size:34px}
       .info-grid{grid-template-columns:1fr}
-      .topbar{
-        align-items:stretch;
-      }
-      .topbar-actions{
-        width:100%;
-      }
-      .topbar-actions .btn{
-        flex:1;
-        text-align:center;
-      }
-      .btns .btn{
-        width:100%;
-        text-align:center;
-      }
+      .topbar{align-items:stretch}
+      .topbar-actions{width:100%}
+      .topbar-actions .btn{flex:1;text-align:center}
+      .btns .btn{width:100%;text-align:center}
     }
   </style>
 </head>
@@ -344,20 +333,13 @@
   <script>
     (async () => {
       const params = new URLSearchParams(location.search);
-
       const rawId =
         params.get("id") ||
         params.get("jobId") ||
         params.get("job") ||
-        params.get("code") ||
         "";
 
-      const rawPublicId =
-        params.get("public_id") || "";
-
       const jobId = rawId.trim();
-      const publicId = rawPublicId.trim();
-      const identifier = publicId || jobId;
 
       const jobError = document.getElementById("jobError");
       const loadingBox = document.getElementById("loadingBox");
@@ -379,7 +361,6 @@
         try {
           const raw = localStorage.getItem("pbz_user");
           if (!raw) return null;
-
           const parsed = JSON.parse(raw);
           return parsed && typeof parsed === "object" ? parsed : null;
         } catch (err) {
@@ -414,7 +395,6 @@
         try {
           localStorage.removeItem("pbz_user");
         } catch (_) {}
-
         window.location.href = "/pros.html";
       }
 
@@ -438,15 +418,14 @@
         return;
       }
 
-      if (!identifier) {
+      if (!jobId) {
         loadingBox.style.display = "none";
         jobError.textContent = "Job not found.";
         return;
       }
 
       const jobUrl = new URL("/.netlify/functions/get-job", window.location.origin);
-      if (jobId) jobUrl.searchParams.set("id", jobId);
-      if (publicId) jobUrl.searchParams.set("public_id", publicId);
+      jobUrl.searchParams.set("id", jobId);
 
       try {
         const jobRes = await fetch(jobUrl.toString());
@@ -459,50 +438,39 @@
         }
 
         const j = jobJson.job;
-
-        const resolvedPublicId = j.public_id || publicId || "";
-        const resolvedInternalId = j.id || jobId || "";
-
-        const displayJobId = resolvedPublicId || resolvedInternalId || identifier;
+        const resolvedId = j.id || jobId;
 
         const title =
-          j.title ||
           j.project_title ||
-          j.job_title ||
+          j.title ||
           j.category ||
           "Untitled job";
 
         const category =
           j.category ||
-          j.trade ||
-          j.service_category ||
           "—";
 
         const location =
-          [j.city, j.state, j.zip].filter(Boolean).join(", ") ||
-          j.address ||
+          [j.city, j.state].filter(Boolean).join(", ") ||
           j.full_address ||
           "—";
 
         const summary =
-          j.summary ||
           j.short_summary ||
-          j.description ||
           j.full_description ||
-          j.details ||
+          j.description ||
           "No project description provided yet.";
 
-        v_id.textContent = displayJobId;
+        v_id.textContent = resolvedId;
         v_title.textContent = title;
         v_category.textContent = category;
         v_location.textContent = location;
         v_posted.textContent = formatDate(j.created_at);
         v_summary.textContent = summary;
 
-        const offerUrl = new URL("/pro-offer.html", window.location.origin);
-        if (resolvedInternalId) offerUrl.searchParams.set("id", resolvedInternalId);
-        if (resolvedPublicId) offerUrl.searchParams.set("public_id", resolvedPublicId);
-        connectLink.href = offerUrl.pathname + offerUrl.search;
+        const messageUrl = new URL("/pro-offer.html", window.location.origin);
+        messageUrl.searchParams.set("id", resolvedId);
+        connectLink.href = messageUrl.pathname + messageUrl.search;
 
         loadingBox.style.display = "none";
         jobContent.style.display = "block";
