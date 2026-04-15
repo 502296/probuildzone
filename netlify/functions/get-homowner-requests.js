@@ -77,7 +77,18 @@ exports.handler = async (event) => {
     // 1) Load homeowner jobs by email
     const { data: jobsRaw, error: jobsError } = await supabase
       .from("homeowner_jobs")
-      .select("id, public_id, category, title, project_title, summary, description, city, state, created_at, email")
+      .select(`
+        id,
+        public_id,
+        category,
+        title,
+        summary,
+        description,
+        city,
+        state,
+        created_at,
+        email
+      `)
       .ilike("email", email)
       .order("created_at", { ascending: false });
 
@@ -103,7 +114,16 @@ exports.handler = async (event) => {
     // 2) Load all requests for those jobs
     const { data: requestsRaw, error: requestsError } = await supabase
       .from("pro_offers")
-      .select("id, job_id, business_name, pro_email, phone, amount, message, status, created_at")
+      .select(`
+        id,
+        job_id,
+        business_name,
+        pro_email,
+        phone,
+        message,
+        status,
+        created_at
+      `)
       .in("job_id", jobIds)
       .order("created_at", { ascending: false });
 
@@ -126,7 +146,6 @@ exports.handler = async (event) => {
         business_name: req.business_name || "Builder",
         pro_email: req.pro_email || null,
         phone: req.phone || null,
-        amount: req.amount ?? null,
         message: req.message || "",
         status: req.status || "pending",
         created_at: req.created_at || null,
@@ -138,7 +157,7 @@ exports.handler = async (event) => {
       id: job.id || null,
       public_id: job.public_id || null,
       category: job.category || null,
-      title: job.title || job.project_title || "Untitled job",
+      title: job.title || "Untitled job",
       summary: job.summary || null,
       description: job.description || null,
       city: job.city || null,
