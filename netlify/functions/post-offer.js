@@ -1,6 +1,6 @@
 // netlify/functions/post-offer.js
 // Transitional architecture:
-// Frontend now uses "Request Connection" language,
+// Frontend now uses "Send Message" language,
 // while backend temporarily keeps compatibility with the existing pro_offers table.
 
 const HEADERS = {
@@ -106,11 +106,11 @@ exports.handler = async (event) => {
     }
 
     // 1) Fetch the job by public_id
+    // Important:
+    // Only select columns that are confirmed to exist.
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowner_jobs")
-      .select(
-        "id, public_id, title, project_title, category, city, state, name, homeowner_name, email, homeowner_email"
-      )
+      .select("id, public_id, title, project_title, category, city, state, name, email")
       .eq("public_id", String(job_public_id).trim())
       .maybeSingle();
 
@@ -137,8 +137,8 @@ exports.handler = async (event) => {
       };
     }
 
-    const homeownerEmail = jobRow.homeowner_email || jobRow.email || null;
-    const homeownerName = jobRow.homeowner_name || jobRow.name || "Homeowner";
+    const homeownerEmail = jobRow.email || null;
+    const homeownerName = jobRow.name || "Homeowner";
     const jobTitle =
       jobRow.title ||
       jobRow.project_title ||
@@ -148,7 +148,7 @@ exports.handler = async (event) => {
     const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
 
     // 2) Insert into pro_offers table temporarily
-    // We keep this table for compatibility, but semantically this is now a connection request.
+    // We keep this table for compatibility, but semantically this is now a message / connection request.
     const insertPayload = {
       job_id: jobRow.id,
       business_name: String(business_name).trim(),
@@ -172,7 +172,7 @@ exports.handler = async (event) => {
         headers: HEADERS,
         body: JSON.stringify({
           ok: false,
-          error: insErr.message || "Failed to save connection request",
+          error: insErr.message || "Failed to save message",
         }),
       };
     }
@@ -182,11 +182,11 @@ exports.handler = async (event) => {
       try {
         const resend = new Resend(RESEND_API_KEY);
 
-        const subject = `New connection request from ${insertPayload.business_name} for "${jobTitle}"`;
+        const subject = `New message from ${insertPayload.business_name} for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
-            <h2 style="margin-bottom: 0.5rem;">You received a new connection request on ProBuildZone</h2>
+            <h2 style="margin-bottom: 0.5rem;">You received a new message on ProBuildZone</h2>
 
             <p>Hi ${homeownerName},</p>
 
