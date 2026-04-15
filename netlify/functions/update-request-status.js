@@ -33,6 +33,10 @@ function buildClient() {
   });
 }
 
+function normalize(value) {
+  return String(value || "").trim();
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -66,8 +70,8 @@ exports.handler = async (event) => {
     });
   }
 
-  const requestId = String(payload.request_id || "").trim();
-  const nextStatus = String(payload.status || "").trim().toLowerCase();
+  const requestId = normalize(payload.request_id);
+  const nextStatus = normalize(payload.status).toLowerCase();
 
   if (!requestId) {
     return json(400, {
@@ -93,7 +97,29 @@ exports.handler = async (event) => {
       });
     }
 
-    // 1) Update request status and fetch full request row
+    // 1) Load existing request first
+    const { data: existingRequest, error: existingError } = await supabase
+      .from("pro_offers")
+      .select("id, job_id, business_name, pro_email, phone, message, amount, status, created_at")
+      .eq("id", requestId)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error("update-request-status existing request error:", existingError);
+      return json(500, {
+        ok: false,
+        error: existingError.message || "Failed to load request",
+      });
+    }
+
+    if (!existingRequest) {
+      return json(404, {
+        ok: false,
+        error: "Request not found",
+      });
+    }
+
+    // 2) Update request status
     const { data: updatedRequest, error: updateError } = await supabase
       .from("pro_offers")
       .update({ status: nextStatus })
@@ -102,7 +128,7 @@ exports.handler = async (event) => {
       .maybeSingle();
 
     if (updateError) {
-      console.error("update-request-status error:", updateError);
+      console.error("update-request-status update error:", updateError);
       return json(500, {
         ok: false,
         error: updateError.message || "Failed to update request status",
@@ -112,28 +138,34 @@ exports.handler = async (event) => {
     if (!updatedRequest) {
       return json(404, {
         ok: false,
-        error: "Request not found",
+        error: "Request not found after update",
       });
+    }
+
+    // 3) Load related homeowner job for richer UI response
+    let jobRow = null;
+
+    if (updatedRequest.job_id) {
+      const { data: jobData, error: jobError } = await supabase
+        .from("homeowner_jobs")
+        .select("id, public_id, title, project_title, category, city, state, name, email, phone")
+        .eq("id", updatedRequest.job_id)
+        .maybeSingle();
+
+      if (jobError) {
+        console.error("update-request-status job lookup error:", jobError);
+      } else {
+        jobRow = jobData || null;
+      }
     }
 
     let emailSent = false;
 
-    // 2) If accepted, send email to the builder
+    // 4) If accepted, send email to builder
     if (nextStatus === "accepted" && updatedRequest.pro_email && RESEND_API_KEY) {
       try {
         const { Resend } = await import("resend");
         const resend = new Resend(RESEND_API_KEY);
-
-        // Load related homeowner job
-        const { data: jobRow, error: jobError } = await supabase
-          .from("homeowner_jobs")
-          .select("id, public_id, title, project_title, category, city, state, name, email")
-          .eq("id", updatedRequest.job_id)
-          .maybeSingle();
-
-        if (jobError) {
-          console.error("update-request-status job lookup error:", jobError);
-        }
 
         const jobTitle =
           (jobRow && (jobRow.title || jobRow.project_title || jobRow.category)) ||
@@ -224,6 +256,26 @@ exports.handler = async (event) => {
     return json(200, {
       ok: true,
       request: updatedRequest,
+      project: jobRow
+        ? {
+            id: jobRow.id || null,
+            public_id: jobRow.public_id || null,
+            title: jobRow.title || jobRow.project_title || jobRow.category || "Untitled job",
+            category: jobRow.category || null,
+            city: jobRow.city || null,
+            state: jobRow.state || null,
+          }
+        : null,
+      approved_builder:
+        nextStatus === "accepted"
+          ? {
+              request_id: updatedRequest.id || null,
+              business_name: updatedRequest.business_name || "Builder",
+              pro_email: updatedRequest.pro_email || null,
+              phone: updatedRequest.phone || null,
+              status: updatedRequest.status || "accepted",
+            }
+          : null,
       email_sent: emailSent,
     });
   } catch (err) {
