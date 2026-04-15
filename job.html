@@ -44,7 +44,7 @@
       border:1px solid var(--border);
       border-radius:24px;
       padding:22px 20px;
-      box-shadow:0 10px 24px rgba(15,42,67,0.06);
+      box-shadow:0 10px rgba(15,42,67,0.06);
     }
 
     .topbar{
@@ -299,14 +299,20 @@
   <script>
     (async () => {
       const params = new URLSearchParams(location.search);
+
       const rawId =
         params.get("id") ||
         params.get("jobId") ||
         params.get("job") ||
         params.get("code") ||
-        params.get("public_id");
+        "";
 
-      const identifier = rawId ? rawId.trim() : "";
+      const rawPublicId =
+        params.get("public_id") || "";
+
+      const jobId = rawId.trim();
+      const publicId = rawPublicId.trim();
+      const identifier = publicId || jobId;
 
       const jobError = document.getElementById("jobError");
       const loadingBox = document.getElementById("loadingBox");
@@ -393,10 +399,12 @@
         return;
       }
 
-      connectLink.href = `/pro-offer.html?id=${encodeURIComponent(identifier)}`;
+      const jobUrl = new URL("/.netlify/functions/get-job", window.location.origin);
+      if (jobId) jobUrl.searchParams.set("id", jobId);
+      if (publicId) jobUrl.searchParams.set("public_id", publicId);
 
       try {
-        const jobRes = await fetch(`/.netlify/functions/get-job?id=${encodeURIComponent(identifier)}`);
+        const jobRes = await fetch(jobUrl.toString());
         const jobJson = await jobRes.json().catch(() => ({}));
 
         if (!jobRes.ok || !jobJson.ok || !jobJson.job) {
@@ -407,7 +415,11 @@
 
         const j = jobJson.job;
 
-        const jobId = j.public_id || j.id || identifier;
+        const resolvedPublicId = j.public_id || publicId || "";
+        const resolvedInternalId = j.id || jobId || "";
+
+        const displayJobId = resolvedPublicId || resolvedInternalId || identifier;
+
         const title =
           j.title ||
           j.project_title ||
@@ -435,12 +447,17 @@
           j.details ||
           "No project description provided yet.";
 
-        v_id.textContent = jobId;
+        v_id.textContent = displayJobId;
         v_title.textContent = title;
         v_category.textContent = category;
         v_location.textContent = location;
         v_posted.textContent = formatDate(j.created_at);
         v_summary.textContent = summary;
+
+        const offerUrl = new URL("/pro-offer.html", window.location.origin);
+        if (resolvedInternalId) offerUrl.searchParams.set("id", resolvedInternalId);
+        if (resolvedPublicId) offerUrl.searchParams.set("public_id", resolvedPublicId);
+        connectLink.href = offerUrl.pathname + offerUrl.search;
 
         loadingBox.style.display = "none";
         jobContent.style.display = "block";
