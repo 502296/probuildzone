@@ -246,17 +246,10 @@
       .card { padding: 16px 14px 20px; }
       .actions { flex-direction: column; }
       .btn-main, .btn-secondary, .btn-danger { width: 100%; text-align: center; }
-      .topbar {
-        align-items: stretch;
-      }
-      .topbar-actions {
-        width: 100%;
-      }
+      .topbar { align-items: stretch; }
+      .topbar-actions { width: 100%; }
       .topbar-actions .btn,
-      .topbar-actions button {
-        flex: 1;
-        text-align: center;
-      }
+      .topbar-actions button { flex: 1; text-align: center; }
     }
   </style>
 </head>
@@ -328,34 +321,24 @@
         </div>
 
         <div class="note">
-          This message is currently stored through the same backend path used for offers, so we keep compatibility with the current ProBuildZone build.
-          Later, we can rename the backend and database layer to a dedicated message or connection-request architecture without breaking the user flow.
+          Your message will be saved as a connection request and delivered through the platform in a clean, professional workflow.
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    function getJobIdentifiers() {
+    function getJobId() {
       try {
         const params = new URLSearchParams(window.location.search);
-
-        const internalId = (
+        return (
           params.get("id") ||
           params.get("job") ||
           params.get("job_id") ||
           ""
         ).trim();
-
-        const publicId = (
-          params.get("public_id") ||
-          params.get("job_public_id") ||
-          ""
-        ).trim();
-
-        return { internalId, publicId };
       } catch (e) {
-        return { internalId: "", publicId: "" };
+        return "";
       }
     }
 
@@ -384,12 +367,10 @@
       try {
         localStorage.removeItem("pbz_user");
       } catch (_) {}
-
       window.location.href = "/pros.html";
     }
 
-    const { internalId, publicId } = getJobIdentifiers();
-    const identifier = publicId || internalId;
+    const jobId = getJobId();
     const storedPro = getStoredPro();
 
     const jobTagEl = document.getElementById("jobTag");
@@ -415,13 +396,11 @@
       logoutBtn.addEventListener("click", handleLogout);
     }
 
-    if (identifier) {
+    if (jobId) {
       const backUrl = new URL("/job.html", window.location.origin);
-      if (internalId) backUrl.searchParams.set("id", internalId);
-      if (publicId) backUrl.searchParams.set("public_id", publicId);
-
+      backUrl.searchParams.set("id", jobId);
       jobBackLink.href = backUrl.pathname + backUrl.search;
-      jobTagEl.textContent = "For job: " + identifier;
+      jobTagEl.textContent = "For job: " + jobId;
     } else {
       jobTagEl.textContent = "Job ID missing. Please open this page from the project link.";
       jobBackLink.href = storedPro ? buildJobsUrl(storedPro) : "/jobs.html";
@@ -473,11 +452,9 @@
     }
 
     cancelBtn.addEventListener("click", () => {
-      if (identifier) {
+      if (jobId) {
         const backUrl = new URL("/job.html", window.location.origin);
-        if (internalId) backUrl.searchParams.set("id", internalId);
-        if (publicId) backUrl.searchParams.set("public_id", publicId);
-
+        backUrl.searchParams.set("id", jobId);
         window.location.href = backUrl.pathname + backUrl.search;
         return;
       }
@@ -499,8 +476,8 @@
         return;
       }
 
-      if (!publicId) {
-        showError("Job public ID is missing. Please go back and open this page from the project details page.");
+      if (!jobId) {
+        showError("Job ID is missing. Please go back and open this page from the project details page.");
         return;
       }
 
@@ -515,11 +492,10 @@
       }
 
       const payload = {
-        job_public_id: publicId,
+        job_id: jobId,
         business_name,
         pro_email,
         phone,
-        amount: null,
         message
       };
 
@@ -527,7 +503,7 @@
       sendBtn.textContent = "Sending...";
 
       try {
-        const res = await fetch("/.netlify/functions/post-offer", {
+        const res = await fetch("/.netlify/functions/post-connection-request", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -536,7 +512,7 @@
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.ok) {
-          console.error("post-offer error:", data);
+          console.error("post-connection-request error:", data);
           showError(data.error || "Something went wrong while sending your message. Please try again.");
         } else {
           showSuccess("Your message has been sent successfully. The homeowner can now review it and reach back if your profile is a good fit.");
