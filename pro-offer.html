@@ -306,17 +306,26 @@
   </div>
 
   <script>
-    function getJobPublicId() {
+    function getJobIdentifiers() {
       try {
         const params = new URLSearchParams(window.location.search);
-        return (
+
+        const internalId = (
           params.get("id") ||
           params.get("job") ||
+          params.get("job_id") ||
+          ""
+        ).trim();
+
+        const publicId = (
+          params.get("public_id") ||
           params.get("job_public_id") ||
           ""
         ).trim();
+
+        return { internalId, publicId };
       } catch (e) {
-        return "";
+        return { internalId: "", publicId: "" };
       }
     }
 
@@ -349,7 +358,8 @@
       window.location.href = "/pros.html";
     }
 
-    const jobPublicId = getJobPublicId();
+    const { internalId, publicId } = getJobIdentifiers();
+    const identifier = publicId || internalId;
     const storedPro = getStoredPro();
 
     const jobTagEl = document.getElementById("jobTag");
@@ -375,9 +385,13 @@
       logoutBtn.addEventListener("click", handleLogout);
     }
 
-    if (jobPublicId) {
-      jobTagEl.textContent = "For job: " + jobPublicId;
-      jobBackLink.href = `/job.html?id=${encodeURIComponent(jobPublicId)}`;
+    if (identifier) {
+      const backUrl = new URL("/job.html", window.location.origin);
+      if (internalId) backUrl.searchParams.set("id", internalId);
+      if (publicId) backUrl.searchParams.set("public_id", publicId);
+
+      jobBackLink.href = backUrl.pathname + backUrl.search;
+      jobTagEl.textContent = "For job: " + identifier;
     } else {
       jobTagEl.textContent = "Job ID missing. Please open this page from the project link.";
       jobBackLink.href = storedPro ? buildJobsUrl(storedPro) : "/jobs.html";
@@ -429,8 +443,12 @@
     }
 
     cancelBtn.addEventListener("click", () => {
-      if (jobPublicId) {
-        window.location.href = `/job.html?id=${encodeURIComponent(jobPublicId)}`;
+      if (identifier) {
+        const backUrl = new URL("/job.html", window.location.origin);
+        if (internalId) backUrl.searchParams.set("id", internalId);
+        if (publicId) backUrl.searchParams.set("public_id", publicId);
+
+        window.location.href = backUrl.pathname + backUrl.search;
         return;
       }
 
@@ -451,8 +469,8 @@
         return;
       }
 
-      if (!jobPublicId) {
-        showError("Job ID is missing. Please go back and open this page from the project link.");
+      if (!publicId) {
+        showError("Job public ID is missing. Please go back and open this page from the project details page.");
         return;
       }
 
@@ -467,7 +485,7 @@
       }
 
       const payload = {
-        job_public_id: jobPublicId,
+        job_public_id: publicId,
         business_name,
         pro_email,
         phone,
