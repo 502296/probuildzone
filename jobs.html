@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -295,8 +295,20 @@
     }
 
     function buildJobDetailsUrl(job) {
-      const identifier = job.public_id || job.id || "";
-      return `/job.html?id=${encodeURIComponent(identifier)}`;
+      const internalId = String(job.id || "").trim();
+      const publicId = String(job.public_id || "").trim();
+
+      const url = new URL("/job.html", window.location.origin);
+
+      if (internalId) {
+        url.searchParams.set("id", internalId);
+      }
+
+      if (publicId) {
+        url.searchParams.set("public_id", publicId);
+      }
+
+      return url.pathname + url.search;
     }
 
     function buildDashboardUrl() {
