@@ -67,6 +67,8 @@ exports.handler = async (event) => {
     const params = event.queryStringParameters || {};
     const email = String(params.email || "").trim().toLowerCase();
 
+    console.log("get-homeowner-requests email:", email);
+
     if (!email) {
       return json(400, {
         ok: false,
@@ -79,6 +81,7 @@ exports.handler = async (event) => {
       .from("homeowner_jobs")
       .select(`
         id,
+        public_id,
         category,
         project_title,
         short_summary,
@@ -95,7 +98,7 @@ exports.handler = async (event) => {
       .order("created_at", { ascending: false });
 
     if (jobsError) {
-      console.error("get-homeowner-requests jobs error:", jobsError);
+      console.error("homeowner_jobs query error:", jobsError);
       return json(500, {
         ok: false,
         error: jobsError.message || "Failed to load homeowner projects",
@@ -103,6 +106,7 @@ exports.handler = async (event) => {
     }
 
     const jobs = Array.isArray(jobsRaw) ? jobsRaw : [];
+    console.log("projects found:", jobs.length);
 
     if (!jobs.length) {
       return json(200, {
@@ -112,8 +116,9 @@ exports.handler = async (event) => {
     }
 
     const jobIds = jobs.map((job) => job.id).filter(Boolean);
+    console.log("jobIds:", jobIds);
 
-    // 2) Load all connection requests for those jobs
+    // 2) Load connection requests for those jobs
     const { data: requestsRaw, error: requestsError } = await supabase
       .from("connection_requests")
       .select(`
@@ -130,7 +135,7 @@ exports.handler = async (event) => {
       .order("created_at", { ascending: false });
 
     if (requestsError) {
-      console.error("get-homeowner-requests requests error:", requestsError);
+      console.error("connection_requests query error:", requestsError);
       return json(500, {
         ok: false,
         error: requestsError.message || "Failed to load incoming requests",
@@ -138,6 +143,7 @@ exports.handler = async (event) => {
     }
 
     const requests = Array.isArray(requestsRaw) ? requestsRaw : [];
+    console.log("requests found:", requests.length);
 
     const grouped = new Map();
 
@@ -157,6 +163,7 @@ exports.handler = async (event) => {
 
     const projects = jobs.map((job) => ({
       id: job.id || null,
+      public_id: job.public_id || null,
       category: job.category || null,
       project_title: job.project_title || "Untitled project",
       short_summary: job.short_summary || null,
