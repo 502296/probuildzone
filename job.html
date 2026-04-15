@@ -21,6 +21,9 @@
       --err:#b00020;
       --soft:#eef4ff;
       --danger:#b42318;
+      --soft-green:#f3faf5;
+      --soft-green-border:#d7eadb;
+      --soft-green-text:#244735;
     }
 
     *{box-sizing:border-box}
@@ -44,7 +47,7 @@
       border:1px solid var(--border);
       border-radius:24px;
       padding:22px 20px;
-      box-shadow:0 10px rgba(15,42,67,0.06);
+      box-shadow:0 10px 30px rgba(15,42,67,0.06);
     }
 
     .topbar{
@@ -155,6 +158,33 @@
       color:var(--ink);
     }
 
+    .message-cta{
+      margin-top:18px;
+      background:var(--soft-green);
+      border:1px solid var(--soft-green-border);
+      border-radius:18px;
+      padding:18px;
+    }
+
+    .message-cta h3{
+      margin:0 0 10px;
+      font-size:22px;
+      line-height:1.25;
+      color:var(--ink);
+    }
+
+    .message-cta p{
+      margin:0 0 12px;
+      color:var(--soft-green-text);
+      line-height:1.75;
+    }
+
+    .message-cta .small-note{
+      margin-top:6px;
+      font-size:14px;
+      color:#597564;
+    }
+
     .btns{
       display:flex;
       gap:12px;
@@ -227,6 +257,10 @@
         flex:1;
         text-align:center;
       }
+      .btns .btn{
+        width:100%;
+        text-align:center;
+      }
     }
   </style>
 </head>
@@ -247,8 +281,8 @@
 
       <h1>Job Details</h1>
       <p class="subtitle">
-        Review the homeowner project details below. If this project is a good fit for your trade,
-        you can request a connection through ProBuildZone.
+        Review the homeowner project details below. If this project matches your trade,
+        send a clear message and introduce yourself early to improve your chances of winning the job.
       </p>
 
       <div id="jobError" class="error"></div>
@@ -283,12 +317,23 @@
         </div>
 
         <div class="privacy-note">
-          <strong>Privacy by design:</strong> homeowner contact details are not shown publicly on this page.
-          Builders first request a connection through the platform. This creates a cleaner, safer, and more professional workflow for both sides.
+          <strong>Professional communication, built in:</strong> homeowner contact details are not shown directly on this page.
+          Builders can send a message through ProBuildZone first, helping both sides connect in a cleaner, safer, and more professional way.
+        </div>
+
+        <div class="message-cta">
+          <h3>Send a Message Now</h3>
+          <p>
+            Be one of the first builders to reach out. A strong message that explains your experience,
+            availability, and fit for the project can help you stand out quickly.
+          </p>
+          <p class="small-note">
+            Builders who respond early with a professional message often get noticed first.
+          </p>
         </div>
 
         <div class="btns">
-          <a id="connectLink" class="btn primary" href="#">Request Connection</a>
+          <a id="connectLink" class="btn primary" href="#">Send Message</a>
           <a id="jobsLink" class="btn white" href="/jobs.html">Back to Matching Jobs</a>
           <a class="btn white" href="/index.html">Back to Home</a>
         </div>
