@@ -37,6 +37,15 @@ function normalize(value) {
   return String(value || "").trim();
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -80,10 +89,10 @@ exports.handler = async (event) => {
     });
   }
 
-  if (!["accepted", "declined"].includes(nextStatus)) {
+  if (!["approved", "declined"].includes(nextStatus)) {
     return json(400, {
       ok: false,
-      error: "Invalid status. Use accepted or declined.",
+      error: "Invalid status. Use approved or declined.",
     });
   }
 
@@ -97,10 +106,10 @@ exports.handler = async (event) => {
       });
     }
 
-    // 1) Load existing request first
+    // 1) Load existing connection request
     const { data: existingRequest, error: existingError } = await supabase
-      .from("pro_offers")
-      .select("id, job_id, business_name, pro_email, phone, message, amount, status, created_at")
+      .from("connection_requests")
+      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
       .eq("id", requestId)
       .maybeSingle();
 
@@ -121,10 +130,10 @@ exports.handler = async (event) => {
 
     // 2) Update request status
     const { data: updatedRequest, error: updateError } = await supabase
-      .from("pro_offers")
+      .from("connection_requests")
       .update({ status: nextStatus })
       .eq("id", requestId)
-      .select("id, job_id, business_name, pro_email, phone, message, amount, status, created_at")
+      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
       .maybeSingle();
 
     if (updateError) {
@@ -142,13 +151,13 @@ exports.handler = async (event) => {
       });
     }
 
-    // 3) Load related homeowner job for richer UI response
+    // 3) Load related homeowner project
     let jobRow = null;
 
     if (updatedRequest.job_id) {
       const { data: jobData, error: jobError } = await supabase
         .from("homeowner_jobs")
-        .select("id, public_id, title, project_title, category, city, state, name, email, phone")
+        .select("id, project_title, short_summary, full_description, category, city, state, contact_name, email, phone, full_address, created_at")
         .eq("id", updatedRequest.job_id)
         .maybeSingle();
 
@@ -161,75 +170,74 @@ exports.handler = async (event) => {
 
     let emailSent = false;
 
-    // 4) If accepted, send email to builder
-    if (nextStatus === "accepted" && updatedRequest.pro_email && RESEND_API_KEY) {
+    // 4) If approved, send email to builder with homeowner contact info
+    if (nextStatus === "approved" && updatedRequest.pro_email && RESEND_API_KEY) {
       try {
         const { Resend } = await import("resend");
         const resend = new Resend(RESEND_API_KEY);
 
         const jobTitle =
-          (jobRow && (jobRow.title || jobRow.project_title || jobRow.category)) ||
+          (jobRow && (jobRow.project_title || jobRow.category)) ||
           "your project";
 
         const homeownerName =
-          (jobRow && jobRow.name) ||
+          (jobRow && jobRow.contact_name) ||
           "Homeowner";
+
+        const homeownerEmail =
+          (jobRow && jobRow.email) ||
+          null;
+
+        const homeownerPhone =
+          (jobRow && jobRow.phone) ||
+          null;
 
         const locationText = jobRow
           ? [jobRow.city, jobRow.state].filter(Boolean).join(", ")
           : "";
 
-        const safeAmount =
-          updatedRequest.amount !== null && updatedRequest.amount !== undefined
-            ? `$${Number(updatedRequest.amount).toFixed(2)}`
-            : null;
+        const safeMessage = updatedRequest.message
+          ? escapeHtml(updatedRequest.message).replace(/\n/g, "<br/>")
+          : "";
 
-        const subject = `Your ProBuildZone request was accepted for "${jobTitle}"`;
+        const subject = `Your ProBuildZone request was approved for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
-            <h2 style="margin-bottom: 0.5rem;">Your request was accepted on ProBuildZone</h2>
+            <h2 style="margin-bottom: 0.5rem;">Your request was approved on ProBuildZone</h2>
 
-            <p>Hi ${updatedRequest.business_name || "Builder"},</p>
+            <p>Hi ${escapeHtml(updatedRequest.business_name || "Builder")},</p>
 
             <p>
-              Good news. A homeowner accepted your connection request for:
-              <strong>${jobTitle}</strong>.
+              Good news. A homeowner approved your connection request for:
+              <strong>${escapeHtml(jobTitle)}</strong>.
             </p>
 
             <h3 style="margin-top: 1.5rem;">Project details</h3>
             <ul>
-              <li><strong>Project:</strong> ${jobTitle}</li>
-              ${
-                jobRow && jobRow.public_id
-                  ? `<li><strong>Job ID:</strong> ${jobRow.public_id}</li>`
-                  : ""
-              }
-              ${
-                locationText
-                  ? `<li><strong>Location:</strong> ${locationText}</li>`
-                  : ""
-              }
-              <li><strong>Homeowner:</strong> ${homeownerName}</li>
-              ${
-                safeAmount
-                  ? `<li><strong>Your estimate:</strong> ${safeAmount}</li>`
-                  : ""
-              }
+              <li><strong>Project:</strong> ${escapeHtml(jobTitle)}</li>
+              ${locationText ? `<li><strong>Location:</strong> ${escapeHtml(locationText)}</li>` : ""}
+            </ul>
+
+            <h3 style="margin-top: 1.5rem;">Homeowner contact</h3>
+            <ul>
+              <li><strong>Name:</strong> ${escapeHtml(homeownerName)}</li>
+              ${homeownerEmail ? `<li><strong>Email:</strong> ${escapeHtml(homeownerEmail)}</li>` : ""}
+              ${homeownerPhone ? `<li><strong>Phone:</strong> ${escapeHtml(homeownerPhone)}</li>` : ""}
             </ul>
 
             ${
-              updatedRequest.message
+              safeMessage
                 ? `
             <h3 style="margin-top: 1.5rem;">Your original message</h3>
-            <p>${String(updatedRequest.message).replace(/\n/g, "<br/>")}</p>
+            <p>${safeMessage}</p>
             `
                 : ""
             }
 
             <p style="margin-top: 1.5rem;">
-              <strong>Next step:</strong> you may now follow up professionally and continue discussing project scope,
-              timing, visit details, and next steps.
+              <strong>Next step:</strong> you may now contact the homeowner professionally to discuss the project,
+              timing, visit details, pricing, and next steps.
             </p>
 
             <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
@@ -244,11 +252,12 @@ exports.handler = async (event) => {
           to: updatedRequest.pro_email,
           subject,
           html,
+          reply_to: homeownerEmail || undefined,
         });
 
         emailSent = true;
       } catch (emailErr) {
-        console.error("update-request-status acceptance email error:", emailErr);
+        console.error("update-request-status approval email error:", emailErr);
         // Do not fail the status update if email sending fails
       }
     }
@@ -259,21 +268,20 @@ exports.handler = async (event) => {
       project: jobRow
         ? {
             id: jobRow.id || null,
-            public_id: jobRow.public_id || null,
-            title: jobRow.title || jobRow.project_title || jobRow.category || "Untitled job",
+            title: jobRow.project_title || jobRow.category || "Untitled project",
             category: jobRow.category || null,
             city: jobRow.city || null,
             state: jobRow.state || null,
           }
         : null,
       approved_builder:
-        nextStatus === "accepted"
+        nextStatus === "approved"
           ? {
               request_id: updatedRequest.id || null,
               business_name: updatedRequest.business_name || "Builder",
               pro_email: updatedRequest.pro_email || null,
               phone: updatedRequest.phone || null,
-              status: updatedRequest.status || "accepted",
+              status: updatedRequest.status || "approved",
             }
           : null,
       email_sent: emailSent,
