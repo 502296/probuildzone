@@ -303,7 +303,7 @@
       border-color:#d7e5ff;
     }
 
-    .badge.accepted{
+    .badge.approved{
       background:#ecfdf3;
       color:var(--success);
       border-color:#bbf7d0;
@@ -438,7 +438,7 @@
 
     function badgeClass(status) {
       const value = String(status || "pending").toLowerCase();
-      if (value === "accepted") return "accepted";
+      if (value === "approved") return "approved";
       if (value === "declined") return "declined";
       return "pending";
     }
@@ -457,11 +457,11 @@
     }
 
     function renderProfile(user) {
-      profileNameEl.textContent = user.name || "Homeowner";
+      profileNameEl.textContent = user.name || user.contact_name || "Homeowner";
       profileMetaEl.innerHTML = `
         <div><strong>Email:</strong> ${escapeHtml(user.email || "-")}</div>
         <div><strong>Phone:</strong> ${escapeHtml(user.phone || "-")}</div>
-        <div><strong>Last Job ID:</strong> ${escapeHtml(user.last_job_public_id || "-")}</div>
+        <div><strong>Last Job ID:</strong> ${escapeHtml(user.last_job_public_id || user.last_job_id || "-")}</div>
       `;
     }
 
@@ -478,7 +478,7 @@
 
     async function updateRequestStatus(requestId, nextStatus, buttonGroup) {
       const buttons = buttonGroup ? buttonGroup.querySelectorAll("button") : [];
-      buttons.forEach(btn => {
+      buttons.forEach((btn) => {
         btn.disabled = true;
         btn.classList.add("btn-disabled");
       });
@@ -507,7 +507,7 @@
         console.error("updateRequestStatus error:", err);
         alert(err.message || "Could not update request status.");
 
-        buttons.forEach(btn => {
+        buttons.forEach((btn) => {
           btn.disabled = false;
           btn.classList.remove("btn-disabled");
         });
@@ -553,22 +553,25 @@
 
     function renderProjects(projects) {
       jobsBox.innerHTML = projects.map((project) => {
-        const title = project.title || "Untitled job";
+        const title =
+          project.project_title ||
+          project.title ||
+          "Untitled project";
+
         const location = [project.city, project.state].filter(Boolean).join(", ");
+
         const requests = Array.isArray(project.requests) ? project.requests : [];
 
         const viewUrl = new URL("/job.html", window.location.origin);
         if (project.id) viewUrl.searchParams.set("id", project.id);
-        if (project.public_id) viewUrl.searchParams.set("public_id", project.public_id);
 
         const editUrl = new URL("/homeowner.html", window.location.origin);
         if (project.id) editUrl.searchParams.set("edit_id", project.id);
-        if (project.public_id) editUrl.searchParams.set("public_id", project.public_id);
 
         const requestsHtml = requests.length
           ? requests.map((req) => {
               const status = String(req.status || "pending").toLowerCase();
-              const isResolved = status === "accepted" || status === "declined";
+              const isResolved = status === "approved" || status === "declined";
 
               return `
                 <div class="request-item">
@@ -590,10 +593,10 @@
                       type="button"
                       class="btn btn-accept ${isResolved ? "btn-disabled" : ""}"
                       data-request-id="${escapeHtml(req.id || "")}"
-                      data-next-status="accepted"
+                      data-next-status="approved"
                       ${isResolved ? "disabled" : ""}
                     >
-                      Accept
+                      Approve
                     </button>
 
                     <button
@@ -616,13 +619,13 @@
             <h3 class="job-title">${escapeHtml(title)}</h3>
 
             <div class="job-meta">
-              <div><strong>Job ID:</strong> ${escapeHtml(project.public_id || project.id || "-")}</div>
+              <div><strong>Job ID:</strong> ${escapeHtml(project.id || "-")}</div>
               <div><strong>Category:</strong> ${escapeHtml(project.category || "-")}</div>
               <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
               <div><strong>Posted:</strong> ${escapeHtml(formatDate(project.created_at))}</div>
             </div>
 
-            <div class="job-summary">${escapeHtml(shortText(project.summary || project.description || "", 260))}</div>
+            <div class="job-summary">${escapeHtml(shortText(project.short_summary || project.summary || project.full_description || project.description || "", 260))}</div>
 
             <div class="requests-block">
               <div class="requests-label">Incoming Requests</div>
