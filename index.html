@@ -483,19 +483,19 @@
 
       if (postJobTopBtn) {
         postJobTopBtn.textContent = hasHomeowner
-          ? "Continue Your Project"
+          ? "Start Your Project"
           : "Start Your Project (Free)";
       }
 
       if (sheetTitle) {
         sheetTitle.textContent = hasHomeowner
-          ? "Continue Your Project"
+          ? "Start Your Project"
           : "Start Your Project";
       }
 
       if (sendBtn) {
         sendBtn.textContent = hasHomeowner
-          ? "🚀 Continue Your Project"
+          ? "🚀 Start Your Project"
           : "🚀 Start Your Project";
       }
     }
@@ -562,13 +562,13 @@
         step1.style.display = "block";
         step2.style.display = "none";
         document.getElementById("sheetTitle").textContent = hasHomeowner
-          ? "Continue Your Project"
+          ? "Start Your Project"
           : "Start Your Project";
       } else {
         step1.style.display = "none";
         step2.style.display = "block";
         document.getElementById("sheetTitle").textContent = hasHomeowner
-          ? "Continue Your Project"
+          ? "Start Your Project"
           : "Start Your Project";
         sheet.scrollTop = 0;
       }
