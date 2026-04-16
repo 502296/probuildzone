@@ -73,25 +73,6 @@
       .brand-logo { padding-bottom: 2px; }
     }
 
-    .homeowner-btn {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      background: #edf0f3;
-      color: #0F2A43;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      border: 1px solid #d8e0ea;
-    }
-
-    .homeowner-btn.show {
-      display: inline-flex;
-    }
-
     .hero-dashboard-btn {
       display: none;
       align-items: center;
@@ -313,7 +294,6 @@
       </div>
       <div class="nav-actions">
         <a href="pros.html" class="pro-btn">For Pros</a>
-        <a href="homeowner-dashboard.html" class="homeowner-btn" id="homeownerDashboardBtn">My Projects</a>
         <div class="menu-wrap">
           <button id="menuBtn" class="menu-btn">Menu ▾</button>
           <div class="menu-panel" id="menuPanel">
@@ -471,7 +451,6 @@
   <script>
     const menuBtn = document.getElementById("menuBtn");
     const menuPanel = document.getElementById("menuPanel");
-    const homeownerDashboardBtn = document.getElementById("homeownerDashboardBtn");
     const menuHomeownerDashboard = document.getElementById("menuHomeownerDashboard");
     const heroHomeownerBtn = document.getElementById("heroHomeownerBtn");
     const postJobTopBtn = document.getElementById("postJobTop");
@@ -493,10 +472,6 @@
     function updateHomeownerDashboardVisibility() {
       const homeowner = getStoredHomeowner();
       const hasHomeowner = !!(homeowner && homeowner.email);
-
-      if (homeownerDashboardBtn) {
-        homeownerDashboardBtn.classList.toggle("show", hasHomeowner);
-      }
 
       if (menuHomeownerDashboard) {
         menuHomeownerDashboard.style.display = hasHomeowner ? "block" : "none";
