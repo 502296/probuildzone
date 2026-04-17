@@ -49,6 +49,27 @@ function uniqueBy(items, keyFn) {
   return out;
 }
 
+const JOB_SELECT = `
+  id,
+  public_id,
+  category,
+  title,
+  project_title,
+  summary,
+  short_summary,
+  description,
+  full_description,
+  city,
+  state,
+  zip,
+  address,
+  full_address,
+  created_at,
+  name,
+  email,
+  phone
+`;
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -86,7 +107,11 @@ exports.handler = async (event) => {
 
     const email = normalize(params.email);
     const phone = normalize(params.phone);
-    const publicId = normalize(params.public_id || params.last_job_id || params.job_id);
+    const publicId = normalize(
+      params.public_id ||
+      params.last_job_id ||
+      params.job_id
+    );
 
     if (!email && !phone && !publicId) {
       return json(400, {
@@ -100,26 +125,7 @@ exports.handler = async (event) => {
     if (publicId) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
-        .select(`
-          id,
-          public_id,
-          category,
-          title,
-          project_title,
-          summary,
-          short_summary,
-          description,
-          full_description,
-          city,
-          state,
-          zip,
-          address,
-          full_address,
-          created_at,
-          name,
-          email,
-          phone
-        `)
+        .select(JOB_SELECT)
         .eq("public_id", publicId)
         .order("created_at", { ascending: false });
 
@@ -137,26 +143,7 @@ exports.handler = async (event) => {
     if (!jobs.length && email) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
-        .select(`
-          id,
-          public_id,
-          category,
-          title,
-          project_title,
-          summary,
-          short_summary,
-          description,
-          full_description,
-          city,
-          state,
-          zip,
-          address,
-          full_address,
-          created_at,
-          name,
-          email,
-          phone
-        `)
+        .select(JOB_SELECT)
         .ilike("email", email)
         .order("created_at", { ascending: false });
 
@@ -174,26 +161,7 @@ exports.handler = async (event) => {
     if (!jobs.length && phone) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
-        .select(`
-          id,
-          public_id,
-          category,
-          title,
-          project_title,
-          summary,
-          short_summary,
-          description,
-          full_description,
-          city,
-          state,
-          zip,
-          address,
-          full_address,
-          created_at,
-          name,
-          email,
-          phone
-        `)
+        .select(JOB_SELECT)
         .eq("phone", phone)
         .order("created_at", { ascending: false });
 
@@ -208,7 +176,7 @@ exports.handler = async (event) => {
       jobs = Array.isArray(data) ? data : [];
     }
 
-    jobs = uniqueBy(jobs, (job) => job.id || job.public_id || JSON.stringify(job));
+    jobs = uniqueBy(jobs, (job) => String(job.id || job.public_id || JSON.stringify(job)));
 
     if (!jobs.length) {
       return json(200, {
@@ -218,46 +186,28 @@ exports.handler = async (event) => {
       });
     }
 
-    const jobIds = jobs.map((job) => job.id).filter(Boolean);
-    const publicIds = jobs.map((job) => job.public_id).filter(Boolean);
+    const jobIds = jobs
+      .map((job) => job.id)
+      .filter(Boolean);
 
     let requests = [];
 
-    if (jobIds.length || publicIds.length) {
-      let query = supabase
+    if (jobIds.length) {
+      const { data, error } = await supabase
         .from("pro_offers")
         .select(`
           id,
           job_id,
-          homeowner_job_id,
-          public_id,
-          job_public_id,
-          status,
+          business_name,
           message,
-          created_at,
-          pro_name,
+          amount,
+          phone,
+          status,
           pro_email,
-          pro_phone,
-          company_name,
-          city,
-          state,
-          category
+          created_at
         `)
+        .in("job_id", jobIds)
         .order("created_at", { ascending: false });
-
-      if (jobIds.length && publicIds.length) {
-        query = query.or(
-          `job_id.in.(${jobIds.join(",")}),homeowner_job_id.in.(${jobIds.join(",")}),job_public_id.in.(${publicIds.join(",")})`
-        );
-      } else if (jobIds.length) {
-        query = query.or(
-          `job_id.in.(${jobIds.join(",")}),homeowner_job_id.in.(${jobIds.join(",")})`
-        );
-      } else if (publicIds.length) {
-        query = query.in("job_public_id", publicIds);
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         console.error("get-homeowner-requests offers lookup error:", error);
@@ -272,12 +222,7 @@ exports.handler = async (event) => {
 
     const requestsWithJob = requests.map((request) => {
       const match = jobs.find((job) => {
-        return (
-          String(job.id || "") === String(request.job_id || "") ||
-          String(job.id || "") === String(request.homeowner_job_id || "") ||
-          String(job.public_id || "") === String(request.job_public_id || "") ||
-          String(job.public_id || "") === String(request.public_id || "")
-        );
+        return String(job.id || "") === String(request.job_id || "");
       });
 
       return {
