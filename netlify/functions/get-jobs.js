@@ -15,6 +15,14 @@ const supabaseKey =
   process.env.SUPABASE_SERVICE_ROLE ||
   process.env.SUPABASE_ANON_KEY;
 
+function json(statusCode, body) {
+  return {
+    statusCode,
+    headers: HEADERS,
+    body: JSON.stringify(body),
+  };
+}
+
 function buildClient() {
   if (!supabaseUrl || !supabaseKey) return null;
 
@@ -23,12 +31,16 @@ function buildClient() {
   });
 }
 
-function json(statusCode, body) {
-  return {
-    statusCode,
-    headers: HEADERS,
-    body: JSON.stringify(body),
-  };
+function normalize(value) {
+  return String(value || "").trim();
+}
+
+function isUuidLike(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function isPublicId(value) {
+  return /^PBZ-\d+$/i.test(value);
 }
 
 exports.handler = async (event) => {
@@ -54,37 +66,44 @@ exports.handler = async (event) => {
     });
   }
 
+  const supabase = buildClient();
+
+  if (!supabase) {
+    return json(500, {
+      ok: false,
+      error: "Failed to initialize Supabase client",
+    });
+  }
+
   try {
-    const supabase = buildClient();
-
-    if (!supabase) {
-      return json(500, {
-        ok: false,
-        error: "Failed to initialize Supabase client",
-      });
-    }
-
     const params = event.queryStringParameters || {};
 
-    const rawId = String(
+    const rawId = normalize(
       params.id ||
       params.jobId ||
       params.job ||
-      params.code ||
       ""
-    ).trim();
+    );
 
-    const rawPublicId = String(
-      params.public_id || ""
-    ).trim();
+    const rawPublicId = normalize(
+      params.public_id ||
+      params.publicId ||
+      ""
+    );
 
-    const identifier = rawId || rawPublicId;
+    let id = rawId;
+    let publicId = rawPublicId;
 
-    if (!identifier) {
+    if (!id && !publicId) {
       return json(400, {
         ok: false,
         error: "Missing job identifier",
       });
+    }
+
+    if (!publicId && isPublicId(id)) {
+      publicId = id;
+      id = "";
     }
 
     const selectFields = `
@@ -111,59 +130,51 @@ exports.handler = async (event) => {
     let data = null;
     let error = null;
 
-    if (rawPublicId) {
+    if (publicId) {
       const result = await supabase
         .from("homeowner_jobs")
         .select(selectFields)
-        .eq("public_id", rawPublicId)
+        .eq("public_id", publicId)
         .maybeSingle();
 
-      data = result.data;
-      error = result.error;
+      if (result.error) {
+        error = result.error;
+      } else if (result.data) {
+        data = result.data;
+      }
     }
 
-    if (!data && rawId) {
+    if (!data && id) {
+      let queryValue = id;
+
+      if (/^\d+$/.test(id)) {
+        queryValue = Number(id);
+      }
+
+      const result = await supabase
+        .from("homeowner_jobs")
+        .select(selectFields)
+        .eq("id", queryValue)
+        .maybeSingle();
+
+      if (result.error) {
+        error = result.error;
+      } else if (result.data) {
+        data = result.data;
+      }
+    }
+
+    if (!data && rawId && isUuidLike(rawId) && rawId !== id) {
       const result = await supabase
         .from("homeowner_jobs")
         .select(selectFields)
         .eq("id", rawId)
         .maybeSingle();
 
-      if (!result.error && result.data) {
-        data = result.data;
-        error = null;
-      } else if (result.error) {
+      if (result.error) {
         error = result.error;
-      }
-    }
-
-    if (!data && /^PBZ-/i.test(identifier)) {
-      const result = await supabase
-        .from("homeowner_jobs")
-        .select(selectFields)
-        .eq("public_id", identifier)
-        .maybeSingle();
-
-      if (!result.error && result.data) {
+      } else if (result.data) {
         data = result.data;
-        error = null;
-      } else if (result.error) {
-        error = result.error;
-      }
-    }
-
-    if (!data && /^\d+$/.test(identifier)) {
-      const result = await supabase
-        .from("homeowner_jobs")
-        .select(selectFields)
-        .eq("id", Number(identifier))
-        .maybeSingle();
-
-      if (!result.error && result.data) {
-        data = result.data;
-        error = null;
-      } else if (result.error) {
-        error = result.error;
       }
     }
 
