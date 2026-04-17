@@ -10,6 +10,18 @@ const HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+function json(statusCode, body) {
+  return {
+    statusCode,
+    headers: HEADERS,
+    body: JSON.stringify(body),
+  };
+}
+
+function normalize(value) {
+  return String(value || "").trim();
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -20,11 +32,10 @@ exports.handler = async (event) => {
   }
 
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: HEADERS,
-      body: JSON.stringify({ ok: false, error: "Method Not Allowed" }),
-    };
+    return json(405, {
+      ok: false,
+      error: "Method Not Allowed",
+    });
   }
 
   try {
@@ -41,14 +52,10 @@ exports.handler = async (event) => {
 
     if (!SUPABASE_URL || !SUPABASE_KEY) {
       console.error("Missing Supabase env vars");
-      return {
-        statusCode: 500,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Server not configured (Supabase)",
-        }),
-      };
+      return json(500, {
+        ok: false,
+        error: "Server not configured (Supabase)",
+      });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -59,104 +66,82 @@ exports.handler = async (event) => {
     try {
       payload = JSON.parse(event.body || "{}");
     } catch {
-      return {
-        statusCode: 400,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Invalid JSON body",
-        }),
-      };
+      return json(400, {
+        ok: false,
+        error: "Invalid JSON body",
+      });
     }
 
-    const {
-      job_public_id,
-      business_name,
-      amount,
-      phone,
-      message,
-      pro_email,
-    } = payload;
+    const jobPublicId = normalize(payload.job_public_id);
+    const businessName = normalize(payload.business_name);
+    const phone = normalize(payload.phone);
+    const message = normalize(payload.message);
+    const proEmail = normalize(payload.pro_email);
+    const rawAmount = payload.amount;
 
-    if (!job_public_id || !business_name || !phone || !pro_email || !message) {
-      return {
-        statusCode: 400,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Missing required fields: job_public_id, business_name, phone, pro_email, message",
-        }),
-      };
+    if (!jobPublicId || !businessName || !phone || !proEmail || !message) {
+      return json(400, {
+        ok: false,
+        error: "Missing required fields: job_public_id, business_name, phone, pro_email, message",
+      });
     }
 
     let parsedAmount = null;
-    if (amount !== undefined && amount !== null && String(amount).trim() !== "") {
-      const numeric = Number(amount);
+    if (rawAmount !== undefined && rawAmount !== null && normalize(rawAmount) !== "") {
+      const numeric = Number(rawAmount);
+
       if (!Number.isFinite(numeric) || numeric < 0) {
-        return {
-          statusCode: 400,
-          headers: HEADERS,
-          body: JSON.stringify({
-            ok: false,
-            error: "Invalid amount",
-          }),
-        };
+        return json(400, {
+          ok: false,
+          error: "Invalid amount",
+        });
       }
+
       parsedAmount = numeric;
     }
 
-    // 1) Fetch the job by public_id
-    // Important:
-    // Only select columns that are confirmed to exist.
+    // 1) Fetch the homeowner job by public_id
+    // Only select confirmed columns that we know exist.
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowner_jobs")
       .select("id, public_id, title, project_title, category, city, state, name, email")
-      .eq("public_id", String(job_public_id).trim())
+      .eq("public_id", jobPublicId)
       .maybeSingle();
 
     if (jobErr) {
       console.error("Error fetching job:", jobErr);
-      return {
-        statusCode: 500,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: jobErr.message || "Failed to load job",
-        }),
-      };
+      return json(500, {
+        ok: false,
+        error: jobErr.message || "Failed to load job",
+      });
     }
 
     if (!jobRow) {
-      return {
-        statusCode: 404,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: "Job not found",
-        }),
-      };
+      return json(404, {
+        ok: false,
+        error: "Job not found",
+      });
     }
 
-    const homeownerEmail = jobRow.email || null;
-    const homeownerName = jobRow.name || "Homeowner";
+    const homeownerEmail = normalize(jobRow.email);
+    const homeownerName = normalize(jobRow.name) || "Homeowner";
     const jobTitle =
-      jobRow.title ||
-      jobRow.project_title ||
-      jobRow.category ||
+      normalize(jobRow.title) ||
+      normalize(jobRow.project_title) ||
+      normalize(jobRow.category) ||
       "your project";
 
     const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
 
-    // 2) Insert into pro_offers table temporarily
-    // We keep this table for compatibility, but semantically this is now a message / connection request.
+    // 2) Insert into pro_offers table using only confirmed columns
     const insertPayload = {
       job_id: jobRow.id,
-      business_name: String(business_name).trim(),
-      message: String(message).trim(),
+      business_name: businessName,
+      message,
       amount: parsedAmount,
-      phone: String(phone).trim(),
+      phone,
       status: "pending",
-      pro_email: String(pro_email).trim(),
+      pro_email: proEmail,
     };
 
     const { data: insertedOffer, error: insErr } = await supabase
@@ -167,14 +152,10 @@ exports.handler = async (event) => {
 
     if (insErr) {
       console.error("Insert pro_offers error:", insErr);
-      return {
-        statusCode: 500,
-        headers: HEADERS,
-        body: JSON.stringify({
-          ok: false,
-          error: insErr.message || "Failed to save message",
-        }),
-      };
+      return json(500, {
+        ok: false,
+        error: insErr.message || "Failed to save message",
+      });
     }
 
     // 3) Send email to homeowner if available
@@ -182,7 +163,7 @@ exports.handler = async (event) => {
       try {
         const resend = new Resend(RESEND_API_KEY);
 
-        const subject = `New message from ${insertPayload.business_name} for "${jobTitle}"`;
+        const subject = `New message from ${businessName} for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
@@ -191,33 +172,26 @@ exports.handler = async (event) => {
             <p>Hi ${homeownerName},</p>
 
             <p>
-              <strong>${insertPayload.business_name}</strong> is interested in your project:
+              <strong>${businessName}</strong> is interested in your project:
               <strong>${jobTitle}</strong>.
             </p>
 
             <h3 style="margin-top: 1.5rem;">Builder details</h3>
             <ul>
-              <li><strong>Business / Pro:</strong> ${insertPayload.business_name}</li>
-              <li><strong>Phone:</strong> ${insertPayload.phone}</li>
-              <li><strong>Email:</strong> ${insertPayload.pro_email}</li>
-              ${
-                locationText
-                  ? `<li><strong>Project location:</strong> ${locationText}</li>`
-                  : ""
-              }
-              ${
-                parsedAmount !== null
-                  ? `<li><strong>Estimated price:</strong> $${parsedAmount.toFixed(2)}</li>`
-                  : ""
-              }
+              <li><strong>Business / Pro:</strong> ${businessName}</li>
+              <li><strong>Phone:</strong> ${phone}</li>
+              <li><strong>Email:</strong> ${proEmail}</li>
+              ${locationText ? `<li><strong>Project location:</strong> ${locationText}</li>` : ""}
+              ${parsedAmount !== null ? `<li><strong>Estimated price:</strong> $${parsedAmount.toFixed(2)}</li>` : ""}
+              <li><strong>Project ID:</strong> ${jobPublicId}</li>
             </ul>
 
             <h3 style="margin-top: 1.5rem;">Message from the Builder</h3>
-            <p>${insertPayload.message.replace(/\n/g, "<br/>")}</p>
+            <p>${message.replace(/\n/g, "<br/>")}</p>
 
             <p style="margin-top: 1.5rem;">
               <strong>Next step:</strong> If this builder looks like a good fit,
-              you can contact <strong>${insertPayload.business_name}</strong> directly
+              you can contact <strong>${businessName}</strong> directly
               to discuss the project, timing, site visit, and next steps.
             </p>
 
@@ -235,7 +209,7 @@ exports.handler = async (event) => {
           to: homeownerEmail,
           subject,
           html,
-          reply_to: insertPayload.pro_email,
+          reply_to: proEmail,
         });
       } catch (emailErr) {
         console.error("Error sending email to homeowner:", emailErr);
@@ -249,23 +223,22 @@ exports.handler = async (event) => {
     }
 
     // 4) Success response
-    return {
-      statusCode: 200,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: true,
-        request: insertedOffer || null,
-      }),
-    };
+    return json(200, {
+      ok: true,
+      request: insertedOffer
+        ? {
+            ...insertedOffer,
+            job_public_id: jobPublicId,
+            project_title: jobTitle,
+            homeowner_email: homeownerEmail || null,
+          }
+        : null,
+    });
   } catch (e) {
     console.error("post-offer error:", e);
-    return {
-      statusCode: 500,
-      headers: HEADERS,
-      body: JSON.stringify({
-        ok: false,
-        error: e.message || "Server error",
-      }),
-    };
+    return json(500, {
+      ok: false,
+      error: e.message || "Server error",
+    });
   }
 };
