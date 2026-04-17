@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Available Jobs - ProBuildZone</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --pbz:#0F2A43;
@@ -214,11 +214,6 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://ekegbmhmgwxjqedkglvg.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_2bnkkC7qhGd1bSQ2VTEbZA_EgdZFaX_";
-
-    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     const params = new URLSearchParams(window.location.search);
 
     const filtersEl = document.getElementById("filters");
@@ -265,9 +260,9 @@
       const stored = getStoredPro();
 
       return {
-        category: normalizeValue(params.get("category") || (stored && stored.category) || ""),
-        city: normalizeValue(params.get("city") || (stored && stored.city) || ""),
-        state: normalizeValue(params.get("state") || (stored && stored.state) || "")
+        category: normalizeValue(params.get("category") || stored?.category || ""),
+        city: normalizeValue(params.get("city") || stored?.city || ""),
+        state: normalizeValue(params.get("state") || stored?.state || "")
       };
     }
 
@@ -295,8 +290,8 @@
     }
 
     function buildJobDetailsUrl(job) {
-      const internalId = String(job.id || "").trim();
-      const publicId = String(job.public_id || "").trim();
+      const internalId = String(job?.id || "").trim();
+      const publicId = String(job?.public_id || "").trim();
 
       const url = new URL("/job.html", window.location.origin);
 
@@ -318,17 +313,21 @@
     function renderJobs(data) {
       jobsBox.innerHTML = data.map((job) => {
         const title =
-          job.title ||
           job.project_title ||
+          job.title ||
           "Untitled job";
 
         const summary =
-          job.summary ||
           job.short_summary ||
+          job.summary ||
           job.description ||
+          job.full_description ||
           "";
 
-        const location = [job.city, job.state].filter(Boolean).join(", ");
+        const location =
+          [job.city, job.state].filter(Boolean).join(", ") ||
+          job.full_address ||
+          "-";
 
         const postedLabel =
           job.created_at
@@ -337,16 +336,17 @@
                 month: "short",
                 day: "numeric"
               })
-            : "";
+            : "Recently";
 
         return `
           <div class="job-card">
             <h3 class="job-title">${escapeHtml(title)}</h3>
 
             <div class="meta">
+              <div><strong>Job ID:</strong> ${escapeHtml(job.public_id || job.id || "-")}</div>
               <div><strong>Category:</strong> ${escapeHtml(job.category || "-")}</div>
-              <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
-              <div><strong>Posted:</strong> ${escapeHtml(postedLabel || "Recently")}</div>
+              <div><strong>Location:</strong> ${escapeHtml(location)}</div>
+              <div><strong>Posted:</strong> ${escapeHtml(postedLabel)}</div>
             </div>
 
             <div class="desc">${escapeHtml(shortText(summary))}</div>
@@ -357,64 +357,6 @@
           </div>
         `;
       }).join("");
-    }
-
-    async function loadJobs() {
-      renderFilters();
-
-      try {
-        let query = client
-          .from("homeowner_jobs")
-          .select(`
-            id,
-            public_id,
-            category,
-            title,
-            project_title,
-            summary,
-            short_summary,
-            description,
-            city,
-            state,
-            created_at
-          `)
-          .order("created_at", { ascending: false })
-          .limit(30);
-
-        if (activeFilters.category) {
-          query = query.eq("category", activeFilters.category);
-        }
-
-        if (activeFilters.city) {
-          query = query.ilike("city", activeFilters.city);
-        }
-
-        if (activeFilters.state) {
-          query = query.ilike("state", activeFilters.state);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-          throw error;
-        }
-
-        const jobs = Array.isArray(data) ? data : [];
-
-        if (!jobs.length) {
-          statusBox.className = "empty";
-          statusBox.textContent = "No jobs found for this area and category yet.";
-          return;
-        }
-
-        statusBox.style.display = "none";
-        jobsBox.style.display = "grid";
-        renderJobs(jobs);
-      } catch (error) {
-        console.error("Jobs load error:", error);
-        statusBox.className = "error";
-        statusBox.textContent = "Could not load jobs right now.";
-      }
     }
 
     function handleLogout() {
@@ -439,6 +381,59 @@
         return false;
       }
       return true;
+    }
+
+    async function loadJobs() {
+      renderFilters();
+
+      try {
+        const jobsUrl = new URL("/.netlify/functions/get-jobs", window.location.origin);
+
+        if (activeFilters.category) {
+          jobsUrl.searchParams.set("category", activeFilters.category);
+        }
+
+        if (activeFilters.city) {
+          jobsUrl.searchParams.set("city", activeFilters.city);
+        }
+
+        if (activeFilters.state) {
+          jobsUrl.searchParams.set("state", activeFilters.state);
+        }
+
+        const res = await fetch(jobsUrl.toString(), {
+          headers: { "Accept": "application/json" }
+        });
+
+        let json = {};
+        try {
+          json = await res.json();
+        } catch (_) {
+          json = {};
+        }
+
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || "Could not load jobs right now.");
+        }
+
+        const jobs = Array.isArray(json.jobs) ? json.jobs : [];
+
+        if (!jobs.length) {
+          statusBox.className = "empty";
+          statusBox.textContent = "No jobs found for this area and category yet.";
+          jobsBox.style.display = "none";
+          return;
+        }
+
+        statusBox.style.display = "none";
+        jobsBox.style.display = "grid";
+        renderJobs(jobs);
+      } catch (error) {
+        console.error("jobs.html load error:", error);
+        statusBox.className = "error";
+        statusBox.textContent = "Could not load jobs right now.";
+        jobsBox.style.display = "none";
+      }
     }
 
     if (logoutBtn) {
