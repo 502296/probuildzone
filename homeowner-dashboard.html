@@ -465,6 +465,59 @@
       `;
     }
 
+    function buildRequestMap(requests) {
+      const map = new Map();
+
+      (requests || []).forEach((req) => {
+        const keys = [
+          String(req.job_id || "").trim(),
+          String(req.homeowner_job_id || "").trim(),
+          String(req.job_public_id || "").trim(),
+          String(req.public_id || "").trim(),
+          String(req.job?.id || "").trim(),
+          String(req.job?.public_id || "").trim()
+        ].filter(Boolean);
+
+        keys.forEach((key) => {
+          if (!map.has(key)) {
+            map.set(key, []);
+          }
+          map.get(key).push(req);
+        });
+      });
+
+      return map;
+    }
+
+    function attachRequestsToProjects(projects, requests) {
+      const requestMap = buildRequestMap(requests);
+
+      return (projects || []).map((project) => {
+        const keys = [
+          String(project.id || "").trim(),
+          String(project.public_id || "").trim()
+        ].filter(Boolean);
+
+        const merged = [];
+        const seen = new Set();
+
+        keys.forEach((key) => {
+          const list = requestMap.get(key) || [];
+          list.forEach((req) => {
+            const reqKey = String(req.id || JSON.stringify(req));
+            if (seen.has(reqKey)) return;
+            seen.add(reqKey);
+            merged.push(req);
+          });
+        });
+
+        return {
+          ...project,
+          requests: merged
+        };
+      });
+    }
+
     function renderStats(projects) {
       const totalProjects = projects.length;
       const totalRequests = projects.reduce((sum, item) => {
@@ -564,6 +617,7 @@
 
         const viewUrl = new URL("/job.html", window.location.origin);
         if (project.id) viewUrl.searchParams.set("id", project.id);
+        if (project.public_id) viewUrl.searchParams.set("public_id", project.public_id);
 
         const editUrl = new URL("/homeowner.html", window.location.origin);
         if (project.id) editUrl.searchParams.set("edit_id", project.id);
@@ -573,16 +627,27 @@
               const status = String(req.status || "pending").toLowerCase();
               const isResolved = status === "approved" || status === "declined";
 
+              const requestName =
+                req.business_name ||
+                req.company_name ||
+                req.pro_name ||
+                "Builder";
+
+              const requestPhone =
+                req.pro_phone ||
+                req.phone ||
+                "-";
+
               return `
                 <div class="request-item">
                   <div class="request-head">
-                    <div class="request-name">${escapeHtml(req.business_name || "Builder")}</div>
+                    <div class="request-name">${escapeHtml(requestName)}</div>
                     <span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span>
                   </div>
 
                   <div class="request-meta">
                     <div><strong>Email:</strong> ${escapeHtml(req.pro_email || "-")}</div>
-                    <div><strong>Phone:</strong> ${escapeHtml(req.phone || "-")}</div>
+                    <div><strong>Phone:</strong> ${escapeHtml(requestPhone)}</div>
                     <div><strong>Sent:</strong> ${escapeHtml(formatDate(req.created_at))}</div>
                   </div>
 
@@ -619,7 +684,7 @@
             <h3 class="job-title">${escapeHtml(title)}</h3>
 
             <div class="job-meta">
-              <div><strong>Job ID:</strong> ${escapeHtml(project.id || "-")}</div>
+              <div><strong>Job ID:</strong> ${escapeHtml(project.public_id || project.id || "-")}</div>
               <div><strong>Category:</strong> ${escapeHtml(project.category || "-")}</div>
               <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
               <div><strong>Posted:</strong> ${escapeHtml(formatDate(project.created_at))}</div>
@@ -673,7 +738,7 @@
     async function loadDashboard() {
       const user = getStoredHomeowner();
 
-      if (!user || !user.email) {
+      if (!user) {
         statusBox.className = "error";
         statusBox.textContent = "No active homeowner session found. Please post a project first.";
         profileNameEl.textContent = "Session missing";
@@ -684,14 +749,35 @@
       renderProfile(user);
 
       try {
-        const res = await fetch(`/.netlify/functions/get-homeowner-requests?email=${encodeURIComponent(user.email)}`);
+        const dashboardUrl = new URL("/.netlify/functions/get-homeowner-requests", window.location.origin);
+
+        if (user.email) {
+          dashboardUrl.searchParams.set("email", user.email);
+        }
+
+        if (user.phone) {
+          dashboardUrl.searchParams.set("phone", user.phone);
+        }
+
+        if (user.last_job_public_id) {
+          dashboardUrl.searchParams.set("public_id", user.last_job_public_id);
+        } else if (user.last_job_id) {
+          dashboardUrl.searchParams.set("last_job_id", user.last_job_id);
+        }
+
+        const res = await fetch(dashboardUrl.toString(), {
+          headers: { "Accept": "application/json" }
+        });
+
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok || !data.ok) {
           throw new Error(data.error || "Failed to load homeowner dashboard");
         }
 
-        const projects = Array.isArray(data.projects) ? data.projects : [];
+        const projectsRaw = Array.isArray(data.projects) ? data.projects : [];
+        const requestsRaw = Array.isArray(data.requests) ? data.requests : [];
+        const projects = attachRequestsToProjects(projectsRaw, requestsRaw);
 
         renderStats(projects);
 
@@ -709,6 +795,7 @@
         console.error("Homeowner dashboard load error:", err);
         statusBox.className = "error";
         statusBox.textContent = "Could not load your homeowner dashboard right now.";
+        jobsBox.style.display = "none";
       }
     }
 
