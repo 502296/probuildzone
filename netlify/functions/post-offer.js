@@ -67,14 +67,16 @@ exports.handler = async (event) => {
 
     // 💥 هنا التعديل المهم
     const insertPayload = {
-      job_id: jobRow.id,
-      business_name: businessName,
-      message,
-      phone,
-      email, // 👈 بدل pro_email
-      status: "pending",
-    };
+  job_id: jobRow.id,
+  job_public_id: jobRow.public_id, // 🔥 هذا هو المفتاح
 
+  business_name: businessName,
+  message,
+  phone,
+  email,
+
+  status: "pending",
+};
     const { data: inserted, error: insertErr } = await supabase
       .from("pro_offers")
       .insert(insertPayload)
