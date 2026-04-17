@@ -232,6 +232,7 @@
     .error{
       color:var(--err);
       margin-bottom:10px;
+      line-height:1.7;
     }
 
     .loading-box{
@@ -332,14 +333,21 @@
 
   <script>
     (async () => {
-      const params = new URLSearchParams(location.search);
+      const params = new URLSearchParams(window.location.search);
+
       const rawId =
         params.get("id") ||
         params.get("jobId") ||
         params.get("job") ||
         "";
 
+      const rawPublicId =
+        params.get("public_id") ||
+        params.get("publicId") ||
+        "";
+
       const jobId = rawId.trim();
+      const publicId = rawPublicId.trim();
 
       const jobError = document.getElementById("jobError");
       const loadingBox = document.getElementById("loadingBox");
@@ -371,9 +379,9 @@
 
       function buildJobsUrl(user) {
         const q = new URLSearchParams({
-          category: user.category || "",
-          city: user.city || "",
-          state: user.state || ""
+          category: user?.category || "",
+          city: user?.city || "",
+          state: user?.state || ""
         });
 
         return "/jobs.html?" + q.toString();
@@ -398,6 +406,12 @@
         window.location.href = "/pros.html";
       }
 
+      function showError(message) {
+        loadingBox.style.display = "none";
+        jobContent.style.display = "none";
+        jobError.textContent = message || "Could not load this job right now.";
+      }
+
       const storedPro = getStoredPro();
 
       if (dashboardLink) {
@@ -413,32 +427,44 @@
       }
 
       if (!storedPro) {
-        loadingBox.style.display = "none";
-        jobError.textContent = "No active Pro session found. Please return to Pro signup first.";
+        showError("No active Pro session found. Please return to Pro signup first.");
         return;
       }
 
-      if (!jobId) {
-        loadingBox.style.display = "none";
-        jobError.textContent = "Job not found.";
+      if (!jobId && !publicId) {
+        showError("Job not found.");
         return;
       }
 
       const jobUrl = new URL("/.netlify/functions/get-job", window.location.origin);
-      jobUrl.searchParams.set("id", jobId);
+
+      if (publicId) {
+        jobUrl.searchParams.set("public_id", publicId);
+      } else if (jobId) {
+        jobUrl.searchParams.set("id", jobId);
+      }
 
       try {
-        const jobRes = await fetch(jobUrl.toString());
-        const jobJson = await jobRes.json().catch(() => ({}));
+        const jobRes = await fetch(jobUrl.toString(), {
+          headers: { "Accept": "application/json" }
+        });
+
+        let jobJson = {};
+        try {
+          jobJson = await jobRes.json();
+        } catch (_) {
+          jobJson = {};
+        }
 
         if (!jobRes.ok || !jobJson.ok || !jobJson.job) {
-          loadingBox.style.display = "none";
-          jobError.textContent = jobJson.error || "Job not found.";
+          showError(jobJson.error || "Job not found.");
           return;
         }
 
         const j = jobJson.job;
-        const resolvedId = j.id || jobId;
+
+        const resolvedId = j.id || jobId || "—";
+        const resolvedPublicId = j.public_id || publicId || "";
 
         const title =
           j.project_title ||
@@ -461,7 +487,7 @@
           j.description ||
           "No project description provided yet.";
 
-        v_id.textContent = resolvedId;
+        v_id.textContent = resolvedPublicId || resolvedId;
         v_title.textContent = title;
         v_category.textContent = category;
         v_location.textContent = location;
@@ -469,15 +495,22 @@
         v_summary.textContent = summary;
 
         const messageUrl = new URL("/pro-offer.html", window.location.origin);
-        messageUrl.searchParams.set("id", resolvedId);
+
+        if (resolvedId && resolvedId !== "—") {
+          messageUrl.searchParams.set("id", resolvedId);
+        }
+
+        if (resolvedPublicId) {
+          messageUrl.searchParams.set("public_id", resolvedPublicId);
+        }
+
         connectLink.href = messageUrl.pathname + messageUrl.search;
 
         loadingBox.style.display = "none";
         jobContent.style.display = "block";
       } catch (err) {
-        console.error(err);
-        loadingBox.style.display = "none";
-        jobError.textContent = "Could not load this job right now.";
+        console.error("job.html load error:", err);
+        showError("Could not load this job right now.");
       }
     })();
   </script>
