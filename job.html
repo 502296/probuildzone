@@ -6,24 +6,28 @@
   <title>Job Details — ProBuildZone</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --ink:#0F2A43;
-      --ink-2:#0b2033;
-      --muted:#6b7a8c;
-      --bg:#f6f7fb;
+      --ink:#0f1720;
+      --ink-soft:#425466;
+      --muted:#6b7280;
+      --bg:#f5f5f7;
       --card:#ffffff;
-      --border:#e7ecf3;
+      --border:#e5e7eb;
       --gold:#D4AF37;
       --gold-2:#c49c1f;
+      --soft:#f8fafc;
+      --soft-blue:#eef4ff;
+      --soft-blue-border:#d9e6ff;
       --err:#b00020;
-      --soft:#eef4ff;
       --danger:#b42318;
-      --soft-green:#f3faf5;
-      --soft-green-border:#d7eadb;
-      --soft-green-text:#244735;
+      --shadow:0 12px 32px rgba(15, 23, 32, 0.06);
+      --radius-xl:28px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
     }
 
     *{box-sizing:border-box}
@@ -32,185 +36,267 @@
       margin:0;
       padding:0;
       background:var(--bg);
-      font-family:Inter,system-ui,Arial,sans-serif;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
       color:var(--ink);
     }
 
+    body{
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
     .wrap{
-      max-width:980px;
-      margin:28px auto;
+      max-width:920px;
+      margin:32px auto 56px;
       padding:0 16px;
     }
 
-    .card{
+    .page{
       background:var(--card);
       border:1px solid var(--border);
-      border-radius:24px;
-      padding:22px 20px;
-      box-shadow:0 10px 30px rgba(15,42,67,0.06);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      padding:24px;
     }
 
     .topbar{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
+      align-items:center;
+      gap:16px;
       flex-wrap:wrap;
-      margin-bottom:12px;
+      margin-bottom:20px;
+    }
+
+    .brand-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#233548;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 12px;
     }
 
     .topbar-actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      align-items:center;
     }
 
-    .eyebrow{
-      display:inline-block;
-      font-size:12px;
+    .hero{
+      padding:8px 0 4px;
+      border-bottom:1px solid #edf0f3;
+      margin-bottom:22px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:14px;
       font-weight:700;
       letter-spacing:.08em;
       text-transform:uppercase;
-      color:var(--ink);
-      background:#f3f7fb;
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding:6px 10px;
-      margin-bottom:14px;
-    }
-
-    h1{
-      margin:0 0 14px;
-      font-size:40px;
-      letter-spacing:-0.5px;
-      line-height:1.1;
-    }
-
-    .subtitle{
-      margin:0 0 18px;
       color:var(--muted);
+    }
+
+    .hero p{
+      margin:0;
+      font-size:34px;
+      line-height:1.12;
+      letter-spacing:-0.03em;
+      font-weight:800;
+      color:var(--ink);
+      max-width:700px;
+    }
+
+    .status-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:18px 0 0;
+    }
+
+    .mini-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:#334155;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .error{
+      color:var(--err);
+      margin:0 0 14px;
       line-height:1.7;
-      max-width:760px;
+      font-size:15px;
     }
 
-    .info-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin:18px 0 8px;
-    }
-
-    .info-card{
+    .loading-box{
       background:#fff;
       border:1px solid var(--border);
-      border-radius:16px;
+      border-radius:var(--radius-md);
+      padding:18px;
+      color:var(--muted);
+      text-align:center;
+      font-size:15px;
+    }
+
+    .content{
+      display:grid;
+      grid-template-columns:1.2fr 0.8fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .stack{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .panel{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:20px;
+    }
+
+    .panel h2{
+      margin:0 0 14px;
+      font-size:18px;
+      line-height:1.2;
+      color:var(--ink);
+    }
+
+    .job-title{
+      margin:0 0 10px;
+      font-size:30px;
+      line-height:1.12;
+      letter-spacing:-0.02em;
+      font-weight:800;
+      color:var(--ink);
+    }
+
+    .job-meta{
+      margin:0;
+      color:var(--ink-soft);
+      font-size:15px;
+      line-height:1.7;
+    }
+
+    .summary{
+      color:#233548;
+      font-size:15px;
+      line-height:1.8;
+      white-space:pre-wrap;
+      margin:0;
+    }
+
+    .info-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .info-item{
       padding:14px 14px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:var(--soft);
     }
 
     .info-label{
       font-size:12px;
       font-weight:700;
+      letter-spacing:.08em;
       text-transform:uppercase;
-      letter-spacing:.06em;
       color:var(--muted);
-      margin-bottom:8px;
+      margin-bottom:6px;
     }
 
     .info-value{
-      font-size:16px;
-      color:var(--ink-2);
+      font-size:15px;
       line-height:1.6;
+      color:var(--ink);
       word-break:break-word;
-    }
-
-    .section{
-      margin-top:24px;
-    }
-
-    .section h2{
-      margin:0 0 12px;
-      font-size:22px;
-      line-height:1.25;
-    }
-
-    .description-box{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:16px;
-      line-height:1.8;
-      color:#24384d;
-      white-space:pre-wrap;
+      font-weight:600;
     }
 
     .privacy-note{
-      margin-top:18px;
-      background:var(--soft);
-      border:1px solid #d7e5ff;
+      background:var(--soft-blue);
+      border:1px solid var(--soft-blue-border);
       border-radius:16px;
       padding:16px;
-      color:#23406a;
+      color:#26415f;
       line-height:1.7;
-    }
-
-    .privacy-note strong{
-      color:var(--ink);
-    }
-
-    .message-cta{
-      margin-top:18px;
-      background:var(--soft-green);
-      border:1px solid var(--soft-green-border);
-      border-radius:18px;
-      padding:18px;
-    }
-
-    .message-cta h3{
-      margin:0 0 10px;
-      font-size:22px;
-      line-height:1.25;
-      color:var(--ink);
-    }
-
-    .message-cta p{
-      margin:0 0 12px;
-      color:var(--soft-green-text);
-      line-height:1.75;
-    }
-
-    .message-cta .small-note{
-      margin-top:6px;
       font-size:14px;
-      color:#597564;
+    }
+
+    .cta-card{
+      background:linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:20px;
+    }
+
+    .cta-card h3{
+      margin:0 0 8px;
+      font-size:22px;
+      line-height:1.2;
+      color:var(--ink);
+    }
+
+    .cta-card p{
+      margin:0 0 14px;
+      color:var(--ink-soft);
+      line-height:1.7;
+      font-size:15px;
+    }
+
+    .cta-note{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+      margin-top:12px;
     }
 
     .btns{
       display:flex;
-      gap:12px;
-      margin-top:22px;
-      flex-wrap:wrap;
+      flex-direction:column;
+      gap:10px;
+      margin-top:16px;
     }
 
     .btn{
       appearance:none;
       border:none;
       cursor:pointer;
-      padding:12px 18px;
-      border-radius:12px;
+      padding:14px 18px;
+      border-radius:14px;
       font-weight:700;
       text-decoration:none;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      text-align:center;
+      font-size:15px;
     }
 
     .btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 8px 18px rgba(15,42,67,0.08);
+      box-shadow:0 10px 18px rgba(15,23,32,0.08);
     }
 
     .btn.primary{
       background:var(--gold);
-      color:#000;
+      color:#111827;
     }
 
     .btn.primary:hover{
@@ -223,45 +309,64 @@
       color:var(--ink);
     }
 
+    .btn.white:hover{
+      background:#fafafa;
+    }
+
     .btn.danger{
       background:#fff;
       color:var(--danger);
-      border:1px solid #f2c7c2;
+      border:1px solid #f1d1cd;
     }
 
-    .error{
-      color:var(--err);
-      margin-bottom:10px;
-      line-height:1.7;
+    .btn.danger:hover{
+      background:#fff8f7;
     }
 
-    .loading-box{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      color:var(--muted);
-      text-align:center;
+    @media (max-width: 860px){
+      .content{
+        grid-template-columns:1fr;
+      }
     }
 
-    @media (max-width:640px){
-      h1{font-size:34px}
-      .info-grid{grid-template-columns:1fr}
-      .topbar{align-items:stretch}
-      .topbar-actions{width:100%}
-      .topbar-actions .btn{flex:1;text-align:center}
-      .btns .btn{width:100%;text-align:center}
+    @media (max-width: 640px){
+      .wrap{
+        margin:20px auto 40px;
+      }
+
+      .page{
+        padding:18px;
+        border-radius:22px;
+      }
+
+      .topbar{
+        align-items:stretch;
+      }
+
+      .topbar-actions{
+        width:100%;
+      }
+
+      .topbar-actions .btn{
+        flex:1;
+      }
+
+      .hero p{
+        font-size:28px;
+      }
+
+      .job-title{
+        font-size:24px;
+      }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="card">
+    <div class="page">
       <div class="topbar">
-        <div>
-          <div class="eyebrow">ProBuildZone Project</div>
-        </div>
+        <div class="brand-chip">ProBuildZone Project</div>
 
         <div class="topbar-actions">
           <a id="dashboardLink" class="btn white" href="/pro-dashboard.html">Dashboard</a>
@@ -269,63 +374,74 @@
         </div>
       </div>
 
-      <h1>Job Details</h1>
-      <p class="subtitle">
-        Review the homeowner project details below. If this project matches your trade,
-        send a clear message and introduce yourself early to improve your chances of winning the job.
-      </p>
+      <div class="hero">
+        <h1>Job Details</h1>
+        <p>Review the project quickly and decide if it is a strong fit for your trade.</p>
+      </div>
 
       <div id="jobError" class="error"></div>
       <div id="loadingBox" class="loading-box">Loading job details...</div>
 
       <div id="jobContent" style="display:none;">
-        <div class="info-grid">
-          <div class="info-card">
-            <div class="info-label">Job ID</div>
-            <div class="info-value" id="v_id">—</div>
+        <div class="content">
+          <div class="stack">
+            <div class="panel">
+              <h2 id="v_title" class="job-title">Untitled job</h2>
+              <p class="job-meta" id="v_meta_line">—</p>
+            </div>
+
+            <div class="panel">
+              <h2>Project Summary</h2>
+              <p class="summary" id="v_summary">—</p>
+            </div>
+
+            <div class="privacy-note">
+              Homeowner contact details stay protected until connection. Builders reach out through ProBuildZone first for a cleaner and more professional experience.
+            </div>
           </div>
 
-          <div class="info-card">
-            <div class="info-label">Category</div>
-            <div class="info-value" id="v_category">—</div>
+          <div class="stack">
+            <div class="panel">
+              <h2>Project Snapshot</h2>
+
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="info-label">Job ID</div>
+                  <div class="info-value" id="v_id">—</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Category</div>
+                  <div class="info-value" id="v_category">—</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Location</div>
+                  <div class="info-value" id="v_location">—</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Posted</div>
+                  <div class="info-value" id="v_posted">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cta-card">
+              <h3>Contact Homeowner</h3>
+              <p>Send a clear, professional message early to improve your chance of getting noticed.</p>
+
+              <div class="btns">
+                <a id="connectLink" class="btn primary" href="#">Contact Homeowner</a>
+                <a id="jobsLink" class="btn white" href="/jobs.html">Back to Matching Jobs</a>
+                <a class="btn white" href="/index.html">Back to Home</a>
+              </div>
+
+              <div class="cta-note">
+                Early, professional responses usually perform better than long introductions.
+              </div>
+            </div>
           </div>
-
-          <div class="info-card">
-            <div class="info-label">Location</div>
-            <div class="info-value" id="v_location">—</div>
-          </div>
-
-          <div class="info-card">
-            <div class="info-label">Posted</div>
-            <div class="info-value" id="v_posted">—</div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h2 id="v_title">Untitled job</h2>
-          <div class="description-box" id="v_summary">—</div>
-        </div>
-
-        <div class="privacy-note">
-          <strong>Professional communication, built in:</strong> homeowner contact details are not shown directly on this page.
-          Builders can send a message through ProBuildZone first, helping both sides connect in a cleaner, safer, and more professional way.
-        </div>
-
-        <div class="message-cta">
-          <h3>Send a Message Now</h3>
-          <p>
-            Be one of the first builders to reach out. A strong message that explains your experience,
-            availability, and fit for the project can help you stand out quickly.
-          </p>
-          <p class="small-note">
-            Builders who respond early with a professional message often get noticed first.
-          </p>
-        </div>
-
-        <div class="btns">
-          <a id="connectLink" class="btn primary" href="#">Send Message</a>
-          <a id="jobsLink" class="btn white" href="/jobs.html">Back to Matching Jobs</a>
-          <a class="btn white" href="/index.html">Back to Home</a>
         </div>
       </div>
     </div>
@@ -359,6 +475,7 @@
       const v_location = document.getElementById("v_location");
       const v_posted = document.getElementById("v_posted");
       const v_summary = document.getElementById("v_summary");
+      const v_meta_line = document.getElementById("v_meta_line");
 
       const connectLink = document.getElementById("connectLink");
       const jobsLink = document.getElementById("jobsLink");
@@ -493,6 +610,7 @@
         v_location.textContent = location;
         v_posted.textContent = formatDate(j.created_at);
         v_summary.textContent = summary;
+        v_meta_line.textContent = [location, category].filter(Boolean).join(" • ");
 
         const messageUrl = new URL("/pro-offer.html", window.location.origin);
 
