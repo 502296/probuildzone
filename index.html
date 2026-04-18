@@ -1,286 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>ProBuildZone — Local Pros, Smart Automation</title>
-  <meta name="description"
-        content="Post your home project with photos. Local contractors send offers. You choose the best match — simple, direct, and automated." />
+  <meta
+    name="description"
+    content="Post your home project with photos. Local contractors send offers. You choose the best match — simple, direct, and automated."
+  />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
-    .sheet { max-height: 90vh; overflow: auto; padding-bottom: 120px; }
-
-    .sticky-submit {
-      position: sticky;
-      bottom: 0;
-      background: rgba(255, 255, 255, .95);
-      backdrop-filter: saturate(140%) blur(4px);
-      padding: 12px;
-      border-top: 1px solid #e6ebf2;
-      box-shadow: 0 -6px 20px rgba(0, 0, 0, .06);
-      display: grid;
-      gap: 8px;
+    :root{
+      --ink:#0f1720;
+      --ink-soft:#425466;
+      --muted:#6b7280;
+      --bg:#f5f5f7;
+      --card:#ffffff;
+      --border:#e5e7eb;
+      --gold:#D4AF37;
+      --gold-2:#c49c1f;
+      --soft:#f8fafc;
+      --soft-blue:#eef4ff;
+      --soft-blue-border:#d9e6ff;
+      --err:#b91c1c;
+      --ok:#166534;
+      --shadow:0 12px 32px rgba(15,23,32,0.06);
+      --radius-xl:28px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
     }
 
-    .sticky-submit .hint { display: block; font-size: .95rem; }
-
-    @media (max-width: 640px) {
-      .sticky-submit { padding: 12px 10px; }
+    .sheet{
+      max-height:90vh;
+      overflow:auto;
+      padding-bottom:120px;
+      background:#fff;
+      border-radius:24px;
     }
 
-    .automation-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 14px;
-      margin-bottom: 12px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(15, 42, 67, 0.82);
-      color: #f9fafb;
-      font-size: 12px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      border: 1px solid rgba(212, 175, 55, 0.5);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    .sticky-submit{
+      position:sticky;
+      bottom:0;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:saturate(140%) blur(8px);
+      padding:14px;
+      border-top:1px solid var(--border);
+      box-shadow:0 -8px 24px rgba(15,23,32,.06);
+      display:grid;
+      gap:8px;
     }
 
-    .automation-pill .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
+    .sticky-submit .hint{
+      display:block;
+      font-size:.95rem;
     }
 
-    .brand-logo {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: .25rem;
-      padding-bottom: 2px;
+    .hint.err{ color:var(--err); }
+    .hint.ok{ color:var(--ok); }
+
+    @media (max-width:640px){
+      .sticky-submit{ padding:12px 10px; }
     }
 
-    .brand-logo .build {
-      position: relative;
-      z-index: 1;
+    .automation-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top:18px;
+      margin-bottom:16px;
+      padding:7px 13px;
+      border-radius:999px;
+      background:#ffffff;
+      color:#233548;
+      font-size:12px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      border:1px solid rgba(212,175,55,0.45);
+      box-shadow:0 10px 26px rgba(15,23,32,0.08);
+      font-weight:700;
     }
 
-    @media (max-width: 430px) {
-      .brand-logo { padding-bottom: 2px; }
+    .automation-pill .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 4px rgba(34,197,94,0.18);
     }
 
-    .hero-dashboard-btn {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      background: rgba(255, 255, 255, 0.96);
-      color: #0F2A43;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-weight: 800;
-      white-space: nowrap;
-      border: 1px solid rgba(216, 224, 234, 0.95);
-      box-shadow: 0 12px 28px rgba(15, 42, 67, 0.18);
-      min-width: 220px;
+    .brand-logo{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      gap:.25rem;
+      padding-bottom:2px;
     }
 
-    .hero-dashboard-btn.show {
-      display: inline-flex;
+    .brand-logo .build{
+      position:relative;
+      z-index:1;
     }
 
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      margin-top: 10px;
+    @media (max-width:430px){
+      .brand-logo{ padding-bottom:2px; }
     }
 
-    #postJobTop {
-      min-width: 240px;
+    .hero-dashboard-btn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      background:#fff;
+      color:#0F2A43;
+      padding:13px 18px;
+      border-radius:14px;
+      font-weight:800;
+      white-space:nowrap;
+      border:1px solid var(--border);
+      box-shadow:0 12px 28px rgba(15,23,32,0.08);
+      min-width:220px;
     }
 
-    @media (max-width: 640px) {
+    .hero-dashboard-btn.show{
+      display:inline-flex;
+    }
+
+    .buttons{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    #postJobTop{
+      min-width:240px;
+    }
+
+    @media (max-width:640px){
       .hero-dashboard-btn,
-      #postJobTop {
-        width: min(100%, 320px);
+      #postJobTop{
+        width:min(100%, 320px);
       }
     }
 
+    .hero .overlay{
+      max-width:760px;
+    }
+
+    .hero .overlay h1{
+      line-height:1.05;
+      letter-spacing:-0.03em;
+    }
+
+    .hero .overlay p{
+      max-width:650px;
+      line-height:1.7;
+    }
+
     /* ===== Open Projects Section ===== */
-    .open-projects {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 56px 20px 72px;
+    .open-projects{
+      max-width:1120px;
+      margin:0 auto;
+      padding:56px 20px 72px;
     }
 
-    .projects-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
+    .projects-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
     }
 
-    .projects-kicker {
-      display: inline-block;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: #8a6a18;
-      font-weight: 700;
-      margin-bottom: 8px;
+    .projects-kicker{
+      display:inline-block;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#8a6a18;
+      font-weight:700;
+      margin-bottom:10px;
     }
 
-    .projects-head h2 {
-      margin: 0;
-      color: #0F2A43;
-      font-size: 34px;
-      line-height: 1.08;
+    .projects-head h2{
+      margin:0;
+      color:#0F2A43;
+      font-size:32px;
+      line-height:1.08;
+      letter-spacing:-0.02em;
     }
 
-    .projects-head p {
-      margin: 8px 0 0;
-      color: #617186;
-      max-width: 760px;
-      line-height: 1.6;
+    .projects-head p{
+      margin:10px 0 0;
+      color:var(--ink-soft);
+      max-width:700px;
+      line-height:1.7;
     }
 
-    .projects-cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      background: #0F2A43;
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      white-space: nowrap;
+    .projects-cta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      background:#0F2A43;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:12px;
+      font-weight:700;
+      white-space:nowrap;
+      box-shadow:0 10px 22px rgba(15,42,67,0.14);
     }
 
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-      gap: 18px;
+    .projects-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      gap:18px;
     }
 
-    .job-card {
-      background: #fff;
-      border: 1px solid #e5eaf0;
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(15, 42, 67, 0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .job-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:20px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    .job-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+    .job-card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
     }
 
-    .job-category {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #eef4ff;
-      color: #0F2A43;
-      font-size: 12px;
-      font-weight: 700;
-      width: fit-content;
+    .job-category{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 11px;
+      border-radius:999px;
+      background:var(--soft-blue);
+      color:#0F2A43;
+      font-size:12px;
+      font-weight:700;
+      width:fit-content;
+      border:1px solid var(--soft-blue-border);
     }
 
-    .job-public-id {
-      color: #7b8797;
-      font-size: 12px;
-      white-space: nowrap;
+    .job-public-id{
+      color:#7b8797;
+      font-size:12px;
+      white-space:nowrap;
+      font-weight:600;
     }
 
-    .job-title {
-      margin: 0;
-      color: #0F2A43;
-      font-size: 20px;
-      line-height: 1.3;
+    .job-title{
+      margin:0;
+      color:#0F2A43;
+      font-size:20px;
+      line-height:1.3;
+      letter-spacing:-0.01em;
     }
 
-    .job-summary {
-      margin: 0;
-      color: #617186;
-      line-height: 1.6;
-      min-height: 48px;
+    .job-summary{
+      margin:0;
+      color:var(--ink-soft);
+      line-height:1.7;
+      min-height:52px;
     }
 
-    .job-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .job-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
 
-    .job-meta span {
-      background: #f4f7fa;
-      color: #334155;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 10px;
+    .job-meta span{
+      background:#f8fafc;
+      color:#334155;
+      font-size:13px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #eef2f6;
     }
 
-    .job-card-actions {
-      margin-top: auto;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .job-card-actions{
+      margin-top:auto;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .job-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 11px 14px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 700;
-      border: 1px solid #d8e0ea;
-      color: #0F2A43;
-      background: #fff;
+    .job-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 14px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:700;
+      border:1px solid #d8e0ea;
+      color:#0F2A43;
+      background:#fff;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
-    .job-link.primary {
-      background: #D4AF37;
-      color: #111827;
-      border-color: #D4AF37;
+    .job-link:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 18px rgba(15,23,32,0.08);
     }
 
-    .jobs-status {
-      color: #617186;
-      background: #fff;
-      border: 1px solid #e5eaf0;
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(15, 42, 67, 0.04);
+    .job-link.primary{
+      background:var(--gold);
+      color:#111827;
+      border-color:var(--gold);
     }
 
-    .jobs-status.error {
-      color: #b91c1c;
-      background: #fff7f7;
-      border-color: #f3caca;
+    .job-link.primary:hover{
+      background:var(--gold-2);
+      border-color:var(--gold-2);
     }
 
-    @media (max-width: 700px) {
-      .projects-head h2 {
-        font-size: 28px;
+    .jobs-status{
+      color:var(--ink-soft);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 10px 24px rgba(15,23,32,0.04);
+      line-height:1.7;
+    }
+
+    .jobs-status.error{
+      color:#b91c1c;
+      background:#fff7f7;
+      border-color:#f3caca;
+    }
+
+    /* ===== Modal polish ===== */
+    .sheet-head{
+      position:sticky;
+      top:0;
+      z-index:5;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--border);
+      padding:16px 18px;
+    }
+
+    .sheet-head h3{
+      margin:0;
+      font-size:24px;
+      letter-spacing:-0.02em;
+    }
+
+    .job-form{
+      padding:20px 18px 8px;
+    }
+
+    .job-form h2{
+      margin:0 0 8px;
+      font-size:28px;
+      line-height:1.1;
+      letter-spacing:-0.02em;
+      color:#0F2A43;
+    }
+
+    .job-form .note{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .cat-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      gap:12px;
+    }
+
+    .cat-card{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:16px;
+      padding:18px 14px;
+      min-height:92px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      font-weight:700;
+      color:#0F2A43;
+      cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      box-shadow:0 8px 20px rgba(15,23,32,0.03);
+    }
+
+    .cat-card:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(15,23,32,0.08);
+      border-color:#d8e0ea;
+    }
+
+    .selected-cat{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      font-weight:700;
+      color:#334155;
+      margin-bottom:16px;
+    }
+
+    .upload-wrap{
+      border:1px dashed #cad5e2;
+      border-radius:18px;
+      padding:18px;
+      background:#fbfcfe;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+      transition:background .12s ease, border-color .12s ease;
+    }
+
+    .upload-wrap.hover{
+      background:#f7fbff;
+      border-color:#aac6ee;
+    }
+
+    .file-hint{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:14px;
+      line-height:1.6;
+    }
+
+    #fileList.card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:16px;
+      min-height:58px;
+    }
+
+    .file-item{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:10px 0;
+      border-bottom:1px solid #f1f4f8;
+    }
+
+    .file-item:last-child{
+      border-bottom:none;
+    }
+
+    .thumb{
+      width:52px;
+      height:52px;
+      border-radius:12px;
+      overflow:hidden;
+      background:#f4f7fa;
+      border:1px solid #e7ecf3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#64748b;
+      flex:0 0 auto;
+    }
+
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .meta{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+
+    .meta b{
+      color:#0F2A43;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      max-width:100%;
+    }
+
+    .meta span{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    label{
+      display:block;
+      margin:14px 0 8px;
+      color:#233548;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input,
+    textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 15px;
+      font:inherit;
+      color:#0f1720;
+      background:#fff;
+      outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:#b8c9e3;
+      box-shadow:0 0 0 4px rgba(59,130,246,0.08);
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:120px;
+    }
+
+    .row2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    @media (max-width:700px){
+      .projects-head h2{
+        font-size:28px;
+      }
+
+      .job-form h2{
+        font-size:24px;
+      }
+
+      .row2{
+        grid-template-columns:1fr;
       }
     }
   </style>
@@ -311,8 +593,11 @@
   <section class="hero" id="home">
     <div class="hero-bg"></div>
     <div class="overlay">
-      <h1>Get Home Projects Done — Local Pros, Smart Automation.</h1>
-      <p>Post your project with photos. Local contractors send offers. You choose the best match, and talk directly.</p>
+      <h1>Post your project. Review local pros. Choose the right fit.</h1>
+      <p>
+        A simpler way to start home projects with local professionals. Share the job, receive responses,
+        and decide who you want to talk to next.
+      </p>
 
       <div class="automation-pill">
         <span class="dot"></span>
@@ -332,8 +617,8 @@
         <span class="projects-kicker">Live Marketplace</span>
         <h2>Open Projects for Local Pros</h2>
         <p>
-          A professional marketplace needs visible demand. These are the newest homeowner requests.
-          Pros can review the project, open the details page, and submit a message directly.
+          The newest homeowner requests appear here. Pros can review the project, open the details page,
+          and reach out with a professional message.
         </p>
       </div>
       <a class="projects-cta" href="pros.html">Join as a Pro</a>
@@ -371,7 +656,8 @@
 
       <section class="job-form" id="step1">
         <h2>Choose a category</h2>
-        <p class="note">Pick the closest category, you can adjust later.</p>
+        <p class="note">Pick the closest category. You can continue in a minute.</p>
+
         <div class="cat-grid">
           <button class="cat-card" data-cat="Roofing">🏠<span>Roofing</span></button>
           <button class="cat-card" data-cat="Decks & Porches">🪚<span>Decks & Porches</span></button>
@@ -394,29 +680,30 @@
         <div class="upload-wrap" id="dropZone">
           <input type="file" id="fileInput" multiple accept="image/*,application/pdf" style="display:none" />
           <button type="button" class="btn outline" id="pickBtn">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos/Files
+            <i class="fa-solid fa-cloud-arrow-up"></i> Choose Photos or Files
           </button>
-          <span class="hint">You can upload multiple images or a PDF.</span>
+          <span class="hint">Upload images or a PDF if you have them.</span>
         </div>
-        <div class="file-hint">Adding files helps pros estimate faster.</div>
+
+        <div class="file-hint">Files help pros understand the project faster.</div>
         <div class="card" id="fileList"></div>
 
         <input type="hidden" id="categoryHidden" value="General" />
 
         <label for="title">Project title *</label>
-        <input id="title" type="text" placeholder="e.g., Replace leaking roof" required />
+        <input id="title" type="text" placeholder="Replace leaking roof" required />
 
         <label for="summary">Short summary</label>
-        <input id="summary" type="text" placeholder="One or two lines..." />
+        <input id="summary" type="text" placeholder="A short overview of the project" />
 
         <div class="row2">
           <div>
             <label for="city">City</label>
-            <input id="city" type="text" placeholder="Enter city" />
+            <input id="city" type="text" placeholder="Louisville" />
           </div>
           <div>
             <label for="state">State</label>
-            <input id="state" type="text" placeholder="Enter state" />
+            <input id="state" type="text" placeholder="KY" />
           </div>
         </div>
 
@@ -437,8 +724,8 @@
         <label for="address">Full address *</label>
         <input id="address" type="text" placeholder="Street, City, State" required />
 
-        <label for="longDesc">Full description *</label>
-        <textarea id="longDesc" rows="4" placeholder="Describe the job in detail..." required></textarea>
+        <label for="longDesc">Project details *</label>
+        <textarea id="longDesc" rows="4" placeholder="Describe the job clearly..." required></textarea>
 
         <div class="sticky-submit">
           <button id="sendBtn" class="btn primary">🚀 Start Your Project</button>
@@ -488,15 +775,11 @@
       }
 
       if (sheetTitle) {
-        sheetTitle.textContent = hasHomeowner
-          ? "Start Your Project"
-          : "Start Your Project";
+        sheetTitle.textContent = "Start Your Project";
       }
 
       if (sendBtn) {
-        sendBtn.textContent = hasHomeowner
-          ? "🚀 Start Your Project"
-          : "🚀 Start Your Project";
+        sendBtn.textContent = "🚀 Start Your Project";
       }
     }
 
@@ -555,21 +838,14 @@
     }
 
     function goStep(n) {
-      const homeowner = getStoredHomeowner();
-      const hasHomeowner = !!(homeowner && homeowner.email);
-
       if (n === 1) {
         step1.style.display = "block";
         step2.style.display = "none";
-        document.getElementById("sheetTitle").textContent = hasHomeowner
-          ? "Start Your Project"
-          : "Start Your Project";
+        document.getElementById("sheetTitle").textContent = "Start Your Project";
       } else {
         step1.style.display = "none";
         step2.style.display = "block";
-        document.getElementById("sheetTitle").textContent = hasHomeowner
-          ? "Start Your Project"
-          : "Start Your Project";
+        document.getElementById("sheetTitle").textContent = "Start Your Project";
         sheet.scrollTop = 0;
       }
     }
@@ -598,9 +874,9 @@
     if (pickBtn) pickBtn.onclick = () => fileInput.click();
 
     const humanSize = (b) =>
-      b < 1024 ? b + ' B'
-        : b < 1048576 ? (b / 1024).toFixed(1) + ' KB'
-          : (b / 1048576).toFixed(1) + ' MB';
+      b < 1024 ? b + " B"
+        : b < 1048576 ? (b / 1024).toFixed(1) + " KB"
+        : (b / 1048576).toFixed(1) + " MB";
 
     const renderList = (files) => {
       fileList.innerHTML = "";
@@ -799,7 +1075,7 @@
           </div>
           <div class="job-card-actions">
             <a class="job-link" href="job.html?id=${encodeURIComponent(jobRef)}">View Details</a>
-            <a class="job-link primary" href="pro-offer.html?id=${encodeURIComponent(jobRef)}">Send Message</a>
+            <a class="job-link primary" href="pro-offer.html?id=${encodeURIComponent(jobRef)}">Contact Homeowner</a>
           </div>
         `;
         jobsGrid.appendChild(card);
@@ -843,5 +1119,4 @@
     loadOpenJobs();
   </script>
 </body>
-
 </html>
