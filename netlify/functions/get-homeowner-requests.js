@@ -176,7 +176,10 @@ exports.handler = async (event) => {
       jobs = Array.isArray(data) ? data : [];
     }
 
-    jobs = uniqueBy(jobs, (job) => String(job.id || job.public_id || JSON.stringify(job)));
+    jobs = uniqueBy(
+      jobs,
+      (job) => String(job.id || job.public_id || JSON.stringify(job))
+    );
 
     if (!jobs.length) {
       return json(200, {
@@ -195,16 +198,18 @@ exports.handler = async (event) => {
     if (jobIds.length) {
       const { data, error } = await supabase
         .from("pro_offers")
-       .select(`
-        id,
-        job_id,
-        business_name,
-        message,
-        amount,
-        phone,
-        status,
-        created_at
-      `)
+        .select(`
+          id,
+          job_id,
+          job_public_id,
+          business_name,
+          message,
+          amount,
+          phone,
+          email,
+          status,
+          created_at
+        `)
         .in("job_id", jobIds)
         .order("created_at", { ascending: false });
 
