@@ -638,6 +638,11 @@
                 req.phone ||
                 "-";
 
+              const requestEmail =
+                req.email ||
+                req.pro_email ||
+                "-";
+
               return `
                 <div class="request-item">
                   <div class="request-head">
@@ -646,7 +651,7 @@
                   </div>
 
                   <div class="request-meta">
-                    <div><strong>Email:</strong> ${escapeHtml(req.pro_email || "-")}</div>
+                    <div><strong>Email:</strong> ${escapeHtml(requestEmail)}</div>
                     <div><strong>Phone:</strong> ${escapeHtml(requestPhone)}</div>
                     <div><strong>Sent:</strong> ${escapeHtml(formatDate(req.created_at))}</div>
                   </div>
