@@ -44,7 +44,7 @@
     }
 
     .page{
-      max-width:1140px;
+      max-width:1120px;
       margin:0 auto;
     }
 
@@ -162,7 +162,7 @@
 
     .summary-grid{
       display:grid;
-      grid-template-columns:1fr 320px;
+      grid-template-columns:1fr 280px;
       gap:16px;
       margin-bottom:28px;
     }
@@ -207,7 +207,6 @@
       display:grid;
       grid-template-columns:1fr;
       gap:12px;
-      height:100%;
     }
 
     .stat{
@@ -255,36 +254,35 @@
       color:var(--muted);
       font-size:14px;
       line-height:1.6;
-      max-width:460px;
+      max-width:420px;
       text-align:right;
     }
 
     .jobs-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
       gap:18px;
     }
 
-    .job-card{
+    .project-card{
       background:#fff;
       border:1px solid var(--border);
       border-radius:22px;
-      padding:20px;
+      padding:18px;
       box-shadow:var(--shadow);
       display:flex;
       flex-direction:column;
-      min-height:100%;
+      gap:14px;
     }
 
-    .job-top{
+    .project-top{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:12px;
     }
 
-    .job-id{
+    .project-id{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -299,26 +297,35 @@
       color:#334155;
     }
 
-    .job-title{
-      margin:0 0 8px;
+    .project-request-count{
+      font-size:13px;
+      font-weight:800;
+      color:var(--muted);
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 10px;
+      white-space:nowrap;
+    }
+
+    .project-title{
+      margin:0;
       font-size:24px;
       line-height:1.2;
       letter-spacing:-0.02em;
       color:var(--pbz);
     }
 
-    .job-meta{
+    .project-meta{
       color:var(--muted);
       font-size:14px;
       line-height:1.7;
-      margin-bottom:14px;
     }
 
-    .job-summary{
+    .project-summary{
       font-size:15px;
       line-height:1.75;
       color:#24384d;
-      margin-bottom:16px;
       white-space:pre-wrap;
       background:#fcfcfd;
       border:1px solid #edf1f5;
@@ -326,18 +333,20 @@
       padding:14px 15px;
     }
 
-    .requests-block{
-      margin-top:6px;
-      border-top:1px solid var(--border);
-      padding-top:14px;
+    .project-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .requests-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:12px;
+    .project-actions .btn{
+      flex:1;
+      min-width:130px;
+    }
+
+    .requests-block{
+      border-top:1px solid var(--border);
+      padding-top:14px;
     }
 
     .requests-label{
@@ -346,12 +355,7 @@
       letter-spacing:.08em;
       text-transform:uppercase;
       color:var(--muted);
-    }
-
-    .requests-count{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
+      margin-bottom:12px;
     }
 
     .request-item{
@@ -406,12 +410,9 @@
       margin-top:12px;
     }
 
-    .job-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:auto;
-      padding-top:8px;
+    .request-actions .btn{
+      flex:1;
+      min-width:120px;
     }
 
     .badge{
@@ -443,6 +444,16 @@
       background:#fef2f2;
       color:var(--danger);
       border-color:#fecaca;
+    }
+
+    .empty-requests{
+      background:#fafbfd;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
     }
 
     .loading,
@@ -507,17 +518,13 @@
         grid-template-columns:1fr;
       }
 
-      .job-card{
-        padding:18px;
-      }
-
-      .job-title{
+      .project-title{
         font-size:22px;
       }
 
-      .job-actions .btn,
+      .project-actions .btn,
       .request-actions .btn{
-        flex:1;
+        flex:1 1 100%;
       }
     }
   </style>
@@ -560,7 +567,7 @@
 
     <div class="section-head">
       <h2 class="section-title">My Projects</h2>
-      <div class="section-copy">Open a project, review connection requests, edit the details, or remove it.</div>
+      <div class="section-copy">Each card gives you the project, request count, and the main actions you need.</div>
     </div>
 
     <div id="statusBox" class="loading">Loading your projects...</div>
@@ -849,34 +856,24 @@
                 </div>
               `;
             }).join("")
-          : `<div class="request-item"><div class="request-meta">No connection requests yet for this project.</div></div>`;
+          : `<div class="empty-requests">No connection requests yet for this project.</div>`;
 
         return `
-          <div class="job-card">
-            <div class="job-top">
-              <div class="job-id">${escapeHtml(project.public_id || project.id || "-")}</div>
+          <div class="project-card">
+            <div class="project-top">
+              <div class="project-id">${escapeHtml(project.public_id || project.id || "-")}</div>
+              <div class="project-request-count">${requests.length} Requests</div>
             </div>
 
-            <h3 class="job-title">${escapeHtml(title)}</h3>
+            <h3 class="project-title">${escapeHtml(title)}</h3>
 
-            <div class="job-meta">
-              <div><strong>Category:</strong> ${escapeHtml(project.category || "-")}</div>
-              <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
-              <div><strong>Posted:</strong> ${escapeHtml(formatDate(project.created_at))}</div>
+            <div class="project-meta">
+              ${escapeHtml(location || project.category || "-")}
             </div>
 
-            <div class="job-summary">${escapeHtml(shortText(project.short_summary || project.summary || project.full_description || project.description || "", 260))}</div>
+            <div class="project-summary">${escapeHtml(shortText(project.short_summary || project.summary || project.full_description || project.description || "", 200))}</div>
 
-            <div class="requests-block">
-              <div class="requests-head">
-                <div class="requests-label">Incoming Requests</div>
-                <div class="requests-count">${requests.length}</div>
-              </div>
-
-              ${requestsHtml}
-            </div>
-
-            <div class="job-actions">
+            <div class="project-actions">
               <a class="btn btn-main" href="${viewUrl.pathname + viewUrl.search}">View Project</a>
               <a class="btn btn-secondary" href="${editUrl.pathname + editUrl.search}">Edit Project</a>
               <button
@@ -887,6 +884,11 @@
               >
                 Delete Project
               </button>
+            </div>
+
+            <div class="requests-block">
+              <div class="requests-label">Incoming Requests</div>
+              ${requestsHtml}
             </div>
           </div>
         `;
@@ -991,4 +993,3 @@
   </script>
 </body>
 </html>
-هذا هو الكامل الان ممكن ترتبه لي كامل و بسيط و نظيف بما يطابق صفحة Pros و ايظا يجب ان يصل الايميل إلى صاحب البيت عندما يبعث البناء و بعدها لما يضغط صاحب البيت قبول لازم يبعث ايميل إلى البناء 
