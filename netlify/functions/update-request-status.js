@@ -106,14 +106,15 @@ exports.handler = async (event) => {
       });
     }
 
-    // 1) Load existing request from pro_offers
+    // IMPORTANT:
+    // pro_offers uses "email", not "pro_email"
     const { data: existingRequest, error: existingError } = await supabase
       .from("pro_offers")
       .select(`
         id,
         job_id,
         business_name,
-        pro_email,
+        email,
         phone,
         message,
         status,
@@ -137,7 +138,6 @@ exports.handler = async (event) => {
       });
     }
 
-    // 2) Update request status in pro_offers
     const { data: updatedRequest, error: updateError } = await supabase
       .from("pro_offers")
       .update({ status: nextStatus })
@@ -146,7 +146,7 @@ exports.handler = async (event) => {
         id,
         job_id,
         business_name,
-        pro_email,
+        email,
         phone,
         message,
         status,
@@ -169,7 +169,6 @@ exports.handler = async (event) => {
       });
     }
 
-    // 3) Load related homeowner project
     let jobRow = null;
 
     if (updatedRequest.job_id) {
@@ -207,8 +206,7 @@ exports.handler = async (event) => {
 
     let emailSent = false;
 
-    // 4) If approved, send email to builder with homeowner contact info
-    if (nextStatus === "approved" && updatedRequest.pro_email && RESEND_API_KEY) {
+    if (nextStatus === "approved" && updatedRequest.email && RESEND_API_KEY) {
       try {
         const { Resend } = await import("resend");
         const resend = new Resend(RESEND_API_KEY);
@@ -276,17 +274,12 @@ exports.handler = async (event) => {
             <p style="margin-top: 1.5rem;">
               You may now contact the homeowner professionally to discuss the project, timeline, pricing, and next steps.
             </p>
-
-            <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
-              ProBuildZone connects homeowners with local builders.
-              Final agreements, pricing, and project terms are handled directly between both sides.
-            </p>
           </div>
         `;
 
         await resend.emails.send({
           from: "ProBuildZone <onboarding@resend.dev>",
-          to: updatedRequest.pro_email,
+          to: updatedRequest.email,
           subject,
           html,
           reply_to: homeownerEmail || undefined,
@@ -316,7 +309,7 @@ exports.handler = async (event) => {
           ? {
               request_id: updatedRequest.id || null,
               business_name: updatedRequest.business_name || "Builder",
-              pro_email: updatedRequest.pro_email || null,
+              pro_email: updatedRequest.email || null,
               phone: updatedRequest.phone || null,
               status: updatedRequest.status || "approved",
             }
