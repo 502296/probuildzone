@@ -150,10 +150,12 @@ exports.handler = async (event) => {
       jobRow.category ||
       "your project";
 
+    // IMPORTANT:
+    // pro_offers uses "email", not "pro_email"
     const insertPayload = {
       job_id: jobRow.id,
       business_name: normalizedBusinessName,
-      pro_email: normalizedProEmail,
+      email: normalizedProEmail,
       phone: normalizedPhone,
       message: normalizedMessage,
       status: "pending",
@@ -166,7 +168,7 @@ exports.handler = async (event) => {
         id,
         job_id,
         business_name,
-        pro_email,
+        email,
         phone,
         message,
         status,
