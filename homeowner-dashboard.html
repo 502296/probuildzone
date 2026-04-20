@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Homeowner Dashboard - ProBuildZone</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --pbz:#0F2A43;
       --gold:#D4AF37;
+      --gold-dark:#c49c1f;
       --muted:#617186;
       --bg:#f3f5f7;
       --card:#ffffff;
@@ -15,20 +19,32 @@
       --danger:#b42318;
       --success:#166534;
       --soft:#eef4ff;
+      --soft-border:#dbe7fb;
+      --shadow:0 14px 34px rgba(15, 23, 32, 0.06);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+      --radius-sm:12px;
     }
 
     *{box-sizing:border-box}
 
-    body{
+    html, body{
       margin:0;
-      font-family:Inter, Arial, sans-serif;
+      padding:0;
       background:var(--bg);
       color:var(--pbz);
-      padding:28px 16px 40px;
+      font-family:Inter, Arial, sans-serif;
+    }
+
+    body{
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      padding:28px 16px 48px;
     }
 
     .page{
-      max-width:1150px;
+      max-width:1180px;
       margin:0 auto;
     }
 
@@ -36,9 +52,38 @@
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      gap:12px;
+      gap:16px;
       flex-wrap:wrap;
-      margin-bottom:22px;
+      margin-bottom:26px;
+    }
+
+    .topbar-copy{
+      max-width:760px;
+    }
+
+    .eyebrow{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(30px, 4vw, 46px);
+      line-height:1.04;
+      letter-spacing:-0.03em;
+      color:var(--pbz);
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:12px;
+      line-height:1.7;
+      max-width:760px;
+      font-size:15px;
     }
 
     .topbar-actions{
@@ -48,43 +93,44 @@
       align-items:center;
     }
 
-    h1{
-      margin:0;
-      font-size:30px;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      margin-top:8px;
-      line-height:1.6;
-      max-width:780px;
-    }
-
     .btn{
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       text-decoration:none;
       border:none;
       cursor:pointer;
-      font-weight:600;
-      border-radius:10px;
-      padding:10px 14px;
+      font-weight:700;
+      border-radius:14px;
+      padding:12px 16px;
       font-family:inherit;
-      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease, background .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease, background .12s ease, border-color .12s ease;
+      font-size:14px;
+      line-height:1;
     }
 
     .btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 8px 16px rgba(0,0,0,.06);
+      box-shadow:0 10px 20px rgba(0,0,0,.06);
     }
 
     .btn-main{
       background:var(--gold);
-      color:#000;
+      color:#111827;
+    }
+
+    .btn-main:hover{
+      background:var(--gold-dark);
     }
 
     .btn-secondary{
-      background:#edf0f3;
+      background:#fff;
       color:var(--pbz);
+      border:1px solid var(--border);
+    }
+
+    .btn-secondary:hover{
+      background:#fafafa;
     }
 
     .btn-danger{
@@ -116,132 +162,208 @@
 
     .hero-grid{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:16px;
-      margin-bottom:22px;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      margin-bottom:28px;
     }
 
     .card{
       background:var(--card);
       border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      box-shadow:0 6px 18px rgba(0,0,0,.04);
-    }
-
-    .eyebrow{
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:var(--muted);
-      margin-bottom:10px;
+      border-radius:var(--radius-xl);
+      padding:22px;
+      box-shadow:var(--shadow);
     }
 
     .profile-name{
-      font-size:24px;
-      font-weight:700;
-      line-height:1.25;
-      margin-bottom:8px;
+      font-size:30px;
+      font-weight:800;
+      line-height:1.12;
+      letter-spacing:-0.025em;
+      margin-bottom:12px;
+      color:var(--pbz);
     }
 
     .profile-meta{
-      color:var(--muted);
-      line-height:1.7;
+      color:#43556a;
+      line-height:1.8;
       font-size:15px;
+    }
+
+    .profile-meta strong{
+      color:var(--pbz);
+    }
+
+    .overview-wrap{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+    }
+
+    .overview-head{
+      margin-bottom:14px;
+    }
+
+    .overview-title{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    .overview-subtitle{
+      margin-top:8px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
     }
 
     .stats{
       display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
+      margin-top:auto;
     }
 
     .stat{
-      background:var(--soft);
-      border:1px solid #dbe7fb;
-      border-radius:14px;
-      padding:14px;
+      background:linear-gradient(180deg, #f7faff 0%, #eef4ff 100%);
+      border:1px solid var(--soft-border);
+      border-radius:18px;
+      padding:16px;
     }
 
     .stat-label{
       font-size:12px;
       text-transform:uppercase;
-      letter-spacing:.06em;
+      letter-spacing:.07em;
       color:var(--muted);
-      font-weight:700;
-      margin-bottom:8px;
+      font-weight:800;
+      margin-bottom:12px;
     }
 
     .stat-value{
-      font-size:24px;
+      font-size:30px;
       font-weight:800;
       line-height:1;
+      color:var(--pbz);
+      letter-spacing:-0.03em;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
     }
 
     .section-title{
-      font-size:22px;
-      margin:0 0 14px;
+      font-size:28px;
+      line-height:1.1;
+      letter-spacing:-0.03em;
+      margin:0;
+      color:var(--pbz);
+    }
+
+    .section-copy{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
     }
 
     .jobs-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
-      gap:16px;
+      grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));
+      gap:18px;
     }
 
     .job-card{
       background:#fff;
       border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px;
-      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      border-radius:22px;
+      padding:20px;
+      box-shadow:var(--shadow);
       display:flex;
       flex-direction:column;
+      min-height:100%;
+    }
+
+    .job-card-top{
+      margin-bottom:14px;
     }
 
     .job-title{
       margin:0 0 8px;
-      font-size:20px;
-      line-height:1.35;
+      font-size:24px;
+      line-height:1.22;
+      letter-spacing:-0.02em;
+      color:var(--pbz);
+    }
+
+    .job-id{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+      color:#334155;
     }
 
     .job-meta{
+      display:grid;
+      gap:8px;
       color:var(--muted);
       font-size:14px;
       line-height:1.6;
-      margin-bottom:12px;
+      margin-bottom:16px;
+    }
+
+    .job-meta strong{
+      color:var(--pbz);
     }
 
     .job-summary{
       font-size:15px;
-      line-height:1.65;
+      line-height:1.75;
       color:#24384d;
-      margin-bottom:16px;
+      margin-bottom:18px;
       white-space:pre-wrap;
+      background:#fcfcfd;
+      border:1px solid #edf1f5;
+      border-radius:16px;
+      padding:14px 15px;
     }
 
     .requests-block{
-      margin-top:12px;
+      margin-top:8px;
       border-top:1px solid var(--border);
-      padding-top:14px;
+      padding-top:16px;
     }
 
     .requests-label{
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:.04em;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
       text-transform:uppercase;
       color:var(--muted);
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
     .request-item{
       background:#fafbfd;
       border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px;
-      margin-bottom:10px;
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
     }
 
     .request-head{
@@ -254,22 +376,31 @@
     }
 
     .request-name{
-      font-weight:700;
+      font-weight:800;
       color:var(--pbz);
+      font-size:15px;
     }
 
     .request-meta{
       font-size:13px;
       color:var(--muted);
-      line-height:1.6;
+      line-height:1.7;
+    }
+
+    .request-meta strong{
+      color:var(--pbz);
     }
 
     .request-message{
       font-size:14px;
-      line-height:1.6;
+      line-height:1.7;
       color:#24384d;
       white-space:pre-wrap;
-      margin-top:8px;
+      margin-top:10px;
+      background:#fff;
+      border:1px solid #edf1f5;
+      border-radius:14px;
+      padding:12px;
     }
 
     .request-actions{
@@ -284,6 +415,7 @@
       gap:10px;
       flex-wrap:wrap;
       margin-top:auto;
+      padding-top:14px;
     }
 
     .badge{
@@ -291,10 +423,12 @@
       align-items:center;
       justify-content:center;
       font-size:12px;
-      font-weight:700;
+      font-weight:800;
       border-radius:999px;
-      padding:6px 10px;
+      padding:7px 11px;
       border:1px solid transparent;
+      text-transform:capitalize;
+      letter-spacing:.02em;
     }
 
     .badge.pending{
@@ -320,10 +454,11 @@
     .error{
       background:#fff;
       border:1px solid var(--border);
-      border-radius:14px;
-      padding:18px;
+      border-radius:20px;
+      padding:18px 20px;
       text-align:center;
       color:var(--muted);
+      box-shadow:var(--shadow);
     }
 
     .error{
@@ -332,26 +467,53 @@
       border-color:#f4c3c3;
     }
 
-    @media (max-width:860px){
+    @media (max-width:900px){
       .hero-grid{
         grid-template-columns:1fr;
       }
     }
 
     @media (max-width:640px){
-      h1{font-size:26px}
+      body{
+        padding:20px 14px 40px;
+      }
+
       .topbar{
         align-items:stretch;
       }
+
       .topbar-actions{
         width:100%;
       }
+
       .topbar-actions .btn{
         flex:1;
         text-align:center;
       }
+
+      .profile-name{
+        font-size:26px;
+      }
+
       .stats{
         grid-template-columns:1fr 1fr;
+      }
+
+      .jobs-grid{
+        grid-template-columns:1fr;
+      }
+
+      .job-card{
+        padding:18px;
+      }
+
+      .job-title{
+        font-size:22px;
+      }
+
+      .job-actions .btn,
+      .request-actions .btn{
+        flex:1;
       }
     }
   </style>
@@ -359,15 +521,16 @@
 <body>
   <div class="page">
     <div class="topbar">
-      <div>
+      <div class="topbar-copy">
+        <div class="eyebrow">ProBuildZone</div>
         <h1>Homeowner Dashboard</h1>
         <div class="subtitle">
-          Review your posted projects and see connection requests sent by local builders through ProBuildZone.
+          Review your posted projects and manage connection requests from local builders in one clean place.
         </div>
       </div>
 
       <div class="topbar-actions">
-        <a class="btn btn-secondary" href="/homeowner.html">Post New Project</a>
+        <a class="btn btn-main" href="/homeowner.html">Post New Project</a>
         <button id="logoutBtn" class="btn btn-danger" type="button">Logout</button>
       </div>
     </div>
@@ -379,8 +542,12 @@
         <div id="profileMeta" class="profile-meta">Please wait while we load your homeowner profile.</div>
       </div>
 
-      <div class="card">
-        <div class="eyebrow">Overview</div>
+      <div class="card overview-wrap">
+        <div class="overview-head">
+          <div class="overview-title">Overview</div>
+          <div class="overview-subtitle">A quick view of your activity on ProBuildZone.</div>
+        </div>
+
         <div class="stats">
           <div class="stat">
             <div class="stat-label">My Projects</div>
@@ -394,7 +561,10 @@
       </div>
     </div>
 
-    <h2 class="section-title">My Projects</h2>
+    <div class="section-head">
+      <h2 class="section-title">My Projects</h2>
+      <div class="section-copy">Open each project, review requests, edit details, or remove a listing.</div>
+    </div>
 
     <div id="statusBox" class="loading">Loading your projects...</div>
     <div id="jobsBox" class="jobs-grid" style="display:none;"></div>
@@ -686,10 +856,12 @@
 
         return `
           <div class="job-card">
-            <h3 class="job-title">${escapeHtml(title)}</h3>
+            <div class="job-card-top">
+              <div class="job-id">${escapeHtml(project.public_id || project.id || "-")}</div>
+              <h3 class="job-title">${escapeHtml(title)}</h3>
+            </div>
 
             <div class="job-meta">
-              <div><strong>Job ID:</strong> ${escapeHtml(project.public_id || project.id || "-")}</div>
               <div><strong>Category:</strong> ${escapeHtml(project.category || "-")}</div>
               <div><strong>Location:</strong> ${escapeHtml(location || "-")}</div>
               <div><strong>Posted:</strong> ${escapeHtml(formatDate(project.created_at))}</div>
