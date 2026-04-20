@@ -80,7 +80,6 @@ const REQUEST_SELECT = `
   amount,
   phone,
   email,
-  pro_email,
   status,
   created_at
 `;
@@ -143,17 +142,13 @@ exports.handler = async (event) => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests public_id lookup error:", error);
-        return json(500, {
-          ok: false,
-          error: error.message || "Failed to load homeowner jobs by public_id",
-        });
+        console.error("job lookup by public_id error:", error);
+      } else {
+        jobs = Array.isArray(data) ? data : [];
       }
-
-      jobs = Array.isArray(data) ? data : [];
     }
 
-    // 2) Then try internal id
+    // 2) Try internal id
     if (!jobs.length && lastJobId) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -162,17 +157,13 @@ exports.handler = async (event) => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests id lookup error:", error);
-        return json(500, {
-          ok: false,
-          error: error.message || "Failed to load homeowner jobs by id",
-        });
+        console.error("job lookup by id error:", error);
+      } else {
+        jobs = Array.isArray(data) ? data : [];
       }
-
-      jobs = Array.isArray(data) ? data : [];
     }
 
-    // 3) Then email
+    // 3) Try email
     if (!jobs.length && email) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -181,17 +172,13 @@ exports.handler = async (event) => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests email lookup error:", error);
-        return json(500, {
-          ok: false,
-          error: error.message || "Failed to load homeowner jobs by email",
-        });
+        console.error("job lookup by email error:", error);
+      } else {
+        jobs = Array.isArray(data) ? data : [];
       }
-
-      jobs = Array.isArray(data) ? data : [];
     }
 
-    // 4) Finally phone
+    // 4) Try phone
     if (!jobs.length && phone) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -200,14 +187,10 @@ exports.handler = async (event) => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests phone lookup error:", error);
-        return json(500, {
-          ok: false,
-          error: error.message || "Failed to load homeowner jobs by phone",
-        });
+        console.error("job lookup by phone error:", error);
+      } else {
+        jobs = Array.isArray(data) ? data : [];
       }
-
-      jobs = Array.isArray(data) ? data : [];
     }
 
     jobs = uniqueBy(
@@ -226,7 +209,11 @@ exports.handler = async (event) => {
     const jobIds = jobs.map((job) => job.id).filter(Boolean);
 
     let requests = [];
+    let requestsError = null;
 
+    // Important:
+    // If requests query fails, do NOT crash the whole dashboard.
+    // Return projects anyway.
     if (jobIds.length) {
       const { data, error } = await supabase
         .from("pro_offers")
@@ -235,14 +222,12 @@ exports.handler = async (event) => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests offers lookup error:", error);
-        return json(500, {
-          ok: false,
-          error: error.message || "Failed to load homeowner requests",
-        });
+        console.error("offers lookup error:", error);
+        requestsError = error.message || "Failed to load requests";
+        requests = [];
+      } else {
+        requests = Array.isArray(data) ? data : [];
       }
-
-      requests = Array.isArray(data) ? data : [];
     }
 
     const requestsWithJob = requests.map((request) => {
@@ -252,7 +237,6 @@ exports.handler = async (event) => {
 
       return {
         ...request,
-        email: request.pro_email || request.email || "",
         job: match || null,
       };
     });
@@ -261,6 +245,7 @@ exports.handler = async (event) => {
       ok: true,
       projects: jobs,
       requests: requestsWithJob,
+      requests_error: requestsError,
     });
   } catch (err) {
     console.error("get-homeowner-requests unexpected error:", err);
