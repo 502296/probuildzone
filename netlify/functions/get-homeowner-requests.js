@@ -70,6 +70,18 @@ const JOB_SELECT = `
   phone
 `;
 
+const REQUEST_SELECT = `
+  id,
+  job_id,
+  job_public_id,
+  business_name,
+  pro_email,
+  phone,
+  message,
+  status,
+  created_at
+`;
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -105,15 +117,12 @@ exports.handler = async (event) => {
   try {
     const params = event.queryStringParameters || {};
 
-    const email = normalize(params.email);
+    const email = normalize(params.email).toLowerCase();
     const phone = normalize(params.phone);
-    const publicId = normalize(
-      params.public_id ||
-      params.last_job_id ||
-      params.job_id
-    );
+    const publicId = normalize(params.public_id || params.job_public_id);
+    const lastJobId = normalize(params.last_job_id || params.job_id);
 
-    if (!email && !phone && !publicId) {
+    if (!email && !phone && !publicId && !lastJobId) {
       return json(400, {
         ok: false,
         error: "Missing homeowner identity",
@@ -122,6 +131,7 @@ exports.handler = async (event) => {
 
     let jobs = [];
 
+    // 1) Try exact public_id first
     if (publicId) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -133,13 +143,33 @@ exports.handler = async (event) => {
         console.error("get-homeowner-requests public_id job lookup error:", error);
         return json(500, {
           ok: false,
-          error: error.message || "Failed to load homeowner jobs",
+          error: error.message || "Failed to load homeowner jobs by public_id",
         });
       }
 
       jobs = Array.isArray(data) ? data : [];
     }
 
+    // 2) If nothing found, try internal job id
+    if (!jobs.length && lastJobId) {
+      const { data, error } = await supabase
+        .from("homeowner_jobs")
+        .select(JOB_SELECT)
+        .eq("id", lastJobId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("get-homeowner-requests last_job_id lookup error:", error);
+        return json(500, {
+          ok: false,
+          error: error.message || "Failed to load homeowner jobs by id",
+        });
+      }
+
+      jobs = Array.isArray(data) ? data : [];
+    }
+
+    // 3) If still nothing, try email
     if (!jobs.length && email) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -151,13 +181,14 @@ exports.handler = async (event) => {
         console.error("get-homeowner-requests email job lookup error:", error);
         return json(500, {
           ok: false,
-          error: error.message || "Failed to load homeowner jobs",
+          error: error.message || "Failed to load homeowner jobs by email",
         });
       }
 
       jobs = Array.isArray(data) ? data : [];
     }
 
+    // 4) Finally try phone
     if (!jobs.length && phone) {
       const { data, error } = await supabase
         .from("homeowner_jobs")
@@ -169,7 +200,7 @@ exports.handler = async (event) => {
         console.error("get-homeowner-requests phone job lookup error:", error);
         return json(500, {
           ok: false,
-          error: error.message || "Failed to load homeowner jobs",
+          error: error.message || "Failed to load homeowner jobs by phone",
         });
       }
 
@@ -189,48 +220,64 @@ exports.handler = async (event) => {
       });
     }
 
-    const jobIds = jobs
-      .map((job) => job.id)
-      .filter(Boolean);
+    const jobIds = jobs.map((job) => job.id).filter(Boolean);
+    const publicIds = jobs.map((job) => job.public_id).filter(Boolean);
 
-    let requests = [];
+    let requestsByJobId = [];
+    let requestsByPublicId = [];
 
     if (jobIds.length) {
       const { data, error } = await supabase
         .from("pro_offers")
-        .select(`
-          id,
-          job_id,
-          job_public_id,
-          business_name,
-          message,
-          amount,
-          phone,
-          email,
-          status,
-          created_at
-        `)
+        .select(REQUEST_SELECT)
         .in("job_id", jobIds)
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("get-homeowner-requests offers lookup error:", error);
+        console.error("get-homeowner-requests offers by job_id lookup error:", error);
         return json(500, {
           ok: false,
-          error: error.message || "Failed to load homeowner requests",
+          error: error.message || "Failed to load homeowner requests by job_id",
         });
       }
 
-      requests = Array.isArray(data) ? data : [];
+      requestsByJobId = Array.isArray(data) ? data : [];
     }
+
+    if (publicIds.length) {
+      const { data, error } = await supabase
+        .from("pro_offers")
+        .select(REQUEST_SELECT)
+        .in("job_public_id", publicIds)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("get-homeowner-requests offers by public_id lookup error:", error);
+        return json(500, {
+          ok: false,
+          error: error.message || "Failed to load homeowner requests by public_id",
+        });
+      }
+
+      requestsByPublicId = Array.isArray(data) ? data : [];
+    }
+
+    let requests = uniqueBy(
+      [...requestsByJobId, ...requestsByPublicId],
+      (req) => String(req.id || JSON.stringify(req))
+    );
 
     const requestsWithJob = requests.map((request) => {
       const match = jobs.find((job) => {
-        return String(job.id || "") === String(request.job_id || "");
+        return (
+          String(job.id || "") === String(request.job_id || "") ||
+          String(job.public_id || "") === String(request.job_public_id || "")
+        );
       });
 
       return {
         ...request,
+        email: request.pro_email || "",
         job: match || null,
       };
     });
