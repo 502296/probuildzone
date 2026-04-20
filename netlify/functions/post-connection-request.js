@@ -84,14 +84,39 @@ exports.handler = async (event) => {
       };
     }
 
+    const normalizedJobId = String(job_id).trim();
+    const normalizedBusinessName = String(business_name).trim();
+    const normalizedProEmail = String(pro_email).trim().toLowerCase();
+    const normalizedPhone = String(phone).trim();
+    const normalizedMessage = String(message).trim();
+
     const { data: jobRow, error: jobErr } = await supabase
       .from("homeowner_jobs")
-      .select("id, project_title, short_summary, city, state, contact_name, phone, email, full_address, full_description, category, created_at")
-      .eq("id", String(job_id).trim())
+      .select(`
+        id,
+        public_id,
+        project_title,
+        title,
+        short_summary,
+        summary,
+        city,
+        state,
+        contact_name,
+        name,
+        phone,
+        email,
+        full_address,
+        address,
+        full_description,
+        description,
+        category,
+        created_at
+      `)
+      .eq("id", normalizedJobId)
       .maybeSingle();
 
     if (jobErr) {
-      console.error("Error fetching homeowners_jobs:", jobErr);
+      console.error("Error fetching homeowner_jobs:", jobErr);
       return {
         statusCode: 500,
         headers: HEADERS,
@@ -114,29 +139,43 @@ exports.handler = async (event) => {
     }
 
     const homeownerEmail = jobRow.email || null;
-    const homeownerName = jobRow.contact_name || "Homeowner";
+    const homeownerName =
+      jobRow.contact_name ||
+      jobRow.name ||
+      "Homeowner";
+
     const jobTitle =
       jobRow.project_title ||
+      jobRow.title ||
       jobRow.category ||
       "your project";
 
     const insertPayload = {
       job_id: jobRow.id,
-      business_name: String(business_name).trim(),
-      pro_email: String(pro_email).trim(),
-      phone: String(phone).trim(),
-      message: String(message).trim(),
+      business_name: normalizedBusinessName,
+      pro_email: normalizedProEmail,
+      phone: normalizedPhone,
+      message: normalizedMessage,
       status: "pending",
     };
 
     const { data: insertedRequest, error: insErr } = await supabase
-      .from("connection_requests")
+      .from("pro_offers")
       .insert(insertPayload)
-      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
+      .select(`
+        id,
+        job_id,
+        business_name,
+        pro_email,
+        phone,
+        message,
+        status,
+        created_at
+      `)
       .maybeSingle();
 
     if (insErr) {
-      console.error("Insert connection_requests error:", insErr);
+      console.error("Insert pro_offers error:", insErr);
       return {
         statusCode: 500,
         headers: HEADERS,
@@ -150,14 +189,15 @@ exports.handler = async (event) => {
     if (homeownerEmail && RESEND_API_KEY) {
       try {
         const resend = new Resend(RESEND_API_KEY);
+
         const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
-        const safeMessage = insertPayload.message
+        const safeMessage = normalizedMessage
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/\n/g, "<br/>");
 
-        const subject = `New message from ${insertPayload.business_name} for "${jobTitle}"`;
+        const subject = `New builder message for "${jobTitle}"`;
 
         const html = `
           <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
@@ -166,23 +206,24 @@ exports.handler = async (event) => {
             <p>Hi ${homeownerName},</p>
 
             <p>
-              <strong>${insertPayload.business_name}</strong> is interested in your project:
+              <strong>${normalizedBusinessName}</strong> is interested in your project:
               <strong>${jobTitle}</strong>.
             </p>
 
             <h3 style="margin-top: 1.5rem;">Builder details</h3>
             <ul>
-              <li><strong>Business / Pro:</strong> ${insertPayload.business_name}</li>
-              <li><strong>Email:</strong> ${insertPayload.pro_email}</li>
-              <li><strong>Phone:</strong> ${insertPayload.phone}</li>
+              <li><strong>Business / Pro:</strong> ${normalizedBusinessName}</li>
+              <li><strong>Email:</strong> ${normalizedProEmail}</li>
+              <li><strong>Phone:</strong> ${normalizedPhone}</li>
               ${locationText ? `<li><strong>Project location:</strong> ${locationText}</li>` : ""}
+              ${jobRow.public_id ? `<li><strong>Project ID:</strong> ${jobRow.public_id}</li>` : ""}
             </ul>
 
             <h3 style="margin-top: 1.5rem;">Message</h3>
             <p>${safeMessage}</p>
 
             <p style="margin-top: 1.5rem;">
-              You can reply directly to this email to continue the conversation with the builder.
+              You can now review this request inside your Homeowner Dashboard on ProBuildZone.
             </p>
           </div>
         `;
@@ -192,7 +233,7 @@ exports.handler = async (event) => {
           to: homeownerEmail,
           subject,
           html,
-          reply_to: insertPayload.pro_email,
+          reply_to: normalizedProEmail,
         });
       } catch (emailErr) {
         console.error("Error sending homeowner email:", emailErr);
