@@ -65,32 +65,6 @@
       .sticky-submit{ padding:12px 10px; }
     }
 
-    .automation-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-top:18px;
-      margin-bottom:16px;
-      padding:7px 13px;
-      border-radius:999px;
-      background:#ffffff;
-      color:#233548;
-      font-size:12px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-      border:1px solid rgba(212,175,55,0.45);
-      box-shadow:0 10px 26px rgba(15,23,32,0.08);
-      font-weight:700;
-    }
-
-    .automation-pill .dot{
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:#22c55e;
-      box-shadow:0 0 0 4px rgba(34,197,94,0.18);
-    }
-
     .brand-logo{
       position:relative;
       display:inline-flex;
@@ -134,7 +108,7 @@
       flex-direction:column;
       align-items:center;
       gap:12px;
-      margin-top:12px;
+      margin-top:22px;
     }
 
     #postJobTop{
@@ -148,18 +122,102 @@
       }
     }
 
+    /* ===== Hero cleanup ===== */
+    .hero{
+      position:relative;
+      min-height:92vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      overflow:hidden;
+    }
+
+    .hero .hero-bg{
+      position:absolute;
+      inset:0;
+      z-index:0;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(
+        180deg,
+        rgba(15,23,32,0.18) 0%,
+        rgba(15,23,32,0.28) 38%,
+        rgba(15,23,32,0.34) 100%
+      );
+      z-index:1;
+      pointer-events:none;
+    }
+
     .hero .overlay{
-      max-width:760px;
+      position:relative;
+      z-index:2;
+      width:100%;
+      max-width:880px;
+      margin:0 auto;
+      padding:120px 20px 80px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      background:transparent !important;
+      box-shadow:none !important;
+      border:none !important;
+      backdrop-filter:none !important;
     }
 
     .hero .overlay h1{
-      line-height:1.05;
-      letter-spacing:-0.03em;
+      margin:0;
+      max-width:820px;
+      line-height:1.02;
+      letter-spacing:-0.045em;
+      font-size:clamp(2.4rem, 6vw, 5rem);
+      font-weight:800;
+      color:#ffffff;
+      text-shadow:0 10px 30px rgba(0,0,0,0.26);
     }
 
     .hero .overlay p{
-      max-width:650px;
-      line-height:1.7;
+      margin:18px auto 0;
+      max-width:720px;
+      line-height:1.75;
+      font-size:clamp(1rem, 1.9vw, 1.18rem);
+      color:rgba(255,255,255,0.96);
+      text-shadow:0 6px 20px rgba(0,0,0,0.22);
+    }
+
+    .automation-pill{
+      display:none !important;
+    }
+
+    @media (max-width:640px){
+      .hero{
+        min-height:88vh;
+      }
+
+      .hero .overlay{
+        padding:110px 18px 70px;
+      }
+
+      .hero .overlay h1{
+        font-size:clamp(2.1rem, 10vw, 3.3rem);
+        line-height:1.04;
+      }
+
+      .hero .overlay p{
+        max-width:92%;
+        font-size:1rem;
+        line-height:1.7;
+      }
+
+      .buttons{
+        margin-top:18px;
+      }
     }
 
     /* ===== Modal polish ===== */
@@ -411,11 +469,6 @@
         A simpler way to start home projects with local professionals. Share the job, receive responses,
         and decide who you want to talk to next.
       </p>
-
-      <div class="automation-pill">
-        <span class="dot"></span>
-        Automated offers. Human decisions.
-      </div>
 
       <div class="buttons">
         <a href="homeowner-dashboard.html" class="hero-dashboard-btn" id="heroHomeownerBtn">My Projects</a>
