@@ -106,10 +106,19 @@ exports.handler = async (event) => {
       });
     }
 
-    // 1) Load existing connection request
+    // 1) Load existing request from pro_offers
     const { data: existingRequest, error: existingError } = await supabase
-      .from("connection_requests")
-      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
+      .from("pro_offers")
+      .select(`
+        id,
+        job_id,
+        business_name,
+        pro_email,
+        phone,
+        message,
+        status,
+        created_at
+      `)
       .eq("id", requestId)
       .maybeSingle();
 
@@ -128,12 +137,21 @@ exports.handler = async (event) => {
       });
     }
 
-    // 2) Update request status
+    // 2) Update request status in pro_offers
     const { data: updatedRequest, error: updateError } = await supabase
-      .from("connection_requests")
+      .from("pro_offers")
       .update({ status: nextStatus })
       .eq("id", requestId)
-      .select("id, job_id, business_name, pro_email, phone, message, status, created_at")
+      .select(`
+        id,
+        job_id,
+        business_name,
+        pro_email,
+        phone,
+        message,
+        status,
+        created_at
+      `)
       .maybeSingle();
 
     if (updateError) {
@@ -157,7 +175,26 @@ exports.handler = async (event) => {
     if (updatedRequest.job_id) {
       const { data: jobData, error: jobError } = await supabase
         .from("homeowner_jobs")
-        .select("id, project_title, short_summary, full_description, category, city, state, contact_name, email, phone, full_address, created_at")
+        .select(`
+          id,
+          public_id,
+          project_title,
+          title,
+          short_summary,
+          summary,
+          full_description,
+          description,
+          category,
+          city,
+          state,
+          contact_name,
+          name,
+          email,
+          phone,
+          full_address,
+          address,
+          created_at
+        `)
         .eq("id", updatedRequest.job_id)
         .maybeSingle();
 
@@ -177,11 +214,11 @@ exports.handler = async (event) => {
         const resend = new Resend(RESEND_API_KEY);
 
         const jobTitle =
-          (jobRow && (jobRow.project_title || jobRow.category)) ||
+          (jobRow && (jobRow.project_title || jobRow.title || jobRow.category)) ||
           "your project";
 
         const homeownerName =
-          (jobRow && jobRow.contact_name) ||
+          (jobRow && (jobRow.contact_name || jobRow.name)) ||
           "Homeowner";
 
         const homeownerEmail =
@@ -216,6 +253,7 @@ exports.handler = async (event) => {
             <h3 style="margin-top: 1.5rem;">Project details</h3>
             <ul>
               <li><strong>Project:</strong> ${escapeHtml(jobTitle)}</li>
+              ${jobRow && jobRow.public_id ? `<li><strong>Project ID:</strong> ${escapeHtml(jobRow.public_id)}</li>` : ""}
               ${locationText ? `<li><strong>Location:</strong> ${escapeHtml(locationText)}</li>` : ""}
             </ul>
 
@@ -236,8 +274,7 @@ exports.handler = async (event) => {
             }
 
             <p style="margin-top: 1.5rem;">
-              <strong>Next step:</strong> you may now contact the homeowner professionally to discuss the project,
-              timing, visit details, pricing, and next steps.
+              You may now contact the homeowner professionally to discuss the project, timeline, pricing, and next steps.
             </p>
 
             <p style="font-size: 0.875rem; color: #6B7280; margin-top: 1.5rem;">
@@ -258,7 +295,6 @@ exports.handler = async (event) => {
         emailSent = true;
       } catch (emailErr) {
         console.error("update-request-status approval email error:", emailErr);
-        // Do not fail the status update if email sending fails
       }
     }
 
@@ -268,7 +304,8 @@ exports.handler = async (event) => {
       project: jobRow
         ? {
             id: jobRow.id || null,
-            title: jobRow.project_title || jobRow.category || "Untitled project",
+            public_id: jobRow.public_id || null,
+            title: jobRow.project_title || jobRow.title || jobRow.category || "Untitled project",
             category: jobRow.category || null,
             city: jobRow.city || null,
             state: jobRow.state || null,
