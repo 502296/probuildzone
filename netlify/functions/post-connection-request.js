@@ -34,16 +34,42 @@ function shortText(value, max = 500) {
   return text.length > max ? text.slice(0, max).trim() + "..." : text;
 }
 
-function buildDashboardUrl(siteUrl) {
+function buildDashboardUrl(siteUrl, jobRow) {
   const base = normalize(siteUrl);
-  if (!base) return "https://probuildzone.com/homeowner-dashboard.html";
+  let origin = "https://probuildzone.com";
 
   try {
-    const url = new URL(base);
-    return `${url.origin}/homeowner-dashboard.html`;
-  } catch {
-    return "https://probuildzone.com/homeowner-dashboard.html";
+    if (base) {
+      origin = new URL(base).origin;
+    }
+  } catch (_) {}
+
+  const url = new URL("/homeowner-dashboard.html", origin);
+
+  if (jobRow?.email) {
+    url.searchParams.set("email", normalize(jobRow.email));
   }
+
+  if (jobRow?.contact_name || jobRow?.name) {
+    url.searchParams.set(
+      "name",
+      normalize(jobRow.contact_name || jobRow.name)
+    );
+  }
+
+  if (jobRow?.phone) {
+    url.searchParams.set("phone", normalize(jobRow.phone));
+  }
+
+  if (jobRow?.public_id) {
+    url.searchParams.set("public_id", normalize(jobRow.public_id));
+  }
+
+  if (jobRow?.id) {
+    url.searchParams.set("last_job_id", normalize(jobRow.id));
+  }
+
+  return url.toString();
 }
 
 exports.handler = async (event) => {
@@ -184,7 +210,7 @@ exports.handler = async (event) => {
     );
 
     const locationText = [jobRow.city, jobRow.state].filter(Boolean).join(", ");
-    const dashboardUrl = buildDashboardUrl(SITE_URL);
+    const dashboardUrl = buildDashboardUrl(SITE_URL, jobRow);
 
     // IMPORTANT:
     // pro_offers uses "email", not "pro_email"
@@ -233,7 +259,7 @@ exports.handler = async (event) => {
         const html = `
           <div style="font-family: Inter, Arial, sans-serif; line-height: 1.65; color: #0f172a; background: #f8fafc; padding: 24px;">
             <div style="max-width: 680px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; overflow: hidden;">
-              
+
               <div style="padding: 24px 24px 10px 24px; background: #0F2A43; color: #ffffff;">
                 <div style="font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; font-weight: 700;">
                   ProBuildZone
