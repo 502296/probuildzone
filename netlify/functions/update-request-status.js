@@ -24,6 +24,8 @@ const supabaseKey =
   process.env.SUPABASE_ANON_KEY;
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL || "ProBuildZone <onboarding@resend.dev>";
 
 function buildClient() {
   if (!supabaseUrl || !supabaseKey) return null;
@@ -44,6 +46,12 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function shortText(value, max = 500) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return text.length > max ? text.slice(0, max).trim() + "..." : text;
 }
 
 exports.handler = async (event) => {
@@ -106,8 +114,6 @@ exports.handler = async (event) => {
       });
     }
 
-    // IMPORTANT:
-    // pro_offers uses "email", not "pro_email"
     const { data: existingRequest, error: existingError } = await supabase
       .from("pro_offers")
       .select(`
@@ -205,89 +211,113 @@ exports.handler = async (event) => {
     }
 
     let emailSent = false;
+    let emailError = null;
 
-    if (nextStatus === "approved" && updatedRequest.email && RESEND_API_KEY) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(RESEND_API_KEY);
+    if (nextStatus === "approved") {
+      if (!updatedRequest.email) {
+        emailError = "Missing builder email";
+        console.error("update-request-status email skipped: missing builder email");
+      } else if (!RESEND_API_KEY) {
+        emailError = "Missing RESEND_API_KEY";
+        console.error("update-request-status email skipped: missing RESEND_API_KEY");
+      } else {
+        try {
+          const { Resend } = await import("resend");
+          const resend = new Resend(RESEND_API_KEY);
 
-        const jobTitle =
-          (jobRow && (jobRow.project_title || jobRow.title || jobRow.category)) ||
-          "your project";
+          const jobTitle =
+            (jobRow && (jobRow.project_title || jobRow.title || jobRow.category)) ||
+            "your project";
 
-        const homeownerName =
-          (jobRow && (jobRow.contact_name || jobRow.name)) ||
-          "Homeowner";
+          const homeownerName =
+            (jobRow && (jobRow.contact_name || jobRow.name)) ||
+            "Homeowner";
 
-        const homeownerEmail =
-          (jobRow && jobRow.email) ||
-          null;
+          const homeownerEmail =
+            (jobRow && jobRow.email) ||
+            null;
 
-        const homeownerPhone =
-          (jobRow && jobRow.phone) ||
-          null;
+          const homeownerPhone =
+            (jobRow && jobRow.phone) ||
+            null;
 
-        const locationText = jobRow
-          ? [jobRow.city, jobRow.state].filter(Boolean).join(", ")
-          : "";
+          const locationText = jobRow
+            ? [jobRow.city, jobRow.state].filter(Boolean).join(", ")
+            : "";
 
-        const safeMessage = updatedRequest.message
-          ? escapeHtml(updatedRequest.message).replace(/\n/g, "<br/>")
-          : "";
+          const projectSummary = shortText(
+            (jobRow && (
+              jobRow.short_summary ||
+              jobRow.summary ||
+              jobRow.full_description ||
+              jobRow.description
+            )) || "",
+            400
+          );
 
-        const subject = `Your ProBuildZone request was approved for "${jobTitle}"`;
+          const safeMessage = updatedRequest.message
+            ? escapeHtml(updatedRequest.message).replace(/\n/g, "<br/>")
+            : "";
 
-        const html = `
-          <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
-            <h2 style="margin-bottom: 0.5rem;">Your request was approved on ProBuildZone</h2>
+          const subject = `Your ProBuildZone request was approved for "${jobTitle}"`;
 
-            <p>Hi ${escapeHtml(updatedRequest.business_name || "Builder")},</p>
+          const html = `
+            <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
+              <h2 style="margin-bottom: 10px;">Your request was approved on ProBuildZone</h2>
 
-            <p>
-              Good news. A homeowner approved your connection request for:
-              <strong>${escapeHtml(jobTitle)}</strong>.
-            </p>
+              <p>Hi ${escapeHtml(updatedRequest.business_name || "Builder")},</p>
 
-            <h3 style="margin-top: 1.5rem;">Project details</h3>
-            <ul>
-              <li><strong>Project:</strong> ${escapeHtml(jobTitle)}</li>
-              ${jobRow && jobRow.public_id ? `<li><strong>Project ID:</strong> ${escapeHtml(jobRow.public_id)}</li>` : ""}
-              ${locationText ? `<li><strong>Location:</strong> ${escapeHtml(locationText)}</li>` : ""}
-            </ul>
+              <p>
+                A homeowner approved your connection request for
+                <strong>${escapeHtml(jobTitle)}</strong>.
+              </p>
 
-            <h3 style="margin-top: 1.5rem;">Homeowner contact</h3>
-            <ul>
-              <li><strong>Name:</strong> ${escapeHtml(homeownerName)}</li>
-              ${homeownerEmail ? `<li><strong>Email:</strong> ${escapeHtml(homeownerEmail)}</li>` : ""}
-              ${homeownerPhone ? `<li><strong>Phone:</strong> ${escapeHtml(homeownerPhone)}</li>` : ""}
-            </ul>
+              <h3 style="margin-top: 22px; margin-bottom: 10px;">Project</h3>
+              <ul style="padding-left: 18px;">
+                <li><strong>Title:</strong> ${escapeHtml(jobTitle)}</li>
+                ${jobRow && jobRow.public_id ? `<li><strong>Project ID:</strong> ${escapeHtml(jobRow.public_id)}</li>` : ""}
+                ${locationText ? `<li><strong>Location:</strong> ${escapeHtml(locationText)}</li>` : ""}
+                ${projectSummary ? `<li><strong>Summary:</strong> ${escapeHtml(projectSummary)}</li>` : ""}
+              </ul>
 
-            ${
-              safeMessage
-                ? `
-            <h3 style="margin-top: 1.5rem;">Your original message</h3>
-            <p>${safeMessage}</p>
-            `
-                : ""
-            }
+              <h3 style="margin-top: 22px; margin-bottom: 10px;">Homeowner Contact</h3>
+              <ul style="padding-left: 18px;">
+                <li><strong>Name:</strong> ${escapeHtml(homeownerName)}</li>
+                ${homeownerEmail ? `<li><strong>Email:</strong> ${escapeHtml(homeownerEmail)}</li>` : ""}
+                ${homeownerPhone ? `<li><strong>Phone:</strong> ${escapeHtml(homeownerPhone)}</li>` : ""}
+              </ul>
 
-            <p style="margin-top: 1.5rem;">
-              You may now contact the homeowner professionally to discuss the project, timeline, pricing, and next steps.
-            </p>
-          </div>
-        `;
+              ${
+                safeMessage
+                  ? `
+                    <h3 style="margin-top: 22px; margin-bottom: 10px;">Your Original Message</h3>
+                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
+                      ${safeMessage}
+                    </div>
+                  `
+                  : ""
+              }
 
-        await resend.emails.send({
-          from: "ProBuildZone <onboarding@resend.dev>",
-          to: updatedRequest.email,
-          subject,
-          html,
-          reply_to: homeownerEmail || undefined,
-        });
+              <p style="margin-top: 22px;">
+                You may now contact the homeowner professionally to discuss timeline, pricing, and next steps.
+              </p>
+            </div>
+          `;
 
-        emailSent = true;
-      } catch (emailErr) {
-        console.error("update-request-status approval email error:", emailErr);
+          const resendResponse = await resend.emails.send({
+            from: RESEND_FROM_EMAIL,
+            to: updatedRequest.email,
+            subject,
+            html,
+            reply_to: homeownerEmail || undefined,
+          });
+
+          console.log("update-request-status resend success:", resendResponse);
+          emailSent = true;
+        } catch (emailErr) {
+          emailError = emailErr?.message || "Failed to send email";
+          console.error("update-request-status approval email error:", emailErr);
+        }
       }
     }
 
@@ -315,6 +345,7 @@ exports.handler = async (event) => {
             }
           : null,
       email_sent: emailSent,
+      email_error: emailError,
     });
   } catch (err) {
     console.error("update-request-status unexpected error:", err);
