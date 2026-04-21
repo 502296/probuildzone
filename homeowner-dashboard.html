@@ -19,7 +19,6 @@
       --danger:#b42318;
       --success:#166534;
       --soft:#eef4ff;
-      --soft-border:#dbe7fb;
       --shadow:0 14px 34px rgba(15, 23, 32, 0.06);
       --radius-xl:26px;
       --radius-lg:20px;
@@ -234,11 +233,6 @@
     }
 
     .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
       margin-bottom:16px;
     }
 
@@ -248,14 +242,6 @@
       letter-spacing:-0.03em;
       margin:0;
       color:var(--pbz);
-    }
-
-    .section-copy{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-      max-width:420px;
-      text-align:right;
     }
 
     .jobs-grid{
@@ -344,18 +330,56 @@
       min-width:130px;
     }
 
-    .requests-block{
+    .requests-toggle{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      color:var(--pbz);
+      font-family:inherit;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:background .12s ease, border-color .12s ease, transform .12s ease;
+    }
+
+    .requests-toggle:hover{
+      background:#f3f6fa;
+      transform:translateY(-1px);
+    }
+
+    .requests-toggle-text{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      text-align:left;
+    }
+
+    .requests-toggle-count{
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .requests-toggle-icon{
+      font-size:18px;
+      line-height:1;
+      color:var(--muted);
+    }
+
+    .requests-panel{
+      display:none;
       border-top:1px solid var(--border);
       padding-top:14px;
     }
 
-    .requests-label{
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:var(--muted);
-      margin-bottom:12px;
+    .requests-panel.open{
+      display:block;
     }
 
     .request-item{
@@ -369,16 +393,53 @@
     .request-head{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
+      align-items:center;
       gap:10px;
-      margin-bottom:8px;
-      flex-wrap:wrap;
+      margin-bottom:0;
+      cursor:pointer;
+    }
+
+    .request-head-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
     }
 
     .request-name{
       font-weight:800;
       color:var(--pbz);
       font-size:15px;
+      word-break:break-word;
+    }
+
+    .request-submeta{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .request-head-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-shrink:0;
+    }
+
+    .request-toggle-icon{
+      font-size:16px;
+      color:var(--muted);
+      line-height:1;
+    }
+
+    .request-body{
+      display:none;
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid #e9eef4;
+    }
+
+    .request-body.open{
+      display:block;
     }
 
     .request-meta{
@@ -426,12 +487,13 @@
       border:1px solid transparent;
       text-transform:capitalize;
       letter-spacing:.02em;
+      white-space:nowrap;
     }
 
     .badge.pending{
-      background:#eef4ff;
-      color:#23406a;
-      border-color:#d7e5ff;
+      background:#f3f4f6;
+      color:#5b6472;
+      border-color:#d9dde3;
     }
 
     .badge.approved{
@@ -510,10 +572,6 @@
         grid-template-columns:1fr 1fr;
       }
 
-      .section-copy{
-        text-align:left;
-      }
-
       .jobs-grid{
         grid-template-columns:1fr;
       }
@@ -525,6 +583,14 @@
       .project-actions .btn,
       .request-actions .btn{
         flex:1 1 100%;
+      }
+
+      .request-head{
+        align-items:flex-start;
+      }
+
+      .request-head-right{
+        align-items:flex-start;
       }
     }
   </style>
@@ -567,7 +633,6 @@
 
     <div class="section-head">
       <h2 class="section-title">My Projects</h2>
-      <div class="section-copy">Each card gives you the project, request count, and the main actions you need.</div>
     </div>
 
     <div id="statusBox" class="loading">Loading your projects...</div>
@@ -615,6 +680,11 @@
       if (value === "approved") return "approved";
       if (value === "declined") return "declined";
       return "pending";
+    }
+
+    function buildersInterestedText(count) {
+      const n = Number(count || 0);
+      return `${n} ${n === 1 ? "Builder" : "Builders"} Interested`;
     }
 
     function getStoredHomeowner() {
@@ -779,15 +849,15 @@
     }
 
     function renderProjects(projects) {
-      jobsBox.innerHTML = projects.map((project) => {
+      jobsBox.innerHTML = projects.map((project, projectIndex) => {
         const title =
           project.project_title ||
           project.title ||
           "Untitled project";
 
         const location = [project.city, project.state].filter(Boolean).join(", ");
-
         const requests = Array.isArray(project.requests) ? project.requests : [];
+        const panelId = `requests-panel-${projectIndex}-${String(project.id || project.public_id || "x").replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
         const viewUrl = new URL("/job.html", window.location.origin);
         if (project.id) viewUrl.searchParams.set("id", project.id);
@@ -797,9 +867,11 @@
         if (project.id) editUrl.searchParams.set("edit_id", project.id);
 
         const requestsHtml = requests.length
-          ? requests.map((req) => {
+          ? requests.map((req, reqIndex) => {
               const status = String(req.status || "pending").toLowerCase();
               const isResolved = status === "approved" || status === "declined";
+              const requestIdSafe = String(req.id || `${projectIndex}-${reqIndex}`).replace(/[^a-zA-Z0-9_-]/g, "");
+              const requestBodyId = `request-body-${requestIdSafe}`;
 
               const requestName =
                 req.business_name ||
@@ -819,39 +891,52 @@
 
               return `
                 <div class="request-item">
-                  <div class="request-head">
-                    <div class="request-name">${escapeHtml(requestName)}</div>
-                    <span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span>
+                  <div class="request-head" data-toggle-request="${requestBodyId}">
+                    <div class="request-head-left">
+                      <div class="request-name">${escapeHtml(requestName)}</div>
+                      <div class="request-submeta">${escapeHtml(formatDate(req.created_at))}</div>
+                    </div>
+
+                    <div class="request-head-right">
+                      <span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span>
+                      <span class="request-toggle-icon" data-request-icon="${requestBodyId}">▼</span>
+                    </div>
                   </div>
 
-                  <div class="request-meta">
-                    <div><strong>Email:</strong> ${escapeHtml(requestEmail)}</div>
-                    <div><strong>Phone:</strong> ${escapeHtml(requestPhone)}</div>
-                    <div><strong>Sent:</strong> ${escapeHtml(formatDate(req.created_at))}</div>
-                  </div>
+                  <div id="${requestBodyId}" class="request-body">
+                    <div class="request-meta">
+                      <div><strong>Email:</strong> ${escapeHtml(requestEmail)}</div>
+                      <div><strong>Phone:</strong> ${escapeHtml(requestPhone)}</div>
+                      <div><strong>Sent:</strong> ${escapeHtml(formatDate(req.created_at))}</div>
+                    </div>
 
-                  <div class="request-message">${escapeHtml(shortText(req.message || "", 300))}</div>
+                    <div class="request-message">${escapeHtml(shortText(req.message || "", 300))}</div>
 
-                  <div class="request-actions" data-request-buttons="${escapeHtml(req.id || "")}">
-                    <button
-                      type="button"
-                      class="btn btn-accept ${isResolved ? "btn-disabled" : ""}"
-                      data-request-id="${escapeHtml(req.id || "")}"
-                      data-next-status="approved"
-                      ${isResolved ? "disabled" : ""}
-                    >
-                      Approve
-                    </button>
+                    ${
+                      status === "pending"
+                        ? `
+                          <div class="request-actions" data-request-buttons="${escapeHtml(req.id || "")}">
+                            <button
+                              type="button"
+                              class="btn btn-accept"
+                              data-request-id="${escapeHtml(req.id || "")}"
+                              data-next-status="approved"
+                            >
+                              Approve
+                            </button>
 
-                    <button
-                      type="button"
-                      class="btn btn-decline ${isResolved ? "btn-disabled" : ""}"
-                      data-request-id="${escapeHtml(req.id || "")}"
-                      data-next-status="declined"
-                      ${isResolved ? "disabled" : ""}
-                    >
-                      Decline
-                    </button>
+                            <button
+                              type="button"
+                              class="btn btn-decline"
+                              data-request-id="${escapeHtml(req.id || "")}"
+                              data-next-status="declined"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        `
+                        : ``
+                    }
                   </div>
                 </div>
               `;
@@ -862,7 +947,7 @@
           <div class="project-card">
             <div class="project-top">
               <div class="project-id">${escapeHtml(project.public_id || project.id || "-")}</div>
-              <div class="project-request-count">${requests.length} Requests</div>
+              <div class="project-request-count">${escapeHtml(buildersInterestedText(requests.length))}</div>
             </div>
 
             <h3 class="project-title">${escapeHtml(title)}</h3>
@@ -886,8 +971,18 @@
               </button>
             </div>
 
-            <div class="requests-block">
-              <div class="requests-label">Incoming Requests</div>
+            <button
+              type="button"
+              class="requests-toggle"
+              data-toggle-panel="${panelId}"
+            >
+              <span class="requests-toggle-text">
+                <span>${escapeHtml(buildersInterestedText(requests.length))}</span>
+              </span>
+              <span class="requests-toggle-icon" data-panel-icon="${panelId}">▼</span>
+            </button>
+
+            <div id="${panelId}" class="requests-panel">
               ${requestsHtml}
             </div>
           </div>
@@ -912,6 +1007,40 @@
           const projectTitle = btn.getAttribute("data-delete-project-title");
           if (!projectId) return;
           deleteProject(projectId, projectTitle);
+        });
+      });
+
+      jobsBox.querySelectorAll("[data-toggle-panel]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const panelId = btn.getAttribute("data-toggle-panel");
+          const panel = document.getElementById(panelId);
+          const icon = jobsBox.querySelector(`[data-panel-icon="${panelId}"]`);
+
+          if (!panel) return;
+
+          const isOpen = panel.classList.contains("open");
+          panel.classList.toggle("open", !isOpen);
+
+          if (icon) {
+            icon.textContent = isOpen ? "▼" : "▲";
+          }
+        });
+      });
+
+      jobsBox.querySelectorAll("[data-toggle-request]").forEach((head) => {
+        head.addEventListener("click", () => {
+          const bodyId = head.getAttribute("data-toggle-request");
+          const body = document.getElementById(bodyId);
+          const icon = jobsBox.querySelector(`[data-request-icon="${bodyId}"]`);
+
+          if (!body) return;
+
+          const isOpen = body.classList.contains("open");
+          body.classList.toggle("open", !isOpen);
+
+          if (icon) {
+            icon.textContent = isOpen ? "▼" : "▲";
+          }
         });
       });
     }
