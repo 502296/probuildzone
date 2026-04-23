@@ -218,6 +218,7 @@
       padding:6px 10px;
       margin-left:8px;
       border:1px solid transparent;
+      text-transform:capitalize;
     }
 
     .badge.pending{
@@ -226,6 +227,7 @@
       border-color:#d7e5ff;
     }
 
+    .badge.approved,
     .badge.accepted{
       background:#ecfdf3;
       color:var(--success);
@@ -362,7 +364,7 @@
 
     function badgeClass(status) {
       const value = String(status || "pending").toLowerCase();
-      if (value === "accepted") return "accepted";
+      if (value === "accepted" || value === "approved") return "approved";
       if (value === "declined") return "declined";
       return "pending";
     }
@@ -408,12 +410,44 @@
       statPendingEl.textContent = String(pending);
     }
 
+    function buildJobUrl(item) {
+      const url = new URL("/job.html", window.location.origin);
+
+      const rawId =
+        item.job_id ||
+        item.id ||
+        "";
+
+      const publicId =
+        item.job_public_id ||
+        item.public_id ||
+        "";
+
+      if (rawId && /^[0-9a-fA-F-]{8,}$/.test(String(rawId))) {
+        url.searchParams.set("id", rawId);
+      }
+
+      if (publicId) {
+        url.searchParams.set("public_id", publicId);
+      }
+
+      return url.pathname + url.search;
+    }
+
+    function normalizeRequests(data) {
+      if (Array.isArray(data?.requests)) return data.requests;
+      if (Array.isArray(data?.offers)) return data.offers;
+      if (Array.isArray(data?.items)) return data.items;
+      return [];
+    }
+
     function renderRequests(requests) {
       requestsBox.innerHTML = requests.map((item) => {
-        const title = item.job_title || item.title || "Untitled job";
+        const title = item.job_title || item.title || item.project_title || "Untitled job";
         const location = [item.city, item.state].filter(Boolean).join(", ");
         const status = String(item.status || "pending").toLowerCase();
-        const jobId = item.job_public_id || item.public_id || item.job_id || "";
+        const jobId = item.job_public_id || item.public_id || item.job_id || item.id || "";
+        const jobUrl = buildJobUrl(item);
 
         return `
           <div class="request-card">
@@ -432,41 +466,94 @@
             <div class="request-message">${escapeHtml(shortText(item.message || ""))}</div>
 
             <div class="request-actions">
-              <a class="btn btn-main" href="/job.html?id=${encodeURIComponent(jobId)}">View Job</a>
+              <a class="btn btn-main" href="${jobUrl}">View Job</a>
             </div>
           </div>
         `;
       }).join("");
     }
 
+    async function fetchJsonOrThrow(url) {
+      const res = await fetch(url, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      const text = await res.text();
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (err) {
+        throw new Error(`Non-JSON response from ${url}`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed for ${url}`);
+      }
+
+      return data;
+    }
+
+    async function loadRequests(user) {
+      const params = new URLSearchParams();
+
+      if (user.email) params.set("email", user.email);
+      if (user.phone) params.set("phone", user.phone);
+
+      const candidateUrls = [
+        `/.netlify/functions/get-pro-requests?${params.toString()}`,
+        `/.netlify/functions/get-offers?${params.toString()}`
+      ];
+
+      let lastError = null;
+
+      for (const url of candidateUrls) {
+        try {
+          const data = await fetchJsonOrThrow(url);
+
+          if (data && (data.ok === true || Array.isArray(data.requests) || Array.isArray(data.offers) || Array.isArray(data.items))) {
+            return normalizeRequests(data);
+          }
+
+          throw new Error(data.error || "Unexpected response format");
+        } catch (err) {
+          console.warn("Dashboard source failed:", url, err);
+          lastError = err;
+        }
+      }
+
+      throw lastError || new Error("Failed to load dashboard data");
+    }
+
     async function loadDashboard() {
       const user = getStoredPro();
 
-      if (!user || !user.email) {
+      if (!user || (!user.email && !user.phone)) {
         statusBox.className = "error";
+        statusBox.style.display = "block";
         statusBox.textContent = "No active Pro session found. Please sign in again.";
         profileNameEl.textContent = "Session missing";
         profileMetaEl.textContent = "Please return to the Pro signup page and continue from there.";
+        statTotalEl.textContent = "0";
+        statPendingEl.textContent = "0";
+        requestsBox.style.display = "none";
         return;
       }
 
       renderProfile(user);
 
       try {
-        const res = await fetch(`/.netlify/functions/get-pro-requests?email=${encodeURIComponent(user.email)}`);
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || "Failed to load dashboard data");
-        }
-
-        const requests = Array.isArray(data.requests) ? data.requests : [];
+        const requests = await loadRequests(user);
 
         renderStats(requests);
 
         if (!requests.length) {
           statusBox.className = "empty";
+          statusBox.style.display = "block";
           statusBox.textContent = "You have not sent any connection requests yet.";
+          requestsBox.style.display = "none";
           return;
         }
 
@@ -476,7 +563,9 @@
       } catch (err) {
         console.error("Dashboard load error:", err);
         statusBox.className = "error";
+        statusBox.style.display = "block";
         statusBox.textContent = "Could not load your dashboard right now.";
+        requestsBox.style.display = "none";
       }
     }
 
