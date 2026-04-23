@@ -214,6 +214,51 @@
   </div>
 
   <script>
+    const PBZ_CANONICAL_CATEGORIES = [
+      "General Construction",
+      "Remodeling",
+      "Plumbing",
+      "Electrical",
+      "HVAC",
+      "Roofing",
+      "Flooring",
+      "Painting",
+      "Drywall",
+      "Landscaping",
+      "Cleaning",
+      "Moving",
+      "Handyman",
+      "Concrete",
+      "Fencing",
+      "Windows & Doors",
+      "Kitchen Remodeling",
+      "Bathroom Remodeling"
+    ];
+
+    const PBZ_CATEGORY_ALIASES = {
+      "general contractor": "General Construction",
+      "general contracting": "General Construction",
+      "contractor": "General Construction",
+      "roof": "Roofing",
+      "roof repair": "Roofing",
+      "plumber": "Plumbing",
+      "electrician": "Electrical",
+      "electrical work": "Electrical",
+      "heating & cooling": "HVAC",
+      "painting interior": "Painting",
+      "painting exterior": "Painting",
+      "floor": "Flooring",
+      "bath remodel": "Bathroom Remodeling",
+      "bathroom remodel": "Bathroom Remodeling",
+      "kitchen remodel": "Kitchen Remodeling",
+      "window and doors": "Windows & Doors",
+      "windows and doors": "Windows & Doors",
+      "windows doors": "Windows & Doors",
+      "decks": "General Construction",
+      "porches": "General Construction",
+      "siding": "General Construction"
+    };
+
     const params = new URLSearchParams(window.location.search);
 
     const filtersEl = document.getElementById("filters");
@@ -241,6 +286,19 @@
       return String(value || "").trim();
     }
 
+    function normalizeCategory(value) {
+      const raw = normalizeValue(value);
+      if (!raw) return "";
+
+      const exact = PBZ_CANONICAL_CATEGORIES.find(
+        (item) => item.toLowerCase() === raw.toLowerCase()
+      );
+      if (exact) return exact;
+
+      const alias = PBZ_CATEGORY_ALIASES[raw.toLowerCase()];
+      return alias || raw;
+    }
+
     function getStoredPro() {
       try {
         const raw = localStorage.getItem("pbz_user");
@@ -260,7 +318,7 @@
       const stored = getStoredPro();
 
       return {
-        category: normalizeValue(params.get("category") || stored?.category || ""),
+        category: normalizeCategory(params.get("category") || stored?.category || ""),
         city: normalizeValue(params.get("city") || stored?.city || ""),
         state: normalizeValue(params.get("state") || stored?.state || "")
       };
@@ -268,6 +326,22 @@
 
     const storedPro = getStoredPro();
     const activeFilters = resolveFilters();
+
+    function syncStoredProCategory() {
+      if (!storedPro) return;
+
+      const normalizedCategory = normalizeCategory(storedPro.category || "");
+      if (!normalizedCategory) return;
+
+      if (normalizedCategory !== storedPro.category) {
+        try {
+          const updated = { ...storedPro, category: normalizedCategory };
+          localStorage.setItem("pbz_user", JSON.stringify(updated));
+        } catch (err) {
+          console.warn("Could not update pbz_user category:", err);
+        }
+      }
+    }
 
     function renderFilters() {
       const pills = [];
@@ -440,6 +514,7 @@
       logoutBtn.addEventListener("click", handleLogout);
     }
 
+    syncStoredProCategory();
     bootSessionLinks();
 
     if (guardSession()) {
