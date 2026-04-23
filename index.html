@@ -293,6 +293,38 @@
       border-color:#d8e0ea;
     }
 
+    .more-services-box{
+      display:none;
+      margin-top:16px;
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:#fbfcfe;
+    }
+
+    .more-services-box label{
+      margin-top:0;
+    }
+
+    .more-services-box select,
+    .more-services-box input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 15px;
+      font:inherit;
+      color:#0f1720;
+      background:#fff;
+      outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease;
+    }
+
+    .more-services-box select:focus,
+    .more-services-box input:focus{
+      border-color:#b8c9e3;
+      box-shadow:0 0 0 4px rgba(59,130,246,0.08);
+    }
+
     .selected-cat{
       display:inline-flex;
       align-items:center;
@@ -526,6 +558,28 @@
           <button class="cat-card" data-cat="Windows & Doors">🪟<span>Windows & Doors</span></button>
           <button class="cat-card" data-cat="Landscaping">🌿<span>Landscaping</span></button>
           <button class="cat-card" data-cat="Handyman">🧰<span>Handyman</span></button>
+          <button class="cat-card" data-cat="more">➕<span>More Services</span></button>
+        </div>
+
+        <div id="moreServicesBox" class="more-services-box">
+          <label for="moreCategory">More services</label>
+          <select id="moreCategory">
+            <option value="">Select service</option>
+            <option value="HVAC">HVAC</option>
+            <option value="Drywall">Drywall</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Moving">Moving</option>
+            <option value="Fencing">Fencing</option>
+            <option value="Remodeling">Remodeling</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <input
+            id="customCategory"
+            type="text"
+            placeholder="Describe your service..."
+            style="display:none; margin-top:10px;"
+          />
         </div>
       </section>
 
@@ -680,6 +734,9 @@
     const sheet = document.querySelector(".sheet");
     const selectedCatEl = document.getElementById("selectedCat").querySelector("b");
     const hiddenCat = document.getElementById("categoryHidden");
+    const moreBox = document.getElementById("moreServicesBox");
+    const moreSelect = document.getElementById("moreCategory");
+    const customInput = document.getElementById("customCategory");
 
     function openDoor() {
       modal.style.display = "flex";
@@ -715,10 +772,46 @@
     document.querySelectorAll(".cat-card").forEach((btn) => {
       btn.addEventListener("click", () => {
         const val = btn.dataset.cat;
+
+        if (val === "more") {
+          moreBox.style.display = "block";
+          customInput.style.display = "none";
+          moreSelect.value = "";
+          customInput.value = "";
+          return;
+        }
+
         hiddenCat.value = val;
         selectedCatEl.textContent = val;
         goStep(2);
       });
+    });
+
+    moreSelect?.addEventListener("change", () => {
+      const val = moreSelect.value;
+
+      if (val === "Other") {
+        customInput.style.display = "block";
+        customInput.focus();
+        return;
+      }
+
+      customInput.style.display = "none";
+      customInput.value = "";
+
+      if (val) {
+        hiddenCat.value = val;
+        selectedCatEl.textContent = val;
+        goStep(2);
+      }
+    });
+
+    customInput?.addEventListener("input", () => {
+      const val = customInput.value.trim();
+      if (val.length > 2) {
+        hiddenCat.value = val;
+        selectedCatEl.textContent = val;
+      }
     });
 
     const fileInput = document.getElementById("fileInput");
@@ -781,6 +874,18 @@
 
     document.getElementById("sendBtn").addEventListener("click", async () => {
       const m = document.getElementById("sendMsg");
+
+      if (moreSelect && moreSelect.value === "Other") {
+        const customVal = customInput.value.trim();
+        if (!customVal) {
+          m.textContent = "Please describe your service.";
+          m.className = "hint err";
+          return;
+        }
+        hiddenCat.value = customVal;
+        selectedCatEl.textContent = customVal;
+      }
+
       const payload = {
         category: document.getElementById("categoryHidden").value || "General Construction",
         title: document.getElementById("title").value.trim(),
