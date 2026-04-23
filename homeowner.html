@@ -340,21 +340,24 @@
         <label for="category">Project category *</label>
         <select id="category" required>
           <option value="">Select a category</option>
-          <option value="Roofing">Roofing</option>
+          <option value="General Construction">General Construction</option>
+          <option value="Remodeling">Remodeling</option>
           <option value="Plumbing">Plumbing</option>
           <option value="Electrical">Electrical</option>
           <option value="HVAC">HVAC</option>
-          <option value="Painting">Painting</option>
+          <option value="Roofing">Roofing</option>
           <option value="Flooring">Flooring</option>
+          <option value="Painting">Painting</option>
+          <option value="Drywall">Drywall</option>
+          <option value="Landscaping">Landscaping</option>
+          <option value="Cleaning">Cleaning</option>
+          <option value="Moving">Moving</option>
+          <option value="Handyman">Handyman</option>
+          <option value="Concrete">Concrete</option>
+          <option value="Fencing">Fencing</option>
+          <option value="Windows & Doors">Windows & Doors</option>
           <option value="Kitchen Remodeling">Kitchen Remodeling</option>
           <option value="Bathroom Remodeling">Bathroom Remodeling</option>
-          <option value="General Contractor">General Contractor</option>
-          <option value="Landscaping">Landscaping</option>
-          <option value="Concrete">Concrete</option>
-          <option value="Siding">Siding</option>
-          <option value="Windows & Doors">Windows & Doors</option>
-          <option value="Decks & Porches">Decks & Porches</option>
-          <option value="Other">Other</option>
         </select>
 
         <label for="title">Project title *</label>
@@ -424,6 +427,28 @@
     const pageTitle = document.getElementById("pageTitle");
     const pageSubhead = document.getElementById("pageSubhead");
     const modeBadge = document.getElementById("modeBadge");
+    const categoryEl = document.getElementById("category");
+
+    const CANONICAL_CATEGORIES = [
+      "General Construction",
+      "Remodeling",
+      "Plumbing",
+      "Electrical",
+      "HVAC",
+      "Roofing",
+      "Flooring",
+      "Painting",
+      "Drywall",
+      "Landscaping",
+      "Cleaning",
+      "Moving",
+      "Handyman",
+      "Concrete",
+      "Fencing",
+      "Windows & Doors",
+      "Kitchen Remodeling",
+      "Bathroom Remodeling"
+    ];
 
     const params = new URLSearchParams(window.location.search);
     const editId = (params.get("edit_id") || params.get("id") || "").trim();
@@ -482,6 +507,33 @@
       }
     }
 
+    function ensureCategoryOption(value) {
+      const normalized = String(value || "").trim();
+      if (!normalized) return;
+
+      const hasOption = Array.from(categoryEl.options).some(
+        (option) => option.value === normalized
+      );
+
+      if (!hasOption) {
+        const option = document.createElement("option");
+        option.value = normalized;
+        option.textContent = `${normalized} (Legacy)`;
+        categoryEl.appendChild(option);
+      }
+    }
+
+    function normalizeCategoryForSubmit(value) {
+      const normalized = String(value || "").trim();
+      if (!normalized) return "";
+
+      const exactMatch = CANONICAL_CATEGORIES.find(
+        (item) => item.toLowerCase() === normalized.toLowerCase()
+      );
+
+      return exactMatch || normalized;
+    }
+
     function resetForAnotherPost() {
       hideSuccessPanel();
       setStatus("", "");
@@ -497,6 +549,7 @@
     }
 
     function populateForm(job) {
+      ensureCategoryOption(job.category || "");
       document.getElementById("category").value = job.category || "";
       document.getElementById("title").value = job.title || job.project_title || "";
       document.getElementById("summary").value = job.summary || "";
@@ -556,7 +609,7 @@
       const homeowner = getStoredHomeowner();
 
       const payload = {
-        category: document.getElementById("category").value.trim(),
+        category: normalizeCategoryForSubmit(document.getElementById("category").value),
         title: document.getElementById("title").value.trim(),
         summary: document.getElementById("summary").value.trim() || null,
         city: document.getElementById("city").value.trim() || null,
