@@ -9,17 +9,79 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <script>
+    const PBZ_CANONICAL_CATEGORIES = [
+      "General Construction",
+      "Remodeling",
+      "Plumbing",
+      "Electrical",
+      "HVAC",
+      "Roofing",
+      "Flooring",
+      "Painting",
+      "Drywall",
+      "Landscaping",
+      "Cleaning",
+      "Moving",
+      "Handyman",
+      "Concrete",
+      "Fencing",
+      "Windows & Doors",
+      "Kitchen Remodeling",
+      "Bathroom Remodeling"
+    ];
+
+    function normalizePbzCategory(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+
+      const exact = PBZ_CANONICAL_CATEGORIES.find(
+        (item) => item.toLowerCase() === raw.toLowerCase()
+      );
+      if (exact) return exact;
+
+      const aliases = {
+        "general contractor": "General Construction",
+        "general contracting": "General Construction",
+        "contractor": "General Construction",
+        "roof": "Roofing",
+        "roof repair": "Roofing",
+        "plumber": "Plumbing",
+        "electrician": "Electrical",
+        "electrical work": "Electrical",
+        "heating & cooling": "HVAC",
+        "painting interior": "Painting",
+        "painting exterior": "Painting",
+        "floor": "Flooring",
+        "bath remodel": "Bathroom Remodeling",
+        "bathroom remodel": "Bathroom Remodeling",
+        "kitchen remodel": "Kitchen Remodeling",
+        "window and doors": "Windows & Doors",
+        "windows and doors": "Windows & Doors",
+        "windows doors": "Windows & Doors",
+        "decks": "General Construction",
+        "porches": "General Construction"
+      };
+
+      const alias = aliases[raw.toLowerCase()];
+      return alias || raw;
+    }
+
     (function () {
       try {
         const raw = localStorage.getItem("pbz_user");
         if (!raw) return;
 
         const user = JSON.parse(raw);
-        const category = (user.category || "").trim();
+        const category = normalizePbzCategory(user.category || "");
         const city = (user.city || "").trim();
         const state = (user.state || "").trim();
 
         if (!category || !city || !state) return;
+
+        if (category !== (user.category || "")) {
+          user.category = category;
+          localStorage.setItem("pbz_user", JSON.stringify(user));
+        }
 
         const params = new URLSearchParams({
           category,
@@ -184,14 +246,24 @@
             <label for="category">Category *</label>
             <select id="category" name="category" required>
               <option value="">Select</option>
-              <option value="Roofing">Roofing</option>
+              <option value="General Construction">General Construction</option>
+              <option value="Remodeling">Remodeling</option>
               <option value="Plumbing">Plumbing</option>
               <option value="Electrical">Electrical</option>
               <option value="HVAC">HVAC</option>
-              <option value="Painting">Painting</option>
+              <option value="Roofing">Roofing</option>
               <option value="Flooring">Flooring</option>
-              <option value="Remodeling">Remodeling</option>
+              <option value="Painting">Painting</option>
+              <option value="Drywall">Drywall</option>
               <option value="Landscaping">Landscaping</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Moving">Moving</option>
+              <option value="Handyman">Handyman</option>
+              <option value="Concrete">Concrete</option>
+              <option value="Fencing">Fencing</option>
+              <option value="Windows & Doors">Windows & Doors</option>
+              <option value="Kitchen Remodeling">Kitchen Remodeling</option>
+              <option value="Bathroom Remodeling">Bathroom Remodeling</option>
             </select>
           </div>
 
