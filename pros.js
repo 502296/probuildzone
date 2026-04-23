@@ -3,6 +3,63 @@
 // After successful signup, save Pro locally and redirect to matching jobs page
 
 (function () {
+  const PBZ_CANONICAL_CATEGORIES = [
+    "General Construction",
+    "Remodeling",
+    "Plumbing",
+    "Electrical",
+    "HVAC",
+    "Roofing",
+    "Flooring",
+    "Painting",
+    "Drywall",
+    "Landscaping",
+    "Cleaning",
+    "Moving",
+    "Handyman",
+    "Concrete",
+    "Fencing",
+    "Windows & Doors",
+    "Kitchen Remodeling",
+    "Bathroom Remodeling",
+  ];
+
+  const PBZ_CATEGORY_ALIASES = {
+    "general contractor": "General Construction",
+    "general contracting": "General Construction",
+    "contractor": "General Construction",
+    "roof": "Roofing",
+    "roof repair": "Roofing",
+    "plumber": "Plumbing",
+    "electrician": "Electrical",
+    "electrical work": "Electrical",
+    "heating & cooling": "HVAC",
+    "painting interior": "Painting",
+    "painting exterior": "Painting",
+    "floor": "Flooring",
+    "bath remodel": "Bathroom Remodeling",
+    "bathroom remodel": "Bathroom Remodeling",
+    "kitchen remodel": "Kitchen Remodeling",
+    "window and doors": "Windows & Doors",
+    "windows and doors": "Windows & Doors",
+    "windows doors": "Windows & Doors",
+    "decks": "General Construction",
+    "porches": "General Construction",
+  };
+
+  function normalizeCategory(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+
+    const exact = PBZ_CANONICAL_CATEGORIES.find(
+      (item) => item.toLowerCase() === raw.toLowerCase()
+    );
+    if (exact) return exact;
+
+    const alias = PBZ_CATEGORY_ALIASES[raw.toLowerCase()];
+    return alias || raw;
+  }
+
   function getField(idOrName) {
     const byId = document.getElementById(idOrName);
     if (byId) return byId;
@@ -80,7 +137,7 @@
       license: getVal("license", "businessLicense", "pro_license"),
       insurance: getVal("insurance", "pro_insurance"),
       notes: getVal("notes", "services", "pro_notes"),
-      category: getVal("category", "trade", "serviceCategory", "pro_category"),
+      category: normalizeCategory(getVal("category", "trade", "serviceCategory", "pro_category")),
       city: getVal("city", "pro_city"),
       state: getVal("state", "pro_state"),
     };
@@ -104,7 +161,7 @@
 
   function buildJobsRedirectUrl(payload) {
     const q = new URLSearchParams({
-      category: payload.category || "",
+      category: normalizeCategory(payload.category || ""),
       city: payload.city || "",
       state: payload.state || "",
     });
@@ -113,6 +170,8 @@
   }
 
   function saveLocalProSession(payload, serverData) {
+    const normalizedCategory = normalizeCategory(payload.category || "");
+
     const pbzUser = {
       name: payload.name || "",
       email: payload.email || "",
@@ -121,7 +180,7 @@
       license: payload.license || "",
       insurance: payload.insurance || "",
       notes: payload.notes || "",
-      category: payload.category || "",
+      category: normalizedCategory,
       city: payload.city || "",
       state: payload.state || "",
       pro_id:
@@ -129,8 +188,13 @@
       saved_at: new Date().toISOString(),
     };
 
+    const normalizedPayload = {
+      ...payload,
+      category: normalizedCategory,
+    };
+
     try {
-      localStorage.setItem("pbz_form_data", JSON.stringify(payload));
+      localStorage.setItem("pbz_form_data", JSON.stringify(normalizedPayload));
     } catch (_) {}
 
     try {
