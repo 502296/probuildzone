@@ -383,6 +383,18 @@
       border-radius:16px;
       padding:14px;
       margin-bottom:12px;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    .request-item:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(0,0,0,.04);
+    }
+
+    .request-item.approved{
+      background:#f0fdf4;
+      border:1px solid #bbf7d0;
+      box-shadow:0 10px 24px rgba(22, 101, 52, 0.08);
     }
 
     .request-head{
@@ -931,6 +943,7 @@
               const status = String(req.status || "pending").toLowerCase();
               const requestIdSafe = String(req.id || `${projectIndex}-${reqIndex}`).replace(/[^a-zA-Z0-9_-]/g, "");
               const requestBodyId = `request-body-${requestIdSafe}`;
+              const approvedClass = status === "approved" ? "approved" : "";
 
               const requestName =
                 req.business_name ||
@@ -949,7 +962,7 @@
                 "-";
 
               return `
-                <div class="request-item">
+                <div class="request-item ${approvedClass}">
                   <div class="request-head" data-toggle-request="${requestBodyId}">
                     <div class="request-head-left">
                       <div class="request-name">${escapeHtml(requestName)}</div>
