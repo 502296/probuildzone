@@ -31,6 +31,12 @@ function json(statusCode, body) {
   };
 }
 
+function isUuidLike(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value || "").trim()
+  );
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -68,22 +74,40 @@ exports.handler = async (event) => {
     const email = String(params.email || "")
       .trim()
       .toLowerCase();
+    const phone = String(params.phone || "").trim();
 
-    if (!email) {
+    if (!email && !phone) {
       return json(400, {
         ok: false,
-        error: "Missing pro email",
+        error: "Missing pro email or phone",
       });
     }
 
     // Step 1: Load this Pro's connection requests
-    const { data: requestsRaw, error: reqError } = await supabase
+    // We match flexibly because some rows may store the pro email in `pro_email`
+    // while older rows may have used `email`.
+    let requestsQuery = supabase
       .from("pro_offers")
       .select(
-        "id, job_id, business_name, pro_email, phone, amount, message, status, created_at"
+        "id, job_id, business_name, pro_email, email, phone, pro_phone, amount, message, status, created_at"
       )
-      .ilike("pro_email", email)
       .order("created_at", { ascending: false });
+
+    if (email && phone) {
+      requestsQuery = requestsQuery.or(
+        `pro_email.ilike.${email},email.ilike.${email},phone.eq.${phone},pro_phone.eq.${phone}`
+      );
+    } else if (email) {
+      requestsQuery = requestsQuery.or(
+        `pro_email.ilike.${email},email.ilike.${email}`
+      );
+    } else if (phone) {
+      requestsQuery = requestsQuery.or(
+        `phone.eq.${phone},pro_phone.eq.${phone}`
+      );
+    }
+
+    const { data: requestsRaw, error: reqError } = await requestsQuery;
 
     if (reqError) {
       console.error("get-pro-requests query error:", reqError);
@@ -103,42 +127,75 @@ exports.handler = async (event) => {
     }
 
     // Step 2: Collect related homeowner job IDs
-    const jobIds = [...new Set(requests.map((item) => item.job_id).filter(Boolean))];
+    const jobKeys = [
+      ...new Set(
+        requests
+          .map((item) => String(item.job_id || "").trim())
+          .filter(Boolean)
+      ),
+    ];
 
-    let jobsMap = new Map();
+    const uuidJobIds = jobKeys.filter(isUuidLike);
+    const publicJobIds = jobKeys.filter((value) => !isUuidLike(value));
 
-    if (jobIds.length) {
-      const { data: jobsRaw, error: jobsError } = await supabase
+    const jobsMap = new Map();
+
+    if (uuidJobIds.length) {
+      const { data: jobsByUuid, error: jobsUuidError } = await supabase
         .from("homeowner_jobs")
         .select("id, public_id, title, project_title, category, city, state")
-        .in("id", jobIds);
+        .in("id", uuidJobIds);
 
-      if (jobsError) {
-        console.error("get-pro-requests jobs lookup error:", jobsError);
+      if (jobsUuidError) {
+        console.error("get-pro-requests jobs UUID lookup error:", jobsUuidError);
         return json(500, {
           ok: false,
-          error: jobsError.message || "Failed to load related jobs",
+          error: jobsUuidError.message || "Failed to load related jobs by id",
         });
       }
 
-      jobsMap = new Map((jobsRaw || []).map((job) => [job.id, job]));
+      (jobsByUuid || []).forEach((job) => {
+        if (job?.id) jobsMap.set(String(job.id), job);
+        if (job?.public_id) jobsMap.set(String(job.public_id), job);
+      });
+    }
+
+    if (publicJobIds.length) {
+      const { data: jobsByPublicId, error: jobsPublicError } = await supabase
+        .from("homeowner_jobs")
+        .select("id, public_id, title, project_title, category, city, state")
+        .in("public_id", publicJobIds);
+
+      if (jobsPublicError) {
+        console.error("get-pro-requests jobs public_id lookup error:", jobsPublicError);
+        return json(500, {
+          ok: false,
+          error: jobsPublicError.message || "Failed to load related jobs by public_id",
+        });
+      }
+
+      (jobsByPublicId || []).forEach((job) => {
+        if (job?.id) jobsMap.set(String(job.id), job);
+        if (job?.public_id) jobsMap.set(String(job.public_id), job);
+      });
     }
 
     // Step 3: Normalize the response for dashboard use
     const normalized = requests.map((item) => {
-      const job = jobsMap.get(item.job_id) || {};
+      const rawJobKey = String(item.job_id || "").trim();
+      const job = jobsMap.get(rawJobKey) || {};
 
       return {
         id: item.id || null,
         job_id: item.job_id || null,
-        job_public_id: job.public_id || null,
+        job_public_id: job.public_id || (rawJobKey && !isUuidLike(rawJobKey) ? rawJobKey : null),
         job_title: job.title || job.project_title || "Untitled job",
         category: job.category || null,
         city: job.city || null,
         state: job.state || null,
         business_name: item.business_name || "Pro",
-        pro_email: item.pro_email || null,
-        phone: item.phone || null,
+        pro_email: item.pro_email || item.email || null,
+        phone: item.pro_phone || item.phone || null,
         amount: item.amount ?? null,
         message: item.message || "",
         status: item.status || "pending",
