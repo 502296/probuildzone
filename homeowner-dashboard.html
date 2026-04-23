@@ -682,7 +682,72 @@
       return `${n} ${n === 1 ? "Builder" : "Builders"} Interested`;
     }
 
+    function getQueryValue(params, key) {
+      const value = params.get(key);
+      return value ? value.trim() : "";
+    }
+
+    function getHomeownerFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+
+      const email = getQueryValue(params, "email");
+      const name = getQueryValue(params, "name");
+      const phone = getQueryValue(params, "phone");
+      const publicId =
+        getQueryValue(params, "public_id") ||
+        getQueryValue(params, "last_job_public_id");
+      const lastJobId = getQueryValue(params, "last_job_id");
+
+      if (!email && !name && !phone && !publicId && !lastJobId) {
+        return null;
+      }
+
+      return {
+        email,
+        name,
+        phone,
+        public_id: publicId,
+        last_job_public_id: publicId,
+        last_job_id: lastJobId,
+        source: "email_link"
+      };
+    }
+
+    function persistHomeownerFromUrl() {
+      const fromUrl = getHomeownerFromUrl();
+      if (!fromUrl) return null;
+
+      let existing = null;
+
+      try {
+        const raw = localStorage.getItem("pbz_homeowner");
+        existing = raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        existing = null;
+      }
+
+      const merged = {
+        ...(existing && typeof existing === "object" ? existing : {}),
+        ...fromUrl
+      };
+
+      try {
+        localStorage.setItem("pbz_homeowner", JSON.stringify(merged));
+      } catch (err) {
+        console.warn("Could not persist homeowner from URL:", err);
+      }
+
+      if (window.location.search) {
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+
+      return merged;
+    }
+
     function getStoredHomeowner() {
+      persistHomeownerFromUrl();
+
       try {
         const raw = localStorage.getItem("pbz_homeowner");
         if (!raw) return null;
@@ -700,7 +765,7 @@
       profileMetaEl.innerHTML = `
         <div><strong>Email:</strong> ${escapeHtml(user.email || "-")}</div>
         <div><strong>Phone:</strong> ${escapeHtml(user.phone || "-")}</div>
-        <div><strong>Last Job ID:</strong> ${escapeHtml(user.last_job_public_id || user.last_job_id || "-")}</div>
+        <div><strong>Last Job ID:</strong> ${escapeHtml(user.last_job_public_id || user.public_id || user.last_job_id || "-")}</div>
       `;
     }
 
@@ -864,7 +929,6 @@
         const requestsHtml = requests.length
           ? requests.map((req, reqIndex) => {
               const status = String(req.status || "pending").toLowerCase();
-              const isResolved = status === "approved" || status === "declined";
               const requestIdSafe = String(req.id || `${projectIndex}-${reqIndex}`).replace(/[^a-zA-Z0-9_-]/g, "");
               const requestBodyId = `request-body-${requestIdSafe}`;
 
@@ -1043,11 +1107,15 @@
     async function loadDashboard() {
       const user = getStoredHomeowner();
 
-      if (!user) {
+      if (!user || (!user.email && !user.phone && !user.last_job_public_id && !user.public_id && !user.last_job_id)) {
         statusBox.className = "error";
+        statusBox.style.display = "block";
         statusBox.textContent = "No active homeowner session found. Please post a project first.";
+        jobsBox.style.display = "none";
         profileNameEl.textContent = "Session missing";
         profileMetaEl.textContent = "Please return to the homeowner project page and create a project first.";
+        statProjectsEl.textContent = "0";
+        statRequestsEl.textContent = "0";
         return;
       }
 
@@ -1066,6 +1134,8 @@
 
         if (user.last_job_public_id) {
           dashboardUrl.searchParams.set("public_id", user.last_job_public_id);
+        } else if (user.public_id) {
+          dashboardUrl.searchParams.set("public_id", user.public_id);
         } else if (user.last_job_id) {
           dashboardUrl.searchParams.set("last_job_id", user.last_job_id);
         }
@@ -1088,6 +1158,7 @@
 
         if (!projects.length) {
           statusBox.className = "empty";
+          statusBox.style.display = "block";
           statusBox.textContent = "You have not posted any projects yet.";
           jobsBox.style.display = "none";
           return;
@@ -1099,6 +1170,7 @@
       } catch (err) {
         console.error("Homeowner dashboard load error:", err);
         statusBox.className = "error";
+        statusBox.style.display = "block";
         statusBox.textContent = "Could not load your homeowner dashboard right now.";
         jobsBox.style.display = "none";
       }
