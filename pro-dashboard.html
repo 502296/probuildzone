@@ -257,6 +257,20 @@
       border-color:#f4c3c3;
     }
 
+    .debug{
+      margin-top:12px;
+      background:#111827;
+      color:#f9fafb;
+      border-radius:12px;
+      padding:14px;
+      font-size:13px;
+      line-height:1.6;
+      text-align:left;
+      white-space:pre-wrap;
+      word-break:break-word;
+      display:none;
+    }
+
     @media (max-width:860px){
       .hero-grid{
         grid-template-columns:1fr;
@@ -322,6 +336,7 @@
     <h2 class="section-title">My Connection Requests</h2>
 
     <div id="statusBox" class="loading">Loading your requests...</div>
+    <div id="debugBox" class="debug"></div>
     <div id="requestsBox" class="requests-grid" style="display:none;"></div>
   </div>
 
@@ -331,6 +346,7 @@
     const statTotalEl = document.getElementById("statTotal");
     const statPendingEl = document.getElementById("statPending");
     const statusBox = document.getElementById("statusBox");
+    const debugBox = document.getElementById("debugBox");
     const requestsBox = document.getElementById("requestsBox");
     const logoutBtn = document.getElementById("logoutBtn");
     const jobsLink = document.getElementById("jobsLink");
@@ -373,7 +389,6 @@
       try {
         const raw = localStorage.getItem("pbz_user");
         if (!raw) return null;
-
         const parsed = JSON.parse(raw);
         return parsed && typeof parsed === "object" ? parsed : null;
       } catch (err) {
@@ -405,40 +420,23 @@
     function renderStats(requests) {
       const total = requests.length;
       const pending = requests.filter(item => String(item.status || "").toLowerCase() === "pending").length;
-
       statTotalEl.textContent = String(total);
       statPendingEl.textContent = String(pending);
     }
 
     function buildJobUrl(item) {
       const url = new URL("/job.html", window.location.origin);
-
-      const rawId =
-        item.job_id ||
-        item.id ||
-        "";
-
-      const publicId =
-        item.job_public_id ||
-        item.public_id ||
-        "";
+      const rawId = item.job_id || item.id || "";
+      const publicId = item.job_public_id || item.public_id || "";
 
       if (rawId && /^[0-9a-fA-F-]{8,}$/.test(String(rawId))) {
         url.searchParams.set("id", rawId);
       }
-
       if (publicId) {
         url.searchParams.set("public_id", publicId);
       }
 
       return url.pathname + url.search;
-    }
-
-    function normalizeRequests(data) {
-      if (Array.isArray(data?.requests)) return data.requests;
-      if (Array.isArray(data?.offers)) return data.offers;
-      if (Array.isArray(data?.items)) return data.items;
-      return [];
     }
 
     function renderRequests(requests) {
@@ -473,58 +471,35 @@
       }).join("");
     }
 
-    async function fetchJsonOrThrow(url) {
-      const res = await fetch(url, {
-        headers: {
-          "Accept": "application/json"
-        }
-      });
+    async function fetchSource(label, url) {
+      const res = await fetch(url, { headers: { "Accept": "application/json" } });
+      const rawText = await res.text();
 
-      const text = await res.text();
       let data = {};
-
       try {
-        data = text ? JSON.parse(text) : {};
+        data = rawText ? JSON.parse(rawText) : {};
       } catch (err) {
-        throw new Error(`Non-JSON response from ${url}`);
+        throw new Error(`${label} returned non-JSON:\n${rawText.slice(0, 500)}`);
       }
 
       if (!res.ok) {
-        throw new Error(data.error || `Request failed for ${url}`);
+        throw new Error(`${label} HTTP ${res.status}: ${data.error || rawText || "Unknown error"}`);
       }
 
-      return data;
-    }
-
-    async function loadRequests(user) {
-      const params = new URLSearchParams();
-
-      if (user.email) params.set("email", user.email);
-      if (user.phone) params.set("phone", user.phone);
-
-      const candidateUrls = [
-        `/.netlify/functions/get-pro-requests?${params.toString()}`,
-        `/.netlify/functions/get-offers?${params.toString()}`
-      ];
-
-      let lastError = null;
-
-      for (const url of candidateUrls) {
-        try {
-          const data = await fetchJsonOrThrow(url);
-
-          if (data && (data.ok === true || Array.isArray(data.requests) || Array.isArray(data.offers) || Array.isArray(data.items))) {
-            return normalizeRequests(data);
-          }
-
-          throw new Error(data.error || "Unexpected response format");
-        } catch (err) {
-          console.warn("Dashboard source failed:", url, err);
-          lastError = err;
-        }
+      if (data.ok === false) {
+        throw new Error(`${label}: ${data.error || "Unknown backend error"}`);
       }
 
-      throw lastError || new Error("Failed to load dashboard data");
+      const requests =
+        Array.isArray(data.requests) ? data.requests :
+        Array.isArray(data.offers) ? data.offers :
+        Array.isArray(data.items) ? data.items : null;
+
+      if (requests === null) {
+        throw new Error(`${label} returned unexpected JSON:\n${JSON.stringify(data, null, 2).slice(0, 800)}`);
+      }
+
+      return { label, requests, raw: data };
     }
 
     async function loadDashboard() {
@@ -532,48 +507,71 @@
 
       if (!user || (!user.email && !user.phone)) {
         statusBox.className = "error";
-        statusBox.style.display = "block";
         statusBox.textContent = "No active Pro session found. Please sign in again.";
         profileNameEl.textContent = "Session missing";
         profileMetaEl.textContent = "Please return to the Pro signup page and continue from there.";
-        statTotalEl.textContent = "0";
-        statPendingEl.textContent = "0";
+        debugBox.style.display = "none";
         requestsBox.style.display = "none";
         return;
       }
 
       renderProfile(user);
 
-      try {
-        const requests = await loadRequests(user);
+      const params = new URLSearchParams();
+      if (user.email) params.set("email", user.email);
+      if (user.phone) params.set("phone", user.phone);
 
-        renderStats(requests);
-
-        if (!requests.length) {
-          statusBox.className = "empty";
-          statusBox.style.display = "block";
-          statusBox.textContent = "You have not sent any connection requests yet.";
-          requestsBox.style.display = "none";
-          return;
+      const sources = [
+        {
+          label: "get-pro-requests",
+          url: `/.netlify/functions/get-pro-requests?${params.toString()}`
+        },
+        {
+          label: "get-offers",
+          url: `/.netlify/functions/get-offers?${params.toString()}`
         }
+      ];
 
-        statusBox.style.display = "none";
-        requestsBox.style.display = "grid";
-        renderRequests(requests);
-      } catch (err) {
-        console.error("Dashboard load error:", err);
-        statusBox.className = "error";
-        statusBox.style.display = "block";
-        statusBox.textContent = "Could not load your dashboard right now.";
-        requestsBox.style.display = "none";
+      const debugLines = [];
+
+      for (const source of sources) {
+        try {
+          debugLines.push(`Trying ${source.label} ...`);
+          const result = await fetchSource(source.label, source.url);
+          debugLines.push(`${source.label} succeeded. Requests found: ${result.requests.length}`);
+
+          renderStats(result.requests);
+
+          if (!result.requests.length) {
+            statusBox.className = "empty";
+            statusBox.textContent = "You have not sent any connection requests yet.";
+            requestsBox.style.display = "none";
+          } else {
+            statusBox.style.display = "none";
+            requestsBox.style.display = "grid";
+            renderRequests(result.requests);
+          }
+
+          debugBox.textContent = debugLines.join("\n");
+          debugBox.style.display = "block";
+          return;
+        } catch (err) {
+          console.error(source.label, err);
+          debugLines.push(`${source.label} failed: ${err.message}`);
+        }
       }
+
+      statusBox.className = "error";
+      statusBox.textContent = "Could not load your dashboard right now.";
+      requestsBox.style.display = "none";
+      debugBox.textContent = debugLines.join("\n");
+      debugBox.style.display = "block";
     }
 
     function handleLogout() {
       try {
         localStorage.removeItem("pbz_user");
       } catch (_) {}
-
       window.location.href = "/pros.html";
     }
 
