@@ -83,28 +83,23 @@ exports.handler = async (event) => {
       });
     }
 
-    // Step 1: Load this Pro's connection requests
-    // We match flexibly because some rows may store the pro email in `pro_email`
-    // while older rows may have used `email`.
+    // Step 1: Load this Pro's connection requests using the actual DB columns:
+    // email + phone
     let requestsQuery = supabase
       .from("pro_offers")
       .select(
-        "id, job_id, business_name, pro_email, email, phone, pro_phone, amount, message, status, created_at"
+        "id, job_id, business_name, email, phone, amount, message, status, created_at"
       )
       .order("created_at", { ascending: false });
 
     if (email && phone) {
       requestsQuery = requestsQuery.or(
-        `pro_email.ilike.${email},email.ilike.${email},phone.eq.${phone},pro_phone.eq.${phone}`
+        `email.ilike.${email},phone.eq.${phone}`
       );
     } else if (email) {
-      requestsQuery = requestsQuery.or(
-        `pro_email.ilike.${email},email.ilike.${email}`
-      );
+      requestsQuery = requestsQuery.ilike("email", email);
     } else if (phone) {
-      requestsQuery = requestsQuery.or(
-        `phone.eq.${phone},pro_phone.eq.${phone}`
-      );
+      requestsQuery = requestsQuery.eq("phone", phone);
     }
 
     const { data: requestsRaw, error: reqError } = await requestsQuery;
@@ -188,14 +183,16 @@ exports.handler = async (event) => {
       return {
         id: item.id || null,
         job_id: item.job_id || null,
-        job_public_id: job.public_id || (rawJobKey && !isUuidLike(rawJobKey) ? rawJobKey : null),
+        job_public_id:
+          job.public_id || (rawJobKey && !isUuidLike(rawJobKey) ? rawJobKey : null),
         job_title: job.title || job.project_title || "Untitled job",
         category: job.category || null,
         city: job.city || null,
         state: job.state || null,
         business_name: item.business_name || "Pro",
-        pro_email: item.pro_email || item.email || null,
-        phone: item.pro_phone || item.phone || null,
+        pro_email: item.email || null,
+        email: item.email || null,
+        phone: item.phone || null,
         amount: item.amount ?? null,
         message: item.message || "",
         status: item.status || "pending",
