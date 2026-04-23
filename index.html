@@ -515,12 +515,12 @@
 
         <div class="cat-grid">
           <button class="cat-card" data-cat="Roofing">🏠<span>Roofing</span></button>
-          <button class="cat-card" data-cat="Decks & Porches">🪚<span>Decks & Porches</span></button>
-          <button class="cat-card" data-cat="Kitchens">🍳<span>Kitchens</span></button>
-          <button class="cat-card" data-cat="Bathrooms">🛁<span>Bathrooms</span></button>
+          <button class="cat-card" data-cat="General Construction">🪚<span>Decks & Porches</span></button>
+          <button class="cat-card" data-cat="Kitchen Remodeling">🍳<span>Kitchens</span></button>
+          <button class="cat-card" data-cat="Bathroom Remodeling">🛁<span>Bathrooms</span></button>
           <button class="cat-card" data-cat="Flooring">🪵<span>Flooring</span></button>
           <button class="cat-card" data-cat="Painting">🎨<span>Painting</span></button>
-          <button class="cat-card" data-cat="Masonry">🧱<span>Masonry</span></button>
+          <button class="cat-card" data-cat="Concrete">🧱<span>Masonry</span></button>
           <button class="cat-card" data-cat="Electrical">⚡<span>Electrical</span></button>
           <button class="cat-card" data-cat="Plumbing">🚰<span>Plumbing</span></button>
           <button class="cat-card" data-cat="Windows & Doors">🪟<span>Windows & Doors</span></button>
@@ -543,7 +543,7 @@
         <div class="file-hint">Files help pros understand the project faster.</div>
         <div class="card" id="fileList"></div>
 
-        <input type="hidden" id="categoryHidden" value="General" />
+        <input type="hidden" id="categoryHidden" value="General Construction" />
 
         <label for="title">Project title *</label>
         <input id="title" type="text" placeholder="Replace leaking roof" required />
@@ -782,7 +782,7 @@
     document.getElementById("sendBtn").addEventListener("click", async () => {
       const m = document.getElementById("sendMsg");
       const payload = {
-        category: document.getElementById("categoryHidden").value || "General",
+        category: document.getElementById("categoryHidden").value || "General Construction",
         title: document.getElementById("title").value.trim(),
         summary: document.getElementById("summary").value.trim(),
         city: document.getElementById("city").value.trim(),
