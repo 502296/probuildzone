@@ -247,19 +247,28 @@
 
     .job-images{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns:1fr;
       gap:12px;
       margin-top:12px;
     }
 
     .job-image{
       width:100%;
-      height:180px;
+      max-height:420px;
       object-fit:cover;
-      border-radius:16px;
+      border-radius:18px;
       border:1px solid var(--border);
       background:#f3f4f6;
       cursor:pointer;
+      display:block;
+      box-shadow:0 10px 24px rgba(15,23,32,0.06);
+    }
+
+    .photo-caption{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin:8px 0 0;
     }
 
     .bottom-actions{
@@ -287,6 +296,7 @@
       .job-side{text-align:left}
       .bottom-actions{flex-direction:column}
       .bottom-actions .btn{width:100%}
+      .job-image{max-height:320px}
     }
   </style>
 </head>
@@ -337,6 +347,7 @@
           <div id="photosBox" class="photos-box">
             <h2>Project Photos</h2>
             <div id="jobImages" class="job-images"></div>
+            <p class="photo-caption">Click the photo to open it in full size.</p>
           </div>
 
           <div class="bottom-actions">
@@ -427,18 +438,30 @@
       }
 
       function publicStorageUrl(path) {
+        if (!path) return "";
         return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${encodeURIComponent(path).replaceAll("%2F", "/")}`;
       }
 
-      function renderJobPhotos(resolvedPublicId, job) {
-        if (!resolvedPublicId || !jobImages || !photosBox) return;
-
+      function getPhotoUrls(job) {
+        const urls = [];
         const paths = [];
+
+        if (job?.photo_url) {
+          urls.push(job.photo_url);
+        }
 
         if (Array.isArray(job?.photos)) {
           job.photos.forEach((p) => {
-            if (typeof p === "string") paths.push(p);
-            else if (p?.path) paths.push(p.path);
+            if (!p) return;
+
+            if (typeof p === "string") {
+              if (p.startsWith("http")) urls.push(p);
+              else paths.push(p);
+              return;
+            }
+
+            if (p.url) urls.push(p.url);
+            if (p.path) paths.push(p.path);
           });
         }
 
@@ -454,34 +477,39 @@
           });
         }
 
-        // Temporary/manual test image for PBZ-46474.
-        // Later, when the upload form saves photo paths in DB, this fallback can be removed.
-        if (resolvedPublicId === "PBZ-46474" && paths.length === 0) {
-          paths.push("PBZ-46474/ROOF-TESTING.png");
-        }
+        paths.forEach((path) => {
+          urls.push(publicStorageUrl(path));
+        });
 
-        const cleanPaths = [...new Set(paths.filter(Boolean))];
+        return [...new Set(urls.filter(Boolean))];
+      }
 
-        if (!cleanPaths.length) {
+      function renderJobPhotos(job) {
+        if (!jobImages || !photosBox) return;
+
+        const photoUrls = getPhotoUrls(job);
+
+        jobImages.innerHTML = "";
+
+        if (!photoUrls.length) {
           photosBox.style.display = "none";
           return;
         }
 
-        jobImages.innerHTML = "";
-
-        cleanPaths.forEach((path) => {
+        photoUrls.forEach((url) => {
           const img = document.createElement("img");
           img.className = "job-image";
           img.alt = "Project photo";
           img.loading = "lazy";
-          img.src = publicStorageUrl(path);
+          img.src = url;
 
           img.addEventListener("click", () => {
-            window.open(img.src, "_blank", "noopener,noreferrer");
+            window.open(url, "_blank", "noopener,noreferrer");
           });
 
           img.onerror = () => {
             img.remove();
+
             if (!jobImages.children.length) {
               photosBox.style.display = "none";
             }
@@ -550,7 +578,7 @@
         const title = j.project_title || j.title || j.category || "Untitled job";
         const category = j.category || "—";
         const location = [j.city, j.state].filter(Boolean).join(", ") || j.full_address || "—";
-        const summary = j.short_summary || j.full_description || j.description || "No project description provided yet.";
+        const summary = j.short_summary || j.summary || j.full_description || j.description || "No project description provided yet.";
 
         v_id.textContent = resolvedPublicId || resolvedId;
         v_title.textContent = title;
@@ -558,7 +586,7 @@
         v_summary.textContent = summary;
         v_meta_line.textContent = [location, category].filter(Boolean).join(" • ");
 
-        renderJobPhotos(resolvedPublicId, j);
+        renderJobPhotos(j);
 
         const messageUrl = new URL("/pro-offer.html", window.location.origin);
 
