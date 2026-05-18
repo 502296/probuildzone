@@ -21,9 +21,6 @@
       --soft-border:#d7e5ff;
       --shadow:0 14px 34px rgba(15, 23, 32, 0.06);
       --radius-xl:28px;
-      --radius-lg:22px;
-      --radius-md:16px;
-      --radius-sm:12px;
     }
 
     *{ box-sizing:border-box; }
@@ -42,15 +39,9 @@
       padding:34px 16px 52px;
     }
 
-    .page{
-      max-width:900px;
-      margin:0 auto;
-    }
+    .page{ max-width:900px; margin:0 auto; }
 
-    .hero{
-      text-align:center;
-      margin-bottom:24px;
-    }
+    .hero{ text-align:center; margin-bottom:24px; }
 
     .eyebrow{
       display:inline-block;
@@ -104,13 +95,9 @@
       text-transform:uppercase;
     }
 
-    .form-wrap{
-      display:block;
-    }
-
     .form-intro{
       margin-bottom:18px;
-      padding:16px 16px;
+      padding:16px;
       border-radius:18px;
       border:1px solid #edf1f5;
       background:#fcfcfd;
@@ -148,35 +135,21 @@
       background:#fff;
       color:var(--brand);
       font-family:inherit;
-      transition:border-color .12s ease, box-shadow .12s ease, background .12s ease;
+      transition:border-color .12s ease, box-shadow .12s ease;
     }
 
-    input::placeholder,
-    textarea::placeholder{
-      color:#8b97a7;
-    }
+    input::placeholder, textarea::placeholder{ color:#8b97a7; }
 
-    input:focus,
-    textarea:focus,
-    select:focus{
+    input:focus, textarea:focus, select:focus{
       outline:none;
       border-color:#b8c9e3;
       box-shadow:0 0 0 4px rgba(59,130,246,0.08);
     }
 
-    textarea{
-      resize:vertical;
-      min-height:130px;
-    }
+    textarea{ resize:vertical; min-height:130px; }
 
-    .row{
-      display:flex;
-      gap:14px;
-    }
-
-    .row > div{
-      flex:1;
-    }
+    .row{ display:flex; gap:14px; }
+    .row > div{ flex:1; }
 
     .field-note{
       color:var(--muted);
@@ -186,8 +159,25 @@
       line-height:1.6;
     }
 
-    button,
-    .action-link{
+    .photo-box{
+      border:1px dashed #cbd5e1;
+      background:#fbfdff;
+      border-radius:18px;
+      padding:14px;
+      margin-top:8px;
+    }
+
+    .photo-preview{
+      display:none;
+      width:100%;
+      max-height:260px;
+      object-fit:cover;
+      border-radius:14px;
+      margin-top:12px;
+      border:1px solid #e5e7eb;
+    }
+
+    button, .action-link{
       width:100%;
       margin-top:18px;
       padding:15px 16px;
@@ -207,8 +197,7 @@
       font-size:15px;
     }
 
-    button:hover,
-    .action-link:hover{
+    button:hover, .action-link:hover{
       transform:translateY(-1px);
       box-shadow:0 10px 20px rgba(0,0,0,.06);
     }
@@ -220,23 +209,9 @@
       transform:none;
     }
 
-    .secondary-link{
-      background:#edf0f3;
-      color:var(--brand);
-    }
-
-    .secondary-link:hover{
-      filter:brightness(.98);
-    }
-
-    .dashboard-link{
-      background:var(--gold);
-      color:#111827;
-    }
-
-    .dashboard-link:hover{
-      background:var(--gold-dark);
-    }
+    .secondary-link{ background:#edf0f3; color:var(--brand); }
+    .dashboard-link{ background:var(--gold); color:#111827; }
+    .dashboard-link:hover{ background:var(--gold-dark); }
 
     .msg{
       margin-top:14px;
@@ -245,15 +220,8 @@
       font-size:14px;
     }
 
-    .msg.ok{
-      color:var(--ok);
-      font-weight:700;
-    }
-
-    .msg.err{
-      color:var(--err);
-      font-weight:700;
-    }
+    .msg.ok{ color:var(--ok); font-weight:700; }
+    .msg.err{ color:var(--err); font-weight:700; }
 
     .success-panel{
       display:none;
@@ -292,27 +260,11 @@
     }
 
     @media (max-width:640px){
-      body{
-        padding:24px 14px 40px;
-      }
-
-      .card{
-        padding:18px;
-        border-radius:22px;
-      }
-
-      .row{
-        flex-direction:column;
-        gap:0;
-      }
-
-      .success-actions{
-        flex-direction:column;
-      }
-
-      .success-actions .action-link{
-        width:100%;
-      }
+      body{ padding:24px 14px 40px; }
+      .card{ padding:18px; border-radius:22px; }
+      .row{ flex-direction:column; gap:0; }
+      .success-actions{ flex-direction:column; }
+      .success-actions .action-link{ width:100%; }
     }
   </style>
 </head>
@@ -397,6 +349,13 @@
         <label for="description">Full description *</label>
         <textarea id="description" required placeholder="Describe your project, measurements, timeline, and anything builders should know."></textarea>
 
+        <label for="projectPhoto">Project photo (optional)</label>
+        <div class="photo-box">
+          <input id="projectPhoto" type="file" accept="image/png,image/jpeg,image/webp">
+          <small class="field-note">Upload one clear project photo. JPG, PNG, or WEBP. Max 5MB.</small>
+          <img id="photoPreview" class="photo-preview" alt="Project photo preview">
+        </div>
+
         <small class="field-note">Fields marked * are required.</small>
 
         <button id="postBtn" type="submit">🚀 Post Job</button>
@@ -428,26 +387,16 @@
     const pageSubhead = document.getElementById("pageSubhead");
     const modeBadge = document.getElementById("modeBadge");
     const categoryEl = document.getElementById("category");
+    const photoInput = document.getElementById("projectPhoto");
+    const photoPreview = document.getElementById("photoPreview");
+
+    let selectedImageData = null;
 
     const CANONICAL_CATEGORIES = [
-      "General Construction",
-      "Remodeling",
-      "Plumbing",
-      "Electrical",
-      "HVAC",
-      "Roofing",
-      "Flooring",
-      "Painting",
-      "Drywall",
-      "Landscaping",
-      "Cleaning",
-      "Moving",
-      "Handyman",
-      "Concrete",
-      "Fencing",
-      "Windows & Doors",
-      "Kitchen Remodeling",
-      "Bathroom Remodeling"
+      "General Construction", "Remodeling", "Plumbing", "Electrical", "HVAC",
+      "Roofing", "Flooring", "Painting", "Drywall", "Landscaping", "Cleaning",
+      "Moving", "Handyman", "Concrete", "Fencing", "Windows & Doors",
+      "Kitchen Remodeling", "Bathroom Remodeling"
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -495,6 +444,7 @@
         last_job_id: job.id || responseData.job_id || "",
         last_job_title: job.title || payload.title || "",
         last_job_category: job.category || payload.category || "",
+        last_photo_path: responseData.photo_path || "",
         saved_at: new Date().toISOString()
       };
     }
@@ -534,10 +484,57 @@
       return exactMatch || normalized;
     }
 
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Could not read image file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    photoInput.addEventListener("change", async () => {
+      selectedImageData = null;
+      photoPreview.style.display = "none";
+      photoPreview.removeAttribute("src");
+      setStatus("", "");
+
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) return;
+
+      const allowed = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowed.includes(file.type)) {
+        photoInput.value = "";
+        return setStatus("Please upload a JPG, PNG, or WEBP image.", "err");
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        photoInput.value = "";
+        return setStatus("Image is too large. Please upload an image under 5MB.", "err");
+      }
+
+      try {
+        const dataUrl = await fileToDataURL(file);
+        selectedImageData = {
+          image_base64: dataUrl,
+          image_name: file.name,
+          image_type: file.type
+        };
+        photoPreview.src = dataUrl;
+        photoPreview.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Could not preview image.", "err");
+      }
+    });
+
     function resetForAnotherPost() {
       hideSuccessPanel();
       setStatus("", "");
       form.reset();
+      selectedImageData = null;
+      photoPreview.style.display = "none";
+      photoPreview.removeAttribute("src");
       form.style.display = "block";
       btn.disabled = false;
       btn.textContent = "🚀 Post Job";
@@ -621,12 +618,18 @@
         description: document.getElementById("description").value.trim(),
       };
 
+      if (selectedImageData && !isEditMode) {
+        payload.image_base64 = selectedImageData.image_base64;
+        payload.image_name = selectedImageData.image_name;
+        payload.image_type = selectedImageData.image_type;
+      }
+
       if (!payload.category || !payload.title || !payload.name || !payload.email || !payload.phone || !payload.address || !payload.description) {
         return setStatus("Please fill all required fields.", "err");
       }
 
       btn.disabled = true;
-      btn.textContent = isEditMode ? "Saving changes…" : "Saving to database…";
+      btn.textContent = isEditMode ? "Saving changes…" : "Saving project…";
       setStatus("", "");
 
       try {
@@ -665,16 +668,17 @@
         saveHomeownerSession(homeownerSession);
 
         if (isEditMode) {
-          setStatus(`✅ Project updated successfully!`, "ok");
+          setStatus("✅ Project updated successfully!", "ok");
           showSuccessPanel(
             "Project updated successfully.",
             "Your changes have been saved. You can now return to your homeowner dashboard and continue reviewing builder requests."
           );
         } else {
+          const photoText = data.photo_path ? " The project photo was uploaded successfully." : "";
           setStatus(`✅ Job posted successfully! Public Job ID: ${data.public_id || homeownerSession.last_job_public_id || "Created"}`, "ok");
           showSuccessPanel(
             "Project posted successfully.",
-            "Your project has been saved. You can now continue to your homeowner dashboard to review your project and incoming connection requests."
+            `Your project has been saved.${photoText} You can now continue to your homeowner dashboard to review your project and incoming connection requests.`
           );
         }
 
