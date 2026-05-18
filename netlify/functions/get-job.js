@@ -9,6 +9,8 @@ const HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+const BUCKET = "homeowner_uploads";
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
@@ -25,7 +27,6 @@ function json(statusCode, body) {
 
 function buildClient() {
   if (!supabaseUrl || !supabaseKey) return null;
-
   return createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false },
   });
@@ -43,62 +44,41 @@ function isPublicId(value) {
   return /^PBZ-\d+$/i.test(value);
 }
 
+function publicUrlForPath(path) {
+  if (!path || !supabaseUrl) return "";
+  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(path).replaceAll("%2F", "/")}`;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: HEADERS,
-      body: "",
-    };
+    return { statusCode: 200, headers: HEADERS, body: "" };
   }
 
   if (event.httpMethod !== "GET") {
-    return json(405, {
-      ok: false,
-      error: "Method not allowed",
-    });
+    return json(405, { ok: false, error: "Method not allowed" });
   }
 
   if (!supabaseUrl || !supabaseKey) {
-    return json(500, {
-      ok: false,
-      error: "Missing Supabase env vars",
-    });
+    return json(500, { ok: false, error: "Missing Supabase env vars" });
   }
 
   const supabase = buildClient();
 
   if (!supabase) {
-    return json(500, {
-      ok: false,
-      error: "Failed to initialize Supabase client",
-    });
+    return json(500, { ok: false, error: "Failed to initialize Supabase client" });
   }
 
   try {
     const params = event.queryStringParameters || {};
 
-    const rawId = normalize(
-      params.id ||
-      params.jobId ||
-      params.job ||
-      ""
-    );
-
-    const rawPublicId = normalize(
-      params.public_id ||
-      params.publicId ||
-      ""
-    );
+    const rawId = normalize(params.id || params.jobId || params.job || "");
+    const rawPublicId = normalize(params.public_id || params.publicId || "");
 
     let id = rawId;
     let publicId = rawPublicId;
 
     if (!id && !publicId) {
-      return json(400, {
-        ok: false,
-        error: "Missing job identifier",
-      });
+      return json(400, { ok: false, error: "Missing job identifier" });
     }
 
     if (!publicId && isPublicId(id)) {
@@ -137,19 +117,12 @@ exports.handler = async (event) => {
         .eq("public_id", publicId)
         .maybeSingle();
 
-      if (result.error) {
-        error = result.error;
-      } else if (result.data) {
-        data = result.data;
-      }
+      if (result.error) error = result.error;
+      else if (result.data) data = result.data;
     }
 
     if (!data && id) {
-      let queryValue = id;
-
-      if (/^\d+$/.test(id)) {
-        queryValue = Number(id);
-      }
+      const queryValue = /^\d+$/.test(id) ? Number(id) : id;
 
       const result = await supabase
         .from("homeowner_jobs")
@@ -157,11 +130,8 @@ exports.handler = async (event) => {
         .eq("id", queryValue)
         .maybeSingle();
 
-      if (result.error) {
-        error = result.error;
-      } else if (result.data) {
-        data = result.data;
-      }
+      if (result.error) error = result.error;
+      else if (result.data) data = result.data;
     }
 
     if (!data && rawId && isUuidLike(rawId) && rawId !== id) {
@@ -171,37 +141,44 @@ exports.handler = async (event) => {
         .eq("id", rawId)
         .maybeSingle();
 
-      if (result.error) {
-        error = result.error;
-      } else if (result.data) {
-        data = result.data;
-      }
+      if (result.error) error = result.error;
+      else if (result.data) data = result.data;
     }
 
     if (error) {
       console.error("get-job error:", error);
-      return json(500, {
-        ok: false,
-        error: error.message || "Failed to load job",
-      });
+      return json(500, { ok: false, error: error.message || "Failed to load job" });
     }
 
     if (!data) {
-      return json(404, {
-        ok: false,
-        error: "Job not found",
-      });
+      return json(404, { ok: false, error: "Job not found" });
     }
+
+    const photosResult = await supabase
+      .from("homeowner_job_photos")
+      .select("id, job_id, path")
+      .eq("job_id", data.id)
+      .order("id", { ascending: true });
+
+    const photos = photosResult.error
+      ? []
+      : (photosResult.data || []).map((photo) => ({
+          id: photo.id,
+          job_id: photo.job_id,
+          path: photo.path,
+          url: publicUrlForPath(photo.path),
+        }));
 
     return json(200, {
       ok: true,
-      job: data,
+      job: {
+        ...data,
+        photos,
+        photo_url: photos[0]?.url || "",
+      },
     });
   } catch (err) {
     console.error("get-job unexpected error:", err);
-    return json(500, {
-      ok: false,
-      error: err.message || "Unexpected error",
-    });
+    return json(500, { ok: false, error: err.message || "Unexpected error" });
   }
 };
