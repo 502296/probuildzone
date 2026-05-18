@@ -20,9 +20,6 @@
       --gold-2:#c49c1f;
       --shadow:0 18px 45px rgba(15, 23, 32, 0.08);
       --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
-      --radius-sm:12px;
       --err:#b00020;
       --danger:#b42318;
     }
@@ -35,11 +32,6 @@
       background:var(--bg);
       font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
       color:var(--ink);
-    }
-
-    body{
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
     }
 
     .wrap{
@@ -60,13 +52,10 @@
     .brand{
       font-size:16px;
       font-weight:800;
-      letter-spacing:-0.02em;
       color:var(--ink);
     }
 
-    .brand span{
-      color:var(--gold);
-    }
+    .brand span{color:var(--gold)}
 
     .topbar-actions{
       display:flex;
@@ -82,7 +71,7 @@
       border-radius:14px;
       font-weight:700;
       text-decoration:none;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
       text-align:center;
       font-size:14px;
       display:inline-flex;
@@ -101,27 +90,17 @@
       color:var(--ink);
     }
 
-    .btn.white:hover{
-      background:#fafafa;
-    }
-
     .btn.primary{
       background:var(--gold);
       color:#111827;
     }
 
-    .btn.primary:hover{
-      background:var(--gold-2);
-    }
+    .btn.primary:hover{background:var(--gold-2)}
 
     .btn.danger{
       background:#fff;
       color:var(--danger);
       border:1px solid #f1d1cd;
-    }
-
-    .btn.danger:hover{
-      background:#fff8f7;
     }
 
     .error{
@@ -198,7 +177,6 @@
       margin:0 0 8px;
       font-size:22px;
       line-height:1.15;
-      letter-spacing:-0.02em;
       font-weight:800;
       color:var(--ink);
     }
@@ -236,14 +214,21 @@
       font-weight:800;
     }
 
-    .summary-box{
+    .summary-box,
+    .photos-box{
       border:1px solid var(--border);
       border-radius:18px;
       padding:18px;
       background:#fcfcfd;
     }
 
-    .summary-box h2{
+    .photos-box{
+      margin-top:16px;
+      display:none;
+    }
+
+    .summary-box h2,
+    .photos-box h2{
       margin:0 0 10px;
       font-size:13px;
       font-weight:800;
@@ -260,6 +245,23 @@
       margin:0;
     }
 
+    .job-images{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .job-image{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#f3f4f6;
+      cursor:pointer;
+    }
+
     .bottom-actions{
       display:flex;
       gap:10px;
@@ -272,52 +274,19 @@
       min-width:180px;
     }
 
-    #jobContent{
-      display:none;
-    }
+    #jobContent{display:none}
 
-    @media (max-width: 700px){
-      .wrap{
-        margin:18px auto 40px;
-      }
-
-      .topbar{
-        align-items:stretch;
-      }
-
-      .topbar-actions{
-        width:100%;
-      }
-
-      .topbar-actions .btn{
-        flex:1;
-      }
-
-      .main-card{
-        padding:18px;
-        border-radius:22px;
-      }
-
-      .job-card{
-        padding:18px;
-      }
-
-      .job-top{
-        grid-template-columns:1fr;
-        gap:8px;
-      }
-
-      .job-side{
-        text-align:left;
-      }
-
-      .bottom-actions{
-        flex-direction:column;
-      }
-
-      .bottom-actions .btn{
-        width:100%;
-      }
+    @media (max-width:700px){
+      .wrap{margin:18px auto 40px}
+      .topbar{align-items:stretch}
+      .topbar-actions{width:100%}
+      .topbar-actions .btn{flex:1}
+      .main-card{padding:18px;border-radius:22px}
+      .job-card{padding:18px}
+      .job-top{grid-template-columns:1fr;gap:8px}
+      .job-side{text-align:left}
+      .bottom-actions{flex-direction:column}
+      .bottom-actions .btn{width:100%}
     }
   </style>
 </head>
@@ -365,6 +334,11 @@
             <p class="summary" id="v_summary">—</p>
           </div>
 
+          <div id="photosBox" class="photos-box">
+            <h2>Project Photos</h2>
+            <div id="jobImages" class="job-images"></div>
+          </div>
+
           <div class="bottom-actions">
             <a id="jobsLink" class="btn white" href="/jobs.html">Back to Matching Jobs</a>
             <a class="btn white" href="/index.html">Back to Home</a>
@@ -376,18 +350,13 @@
 
   <script>
     (async () => {
+      const SUPABASE_URL = "https://ekegbmhmgwxjqedkglvg.supabase.co";
+      const STORAGE_BUCKET = "homeowner_uploads";
+
       const params = new URLSearchParams(window.location.search);
 
-      const rawId =
-        params.get("id") ||
-        params.get("jobId") ||
-        params.get("job") ||
-        "";
-
-      const rawPublicId =
-        params.get("public_id") ||
-        params.get("publicId") ||
-        "";
+      const rawId = params.get("id") || params.get("jobId") || params.get("job") || "";
+      const rawPublicId = params.get("public_id") || params.get("publicId") || "";
 
       const jobId = rawId.trim();
       const publicId = rawPublicId.trim();
@@ -398,11 +367,12 @@
 
       const v_id = document.getElementById("v_id");
       const v_title = document.getElementById("v_title");
-      const v_category = document.getElementById("v_category");
-      const v_location = document.getElementById("v_location");
       const v_posted = document.getElementById("v_posted");
       const v_summary = document.getElementById("v_summary");
       const v_meta_line = document.getElementById("v_meta_line");
+
+      const photosBox = document.getElementById("photosBox");
+      const jobImages = document.getElementById("jobImages");
 
       const connectLink = document.getElementById("connectLink");
       const jobsLink = document.getElementById("jobsLink");
@@ -454,6 +424,73 @@
         loadingBox.style.display = "none";
         jobContent.style.display = "none";
         jobError.textContent = message || "Could not load this job right now.";
+      }
+
+      function publicStorageUrl(path) {
+        return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${encodeURIComponent(path).replaceAll("%2F", "/")}`;
+      }
+
+      function renderJobPhotos(resolvedPublicId, job) {
+        if (!resolvedPublicId || !jobImages || !photosBox) return;
+
+        const paths = [];
+
+        if (Array.isArray(job?.photos)) {
+          job.photos.forEach((p) => {
+            if (typeof p === "string") paths.push(p);
+            else if (p?.path) paths.push(p.path);
+          });
+        }
+
+        if (Array.isArray(job?.image_paths)) {
+          job.image_paths.forEach((p) => {
+            if (typeof p === "string") paths.push(p);
+          });
+        }
+
+        if (Array.isArray(job?.photo_paths)) {
+          job.photo_paths.forEach((p) => {
+            if (typeof p === "string") paths.push(p);
+          });
+        }
+
+        // Temporary/manual test image for PBZ-46474.
+        // Later, when the upload form saves photo paths in DB, this fallback can be removed.
+        if (resolvedPublicId === "PBZ-46474" && paths.length === 0) {
+          paths.push("PBZ-46474/ROOF-TESTING.png");
+        }
+
+        const cleanPaths = [...new Set(paths.filter(Boolean))];
+
+        if (!cleanPaths.length) {
+          photosBox.style.display = "none";
+          return;
+        }
+
+        jobImages.innerHTML = "";
+
+        cleanPaths.forEach((path) => {
+          const img = document.createElement("img");
+          img.className = "job-image";
+          img.alt = "Project photo";
+          img.loading = "lazy";
+          img.src = publicStorageUrl(path);
+
+          img.addEventListener("click", () => {
+            window.open(img.src, "_blank", "noopener,noreferrer");
+          });
+
+          img.onerror = () => {
+            img.remove();
+            if (!jobImages.children.length) {
+              photosBox.style.display = "none";
+            }
+          };
+
+          jobImages.appendChild(img);
+        });
+
+        photosBox.style.display = "block";
       }
 
       const storedPro = getStoredPro();
@@ -510,32 +547,18 @@
         const resolvedId = j.id || jobId || "—";
         const resolvedPublicId = j.public_id || publicId || "";
 
-        const title =
-          j.project_title ||
-          j.title ||
-          j.category ||
-          "Untitled job";
-
-        const category =
-          j.category ||
-          "—";
-
-        const location =
-          [j.city, j.state].filter(Boolean).join(", ") ||
-          j.full_address ||
-          "—";
-
-        const summary =
-          j.short_summary ||
-          j.full_description ||
-          j.description ||
-          "No project description provided yet.";
+        const title = j.project_title || j.title || j.category || "Untitled job";
+        const category = j.category || "—";
+        const location = [j.city, j.state].filter(Boolean).join(", ") || j.full_address || "—";
+        const summary = j.short_summary || j.full_description || j.description || "No project description provided yet.";
 
         v_id.textContent = resolvedPublicId || resolvedId;
         v_title.textContent = title;
         v_posted.textContent = formatDate(j.created_at);
         v_summary.textContent = summary;
         v_meta_line.textContent = [location, category].filter(Boolean).join(" • ");
+
+        renderJobPhotos(resolvedPublicId, j);
 
         const messageUrl = new URL("/pro-offer.html", window.location.origin);
 
