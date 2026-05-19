@@ -10,11 +10,7 @@ const HEADERS = {
 };
 
 function json(statusCode, body) {
-  return {
-    statusCode,
-    headers: HEADERS,
-    body: JSON.stringify(body),
-  };
+  return { statusCode, headers: HEADERS, body: JSON.stringify(body) };
 }
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -29,7 +25,6 @@ const RESEND_FROM_EMAIL =
 
 function buildClient() {
   if (!supabaseUrl || !supabaseKey) return null;
-
   return createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false },
   });
@@ -37,6 +32,10 @@ function buildClient() {
 
 function normalize(value) {
   return String(value || "").trim();
+}
+
+function normalizeEmail(value) {
+  return normalize(value).toLowerCase();
 }
 
 function escapeHtml(value) {
@@ -50,58 +49,51 @@ function escapeHtml(value) {
 
 function shortText(value, max = 500) {
   const text = String(value || "").trim();
-  if (!text) return "";
   return text.length > max ? text.slice(0, max).trim() + "..." : text;
 }
 
 async function grantJobAccess(supabase, jobId, builderEmail) {
   if (!jobId || !builderEmail) {
-    return {
-      granted: false,
-      reason: "Missing job_id or builder email",
-    };
+    return { granted: false, reason: "Missing job_id or builder email" };
   }
 
-  const cleanEmail = normalize(builderEmail).toLowerCase();
+  const cleanEmail = normalizeEmail(builderEmail);
 
-  const { data: proRow, error: proError } = await supabase
+  const { data: proRows, error: proError } = await supabase
     .from("pros")
-    .select("id, email")
+    .select("id, email, created_at")
     .ilike("email", cleanEmail)
-    .maybeSingle();
+    .order("created_at", { ascending: false })
+    .limit(1);
 
   if (proError) {
     console.error("grantJobAccess pro lookup error:", proError);
-    return {
-      granted: false,
-      reason: proError.message || "Failed to find pro",
-    };
+    return { granted: false, reason: proError.message || "Failed to find pro" };
   }
 
-  if (!proRow || !proRow.id) {
+  const proRow = Array.isArray(proRows) && proRows.length ? proRows[0] : null;
+
+  if (!proRow?.id) {
     console.warn("grantJobAccess skipped: pro not found for email", cleanEmail);
-    return {
-      granted: false,
-      reason: "Pro not found in pros table",
-    };
+    return { granted: false, reason: "Pro not found in pros table" };
   }
 
-  const { data: existingAccess, error: existingAccessError } = await supabase
+  const { data: existingRows, error: existingError } = await supabase
     .from("job_access")
     .select("job_id, pro_id, granted_at")
     .eq("job_id", jobId)
     .eq("pro_id", proRow.id)
-    .maybeSingle();
+    .limit(1);
 
-  if (existingAccessError) {
-    console.error("grantJobAccess existing access error:", existingAccessError);
+  if (existingError) {
+    console.error("grantJobAccess existing access error:", existingError);
     return {
       granted: false,
-      reason: existingAccessError.message || "Failed to check existing access",
+      reason: existingError.message || "Failed to check existing access",
     };
   }
 
-  if (existingAccess) {
+  if (Array.isArray(existingRows) && existingRows.length > 0) {
     return {
       granted: true,
       already_exists: true,
@@ -109,19 +101,17 @@ async function grantJobAccess(supabase, jobId, builderEmail) {
     };
   }
 
-  const { error: insertAccessError } = await supabase
-    .from("job_access")
-    .insert({
-      job_id: jobId,
-      pro_id: proRow.id,
-      granted_at: new Date().toISOString(),
-    });
+  const { error: insertError } = await supabase.from("job_access").insert({
+    job_id: jobId,
+    pro_id: proRow.id,
+    granted_at: new Date().toISOString(),
+  });
 
-  if (insertAccessError) {
-    console.error("grantJobAccess insert error:", insertAccessError);
+  if (insertError) {
+    console.error("grantJobAccess insert error:", insertError);
     return {
       granted: false,
-      reason: insertAccessError.message || "Failed to grant job access",
+      reason: insertError.message || "Failed to grant job access",
     };
   }
 
@@ -134,45 +124,29 @@ async function grantJobAccess(supabase, jobId, builderEmail) {
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: HEADERS,
-      body: "",
-    };
+    return { statusCode: 200, headers: HEADERS, body: "" };
   }
 
   if (event.httpMethod !== "POST") {
-    return json(405, {
-      ok: false,
-      error: "Method not allowed",
-    });
+    return json(405, { ok: false, error: "Method not allowed" });
   }
 
   if (!supabaseUrl || !supabaseKey) {
-    return json(500, {
-      ok: false,
-      error: "Missing Supabase env vars",
-    });
+    return json(500, { ok: false, error: "Missing Supabase env vars" });
   }
 
   let payload = {};
   try {
     payload = JSON.parse(event.body || "{}");
   } catch {
-    return json(400, {
-      ok: false,
-      error: "Invalid JSON body",
-    });
+    return json(400, { ok: false, error: "Invalid JSON body" });
   }
 
   const requestId = normalize(payload.request_id);
   const nextStatus = normalize(payload.status).toLowerCase();
 
   if (!requestId) {
-    return json(400, {
-      ok: false,
-      error: "Missing request_id",
-    });
+    return json(400, { ok: false, error: "Missing request_id" });
   }
 
   if (!["approved", "declined"].includes(nextStatus)) {
@@ -194,21 +168,12 @@ exports.handler = async (event) => {
 
     const { data: existingRequest, error: existingError } = await supabase
       .from("pro_offers")
-      .select(`
-        id,
-        job_id,
-        business_name,
-        email,
-        phone,
-        message,
-        status,
-        created_at
-      `)
+      .select("id, job_id, business_name, email, phone, message, status, created_at")
       .eq("id", requestId)
       .maybeSingle();
 
     if (existingError) {
-      console.error("update-request-status existing request error:", existingError);
+      console.error("existing request error:", existingError);
       return json(500, {
         ok: false,
         error: existingError.message || "Failed to load request",
@@ -216,30 +181,18 @@ exports.handler = async (event) => {
     }
 
     if (!existingRequest) {
-      return json(404, {
-        ok: false,
-        error: "Request not found",
-      });
+      return json(404, { ok: false, error: "Request not found" });
     }
 
     const { data: updatedRequest, error: updateError } = await supabase
       .from("pro_offers")
       .update({ status: nextStatus })
       .eq("id", requestId)
-      .select(`
-        id,
-        job_id,
-        business_name,
-        email,
-        phone,
-        message,
-        status,
-        created_at
-      `)
+      .select("id, job_id, business_name, email, phone, message, status, created_at")
       .maybeSingle();
 
     if (updateError) {
-      console.error("update-request-status update error:", updateError);
+      console.error("update request error:", updateError);
       return json(500, {
         ok: false,
         error: updateError.message || "Failed to update request status",
@@ -247,10 +200,7 @@ exports.handler = async (event) => {
     }
 
     if (!updatedRequest) {
-      return json(404, {
-        ok: false,
-        error: "Request not found after update",
-      });
+      return json(404, { ok: false, error: "Request not found after update" });
     }
 
     let jobRow = null;
@@ -282,7 +232,7 @@ exports.handler = async (event) => {
         .maybeSingle();
 
       if (jobError) {
-        console.error("update-request-status job lookup error:", jobError);
+        console.error("job lookup error:", jobError);
       } else {
         jobRow = jobData || null;
       }
@@ -304,42 +254,35 @@ exports.handler = async (event) => {
     if (nextStatus === "approved") {
       if (!updatedRequest.email) {
         emailError = "Missing builder email";
-        console.error("update-request-status email skipped: missing builder email");
       } else if (!RESEND_API_KEY) {
         emailError = "Missing RESEND_API_KEY";
-        console.error("update-request-status email skipped: missing RESEND_API_KEY");
       } else {
         try {
           const { Resend } = await import("resend");
           const resend = new Resend(RESEND_API_KEY);
 
           const jobTitle =
-            (jobRow && (jobRow.project_title || jobRow.title || jobRow.category)) ||
+            jobRow?.project_title ||
+            jobRow?.title ||
+            jobRow?.category ||
             "your project";
 
           const homeownerName =
-            (jobRow && (jobRow.contact_name || jobRow.name)) ||
-            "Homeowner";
+            jobRow?.contact_name || jobRow?.name || "Homeowner";
 
-          const homeownerEmail =
-            (jobRow && jobRow.email) ||
-            null;
-
-          const homeownerPhone =
-            (jobRow && jobRow.phone) ||
-            null;
+          const homeownerEmail = jobRow?.email || null;
+          const homeownerPhone = jobRow?.phone || null;
 
           const locationText = jobRow
             ? [jobRow.city, jobRow.state].filter(Boolean).join(", ")
             : "";
 
           const projectSummary = shortText(
-            (jobRow && (
-              jobRow.short_summary ||
-              jobRow.summary ||
-              jobRow.full_description ||
-              jobRow.description
-            )) || "",
+            jobRow?.short_summary ||
+              jobRow?.summary ||
+              jobRow?.full_description ||
+              jobRow?.description ||
+              "",
             400
           );
 
@@ -351,7 +294,7 @@ exports.handler = async (event) => {
 
           const html = `
             <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111827;">
-              <h2 style="margin-bottom: 10px;">Your request was approved on ProBuildZone</h2>
+              <h2>Your request was approved on ProBuildZone</h2>
 
               <p>Hi ${escapeHtml(updatedRequest.business_name || "Builder")},</p>
 
@@ -360,16 +303,16 @@ exports.handler = async (event) => {
                 <strong>${escapeHtml(jobTitle)}</strong>.
               </p>
 
-              <h3 style="margin-top: 22px; margin-bottom: 10px;">Project</h3>
-              <ul style="padding-left: 18px;">
+              <h3>Project</h3>
+              <ul>
                 <li><strong>Title:</strong> ${escapeHtml(jobTitle)}</li>
-                ${jobRow && jobRow.public_id ? `<li><strong>Project ID:</strong> ${escapeHtml(jobRow.public_id)}</li>` : ""}
+                ${jobRow?.public_id ? `<li><strong>Project ID:</strong> ${escapeHtml(jobRow.public_id)}</li>` : ""}
                 ${locationText ? `<li><strong>Location:</strong> ${escapeHtml(locationText)}</li>` : ""}
                 ${projectSummary ? `<li><strong>Summary:</strong> ${escapeHtml(projectSummary)}</li>` : ""}
               </ul>
 
-              <h3 style="margin-top: 22px; margin-bottom: 10px;">Homeowner Contact</h3>
-              <ul style="padding-left: 18px;">
+              <h3>Homeowner Contact</h3>
+              <ul>
                 <li><strong>Name:</strong> ${escapeHtml(homeownerName)}</li>
                 ${homeownerEmail ? `<li><strong>Email:</strong> ${escapeHtml(homeownerEmail)}</li>` : ""}
                 ${homeownerPhone ? `<li><strong>Phone:</strong> ${escapeHtml(homeownerPhone)}</li>` : ""}
@@ -378,7 +321,7 @@ exports.handler = async (event) => {
               ${
                 safeMessage
                   ? `
-                    <h3 style="margin-top: 22px; margin-bottom: 10px;">Your Original Message</h3>
+                    <h3>Your Original Message</h3>
                     <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:12px;">
                       ${safeMessage}
                     </div>
@@ -386,13 +329,13 @@ exports.handler = async (event) => {
                   : ""
               }
 
-              <p style="margin-top: 22px;">
+              <p>
                 You may now contact the homeowner professionally to discuss timeline, pricing, and next steps.
               </p>
             </div>
           `;
 
-          const resendResponse = await resend.emails.send({
+          await resend.emails.send({
             from: RESEND_FROM_EMAIL,
             to: updatedRequest.email,
             subject,
@@ -400,11 +343,10 @@ exports.handler = async (event) => {
             reply_to: homeownerEmail || undefined,
           });
 
-          console.log("update-request-status resend success:", resendResponse);
           emailSent = true;
         } catch (emailErr) {
           emailError = emailErr?.message || "Failed to send email";
-          console.error("update-request-status approval email error:", emailErr);
+          console.error("approval email error:", emailErr);
         }
       }
     }
@@ -416,7 +358,11 @@ exports.handler = async (event) => {
         ? {
             id: jobRow.id || null,
             public_id: jobRow.public_id || null,
-            title: jobRow.project_title || jobRow.title || jobRow.category || "Untitled project",
+            title:
+              jobRow.project_title ||
+              jobRow.title ||
+              jobRow.category ||
+              "Untitled project",
             category: jobRow.category || null,
             city: jobRow.city || null,
             state: jobRow.state || null,
