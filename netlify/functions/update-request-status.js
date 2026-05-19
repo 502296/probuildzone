@@ -54,6 +54,84 @@ function shortText(value, max = 500) {
   return text.length > max ? text.slice(0, max).trim() + "..." : text;
 }
 
+async function grantJobAccess(supabase, jobId, builderEmail) {
+  if (!jobId || !builderEmail) {
+    return {
+      granted: false,
+      reason: "Missing job_id or builder email",
+    };
+  }
+
+  const cleanEmail = normalize(builderEmail).toLowerCase();
+
+  const { data: proRow, error: proError } = await supabase
+    .from("pros")
+    .select("id, email")
+    .ilike("email", cleanEmail)
+    .maybeSingle();
+
+  if (proError) {
+    console.error("grantJobAccess pro lookup error:", proError);
+    return {
+      granted: false,
+      reason: proError.message || "Failed to find pro",
+    };
+  }
+
+  if (!proRow || !proRow.id) {
+    console.warn("grantJobAccess skipped: pro not found for email", cleanEmail);
+    return {
+      granted: false,
+      reason: "Pro not found in pros table",
+    };
+  }
+
+  const { data: existingAccess, error: existingAccessError } = await supabase
+    .from("job_access")
+    .select("job_id, pro_id, granted_at")
+    .eq("job_id", jobId)
+    .eq("pro_id", proRow.id)
+    .maybeSingle();
+
+  if (existingAccessError) {
+    console.error("grantJobAccess existing access error:", existingAccessError);
+    return {
+      granted: false,
+      reason: existingAccessError.message || "Failed to check existing access",
+    };
+  }
+
+  if (existingAccess) {
+    return {
+      granted: true,
+      already_exists: true,
+      pro_id: proRow.id,
+    };
+  }
+
+  const { error: insertAccessError } = await supabase
+    .from("job_access")
+    .insert({
+      job_id: jobId,
+      pro_id: proRow.id,
+      granted_at: new Date().toISOString(),
+    });
+
+  if (insertAccessError) {
+    console.error("grantJobAccess insert error:", insertAccessError);
+    return {
+      granted: false,
+      reason: insertAccessError.message || "Failed to grant job access",
+    };
+  }
+
+  return {
+    granted: true,
+    already_exists: false,
+    pro_id: proRow.id,
+  };
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -210,6 +288,16 @@ exports.handler = async (event) => {
       }
     }
 
+    let accessResult = null;
+
+    if (nextStatus === "approved") {
+      accessResult = await grantJobAccess(
+        supabase,
+        updatedRequest.job_id,
+        updatedRequest.email
+      );
+    }
+
     let emailSent = false;
     let emailError = null;
 
@@ -334,6 +422,7 @@ exports.handler = async (event) => {
             state: jobRow.state || null,
           }
         : null,
+      access: accessResult,
       approved_builder:
         nextStatus === "approved"
           ? {
