@@ -335,15 +335,34 @@ exports.handler = async (event) => {
             </div>
           `;
 
-          await resend.emails.send({
-            from: RESEND_FROM_EMAIL,
-            to: updatedRequest.email,
-            subject,
-            html,
-            reply_to: homeownerEmail || undefined,
-          });
+        const resendResult = await resend.emails.send({
+  from: RESEND_FROM_EMAIL,
+  to: updatedRequest.email,
+  subject,
+  html,
+  reply_to: homeownerEmail || undefined,
+});
 
-          emailSent = true;
+console.log(
+  "Resend approval email result:",
+  JSON.stringify(resendResult)
+);
+
+if (resendResult?.error) {
+  emailSent = false;
+
+  emailError =
+    resendResult.error.message ||
+    JSON.stringify(resendResult.error) ||
+    "Resend failed to send approval email";
+
+  console.error(
+    "Resend approval email failed:",
+    resendResult.error
+  );
+} else {
+  emailSent = true;
+}
         } catch (emailErr) {
           emailError = emailErr?.message || "Failed to send email";
           console.error("approval email error:", emailErr);
